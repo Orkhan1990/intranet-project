@@ -5,7 +5,9 @@ import { AllEntites } from "./AllEntites"
 export class User extends AllEntites {
    
 
-    @Column()
+    @Column({
+        unique:true
+    })
     userName: string
 
     @Column({
