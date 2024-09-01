@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Table } from "flowbite-react";
+import { ClientType } from "../types/types";
+
+
 
 
 const ClientList = () => {
@@ -11,11 +14,11 @@ const ClientList = () => {
   })
   // console.log(discountData);
 
-  const handleChange=(e)=>{
+  const handleChange=(e:React.ChangeEvent<HTMLInputElement>):void=>{
     setDiscountData({...discountData,[e.target.id]:e.target.value})
   }
  
-  const  handleSubmit=async(id)=>{
+  const  handleSubmit=async(id:number)=>{
     console.log(id,discountData)
     try {
       const res = await fetch(
@@ -34,7 +37,7 @@ const ClientList = () => {
       const data=await res.json();
       console.log(data);
 
-    } catch (error) {
+    } catch (error:any) {
       setError(error.message)
     }
 
@@ -58,7 +61,7 @@ const ClientList = () => {
           setError(data.message);
         }
         setClients(data);
-      } catch (error) {
+      } catch (error:any) {
         setError(error.message);
       }
     };
@@ -81,7 +84,7 @@ const ClientList = () => {
         </Table.Head>
         <Table.Body className="divide-y">
 
-        {clients.map((item, index) => (
+        {clients.map((item:ClientType, index:number) => (
             <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
             <Table.Cell>{index+1}</Table.Cell>
             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">

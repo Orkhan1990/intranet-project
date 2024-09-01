@@ -17,6 +17,7 @@ import {
   import { FiPrinter } from "react-icons/fi";
   import { Formik, Form, Field, ErrorMessage, FieldArray } from "formik";
   import * as Yup from "yup";
+import { ClientType, NewCardInitialValues } from "../types/types";
   
   const types = [
     "Tiqac",
@@ -27,46 +28,7 @@ import {
     "Diger Texnika",
   ];
   
-  interface NewCardInitialValues  {
-    clientId:number,
-    type: string,
-    manufactured:string,
-    model:string,
-    sassi:string,
-    carNumber:string,
-    produceDate: string,
-    km: string,
-    qostNumber:string,
-    paymentType: string,
-    nds: boolean,
-    repairAgain: boolean,
-    servisInfo: boolean,
-    comments:string,
-    recommendation: string,
-    problems: [
-      {
-        description: string,
-        serviceWorkers:string[],
-      },
-    ],
-    jobs: [
-      {
-        code: string,
-        name: string,
-        av:number,
-        price: number,
-        discount: number,
-        oil:string,
-        jobWorkers:[{ workerAv: string, workerId: string }],
-      },
-    ],
-    expences: [
-      {
-        description: string,
-        price: number,
-      },
-    ],
-  };
+ 
   
   const NewCard = () => {
     const [errorMessage, setErrorMessage] = useState(false);
@@ -175,7 +137,7 @@ import {
       getClients();
     }, []);
   
-    const onSubmit = (values, props) => {
+    const onSubmit = (values:NewCardInitialValues) => {
       console.log(values);
     };
     return (
@@ -195,8 +157,8 @@ import {
                     name="clientId"
                   >
                     <option value="">Müştərini seç</option>
-                    {clients.map((item, index) => (
-                      <option value={item._id} key={index}>
+                    {clients.map((item:ClientType, index:number) => (
+                      <option value={item.id} key={index}>
                         {item.companyName}
                       </option>
                     ))}
@@ -468,7 +430,7 @@ import {
               {/* -------------------------------------------------------------------------------------------- */}
               {/* PROBLEM SECTION */}
               <FieldArray name="problems">
-                {({ push, remove }) => (
+                {({ push }) => (
                   <>
                     {values.problems.map((_, index) => (
                       <div key={index}>
@@ -502,7 +464,7 @@ import {
               {/* -----------------------------------------------------------------------------------------          */}
               {/* JOBS SECTION */}
               <FieldArray name="jobs">
-                {({ push, remove }) => (
+                {({ push }) => (
                   <div className="border p-5 rounded-md  overflow-x-scroll">
                     <h2 className="mb-4">İşçilik</h2>
                     <Table>
@@ -515,13 +477,11 @@ import {
                         <Table.HeadCell>Yağ</Table.HeadCell>
                         <Table.HeadCell>Görüldü</Table.HeadCell>
                       </Table.Head>
-                      {values.jobs.map((_, index) => (
+                      {values.jobs.map((_, index:number) => (
                         <NewCardWorkers
                           workers={workers}
                           name={`jobs[${index}]`}
                           values={values.jobs[index]}
-                          index={index}
-                          setFieldValue={setFieldValue}
                         />
                       ))}
                     </Table>
@@ -557,7 +517,7 @@ import {
               {/*EXPENCES*/}
   
               <FieldArray name="expences">
-                {({ push, remove }) => (
+                {({ push }) => (
                   <>
                     {values.expences.map((_, index) => (
                       <AddCharges name={`expences[${index}]`} />

@@ -2,7 +2,15 @@ import { Button, TextInput } from 'flowbite-react'
 import { Field } from 'formik'
 import React, { useState } from 'react'
 
-const AddCharges = ({name,push}) => {
+
+interface AddChargesProps{
+  name:string
+}
+
+
+
+
+const AddCharges = ({name}:AddChargesProps) => {
 
  
   return (

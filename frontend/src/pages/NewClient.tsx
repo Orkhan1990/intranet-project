@@ -1,20 +1,41 @@
 import { Button, Label, Select, TextInput, Textarea } from "flowbite-react";
-import React, { useState } from "react";
-import {useSelector} from "react-redux";
+import { Form, Formik } from "formik";
+import { useState } from "react";
+import { ClientType} from "../types/types";
+// import { useAppSelector } from "../redux-toolkit/hooks/hooks";
+
+
+
 
 const NewClient = () => {
   const [formData, setFormData] = useState({});
   const[error,setError]=useState(false);
   const[success,setSuccess]=useState("");
 
-const {currentUser}=useSelector(state=>state.auth);
+// const {currentUser}=useAppSelector(state=>state.auth);
 
-
+   const initialValues:ClientType={
+    companyName:"",
+    companyRepresentative:"",
+    phoneNumber:"",
+    email:"",
+    address:"",
+    requisite:"",
+    voen:"",
+    contractNumber:"",
+    contractDate:"",
+    approver:"",
+    oneCCode:"",
+    type:"",
+    typeOfStatus:"",
+    av:0,
+    partsDiscount:0
+   }
   // console.log(currentUser);
   console.log(formData);
 
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e:any) => {
     e.preventDefault();
     try {
 
@@ -34,16 +55,16 @@ const {currentUser}=useSelector(state=>state.auth);
        }
       //  console.log(data);
        if(res.ok){
-         setSuccess(`${formData.companyName} şirkəti yaradıldı`);
-         setError("")
+        //  setSuccess(`${formData.companyName} şirkəti yaradıldı`);
+         setError(false)
        }
 
       
-    } catch (error) {
+    } catch (error:any) {
       setError(error.message);
     }
   };
-  const handleChange = async (e) => {
+  const handleChange = async (e:any) => {
     setFormData({...formData,[e.target.id]:e.target.value})
   };
 
@@ -51,8 +72,10 @@ const {currentUser}=useSelector(state=>state.auth);
     <div className="min-h-screen ">
       <div className="m-10 max-w-2xl mx-auto">
         <h2 className="text-2xl text-center font-semibold">Yeni müştəri</h2>
-        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-          <div>
+        <Formik initialValues={initialValues} className="flex flex-col gap-5" onSubmit={onSubmit}>
+          {({values})=>(
+           <Form>
+           <div>
             <Label htmlFor="companyName" value="Şirkət adı" />
             <TextInput
               id="companyName"
@@ -185,7 +208,10 @@ const {currentUser}=useSelector(state=>state.auth);
           <Button type="submit" color="blue" className="w-[200px]">
             Yadda Saxla
           </Button>
-        </form>
+           </Form>
+          )}
+         
+        </Formik>
         {
           error&&<p className="text-red-600">{error}</p>
         }

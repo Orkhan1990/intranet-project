@@ -1,11 +1,16 @@
-import { Table, Button, TextInput } from "flowbite-react";
+import { Table, TextInput } from "flowbite-react";
 import { FaArrowAltCircleUp } from "react-icons/fa";
-import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import NewCardWorkersName from "./NewCardWorkersName";
 import { Field, FieldArray } from "formik";
 
-const NewCardWorkers = ({ workers, values, name,setFieldValue }) => {
+interface NewCardWorkersProp{
+  workers:Array<object>,
+  values:object,
+  name:string,
+}
+
+const NewCardWorkers = ({ workers, values, name}:NewCardWorkersProp) => {
   return (
     <Table.Body>
       <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
@@ -25,7 +30,7 @@ const NewCardWorkers = ({ workers, values, name,setFieldValue }) => {
               className="w-[300px]"
               name={`${name}.name`}
             />
-            <Link>
+            <Link to="">
               <FaArrowAltCircleUp className="text-2xl text-green-600" />
             </Link>
           </div>
@@ -66,7 +71,7 @@ const NewCardWorkers = ({ workers, values, name,setFieldValue }) => {
           <FieldArray name={`${name}.jobWorkers`}>
             {({ push, remove }) => (
               <div className="flex flex-col gap-2">
-                {values.jobWorkers.map((_, index) => (
+                {values.jobWorkers.map((_, index:number) => (
                   <NewCardWorkersName
                     workers={workers}
                     name={`${name}.jobWorkers[${index}]`}
