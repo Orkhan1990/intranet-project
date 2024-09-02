@@ -8,7 +8,8 @@ import {
   } from "flowbite-react";
   import { Field, FieldArray, Form, Formik } from "formik";
   import PartsList from "../components/PartsList";
-  import React, { useEffect, useState } from "react";
+  import{ useEffect, useState } from "react";
+import { ClientType } from "../types/types";
   
   const orderInitialValues = {
     project: "",
@@ -44,7 +45,7 @@ import {
     const [clients, setClients] = useState([]);
     const [error, setError] = useState("");
   
-    const onSubmit = (props, values) => {
+    const onSubmit = ( values:any) => {
       console.log(values);
     };
   
@@ -67,7 +68,7 @@ import {
             setError(data.message);
           }
           setClients(data);
-        } catch (error) {
+        } catch (error:any) {
           setError(error.message);
         }
       };
@@ -81,7 +82,7 @@ import {
           Ehtiyyat hissələrin sifarişi
         </h2>
         <Formik initialValues={orderInitialValues} onSubmit={onSubmit}>
-          {({ props, values }) => (
+          {({ values }) => (
             <Form className="flex flex-col gap-5">
               <div className="flex gap-2 items-center">
                 <label htmlFor="" className="w-[100px]">
@@ -117,7 +118,7 @@ import {
                 </label>
                 <Field as={Select} className="w-[200px]" name="client">
                   {
-                      clients.map((client,index)=>(
+                      clients.map((client:ClientType,index)=>(
                           <option value={client.id} key={index}>{client.companyName}</option>
   
                       ))

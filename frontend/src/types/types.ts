@@ -14,7 +14,7 @@ export interface ClientType{
      type:string,
      typeOfStatus:string,
      av:number,
-     partsDiscount:number
+     partsDiscount:number,
   }
 
 

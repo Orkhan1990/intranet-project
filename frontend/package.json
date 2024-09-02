@@ -13,6 +13,7 @@
     "@reduxjs/toolkit": "^2.2.7",
     "@types/react-redux": "^7.1.33",
     "@types/react-router-dom": "^5.3.3",
+    "@types/yup": "^0.32.0",
     "flowbite-react": "^0.10.1",
     "formik": "^2.4.6",
     "react": "^18.3.1",

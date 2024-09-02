@@ -1,25 +1,31 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button, Label, TextInput } from "flowbite-react";
 import {Link} from "react-router-dom";
+import { Form, Formik } from 'formik';
 
+
+
+
+interface SignUpInterface{
+  userName:string,
+  email:string,
+  password:string
+}
 
 
 const SignUp = () => {
-  const[error,setError]=useState(false);
-  const[success,setSuccess]=useState(false);
-  const[formData,setFormData]=useState({
-    username:"",
+  const[error,setError]=useState("");
+  const[success,setSuccess]=useState("");
+ 
+   const initialValues:SignUpInterface={
+    userName:"",
     email:"",
     password:""
-  })
-   console.log(formData);
-  const handleChange=(e)=>{
-     setFormData({...formData,[e.target.id]:e.target.value})
-  }
+   }
 
-  const handleFormSubmit=async(e)=>{
+  const onSubmit=async(e:any,values:any)=>{
     e.preventDefault();
-    if(formData.username===""||formData.email===""||formData.password===""){
+    if(values.userName===""||values.email===""||values.password===""){
       return setError("Xanaları doldur!!")
     }
      try {
@@ -28,7 +34,7 @@ const SignUp = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(values)
       });
       
       const data=await res.json();
@@ -42,7 +48,7 @@ const SignUp = () => {
         setSuccess("İstifadəçi uğurla qeydiyyatdan keçdi!")
       }
       setError("")
-     } catch (error) {
+     } catch (error:any) {
        setError(error.message)
        setSuccess("")
      }
@@ -52,21 +58,23 @@ const SignUp = () => {
         <div className='bgFon min-h-screen flex justify-center items-center'>
             <div className='text-white w-[350px]'>
                 <h1 className='text-center text-3xl font-semibold'>Qeydiyyatdan keç</h1>
-                <form  className='flex flex-col gap-3 mt-5' onSubmit={handleFormSubmit}>
-                    <div>
-                    <Label htmlFor="username" value="İstifadəçi adı"  className='text-white text-md'/>
-                    <TextInput id="username" type="text" placeholder="İstifadəçi adı" required  onChange={handleChange}/>
+                <Formik initialValues={initialValues} onSubmit={onSubmit}>
+                  <Form className='flex flex-col gap-3 mt-5'>
+                  <div>
+                    <Label htmlFor="userName" value="İstifadəçi adı"  className='text-white text-md'/>
+                    <TextInput id="userName" type="text" placeholder="İstifadəçi adı" required  name="userName"/>
                     </div>
                     <div>
                     <Label htmlFor="email" value="Elektron ünvan"  className='text-white text-md'/>
-                    <TextInput id="email" type="email" placeholder="Elektron ünvan" required onChange={handleChange}/>
+                    <TextInput id="email" type="email" placeholder="Elektron ünvan" required name="email"/>
                     </div>
                     <div>
                     <Label htmlFor="password" value="Şifrə" className='text-white text-md'/>
-                    <TextInput id="password" type="password"  onChange={handleChange}/>
+                    <TextInput id="password" type="password"  name="password"/>
                     </div>
                     <Button type='submit'>Qeydiyyatdan keç</Button>
-                </form>
+                  </Form>
+                </Formik>
                 <p className='mt-2 text-sm'>Hesab varsa? <Link to={"/sign-in"} className='text-sky-300' >Daxil ol</Link></p>
                 {
                   !error&&success&&(<p className='mt-2 text-sm text-green-300'>{success}</p>)

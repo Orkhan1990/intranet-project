@@ -5,9 +5,8 @@ import {
     Button,
     Table,
     Textarea,
-    Checkbox,
   } from "flowbite-react";
-  import React, { useEffect, useState } from "react";
+  import { useEffect, useState } from "react";
   import { Link } from "react-router-dom";
   import { FaPlus } from "react-icons/fa";
   import NewCardProblems from "../components/NewCardProblems";
@@ -15,8 +14,8 @@ import {
   import NewCardAddParts from "../components/NewCardAddParts";
   import AddCharges from "../components/AddCharges";
   import { FiPrinter } from "react-icons/fi";
-  import { Formik, Form, Field, ErrorMessage, FieldArray } from "formik";
-  import * as Yup from "yup";
+  import { Formik, Form, Field,FieldArray } from "formik";
+  // import * as Yup from "yup";
 import { ClientType, NewCardInitialValues } from "../types/types";
   
   const types = [

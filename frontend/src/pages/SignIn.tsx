@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, Label, TextInput } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { successStart } from "../redux/features/auth/authSlice";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { successStart } from "../redux-toolkit/feauters/authSlice";
+import { Formik, Form, Field} from "formik";
 import * as Yup from "yup";
 
 const singInInitialValues = {
@@ -17,59 +17,13 @@ const signInValidationSchema = Yup.object().shape({
 });
 
 const SignInn = () => {
-  const [error, setError] = useState(false);
-//   const [formData, setFormData] = useState({
-//     username: "",
-//     password: "",
-//   });
+  const [error, setError] = useState("");
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
-//   console.log(formData);
 
-  //   const handleChange = (e) => {
-  //     setFormData({ ...formData, [e.target.id]: e.target.value });
-  //   };
-  //   const handleFormSubmit = async (e) => {
-  //     e.preventDefault();
-  //     if (
-  //       formData.username === "" ||
-  //       formData.email === "" ||
-  //       formData.password === ""
-  //     ) {
-  //       return setError("Xanaları doldur!!");
-  //     }
 
-  //     try {
-  //       const res = await fetch("http://localhost:3004/api/v1/auth/signIn", {
-  //         method: "POST",
-  //         credentials: "include", // added this part
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify(formData),
-  //       });
-
-  //       const data = await res.json();
-  //       console.log(data);
-  //       if (data.success === false) {
-  //         setError(data.message);
-  //         return;
-  //       }
-  //       if (data.isWorker === true && !data.isAdmin) {
-  //         setError("Zəhmət olmasa administratorla əlaqə saxlayın !");
-  //         return;
-  //       }
-  //       if (res.ok) {
-  //         dispatch(successStart(data));
-  //         navigate("/");
-  //       }
-  //       setError("");
-  //     } catch (error) {
-  //       setError(error.message);
-  //     }
-  //   };
-
-  const onSubmit = async (values, props) => {
+  const onSubmit = async (values:any,props:any) => {
     try {
       const res = await fetch("http://localhost:3004/api/v1/auth/signIn", {
         method: "POST",
@@ -99,7 +53,7 @@ const SignInn = () => {
         navigate("/");
       }
       setError("");
-    } catch (error) {
+    } catch (error:any) {
       setError(error.message);
     }
   };
