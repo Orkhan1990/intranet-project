@@ -1,9 +1,7 @@
 import { Table } from 'flowbite-react';
-import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const NewCardAddParts = () => {
-    const[count,setCount]=useState(1);
   return (
     <div className="border p-5 rounded-md">
     <h2 className='font-semibold mb-5'>Ehtiyyat hissələri</h2>
@@ -30,8 +28,8 @@ const NewCardAddParts = () => {
     <span>0 AZN</span>
   </div>
   <div className='flex flex-col gap-1 mt-5 text-blue-700  w-[100px]'>
-    <Link className='hover:underline'>E/h əlavə et (barkod ilə)</Link>
-    <Link className='hover:underline'>E/h əlavə et </Link>
+    <Link to="" className='hover:underline'>E/h əlavə et (barkod ilə)</Link>
+    <Link to="" className='hover:underline'>E/h əlavə et </Link>
 
   </div>
   </div>

@@ -1,4 +1,16 @@
-export const navbarList = [
+
+
+export interface NavMenu{
+    title:string,
+    subItems:SubNavMenu[]
+}
+export interface SubNavMenu{
+    title:string,
+    url:string
+}
+
+
+export const navbarList:NavMenu[] = [
     {
       title: "Servis",
       subItems:[

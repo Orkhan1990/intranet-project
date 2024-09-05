@@ -6,7 +6,9 @@ import { Field, FieldArray } from "formik";
 
 interface NewCardWorkersProp{
   workers:Array<object>,
-  values:object,
+  values:{
+    jobWorkers:Array<any>
+  },
   name:string,
 }
 

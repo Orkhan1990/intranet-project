@@ -58,7 +58,7 @@ const UpdateClient = () => {
             return;
           }
            console.log(data);
-          setFormData(data)
+          // setFormData(data)
           
          } catch (error:any) {
             setError(error.message);
@@ -119,146 +119,137 @@ const UpdateClient = () => {
                   placeholder="Şirkət adı"
                   required
                   name="companyName"
-                  value={formData.companyName}
                 />
               </div>
     
               <div>
                 <Label htmlFor="companyRepresentative" value="Şirkət nümayəndəsi" />
-                <TextInput
+                <Field as={TextInput}
                   id="companyRepresentative"
                   type="text"
                   placeholder="Şirkət nümayəndəsi"
                   required
-                  onChange={handleChange}
-                  value={formData.companyRepresentative}
+                  name="companyRepresentative"
     
                 />
               </div>
               <div>
                 <Label htmlFor="phoneNumber" value="Telefon nömrəsi" />
-                <TextInput
+                <Field as={TextInput}
                   id="phoneNumber"
                   type="text"
                   placeholder="Telefon nömrəsi"
                   required
-                  onChange={handleChange}
-                  value={formData.phoneNumber       }
+                  name="phoneNumber"
+           
     
                 />
               </div>
     
               <div>
                 <Label htmlFor="email" value="Email" />
-                <TextInput
+                <Field as={TextInput}
                   id="email"
                   type="email"
                   placeholder="Email"
                   required
-                  onChange={handleChange}
-                  value={formData.email}
+                  name="email"
     
                 />
               </div>
     
               <div>
                 <Label htmlFor="address" value="Ünvan" />
-                <TextInput
+                <Field as={TextInput}
                   id="address"
                   type="text"
                   placeholder="Ünvan"
                   required
-                  onChange={handleChange}
-                  value={formData.address}
+                  name="address"
     
                 />
               </div>
     
               <div>
                 <Label htmlFor="requisite" value="Rekvizit" />
-                <Textarea
+                <Field as={Textarea}
                   id="requisite"
                   type="text"
                   placeholder="Rekvizitlər...."
                   rows={4}
                   required
-                  onChange={handleChange}
-                  value={formData.requisite}
+                  name="requisite"
     
                 />
               </div>
               <div>
                 <Label htmlFor="voen" value="Vöen" />
-                <TextInput id="voen" type="text" placeholder="Vöen" required onChange={handleChange} value={formData.voen}/>
+                <Field as={TextInput} id="voen" type="text" placeholder="Vöen" required />
               </div>
     
               <div>
                 <Label htmlFor="contractNumber" value="Müqavilə nömrəsi" />
-                <TextInput
+                <Field as={TextInput}
                   id="contractNumber"
                   type="text"
                   placeholder="Müqavilə nömrəsi"
                   required
-                  onChange={handleChange}
-                  value={formData.contractNumber}
+                  name="contractNumber"
     
                 />
               </div>
     
               <div>
                 <Label htmlFor="contractDate" value="Müqavilə tarixi" />
-                <TextInput
+                <Field as={TextInput}
                   id="contractDate"
                   type="text"
                   placeholder="Müqavilə tarixi"
                   required
-                  onChange={handleChange}
-                  value={formData.contractDate}
+                  name="contractDate"
     
                 />
               </div>
               <div>
                 <Label htmlFor="approver" value="Təsdiq edən şəxs" />
-                <TextInput
+                <Field as={TextInput}
                   id="approver"
                   type="text"
                   placeholder="Təsdiq edən şəxs"
                   required
-                  onChange={handleChange}
-                  value={formData.approver}
+                  name="approver"
     
                 />
               </div>
     
               <div>
                 <Label htmlFor="oneCCode" value="1C kod" />
-                <TextInput
+                <Field as={TextInput}
                   id="oneCCode"
                   type="text"
                   placeholder="1C kod"
                   required
-                  onChange={handleChange}
-                  value={formData.oneCCode}
+                 name="oneCCode"
     
                 />
               </div>
               <div className="flex gap-20">
                 <div>
                   <Label htmlFor="type" value="Tipi" />
-                  <Select id="type" required onChange={handleChange} value={formData.type}
+                  <Field as={Select} id="type" required name="type"
                   >
                     <option value={"customer"}>Müştəri</option>
                     <option value={"worker"}>Işçi</option>
                     <option value={"boss"}>Təsisçi</option>
                     <option value={"itb"}>İTB</option>
-                  </Select>
+                  </Field>
                 </div>
                 <div>
                   <Label htmlFor="typeOfStatus" value="FizikiHüquqi" />
-                  <Select id="typeOfStatus" required onChange={handleChange} value={formData.typeOfStatus}>
+                  <Field as={Select} id="typeOfStatus" required name="typeOfStatus">
                     <option value={"phisical"}>Fiziki</option>
                     <option value={"legal"}>Hüquqi</option>
-                  </Select>
+                  </Field>
                 </div>
               </div>
               <Button type="submit" color="blue" className="w-[200px]">

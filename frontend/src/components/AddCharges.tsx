@@ -1,6 +1,5 @@
-import { Button, TextInput } from 'flowbite-react'
+import {TextInput } from 'flowbite-react'
 import { Field } from 'formik'
-import React, { useState } from 'react'
 
 
 interface AddChargesProps{
@@ -23,8 +22,7 @@ const AddCharges = ({name}:AddChargesProps) => {
         <Field as={TextInput} type="text" name={`${name}.price`}/>
         <span>AZN</span>
         </div>
-        
-      </div>
+    </div>
 
   
   </div>

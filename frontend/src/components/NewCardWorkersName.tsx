@@ -1,11 +1,26 @@
 import { TextInput,Select, Button } from "flowbite-react";
 import { Field } from "formik";
-import React, {  useState } from "react";
 
-const NewCardWorkersName = ({workers,name,value,index,push,remove}) => {
- 
- 
 
+
+
+
+interface NewCardWorkersNameInterface{
+  workers:[
+    {
+      id:number,
+      firstName:string,
+      lastName:string
+    }
+  ],
+  index:number,
+  name:string,
+  push:(workerAv:string,workerId:string)=>void,
+  remove:(index:number)=>void
+}
+
+const NewCardWorkersName = ({workers,name,index,push,remove}:NewCardWorkersNameInterface) => {
+ 
   return (
     <div className=" flex flex-col gap-2">
    
@@ -24,7 +39,7 @@ const NewCardWorkersName = ({workers,name,value,index,push,remove}) => {
             {
               workers&&workers.map((worker,index)=>(
                
-                <option value={worker._id} key={index}>{worker.firstName+" "+worker.lastName}</option>
+                <option value={worker.id} key={index}>{worker.firstName+" "+worker.lastName}</option>
              
               ))
             }
