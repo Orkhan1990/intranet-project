@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, Label, TextInput } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { successStart } from "../redux-toolkit/feauters/authSlice";
+import { successStart } from "../redux-toolkit/features/auth/authSlice";
 import { Formik, Form, Field} from "formik";
 import * as Yup from "yup";
 
@@ -16,16 +16,16 @@ const signInValidationSchema = Yup.object().shape({
   password: Yup.string().required("Xananı doldur!"),
 });
 
-const SignInn = () => {
+const SignIn = () => {
   const [error, setError] = useState("");
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
 
-  const onSubmit = async (values:any,props:any) => {
+  const onSubmit = async (values:any, props:any) => {
     try {
-      const res = await fetch("http://localhost:3004/api/v1/auth/signIn", {
+      const res = await fetch("http://localhost:3006/api/v1/auth/signIn", {
         method: "POST",
         credentials: "include", // added this part
         headers: {
@@ -98,7 +98,7 @@ const SignInn = () => {
                 {props.errors.password&& (<p className="text-sm text-red-500">{props.errors.password}</p>)}
 
                 </div>
-                <Button type="submit" disabled={props.isSubmitting}>Daxil ol</Button>
+                <Button type="submit" disabled={props.isSubmitting} isProcessing={props.isSubmitting} className="!bg-cyan-700 hover:!bg-cyan-900">Daxil ol</Button>
               </Form>
             )}
           </Formik>
@@ -115,4 +115,4 @@ const SignInn = () => {
   );
 };
 
-export default SignInn;
+export default SignIn;

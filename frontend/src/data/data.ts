@@ -1,16 +1,15 @@
-
-
-export interface NavMenu{
-    title:string,
-    subItems:SubNavMenu[]
-}
-export interface SubNavMenu{
+ export  interface SubItemsInterface{
     title:string,
     url:string
 }
 
 
-export const navbarList:NavMenu[] = [
+ export interface NavbarListInterface{
+    title:string,
+    subItems:SubItemsInterface[]
+}
+
+export const navbarList:NavbarListInterface[] = [
     {
       title: "Servis",
       subItems:[
@@ -136,3 +135,5 @@ export const navbarList:NavMenu[] = [
       ]
     },
   ];
+  
+  

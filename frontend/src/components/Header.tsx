@@ -1,7 +1,9 @@
+
 import { Button } from "flowbite-react";
+// import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { signOut } from "../redux-toolkit/feauters/authSlice";
+import { signOut } from "../redux-toolkit/features/auth/authSlice";
 import SubMenu from "./SubMenu";
 import { CiSettings } from "react-icons/ci";
 import { navbarList } from "../data/data";
@@ -17,7 +19,12 @@ const Header = () => {
     dispatch(signOut());
   };
 
-
+  // const handleMouseEnter = () => {
+  //   setShowSubMenu(true);
+  // };
+  // const handleMouseLeave = () => {
+  //   setShowSubMenu(false);
+  // };
   
   
 

@@ -1,20 +1,22 @@
 import Header from './Header'
 import Footer from './Footer'
-import { ReactNode } from 'react';
+import { ReactNode } from 'react'
 
 
-
-interface LayoutProps {
-  children: ReactNode;
+interface LayoutInterface{
+  children:ReactNode
 }
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+
+
+
+const Layout:React.FC<LayoutInterface> = ({children}) => {
   return (
     <div className='h-screen'>
-      <Header />
-      {children}
-      <Footer />
+        <Header/>
+        {children}
+        <Footer/>
     </div>
-  );
-};
+  )
+}
 
 export default Layout

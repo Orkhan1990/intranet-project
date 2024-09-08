@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
-import { SubNavMenu } from "../data/data";
+import { SubItemsInterface } from "../data/data";
 
 
 
 interface DropdownInterface{
-  submenus:SubNavMenu[],
-  dropdown:boolean
+    submenus:SubItemsInterface[],
+    dropdown:boolean
 }
+
 const Dropdown = ({ submenus, dropdown }:DropdownInterface) => {
   return (
     <ul
@@ -14,7 +15,7 @@ const Dropdown = ({ submenus, dropdown }:DropdownInterface) => {
         dropdown ? "show" : "dropdown"
       }  dropdow_menu absolute servis_list z-10`}
     >
-      {submenus.map((submenu:SubNavMenu, index:number) => (
+      {submenus.map((submenu, index) => (
         <Link to={submenu.url}>
           <li key={index} className="">
             {submenu.title}

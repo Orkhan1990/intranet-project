@@ -1,7 +1,13 @@
-import{ useState } from "react";
+import { useState } from "react";
 import Dropdown from "./Dropdown";
+import { NavbarListInterface } from "../data/data";
 
-const SubMenu = ({item}) => {
+
+
+interface SubMenuInterface{
+   item:NavbarListInterface
+}
+const SubMenu = ({item}:SubMenuInterface) => {
   const [dropdown, setDropdown] = useState(false);
   return (
     <li onMouseEnter={() => setDropdown(true)} onMouseLeave={() => setDropdown(false)}>
