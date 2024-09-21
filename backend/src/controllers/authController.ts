@@ -2,8 +2,8 @@ import { NextFunction, Request,Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entites/User";
 import bcrypt from "bcrypt";
-import errorHandler from "../utilities/errorHandler";
 import jwt from "jsonwebtoken";
+import errorHandler from "../middleware/errorHandler";
 
 export const signIn=async(req:Request,res:Response,next:NextFunction)=>{
     try {
@@ -11,15 +11,13 @@ export const signIn=async(req:Request,res:Response,next:NextFunction)=>{
            const userRepository = AppDataSource.getRepository(User);
            const existUser=await userRepository.findOneBy({userName});
            if(!existUser){
-              next(errorHandler(401,"Belə bir istifadəçi yoxdur!"));
-              return;
+            next(errorHandler(401,"Belə bir istifadəçi yoxdur!"))
            }
 
            const isMatchPassword=bcrypt.compareSync(password,existUser.password);
 
            if(!isMatchPassword){
             next(errorHandler(401,"Şifrə uyğun deyil!"));
-            return;
            }
   
 
@@ -30,7 +28,7 @@ export const signIn=async(req:Request,res:Response,next:NextFunction)=>{
 
         
     } catch (error) {
-        next(errorHandler(401,error.message))  
+       next(errorHandler(401,error)) 
     }
 }
 
@@ -43,10 +41,10 @@ export const signUp=async(req:Request,res:Response,next:NextFunction)=>{
         const userRepository = AppDataSource.getRepository(User);
        const existUser=await userRepository.findOneBy({ email});
        
-    
-       if(existUser){
-         next(errorHandler(401,"Belə bir istifadəçi artıq mövcuddur!"))
-         return;
+        console.log(existUser);
+        
+       if(existUser===null){
+        next(errorHandler(401,"Belə bir istifadəçi artıq mövcuddur!")) 
        }
        const hashPassword=bcrypt.hashSync(password,10)
         const user = new User();
@@ -58,6 +56,6 @@ export const signUp=async(req:Request,res:Response,next:NextFunction)=>{
     
         res.status(200).json(user);
       } catch (error) {
-        next(errorHandler(401,error.message));
+        next(errorHandler(401,error)) 
       }
 }

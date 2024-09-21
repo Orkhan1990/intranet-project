@@ -3,27 +3,34 @@ import { Button, Label, TextInput } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { successStart } from "../redux-toolkit/features/auth/authSlice";
-import { Formik, Form, Field} from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
-const singInInitialValues = {
-  username: "",
+
+
+interface SingInInitialValuesInterface{
+  userName:string,
+  password:string
+}
+
+
+const singInInitialValues:SingInInitialValuesInterface = {
+  userName: "",
   password: "",
 };
 
 const signInValidationSchema = Yup.object().shape({
-  username: Yup.string().required("Xananı doldur!"),
+  userName: Yup.string().required("Xananı doldur!"),
   password: Yup.string().required("Xananı doldur!"),
 });
 
 const SignIn = () => {
   const [error, setError] = useState("");
 
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-
-  const onSubmit = async (values:any, props:any) => {
+  const onSubmit = async (values: any, props: any) => {
     try {
       const res = await fetch("http://localhost:3006/api/v1/auth/signIn", {
         method: "POST",
@@ -46,14 +53,14 @@ const SignIn = () => {
       }
       if (res.ok) {
         dispatch(successStart(data));
-        setTimeout(()=>{
-            props.resetForm()
-            props.setSubmitting(false)
-        },2000)
+        setTimeout(() => {
+          props.resetForm();
+          props.setSubmitting(false);
+        }, 2000);
         navigate("/");
       }
       setError("");
-    } catch (error:any) {
+    } catch (error: any) {
       setError(error.message);
     }
   };
@@ -72,17 +79,21 @@ const SignIn = () => {
               <Form className="flex flex-col gap-3 mt-5">
                 <div className="flex flex-col gap-2 ">
                   <Label
-                    htmlFor="username"
+                    htmlFor="userName"
                     value="İstifadəçi adı"
                     className="text-white text-md"
                   />
                   <Field
                     type="text"
-                    name="username"
+                    name="userName"
                     placeholder="İstifadəçi adı"
                     as={TextInput}
                   />
-                  {props.errors.username&& (<p className="text-sm text-red-500">{props.errors.username}</p>)}
+                  <ErrorMessage
+                    name="userName"
+                    component="div"
+                    className="text-red-700"
+                  />
                 </div>
                 <div className="flex flex-col gap-2">
                   <Label
@@ -90,15 +101,21 @@ const SignIn = () => {
                     value="Şifrə"
                     className="text-white text-md"
                   />
-                  <Field 
-                  as={TextInput} 
-                  type="password"
-                   name="password"
-                   />
-                {props.errors.password&& (<p className="text-sm text-red-500">{props.errors.password}</p>)}
-
+                  <Field as={TextInput} type="password" name="password" />
+                  <ErrorMessage
+                    name="userName"
+                    component="div"
+                    className="text-red-700"
+                  />
                 </div>
-                <Button type="submit" disabled={props.isSubmitting} isProcessing={props.isSubmitting} className="!bg-cyan-700 hover:!bg-cyan-900">Daxil ol</Button>
+                <Button
+                  type="submit"
+                  disabled={props.isSubmitting}
+                  isProcessing={props.isSubmitting}
+                  className="!bg-cyan-700 hover:!bg-cyan-900"
+                >
+                  Daxil ol
+                </Button>
               </Form>
             )}
           </Formik>
