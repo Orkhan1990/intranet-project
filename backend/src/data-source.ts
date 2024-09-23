@@ -15,9 +15,16 @@ export const AppDataSource = new DataSource({
     database:DATABASE,
     entities: [User],
     synchronize: true,
-    logging: false,
 })
 
 // to initialize the initial connection with the database, register all entities
 // and "synchronize" database schema, call "initialize()" method of a newly created database
 // once in your application bootstrap
+AppDataSource.initialize()
+.then(() => {
+    console.log("Database connected successfuly!"); 
+})
+.catch((error) =>{
+  console.log(error);
+  
+})

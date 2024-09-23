@@ -32,7 +32,7 @@ const SignIn = () => {
 
   const onSubmit = async (values: any, props: any) => {
     try {
-      const res = await fetch("http://localhost:3006/api/v1/auth/signIn", {
+      const res = await fetch("http://localhost:3013/api/v1/auth/signIn", {
         method: "POST",
         credentials: "include", // added this part
         headers: {

@@ -34,7 +34,7 @@ const SignUp = () => {
   const onSubmit =async (values: any) => {
     console.log(values);
     try {
-          const res = await fetch("http://localhost:3006/api/v1/auth/signUp", {
+          const res = await fetch("http://localhost:3013/api/v1/auth/signUp", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

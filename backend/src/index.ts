@@ -23,18 +23,7 @@ app.use(cors());
 app.use("/api/v1/user",userRouter);
 app.use("/api/v1/auth",authRouter)
 
-  AppDataSource.initialize()
-  .then(() => {
-      console.log("Database connected successfuly!"); 
-  })
-  .catch((error) =>{
-    console.log(error);
-    
-    app.use((req:Request,res:Response,next:NextFunction)=>{ 
-      next(error)
-    })
-  })
-
+ 
 
 
 app.use((error:CustomError,req:Request,res:Response,next:NextFunction)=>{

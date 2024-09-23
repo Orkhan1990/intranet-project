@@ -1,12 +1,12 @@
 import { Entity, Column} from "typeorm"
 import { AllEntites } from "./AllEntites"
 
-@Entity()
+@Entity({name:"users"})
 export class User extends AllEntites {
    
 
     @Column({
-        unique:true
+       unique:true
     })
     userName: string
 

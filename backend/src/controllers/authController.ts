@@ -35,27 +35,42 @@ export const signIn=async(req:Request,res:Response,next:NextFunction)=>{
 
 
 export const signUp=async(req:Request,res:Response,next:NextFunction)=>{
+  
     try {
         const { userName, email, password } = req.body;
     
         const userRepository = AppDataSource.getRepository(User);
-       const existUser=await userRepository.findOneBy({ email});
+       const existUser= userRepository.createQueryBuilder("user").where("user.email=",{email}).orWhere("user.userName=",{userName});
+       console.log(existUser);
        
-        console.log(existUser);
+      
         
-       if(existUser===null){
+       if(existUser){
         next(errorHandler(401,"Belə bir istifadəçi artıq mövcuddur!")) 
+        return;
        }
-       const hashPassword=bcrypt.hashSync(password,10)
+       
+
+      //  if(existUserName){
+      //   next(errorHandler(401,"Belə bir istifadəçi artıq mövcuddur!")) 
+      //   return;
+      //  }
+    
+        const hashPassword=bcrypt.hashSync(password,10)
         const user = new User();
         user.userName = userName;
         user.email = email;
         user.password = hashPassword;
-    
+          console.log(user);
+          
         await userRepository.save(user);
     
         res.status(200).json(user);
+       
+      //  return next(errorHandler(401,"Belə bir istifadəçi artıq mövcuddur!"))
       } catch (error) {
+        console.log("salam");
+        
         next(errorHandler(401,error)) 
       }
 }
