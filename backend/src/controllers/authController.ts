@@ -41,9 +41,8 @@ export const signUp=async(req:Request,res:Response,next:NextFunction)=>{
         const userRepository = AppDataSource.getRepository(User);
        const existUser=await userRepository.findOneBy({ email});
        
-        console.log(existUser);
         
-       if(existUser===null){
+       if(existUser||existUser.userName===userName){
         next(errorHandler(401,"Belə bir istifadəçi artıq mövcuddur!")) 
        }
        const hashPassword=bcrypt.hashSync(password,10)

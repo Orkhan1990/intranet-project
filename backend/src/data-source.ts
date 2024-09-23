@@ -15,7 +15,7 @@ export const AppDataSource = new DataSource({
     database:DATABASE,
     entities: [User],
     synchronize: true,
-    logging: false,
+    logging: true
 })
 
 // to initialize the initial connection with the database, register all entities
