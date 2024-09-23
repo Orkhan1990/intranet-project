@@ -51,10 +51,7 @@ export const signUp=async(req:Request,res:Response,next:NextFunction)=>{
        }
        
 
-      //  if(existUserName){
-      //   next(errorHandler(401,"Belə bir istifadəçi artıq mövcuddur!")) 
-      //   return;
-      //  }
+     
     
         const hashPassword=bcrypt.hashSync(password,10)
         const user = new User();
@@ -67,7 +64,6 @@ export const signUp=async(req:Request,res:Response,next:NextFunction)=>{
     
         res.status(200).json(user);
        
-      //  return next(errorHandler(401,"Belə bir istifadəçi artıq mövcuddur!"))
       } catch (error) {
         console.log("salam");
         
