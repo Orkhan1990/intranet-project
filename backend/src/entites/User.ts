@@ -1,5 +1,7 @@
-import { Entity, Column} from "typeorm"
+import { Entity, Column, OneToMany} from "typeorm"
 import { AllEntites } from "./AllEntites"
+import { UserRole } from "../enums/userRole"
+import { Client } from "./Client"
 
 @Entity({name:"users"})
 export class User extends AllEntites {
@@ -25,6 +27,14 @@ export class User extends AllEntites {
     })
     email: string
 
+    @Column({
+        default:UserRole.User
+    })
+    userRole: UserRole
+
     @Column()
     password: string
+
+    @OneToMany(() => Client, (client) => client.user)
+    clients: Client[]
 }

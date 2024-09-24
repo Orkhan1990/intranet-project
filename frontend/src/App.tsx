@@ -5,6 +5,10 @@ import Protected from "./components/Protected";
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
+import Orders from './pages/Orders';
+import NewCard from './pages/NewCard';
+import NewClient from './pages/NewClient';
+import ClientList from './pages/ClientList';
 
 
 
@@ -13,7 +17,14 @@ function App() {
     <Router>
      <Routes>
       <Route element={<Protected/>}>
-      <Route path="/" element={<Layout><Home /></Layout>} />       
+      <Route path="/" element={<Layout><Home /></Layout>} />    
+      <Route path="/orders" element={<Layout><Orders/></Layout>} />     
+      <Route path="/newCard" element={<Layout><NewCard/></Layout>} />     
+      <Route path="/newClient" element={<Layout><NewClient/></Layout>} />       
+      <Route path="/clientList" element={<Layout><ClientList/></Layout>} />       
+
+  
+   
       </Route>
       <Route path="*" element={<NoPage />} />
       <Route path="/sign-in" element={<SignIn />} />

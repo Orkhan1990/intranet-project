@@ -2,10 +2,10 @@ import {CustomError} from "./middleware/errorHandler";
 import express,{Response,Request, NextFunction} from "express";
 import userRouter from "./routes/userRouter";
 import authRouter from "./routes/authRouter";
+import clientRouter from "./routes/clientRouter";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors  from "cors";
-import { AppDataSource } from "./data-source";
 dotenv.config();
 
 
@@ -22,6 +22,8 @@ app.use(cors());
 
 app.use("/api/v1/user",userRouter);
 app.use("/api/v1/auth",authRouter)
+app.use("/api/v1/client",clientRouter)
+
 
  
 

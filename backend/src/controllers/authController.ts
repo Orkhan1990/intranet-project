@@ -8,6 +8,8 @@ import errorHandler from "../middleware/errorHandler";
 export const signIn=async(req:Request,res:Response,next:NextFunction)=>{
     try {
            const{userName,password}=req.body;
+           console.log(req.body);
+           
            const userRepository = AppDataSource.getRepository(User);
            const existUser=await userRepository.findOneBy({userName});
            if(!existUser){
@@ -40,8 +42,7 @@ export const signUp=async(req:Request,res:Response,next:NextFunction)=>{
         const { userName, email, password } = req.body;
     
         const userRepository = AppDataSource.getRepository(User);
-       const existUser= userRepository.createQueryBuilder("user").where("user.email=",{email}).orWhere("user.userName=",{userName});
-       console.log(existUser);
+       const existUser=await userRepository.findOneBy({email});
        
       
         
@@ -50,7 +51,12 @@ export const signUp=async(req:Request,res:Response,next:NextFunction)=>{
         return;
        }
        
+       const existUserName=await userRepository.findOneBy({userName});
 
+       if(existUserName){
+        next(errorHandler(401,"Belə bir istifadəçi artıq mövcuddur!")) 
+        return;
+       }
      
     
         const hashPassword=bcrypt.hashSync(password,10)
@@ -58,15 +64,12 @@ export const signUp=async(req:Request,res:Response,next:NextFunction)=>{
         user.userName = userName;
         user.email = email;
         user.password = hashPassword;
-          console.log(user);
           
         await userRepository.save(user);
     
         res.status(200).json(user);
        
       } catch (error) {
-        console.log("salam");
-        
         next(errorHandler(401,error)) 
       }
 }
