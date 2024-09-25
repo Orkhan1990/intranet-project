@@ -1,10 +1,9 @@
 import { Button, Label, Select, TextInput, Textarea } from "flowbite-react";
-import { Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useState } from "react";
-import * as Yup from "yup";
-
 // import {useSelector} from "react-redux";
 // import { RootState } from "../redux-toolkit/store/store";
+import * as Yup from "yup";
 
 interface NewClientInterface {
   companyName: string;
@@ -29,29 +28,37 @@ const NewClient = () => {
   const [success, setSuccess] = useState("");
 
   const initialValues: NewClientInterface = {
-  companyName:"",
-  companyRepresentative:"",
-  phoneNumber:"",
-  email:"",
-  address:"",
-  requisite:"",
-  voen:"",
-  contractNumber:"",
-  contractDate:"",
-  approver:"",
-  oneCCode:"",
-  type:"",
-  typeOfStatus:"",
-  av:0,
-  partsDiscount:0
+    companyName: "",
+    companyRepresentative: "",
+    phoneNumber: "",
+    email: "",
+    address: "",
+    requisite: "",
+    voen: "",
+    contractNumber: "",
+    contractDate: "",
+    approver: "",
+    oneCCode: "",
+    type: "",
+    typeOfStatus: "",
+    av: 0,
+    partsDiscount: 0,
   };
 
   const clientValidationSchema = Yup.object().shape({
-    userName: Yup.string().required("Xananı doldur!"),
-    password: Yup.string().required("Xananı doldur!"),
+    companyName: Yup.string().required("Xananı doldur!"),
+    companyRepresentative: Yup.string().required("Xananı doldur!"),
+    phoneNumber: Yup.string().required("Xananı doldur!"),
+    email: Yup.string().required("Xananı doldur!"),
+    address: Yup.string().required("Xananı doldur!"),
+    requisite: Yup.string().required("Xananı doldur!"),
+    voen: Yup.string().required("Xananı doldur!"),
+    contractNumber: Yup.string().required("Xananı doldur!"),
+    contractDate: Yup.string().required("Xananı doldur!"),
+    approver: Yup.string().required("Xananı doldur!"),
+    type: Yup.string().required("Verilənlərdən birini seç!"),
+    typeOfStatus: Yup.string().required("Verilənlərdən birini seç!"),
   });
-
- 
 
   const onSubmit = async (e: any, values: any) => {
     e.preventDefault();
@@ -82,7 +89,6 @@ const NewClient = () => {
     }
   };
 
-
   return (
     <div className="min-h-screen ">
       <div className="m-10 max-w-2xl mx-auto">
@@ -99,7 +105,13 @@ const NewClient = () => {
                 id="companyName"
                 type="text"
                 placeholder="Şirkət adı"
+                name="companyName"
                 required
+              />
+              <ErrorMessage
+                name="companyName"
+                component="div"
+                className="text-red-700"
               />
             </div>
 
@@ -112,7 +124,13 @@ const NewClient = () => {
                 id="companyRepresentative"
                 type="text"
                 placeholder="Şirkət nümayəndəsi"
+                name="companyRepresentative"
                 required
+              />
+              <ErrorMessage
+                name="companyRepresentative"
+                component="div"
+                className="text-red-700"
               />
             </div>
             <div>
@@ -122,12 +140,23 @@ const NewClient = () => {
                 type="text"
                 placeholder="Telefon nömrəsi"
                 required
+                name="phoneNumber"
+              />
+              <ErrorMessage
+                name="phoneNumber"
+                component="div"
+                className="text-red-700"
               />
             </div>
 
             <div>
               <Label htmlFor="email" value="Email" />
-              <TextInput id="email" type="email" placeholder="Email" required />
+              <TextInput id="email" type="email" placeholder="Email" required name="email"/>
+              <ErrorMessage
+                name="email"
+                component="div"
+                className="text-red-700"
+              />
             </div>
 
             <div>
@@ -137,6 +166,12 @@ const NewClient = () => {
                 type="text"
                 placeholder="Ünvan"
                 required
+                name="address"
+              />
+               <ErrorMessage
+                name="address"
+                component="div"
+                className="text-red-700"
               />
             </div>
 
@@ -149,6 +184,12 @@ const NewClient = () => {
                 placeholder="Rekvizitlər...."
                 rows={4}
                 required
+                name="requisite"
+              />
+              <ErrorMessage
+                name="requisite"
+                component="div"
+                className="text-red-700"
               />
             </div>
             <div>
@@ -159,6 +200,12 @@ const NewClient = () => {
                 type="text"
                 placeholder="Vöen"
                 required
+                name="voen"
+              />
+               <ErrorMessage
+                name="voen"
+                component="div"
+                className="text-red-700"
               />
             </div>
 
@@ -170,6 +217,12 @@ const NewClient = () => {
                 type="text"
                 placeholder="Müqavilə nömrəsi"
                 required
+                name="contractNumber"
+              />
+                <ErrorMessage
+                name="contractNumber"
+                component="div"
+                className="text-red-700"
               />
             </div>
 
@@ -181,6 +234,12 @@ const NewClient = () => {
                 type="text"
                 placeholder="Müqavilə tarixi"
                 required
+                name="contractDate"
+              />
+               <ErrorMessage
+                name="contractDate"
+                component="div"
+                className="text-red-700"
               />
             </div>
             <div>
@@ -191,6 +250,12 @@ const NewClient = () => {
                 type="text"
                 placeholder="Təsdiq edən şəxs"
                 required
+                name="approver"
+              />
+              <ErrorMessage
+                name="approver"
+                component="div"
+                className="text-red-700"
               />
             </div>
 
@@ -202,24 +267,35 @@ const NewClient = () => {
                 type="text"
                 placeholder="1C kod"
                 required
+                name="oneCCode"
               />
             </div>
             <div className="flex gap-20">
               <div>
                 <Label htmlFor="type" value="Tipi" />
-                <Field as={Select} id="type" required>
+                <Field as={Select} id="type" required name="type">
                   <option value={"customer"}>Müştəri</option>
                   <option value={"worker"}>Işçi</option>
                   <option value={"boss"}>Təsisçi</option>
                   <option value={"itb"}>İTB</option>
                 </Field>
+                <ErrorMessage
+                name="type"
+                component="div"
+                className="text-red-700"
+              />
               </div>
               <div>
                 <Label htmlFor="typeOfStatus" value="FizikiHüquqi" />
-                <Field as={Select} id="typeOfStatus" required>
+                <Field as={Select} id="typeOfStatus" required name="typeOfStatus">
                   <option value={"phisical"}>Fiziki</option>
                   <option value={"legal"}>Hüquqi</option>
                 </Field>
+                <ErrorMessage
+                name="typeOfStatus"
+                component="div"
+                className="text-red-700"
+              />
               </div>
             </div>
             <Button type="submit" color="blue" className="w-[200px]">

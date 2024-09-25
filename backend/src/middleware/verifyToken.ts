@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import errorHandler from "./errorHandler";
-import { UserInterface } from "../types/projectTypes";
+// import { UserInterface } from "../types/projectTypes";
 
 
-interface CustomRequset extends Request{
-    user?:string|JwtPayload
+export interface CustomRequest extends Request{
+    userId?:string|JwtPayload
 }
 
 
 
-const verifyToken=async(req:CustomRequset,res:Response,next:NextFunction)=>{
+const verifyToken=async(req:CustomRequest,res:Response,next:NextFunction)=>{
 
     const token=req.cookies.access_token;
 
@@ -22,7 +22,8 @@ const verifyToken=async(req:CustomRequset,res:Response,next:NextFunction)=>{
     
     try {
         const decoded=jwt.verify(token,process.env.JWT_SECRET);
-        req.user=decoded;
+        console.log(decoded); 
+        req.userId=(decoded as any).id;
         next();
         
     } catch (error) {

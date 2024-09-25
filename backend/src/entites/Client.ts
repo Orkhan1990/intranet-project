@@ -6,7 +6,7 @@ import { User } from "./User";
 @Entity({name:"clients"})
 export class Client extends AllEntites{
 
-    @Column()
+    @Column({unique:true})
      companyName:string
 
      
@@ -50,15 +50,14 @@ export class Client extends AllEntites{
     @Column({default:"phisical"})
     typeOfStatus:string
 
-    @Column({default:0})
+    @Column({nullable:true,default:0})
     av:number
 
-    @Column({default:0})
+    @Column({nullable:true,default:0})
     partsDiscount:number
 
     @ManyToOne(() => User, (user) => user.clients)
     user: User
 
-    @Column()
-    userId: number;
+   
 }

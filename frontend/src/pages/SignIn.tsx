@@ -36,6 +36,7 @@ const SignIn = () => {
       
       const res = await fetch("http://localhost:3013/api/v1/auth/signIn", {
         method: "POST",
+        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
         },

@@ -18,7 +18,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend URL
+  credentials: true,
+}));
 
 app.use("/api/v1/user",userRouter);
 app.use("/api/v1/auth",authRouter)
