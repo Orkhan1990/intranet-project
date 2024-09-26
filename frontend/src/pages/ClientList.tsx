@@ -15,45 +15,29 @@ interface ClientInterface{
 
 }
 
+interface DiscountClientInterafce{
+  av:number,
+  partsDiscount:number
+}
+
 
 const ClientList = () => {
   const [clients, setClients] = useState([]);
   const [error, setError] = useState(false);
-  const [discountData,setDiscountData]=useState({
-  
+  const [discountData,setDiscountData]=useState<DiscountClientInterafce>({
+    av:0,
+    partsDiscount:0
   })
-  // console.log(discountData);
+
+  
+  
+console.log(discountData);
 
 
+  
+  
+  
 
-  const handleChange=(e:any)=>{
-    setDiscountData({...discountData,[e.target.id]:e.target.value})
-  }
- 
-  const  handleSubmit=async(id:number)=>{
-    console.log(id,discountData)
-    try {
-      const res = await fetch(
-        `http://localhost:3013/api/v1/client/discountClient/${id}`,
-        {
-          method: "POST",
-          credentials: "include", // added this part
-          headers: {
-            'Accept': 'application/json, text/plain, */*',
-            "Content-Type": "application/json",
-          },
-          body:JSON.stringify(discountData)
-        }
-      );
-
-      const data=await res.json();
-      console.log(data);
-
-    } catch (error:any) {
-      setError(error.message)
-    }
-
-  } 
   useEffect(() => {
     const getAllClients = async () => {
       try {
@@ -79,6 +63,38 @@ const ClientList = () => {
     };
     getAllClients();
   }, []);
+
+
+  const handleChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    setDiscountData((prev)=>({...prev,[e.target.id]:e.target.value}))
+  }
+
+  console.log(discountData);
+    
+  const  handleSubmit=async(id:number)=>{
+    console.log(id,discountData)
+    try {
+      // const res = await fetch(
+      //   `http://localhost:3013/api/v1/client/discountClient/${id}`,
+      //   {
+      //     method: "POST",
+      //     credentials: "include", // added this part
+      //     headers: {
+      //       'Accept': 'application/json, text/plain, */*',
+      //       "Content-Type": "application/json",
+      //     },
+      //     body:JSON.stringify(discountData)
+      //   }
+      // );
+
+      // const data=await res.json();
+      // console.log(data);
+
+    } catch (error:any) {
+      setError(error.message)
+    }
+
+  } 
   return (
     <div className="min-h-screen p-10">
       <form action="">
@@ -97,7 +113,7 @@ const ClientList = () => {
         <Table.Body className="divide-y">
 
         {clients.map((item:ClientInterface, index:number) => (
-            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+            <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
             <Table.Cell>{index+1}</Table.Cell>
             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
               {item.companyName}

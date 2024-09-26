@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { AllEntites } from "./AllEntites";
 import { User } from "./User";
 
@@ -50,14 +50,21 @@ export class Client extends AllEntites{
     @Column({default:"phisical"})
     typeOfStatus:string
 
-    @Column({nullable:true,default:0})
+    @Column({nullable:true})
     av:number
 
-    @Column({nullable:true,default:0})
-    partsDiscount:number
+    @Column({nullable:true})
+    partsDiscount:number;
+
+    @Column()
+    userId: number;
 
     @ManyToOne(() => User, (user) => user.clients)
+    @JoinColumn({ name: "userId" })
+
     user: User
+
+
     
    
 }
