@@ -4,6 +4,7 @@ import userRouter from "./routes/userRouter";
 import authRouter from "./routes/authRouter";
 import clientRouter from "./routes/clientRouter";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors  from "cors";
 dotenv.config();
@@ -22,7 +23,7 @@ app.use(cors({
   origin: 'http://localhost:5173', // Your frontend URL
   credentials: true,
 }));
-
+app.use(cookieParser());
 app.use("/api/v1/user",userRouter);
 app.use("/api/v1/auth",authRouter)
 app.use("/api/v1/client",clientRouter)

@@ -58,6 +58,6 @@ export class Client extends AllEntites{
 
     @ManyToOne(() => User, (user) => user.clients)
     user: User
-
+    
    
 }

@@ -3,10 +3,10 @@ import errorHandler from "../middleware/errorHandler";
 import { AppDataSource } from "../data-source";
 import { Client } from "../entites/Client";
 import { User } from "../entites/User";
-import { CustomRequest } from "../middleware/verifyToken";
+// import { CustomRequest } from "../middleware/verifyToken";
 
 export const createClient = async (
-  req: CustomRequest,
+  req:Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -28,13 +28,17 @@ export const createClient = async (
       av,
       partsDiscount,
     } = req.body;
-   const userId=req.userId;
+  //  const userId=req.userId;
+   console.log(req.body);
+  //  console.log(req.userId);
+   
+   
     
 
     const clientRepository=AppDataSource.getRepository(Client);
     const userRepository=AppDataSource.getRepository(User);
     const existClient=await clientRepository.findOneBy({companyName});
-    const user=await userRepository.findOneBy({})
+    // const user=await userRepository.findOneBy({id:userId})
 
     if(existClient){
         next(errorHandler(401,"Şirkət artıq mövcuddur!"));
@@ -57,6 +61,11 @@ export const createClient = async (
     newClient.typeOfStatus=typeOfStatus;
     newClient.av=av;
     newClient.partsDiscount=partsDiscount;
+    // newClient.user=user;
+
+    await clientRepository.save(newClient);
+
+    res.status(200).json(newClient)
     
 
   } catch (error) {

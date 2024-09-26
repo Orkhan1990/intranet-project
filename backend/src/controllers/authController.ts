@@ -21,7 +21,6 @@ export const signIn=async(req:Request,res:Response,next:NextFunction)=>{
            if(!isMatchPassword){
             next(errorHandler(401,"Şifrə uyğun deyil!"));
            }
-  
 
            const {password:pass,...rest}=existUser;
            const token=jwt.sign({id:existUser.id},process.env.JWT_SECRET);

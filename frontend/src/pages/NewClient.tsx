@@ -1,8 +1,6 @@
 import { Button, Label, Select, TextInput, Textarea } from "flowbite-react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useState } from "react";
-// import {useSelector} from "react-redux";
-// import { RootState } from "../redux-toolkit/store/store";
 import * as Yup from "yup";
 
 interface NewClientInterface {
@@ -60,11 +58,10 @@ const NewClient = () => {
     typeOfStatus: Yup.string().required("Verilənlərdən birini seç!"),
   });
 
-  const onSubmit = async (e: any, values: any) => {
-    e.preventDefault();
+  const onSubmit = async ( values: any) => {
     try {
       const res = await fetch(
-        "http://localhost:3013/api/v1/client/clientCreate",
+        "http://localhost:3013/api/v1/client/createClient",
         {
           method: "POST",
           credentials: "include", // added this part
@@ -101,7 +98,7 @@ const NewClient = () => {
           <Form className="flex flex-col gap-5">
             <div>
               <Label htmlFor="companyName" value="Şirkət adı" />
-              <TextInput
+              <Field as={TextInput}
                 id="companyName"
                 type="text"
                 placeholder="Şirkət adı"
@@ -120,7 +117,7 @@ const NewClient = () => {
                 htmlFor="companyRepresentative"
                 value="Şirkət nümayəndəsi"
               />
-              <TextInput
+              <Field as={TextInput}
                 id="companyRepresentative"
                 type="text"
                 placeholder="Şirkət nümayəndəsi"
@@ -135,7 +132,7 @@ const NewClient = () => {
             </div>
             <div>
               <Label htmlFor="phoneNumber" value="Telefon nömrəsi" />
-              <TextInput
+              <Field as={TextInput}
                 id="phoneNumber"
                 type="text"
                 placeholder="Telefon nömrəsi"
@@ -151,7 +148,7 @@ const NewClient = () => {
 
             <div>
               <Label htmlFor="email" value="Email" />
-              <TextInput id="email" type="email" placeholder="Email" required name="email"/>
+              <Field as={TextInput} id="email" type="email" placeholder="Email" required name="email"/>
               <ErrorMessage
                 name="email"
                 component="div"
@@ -161,7 +158,7 @@ const NewClient = () => {
 
             <div>
               <Label htmlFor="address" value="Ünvan" />
-              <TextInput
+              <Field as={TextInput}
                 id="address"
                 type="text"
                 placeholder="Ünvan"
