@@ -2,30 +2,15 @@ import { Button, Label, Select, TextInput, Textarea } from "flowbite-react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useState } from "react";
 import * as Yup from "yup";
+import { ClientInterface } from "../types";
 
-interface NewClientInterface {
-  companyName: string;
-  companyRepresentative: string;
-  phoneNumber: string;
-  email: string;
-  address: string;
-  requisite: string;
-  voen: string;
-  contractNumber: string;
-  contractDate: string;
-  approver: string;
-  oneCCode: string;
-  type: string;
-  typeOfStatus: string;
-  av: number;
-  partsDiscount: number;
-}
+
 
 const NewClient = () => {
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState("");
 
-  const initialValues: NewClientInterface = {
+  const initialValues: ClientInterface = {
     companyName: "",
     companyRepresentative: "",
     phoneNumber: "",

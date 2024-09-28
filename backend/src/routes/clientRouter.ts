@@ -1,5 +1,5 @@
 import express from "express";
-import { createClient, discountClient, getClients } from "../controllers/clientController";
+import { createClient, discountClient, getClient, getClients, updateClient } from "../controllers/clientController";
 import verifyToken from "../middleware/verifyToken";
 
 
@@ -11,9 +11,11 @@ const router=express.Router();
 
 
 
-router.post('/createClient',verifyToken,createClient );
 router.get('/getClients',getClients);
-router.get('/discountClient/:id',discountClient);
+router.get('/getClient/:id',getClient);
+router.post('/createClient',verifyToken,createClient );
+router.post('/discountClient/:id',discountClient);
+router.post('/updateClient/:id',updateClient);
 
 
 

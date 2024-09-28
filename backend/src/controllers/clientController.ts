@@ -97,10 +97,8 @@ export const discountClient = async (
   try {
     const id = Number(req.params.id);
     const { av, partsDiscount } = req.body;
-    console.log(req.body);
-    console.log(id);
-    
-
+   
+  
     const clientRepository = AppDataSource.getRepository(Client);
     const client = await clientRepository.findOneBy({ id });
 
@@ -117,3 +115,80 @@ export const discountClient = async (
     next(errorHandler(401, error));
   }
 };
+
+
+export const getClient=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+
+    const id=Number(req.params.id);
+    const clientRepository=AppDataSource.getRepository(Client);
+
+    const client=await clientRepository.findOneBy({id});
+
+
+    if(!client){
+      next(errorHandler(401,"Müştəri mövcud deyil!"));
+      return;
+    }
+
+    res.status(201).json(client);
+    
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}
+
+
+export const updateClient=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+
+    const id=Number(req.params.id);
+    const {
+      companyName,
+      companyRepresentative,
+      phoneNumber,
+      email,
+      address,
+      requisite,
+      voen,
+      contractNumber,
+      contractDate,
+      approver,
+      oneCCode,
+      type,
+      typeOfStatus,
+      av,
+      partsDiscount,
+    } = req.body;
+
+    const clientRepository=AppDataSource.getRepository(Client);
+
+    const clientDataUpdate=await clientRepository.findOneBy({id});
+
+    if(!clientDataUpdate){
+      next(errorHandler(401,"Müştəri mövcud deyil!"))
+    }
+
+    clientDataUpdate.companyName = companyName;
+    clientDataUpdate.companyRepresentative = companyRepresentative;
+    clientDataUpdate.phoneNumber = phoneNumber;
+    clientDataUpdate.email = email;
+    clientDataUpdate.address = address;
+    clientDataUpdate.requisite = requisite;
+    clientDataUpdate.voen = voen;
+    clientDataUpdate.contractNumber = contractNumber;
+    clientDataUpdate.contractDate = contractDate;
+    clientDataUpdate.approver = approver;
+    clientDataUpdate.oneCCode = oneCCode;
+    clientDataUpdate.type = type;
+    clientDataUpdate.typeOfStatus = typeOfStatus;
+    clientDataUpdate.av = av;
+    clientDataUpdate.partsDiscount = partsDiscount;
+
+    await clientRepository.save(clientDataUpdate);
+    res.status(201).json(clientDataUpdate);
+ 
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}
