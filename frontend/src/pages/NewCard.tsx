@@ -79,7 +79,7 @@ const NewCard = () => {
     const getWorkers = async () => {
       try {
         const res = await fetch(
-          "http://localhost:3004/api/v1/user/getWorkers",
+          "http://localhost:3013/api/v1/user/getWorkers",
           {
             method: "GET",
             credentials: "include", // added this part
@@ -105,7 +105,7 @@ const NewCard = () => {
     const getClients = async () => {
       try {
         const res = await fetch(
-          "http://localhost:3004/api/v1/client/getClients",
+          "http://localhost:3013/api/v1/client/getClients",
           {
             method: "GET",
             credentials: "include", // added this part

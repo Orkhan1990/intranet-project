@@ -28,7 +28,7 @@ export class User extends AllEntites {
     email: string
 
     @Column({
-        default:UserRole.User
+        default:UserRole.ServiceUser
     })
     userRole: UserRole
 

@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { successStart } from "../redux-toolkit/features/auth/authSlice";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { UserRole } from "../enums/projectEnums";
 
 
 
@@ -49,7 +50,7 @@ const SignIn = () => {
         setError(data.message);
         return;
       }
-      if (data.userRole === "User") {
+      if (data.userRole ===UserRole.ServiceUser) {
         setError("Zəhmət olmasa administratorla əlaqə saxlayın !");
         return;
       }

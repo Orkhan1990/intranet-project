@@ -1,7 +1,9 @@
 import { AppDataSource } from "../data-source";
 import { User } from "../entites/User";
-import { Response, Request } from "express";
+import { Response, Request, NextFunction } from "express";
 import bcrypt from "bcrypt";
+import errorHandler from "../middleware/errorHandler";
+import { UserRole } from "../enums/userRole";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -29,3 +31,28 @@ export const createUser = async (req: Request, res: Response) => {
     console.log(error);
   }
 };
+
+
+export const getWorkers=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+
+    const userRepository=AppDataSource.getRepository(User);
+
+    const serviceWorkers=await userRepository.find({
+      where:{
+        userRole:UserRole.ServiceUser
+      }
+    })
+
+    if(!serviceWorkers){
+      next(errorHandler(401,"Servis işçiləri mövcud deyil!"));
+      return;
+    }
+
+    res.status(201).json(serviceWorkers);
+
+    
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}
