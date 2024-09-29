@@ -8,7 +8,6 @@ import errorHandler from "../middleware/errorHandler";
 export const signIn=async(req:Request,res:Response,next:NextFunction)=>{
     try {
            const{userName,password}=req.body;
-           console.log(req.body);
            
            const userRepository = AppDataSource.getRepository(User);
            const existUser=await userRepository.findOneBy({userName});

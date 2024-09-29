@@ -1,10 +1,11 @@
 import { Entity, Column, OneToMany} from "typeorm"
-import { AllEntites } from "./AllEntites"
+import { AllEntities } from "./AllEntities"
 import { UserRole } from "../enums/userRole"
 import { Client } from "./Client"
+import { NewCardProblems } from "./NewCardProblems"
 
 @Entity({name:"users"})
-export class User extends AllEntites {
+export class User extends AllEntities {
    
 
     @Column({
@@ -37,4 +38,7 @@ export class User extends AllEntites {
 
     @OneToMany(() => Client, (client) => client.user)
     clients: Client[]
+
+    @OneToMany(() => NewCardProblems, (newCardproblem) => newCardproblem.serviceWorkers)
+    newCardproblem: NewCardProblems[];
 }

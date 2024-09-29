@@ -27,7 +27,7 @@ const types = [
 ];
 
 const newCardInitialValues:NewCardInterface = {
-  clientId: "",
+  clientId:0,
   type: "tiqac",
   manufactured: "man",
   model: "",

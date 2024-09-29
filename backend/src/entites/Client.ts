@@ -1,10 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { AllEntites } from "./AllEntites";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { AllEntities } from "./AllEntities";
 import { User } from "./User";
+import { NewCard } from "./NewCard";
 
 
 @Entity({name:"clients"})
-export class Client extends AllEntites{
+export class Client extends AllEntities{
 
     @Column({unique:true})
      companyName:string
@@ -61,10 +62,10 @@ export class Client extends AllEntites{
 
     @ManyToOne(() => User, (user) => user.clients)
     @JoinColumn({ name: "userId" })
-
     user: User
 
-
+    @OneToMany(() => NewCard, (newCard) => newCard.client)
+    newCards: NewCard[]
     
    
 }

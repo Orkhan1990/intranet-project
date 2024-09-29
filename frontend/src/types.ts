@@ -58,7 +58,7 @@ export interface ClientInterface {
 
 
   export interface NewCardInterface{
-    clientId: string,
+    clientId:number,
     type:string,
     manufactured:string,
     model:string,

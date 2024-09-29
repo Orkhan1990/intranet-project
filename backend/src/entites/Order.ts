@@ -1,9 +1,9 @@
 import { Entity } from "typeorm";
-import { AllEntites } from "./AllEntites";
+import { AllEntities } from "./AllEntities";
 
 
 @Entity({name:"orders"})
-export class Order extends AllEntites{
+export class Order extends AllEntities{
 
     
 
