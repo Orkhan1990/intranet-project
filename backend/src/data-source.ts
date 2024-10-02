@@ -3,6 +3,8 @@ import { DataSource } from "typeorm"
 import { User } from "./entites/User"
 import dotenv from "dotenv";
 import { Client } from "./entites/Client";
+import { NewCard } from "./entites/NewCard";
+import { NewCardProblems } from "./entites/NewCardProblems";
 dotenv.config();
 
 
@@ -14,7 +16,7 @@ export const AppDataSource = new DataSource({
     username:DATABASE_USERNAME,
     password:DATABASE_PASSWORD,
     database:DATABASE,
-    entities: [User,Client],
+    entities: [User,Client,NewCard,NewCardProblems],
     synchronize: true,
 })
 

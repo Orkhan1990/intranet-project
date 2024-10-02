@@ -529,6 +529,7 @@ const NewCard = () => {
                 </>
               )}
             </FieldArray>
+            
             <NewCardAddParts />
 
             <div className="border p-5 rounded-md">

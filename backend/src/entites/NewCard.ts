@@ -2,6 +2,7 @@ import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Client } from "./Client";
 import { NewCardProblems } from "./NewCardProblems";
+import { NewCardJobs } from "./NewCardJobs";
 
 @Entity({name:"newCards"})
 
@@ -58,4 +59,7 @@ export class NewCard extends AllEntities{
 
     @OneToMany(()=>NewCardProblems,(newCardProblem)=>newCardProblem.newCard)
     newCardProblems:NewCardProblems[]
+
+    @OneToMany(()=>NewCardJobs,(newCardjob)=>newCardjob.newCard)
+    newCardJobs:NewCardJobs[]
 }
