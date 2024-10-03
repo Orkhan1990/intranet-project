@@ -57,9 +57,9 @@ export class NewCard extends AllEntities{
     @Column()
     clientId:number;
 
-    @OneToMany(()=>NewCardProblems,(newCardProblem)=>newCardProblem.newCard)
+    @OneToMany(()=>NewCardProblems,(newCardProblem)=>newCardProblem.newCard,{cascade:true})
     newCardProblems:NewCardProblems[]
 
-    @OneToMany(()=>NewCardJobs,(newCardjob)=>newCardjob.newCard)
+    @OneToMany(()=>NewCardJobs,(newCardjob)=>newCardjob.newCard,{cascade:true})
     newCardJobs:NewCardJobs[]
 }

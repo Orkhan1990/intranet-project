@@ -37,10 +37,10 @@ export class User extends AllEntities {
     @Column()
     password: string
 
-    @OneToMany(() => Client, (client) => client.user)
+    @OneToMany(() => Client, (client) => client.user,{cascade:true})
     clients: Client[]
 
-    @OneToMany(() => NewCardProblems, (newCardproblem) => newCardproblem.serviceWorkers)
+    @OneToMany(() => NewCardProblems, (newCardproblem) => newCardproblem.serviceWorkers,{cascade:true})
     newCardproblem: NewCardProblems[];
 
     @OneToOne(() => NewCardJobsWorker)

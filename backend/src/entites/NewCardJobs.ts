@@ -29,7 +29,7 @@ discount:number
 @Column()
 oil:string
 
-@OneToMany(() => NewCardJobsWorker, (worker) => worker.newCardJob)
+@OneToMany(() => NewCardJobsWorker, (worker) => worker.newCardJob,{cascade:true})
     workers: NewCardJobsWorker[]
 
     @ManyToOne(() => NewCard, (newCard) => newCard.newCardJobs)

@@ -52,7 +52,6 @@ const NewCardWorkers = ({ workers, values, name }:CardWorkersInterface) => {
             as={TextInput}
             type="text"
             className="w-[100px]"
-            name={`${name}.price`}
           />
         </Table.Cell>
         <Table.Cell>

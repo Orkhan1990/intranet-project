@@ -20,7 +20,7 @@ const NewCardWorkersName = ({workers,name,index,push,remove}:WorkersNameInterfac
         <div className="flex gap-4 items-center">
           <Button
           color={"blue"}
-          onClick={()=>remove(index)}
+          onClick={()=>index>0&&remove(index)}
           >
             -
           </Button>

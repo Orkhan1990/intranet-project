@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import { Client } from "./entites/Client";
 import { NewCard } from "./entites/NewCard";
 import { NewCardProblems } from "./entites/NewCardProblems";
+import { NewCardJobs } from "./entites/NewCardJobs";
+import { NewCardJobsWorker } from "./entites/NewCardJobWorkers";
 dotenv.config();
 
 
@@ -16,7 +18,7 @@ export const AppDataSource = new DataSource({
     username:DATABASE_USERNAME,
     password:DATABASE_PASSWORD,
     database:DATABASE,
-    entities: [User,Client,NewCard,NewCardProblems],
+    entities: [User,Client,NewCard,NewCardProblems,NewCardJobs,NewCardJobsWorker],
     synchronize: true,
 })
 

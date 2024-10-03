@@ -14,7 +14,7 @@ import NewCardWorkers from "../components/NewCardWorkers";
 import NewCardAddParts from "../components/NewCardAddParts";
 import AddCharges from "../components/AddCharges";
 import { FiPrinter } from "react-icons/fi";
-import { Formik, Form, Field,FieldArray } from "formik";
+import { Formik, Form, Field, FieldArray } from "formik";
 import { ClientInterface, NewCardInterface } from "../types";
 
 const types = [
@@ -26,8 +26,12 @@ const types = [
   "Diger Texnika",
 ];
 
-const newCardInitialValues:NewCardInterface = {
-  clientId:0,
+
+let price:number=0;
+let count:number=0;
+
+const newCardInitialValues: NewCardInterface = {
+  clientId: 0,
   type: "tiqac",
   manufactured: "man",
   model: "",
@@ -56,7 +60,7 @@ const newCardInitialValues:NewCardInterface = {
       price: 0,
       discount: 0,
       oil: "",
-      jobWorkers: [{ workerAv: "", workerId:0 }],
+      jobWorkers: [{ workerAv: "", workerId: 0 }],
     },
   ],
   expences: [
@@ -97,7 +101,7 @@ const NewCard = () => {
         }
 
         setWorkers(data);
-      } catch (error:any) {
+      } catch (error: any) {
         setError(error.message);
       }
     };
@@ -121,7 +125,7 @@ const NewCard = () => {
           return;
         }
         setClients(data);
-      } catch (error:any) {
+      } catch (error: any) {
         setError(error.message);
       }
     };
@@ -129,7 +133,7 @@ const NewCard = () => {
     getClients();
   }, []);
 
-  const onSubmit = (values:NewCardInterface) => {
+  const onSubmit = (values: NewCardInterface) => {
     console.log(values);
   };
   return (
@@ -149,7 +153,7 @@ const NewCard = () => {
                   name="clientId"
                 >
                   <option value="">Müştərini seç</option>
-                  {clients.map((item:ClientInterface, index:number) => (
+                  {clients.map((item: ClientInterface, index: number) => (
                     <option value={item.id} key={index}>
                       {item.companyName}
                     </option>
@@ -422,7 +426,7 @@ const NewCard = () => {
             {/* -------------------------------------------------------------------------------------------- */}
             {/* PROBLEM SECTION */}
             <FieldArray name="problems">
-              {({ push}) => (
+              {({ push, remove }) => (
                 <>
                   {values.problems.map((_, index) => (
                     <div key={index}>
@@ -448,6 +452,17 @@ const NewCard = () => {
                     >
                       Əlavə et <span className="ml-2 ">+</span>
                     </Button>
+                    <Button
+                      color="blue"
+                      type="button"
+                      className="mt-5"
+                      onClick={() =>
+                        values.problems.length > 1 &&
+                        remove(values.problems.length - 1)
+                      }
+                    >
+                      Azalt <span className="ml-2 ">+</span>
+                    </Button>
                   </div>
                 </>
               )}
@@ -456,7 +471,7 @@ const NewCard = () => {
             {/* -----------------------------------------------------------------------------------------          */}
             {/* JOBS SECTION */}
             <FieldArray name="jobs">
-              {({ push}) => (
+              {({ push, remove }) => (
                 <div className="border p-5 rounded-md  overflow-x-scroll">
                   <h2 className="mb-4">İşçilik</h2>
                   <Table>
@@ -500,6 +515,15 @@ const NewCard = () => {
                     >
                       Əlavə et <span className="ml-2 ">+</span>
                     </Button>
+                    <Button
+                      color="blue"
+                      className="mt-5"
+                      onClick={() =>
+                        values.jobs.length > 1 && remove(values.jobs.length - 1)
+                      }
+                    >
+                      Azalt <span className="ml-2 ">-</span>
+                    </Button>
                   </div>
                 </div>
               )}
@@ -509,7 +533,7 @@ const NewCard = () => {
             {/*EXPENCES*/}
 
             <FieldArray name="expences">
-              {({ push}) => (
+              {({ push }) => (
                 <>
                   {values.expences.map((_, index) => (
                     <AddCharges name={`expences[${index}]`} />
@@ -529,7 +553,7 @@ const NewCard = () => {
                 </>
               )}
             </FieldArray>
-            
+
             <NewCardAddParts />
 
             <div className="border p-5 rounded-md">
@@ -555,6 +579,7 @@ const NewCard = () => {
               <Button type="submit" color={"blue"}>
                 Yadda Saxla
               </Button>
+              <Button color={"blue"}>Kartı bağla</Button>
               <div className="w-[110px] flex justify-center gap-2 p-3 items-center  bg-blue-700 text-white  rounded-lg cursor-pointer hover:bg-blue-800">
                 <span>Çap et</span>
                 <FiPrinter />
