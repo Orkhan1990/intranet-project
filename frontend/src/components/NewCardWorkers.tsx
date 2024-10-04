@@ -48,10 +48,12 @@ const NewCardWorkers = ({ workers, values, name }:CardWorkersInterface) => {
           />
         </Table.Cell>
         <Table.Cell>
-          <Field
-            as={TextInput}
+          <TextInput
             type="text"
             className="w-[100px]"
+            readOnly
+            value={(values.av)*50*(1-values.discount/100)}
+            // value={}
           />
         </Table.Cell>
         <Table.Cell>

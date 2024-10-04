@@ -575,6 +575,29 @@ const NewCard = () => {
                 name="recommendation"
               />
             </div>
+            <div className={`gap-2 font-semibold ${values.nds? 'hidden':'flex'} self-end `}>
+              <span >Cəm:</span>
+              <span>0 AZN</span>
+            </div>
+            {
+              values.nds&&(
+                <div className={`${values.nds? 'flex':'hidden'} flex-col self-end `}>
+                <div className="flex gap-2 font-semibold">
+                  <span >Cəm:</span>
+                  <span>0 AZN</span>
+                </div>
+                <div className="flex gap-2 font-semibold">
+                  <span >ƏDV 18%:</span>
+                  <span>0 AZN</span>
+                </div>
+                <div className="flex gap-2 font-semibold">
+                  <span >Cəmi ƏDV ilə:</span>
+                  <span>0 AZN</span>
+                </div>
+                </div>
+              )
+            }
+          
             <div className="flex gap-2 items-center">
               <Button type="submit" color={"blue"}>
                 Yadda Saxla
