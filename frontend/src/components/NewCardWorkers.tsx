@@ -4,17 +4,24 @@ import { Link } from "react-router-dom";
 import NewCardWorkersName from "./NewCardWorkersName";
 import { Field, FieldArray } from "formik";
 import {  NewCardJobsInterface, UserInterface } from "../types";
+import { useEffect } from "react";
 
 
 
 interface CardWorkersInterface{
     workers:UserInterface[],
     values:NewCardJobsInterface,
-    name:string
+    name:string,
+    jobWorkerPrice:(price:any)=>void
 }
 
 
-const NewCardWorkers = ({ workers, values, name }:CardWorkersInterface) => {
+const NewCardWorkers = ({ workers, values, name,jobWorkerPrice }:CardWorkersInterface) => {
+  const price= (values.av || 0) * 50 * (1 - (values.discount || 0) / 100);
+  useEffect(() => {
+    jobWorkerPrice(price);
+}, [price, jobWorkerPrice]);
+
   return (
     <Table.Body>
       <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
@@ -52,7 +59,7 @@ const NewCardWorkers = ({ workers, values, name }:CardWorkersInterface) => {
             type="text"
             className="w-[100px]"
             readOnly
-            value={(values.av)*50*(1-values.discount/100)}
+            value={price}
             // value={}
           />
         </Table.Cell>

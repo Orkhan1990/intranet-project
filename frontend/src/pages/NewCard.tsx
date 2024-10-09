@@ -78,6 +78,15 @@ const NewCard = () => {
   const [openGedis, setOpenGedis] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
+  const [jobPrices,setJobPrices]=useState<number[]>([0]);
+
+  const handlePriceUpdate=(index:number,price:number)=>{
+    const newPrice=[...jobPrices];
+    newPrice[index]=price;
+    setJobPrices(newPrice);
+  }
+
+  const totalPrice = jobPrices.reduce((accum, price) => accum + price, 0);
 
   useEffect(() => {
     const getWorkers = async () => {
@@ -489,12 +498,14 @@ const NewCard = () => {
                         workers={workers}
                         name={`jobs[${index}]`}
                         values={values.jobs[index]}
+                        jobWorkerPrice={(price)=>handlePriceUpdate(index,price)}
                       />
                     ))}
                   </Table>
                   <div className="flex  gap-2 mt-5 items-center justify-center">
                     <h2 className="font-bold">Cəmi:</h2>
-                    <span className="font-semibold">0 AZN</span>
+                    <span className="font-semibold">
+                      {totalPrice} AZN</span>
                   </div>
 
                   <div className="flex gap-5">
