@@ -19,7 +19,9 @@ export const AppDataSource = new DataSource({
     password:DATABASE_PASSWORD,
     database:DATABASE,
     entities: [User,Client,NewCard,NewCardProblems,NewCardJobs,NewCardJobsWorker],
-    synchronize: true,
+    synchronize: false,
+    migrations: [__dirname + "src/migration/*.{js,ts}"],
+
 })
 
 // to initialize the initial connection with the database, register all entities

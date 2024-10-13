@@ -1,4 +1,4 @@
-import { AppDataSource } from "../data-source";
+import { AppDataSource } from "../database";
 import { User } from "../entites/User";
 import { Response, Request, NextFunction } from "express";
 import bcrypt from "bcrypt";

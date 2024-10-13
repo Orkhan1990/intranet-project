@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import errorHandler from "../middleware/errorHandler";
-import { AppDataSource } from "../data-source";
+import { AppDataSource } from "../database";
 import { Client } from "../entites/Client";
 import { User } from "../entites/User";
 import { CustomRequest } from "../middleware/verifyToken";
