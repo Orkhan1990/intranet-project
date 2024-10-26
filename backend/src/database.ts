@@ -20,7 +20,7 @@ export const AppDataSource = new DataSource({
     database:DATABASE,
     entities: [User,Client,NewCard,NewCardProblems,NewCardJobs,NewCardJobsWorker],
     synchronize: false,
-    migrations: [__dirname + "src/migration/*.{js,ts}"],
+    migrations: ["./src/migrations/**/*.ts"],
 
 })
 

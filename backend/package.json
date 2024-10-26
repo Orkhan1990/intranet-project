@@ -3,13 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "commonjs",
+  "module": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
-    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migration:run": "npm run typeorm migration:run -d src/database.ts"
+    "dev": "nodemon --watch src --exec ts-node src/index.ts"
   },
   "keywords": [],
   "author": "",

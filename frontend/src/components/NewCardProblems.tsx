@@ -13,12 +13,12 @@ interface CardProblemsIterface{
 const NewCardProblems = ({ workers, name, values, setFieldValue }:CardProblemsIterface) => {
   return (
     <div>
-      <div className="flex gap-[250px] mt-2">
+      <div className="flex gap-2 mt-2">
         <Field
           as={TextInput}
           type="text"
-          className="w-[500px]"
           name={`${name}.description`}
+          className="w-full"
         />
         <div className="flex flex-col">
 

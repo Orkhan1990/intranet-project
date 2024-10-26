@@ -1,18 +1,25 @@
 import {TextInput } from 'flowbite-react'
 import { Field } from 'formik'
+import { useEffect } from 'react';
+import { NewCardExpencesInterface } from '../types';
 
 
 
-interface ChargesInterface{
-    description:string,
-    price:number
-}
+// interface ChargesInterface{
+//     description:string,
+// }
 
 interface AddChargesInterface{
-    name:string
+    name:string,
+    values:NewCardExpencesInterface
+    expenceUpdatePrice:(price:any)=>void;
 }
-const AddCharges = ({name}:AddChargesInterface) => {
+const AddCharges = ({name,values,expenceUpdatePrice}:AddChargesInterface) => {
 
+
+  useEffect(()=>{
+       expenceUpdatePrice(+values.price)
+  },[values.price])
  
   return (
    <div className="border p-5 rounded-md">

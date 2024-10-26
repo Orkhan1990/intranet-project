@@ -20,7 +20,7 @@ const NewCardWorkers = ({ workers, values, name,jobWorkerPrice }:CardWorkersInte
   const price= (values.av || 0) * 50 * (1 - (values.discount || 0) / 100);
   useEffect(() => {
     jobWorkerPrice(price);
-}, [price, jobWorkerPrice]);
+}, [price]);
 
   return (
     <Table.Body>

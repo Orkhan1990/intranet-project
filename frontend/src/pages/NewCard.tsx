@@ -26,10 +26,6 @@ const types = [
   "Diger Texnika",
 ];
 
-
-let price:number=0;
-let count:number=0;
-
 const newCardInitialValues: NewCardInterface = {
   clientId: 0,
   type: "tiqac",
@@ -78,15 +74,31 @@ const NewCard = () => {
   const [openGedis, setOpenGedis] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
-  const [jobPrices,setJobPrices]=useState<number[]>([0]);
+  const [jobPrices, setJobPrices] = useState<number[]>([0]);
+  const [expencePrice, setExpencePrice] = useState<number[]>([0]);
 
-  const handlePriceUpdate=(index:number,price:number)=>{
-    const newPrice=[...jobPrices];
-    newPrice[index]=price;
+
+
+  const handlePriceUpdate = (index: number, price: number) => {
+    const newPrice = [...jobPrices];
+    newPrice[index] = price;
     setJobPrices(newPrice);
-  }
+  };
+
+  const handleExpencesPrice = (index: number, price: number) => {
+    const newExpencesPrice = [...expencePrice];
+    newExpencesPrice[index] = price;
+    setExpencePrice(newExpencesPrice);
+  };
 
   const totalPrice = jobPrices.reduce((accum, price) => accum + price, 0);
+  const totalExpencesPrice = expencePrice.reduce(
+    (accum, price) => accum + price,0);
+
+    const totalPriceWithoutNds=totalExpencesPrice+totalPrice;
+    const totalPriceNds=totalPriceWithoutNds*0.18;
+    const totalPriceWithNds=totalPriceWithoutNds+totalPriceNds;
+  
 
   useEffect(() => {
     const getWorkers = async () => {
@@ -498,14 +510,15 @@ const NewCard = () => {
                         workers={workers}
                         name={`jobs[${index}]`}
                         values={values.jobs[index]}
-                        jobWorkerPrice={(price)=>handlePriceUpdate(index,price)}
+                        jobWorkerPrice={(price) =>
+                          handlePriceUpdate(index, price)
+                        }
                       />
                     ))}
                   </Table>
                   <div className="flex  gap-2 mt-5 items-center justify-center">
                     <h2 className="font-bold">Cəmi:</h2>
-                    <span className="font-semibold">
-                      {totalPrice} AZN</span>
+                    <span className="font-semibold">{totalPrice} AZN</span>
                   </div>
 
                   <div className="flex gap-5">
@@ -529,9 +542,12 @@ const NewCard = () => {
                     <Button
                       color="blue"
                       className="mt-5"
-                      onClick={() =>
-                        values.jobs.length > 1 && remove(values.jobs.length - 1)
-                      }
+                      onClick={() => {
+                        if (values.jobs.length > 1) {
+                          remove(values.jobs.length - 1);
+                          setJobPrices(jobPrices.slice(0, -1));
+                        }
+                      }}
                     >
                       Azalt <span className="ml-2 ">-</span>
                     </Button>
@@ -544,21 +560,40 @@ const NewCard = () => {
             {/*EXPENCES*/}
 
             <FieldArray name="expences">
-              {({ push }) => (
+              {({ push,remove }) => (
                 <>
                   {values.expences.map((_, index) => (
-                    <AddCharges name={`expences[${index}]`} />
+                    <AddCharges
+                      name={`expences[${index}]`}
+                      expenceUpdatePrice={(price) =>
+                        handleExpencesPrice(index, price)
+                      }
+                      values={values.expences[index]}
+                    />
                   ))}
                   <div className="flex gap-2 items-center font-semibold justify-end ">
                     <span>Cəmi:</span>
-                    <span>0 AZN</span>
+                    <span>{totalExpencesPrice} AZN</span>
                   </div>
-                  <div>
+                  <div className="flex w-full gap-5">
                     <Button
                       color="blue"
+                      className="mt-5"
                       onClick={() => push({ description: "", price: "" })}
                     >
-                      Əlavə et <span className="ml-2 ">+</span>
+                      Əlavə et <span className="ml-2">+</span>
+                    </Button>
+                    <Button
+                      color="blue"
+                      className="mt-5"
+                      onClick={() => {
+                        if (values.expences.length > 1) {
+                          remove(values.expences.length - 1);
+                          setExpencePrice(expencePrice.slice(0, -1));
+                        }
+                      }}
+                    >
+                      Azalt <span className="ml-2 ">-</span>
                     </Button>
                   </div>
                 </>
@@ -586,29 +621,35 @@ const NewCard = () => {
                 name="recommendation"
               />
             </div>
-            <div className={`gap-2 font-semibold ${values.nds? 'hidden':'flex'} self-end `}>
-              <span >Cəm:</span>
-              <span>0 AZN</span>
+            <div
+              className={`gap-2 font-semibold ${
+                values.nds ? "hidden" : "flex"
+              } self-end `}
+            >
+              <span>Cəm:</span>
+              <span>{totalPriceWithoutNds} AZN</span>
             </div>
-            {
-              values.nds&&(
-                <div className={`${values.nds? 'flex':'hidden'} flex-col self-end `}>
+            {values.nds && (
+              <div
+                className={`${
+                  values.nds ? "flex" : "hidden"
+                } flex-col self-end `}
+              >
                 <div className="flex gap-2 font-semibold">
-                  <span >Cəm:</span>
-                  <span>0 AZN</span>
+                  <span>Cəm:</span>
+                  <span>{totalPriceWithoutNds} AZN</span>
                 </div>
                 <div className="flex gap-2 font-semibold">
-                  <span >ƏDV 18%:</span>
-                  <span>0 AZN</span>
+                  <span>ƏDV 18%:</span>
+                  <span>{totalPriceNds} AZN</span>
                 </div>
                 <div className="flex gap-2 font-semibold">
-                  <span >Cəmi ƏDV ilə:</span>
-                  <span>0 AZN</span>
+                  <span>Cəmi ƏDV ilə:</span>
+                  <span>{totalPriceWithNds} AZN</span>
                 </div>
-                </div>
-              )
-            }
-          
+              </div>
+            )}
+
             <div className="flex gap-2 items-center">
               <Button type="submit" color={"blue"}>
                 Yadda Saxla
