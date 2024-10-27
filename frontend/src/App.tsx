@@ -10,6 +10,7 @@ import NewCard from './pages/NewCard';
 import NewClient from './pages/NewClient';
 import ClientList from './pages/ClientList';
 import UpdateClient from './pages/UpdateClient';
+import ImportWarehouse from './pages/ImportWarehouse';
 
 
 
@@ -23,8 +24,9 @@ function App() {
       <Route path="/newCard" element={<Layout><NewCard/></Layout>} />     
       <Route path="/newClient" element={<Layout><NewClient/></Layout>} />       
       <Route path="/clientList" element={<Layout><ClientList/></Layout>} />   
-      <Route path="/updateClient/:id" element={<Layout><UpdateClient/></Layout>} />       
-  
+      <Route path="/updateClient/:id" element={<Layout><UpdateClient/></Layout>} />
+      <Route path="/importWarehouse" element={<Layout><ImportWarehouse/></Layout>} />       
+       
       </Route>
       <Route path="*" element={<NoPage />} />
       <Route path="/sign-in" element={<SignIn />} />

@@ -1,3 +1,4 @@
+import { Liquidity, Market, PayType } from "./enums/projectEnums";
 
 export interface UserInterface{
   id:number,
@@ -76,4 +77,28 @@ export interface ClientInterface {
     problems: NewCardProblemsInterface[],
     jobs:NewCardJobsInterface[],
     expences:NewCardExpencesInterface[]
+  }
+
+
+
+  export interface PartsInterface{
+    kod:string,
+    origKod:string,
+    nameParts:string,
+    brand:number,
+    liquidity:Liquidity,
+    count:number,
+    price:number,
+    salesPrice:number,
+  }
+
+  export interface WarehouseInterface{
+    requestId:number,
+    supplierId:number,
+    invoice:string,
+    market:Market,
+    paymentType:PayType
+    comment:string,
+    parts:PartsInterface[]
+    message:string
   }

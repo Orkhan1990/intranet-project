@@ -46,7 +46,7 @@ const newCardInitialValues: NewCardInterface = {
     {
       description: "",
       serviceWorkers: [""],
-    },
+    }
   ],
   jobs: [
     {
@@ -57,13 +57,13 @@ const newCardInitialValues: NewCardInterface = {
       discount: 0,
       oil: "",
       jobWorkers: [{ workerAv: "", workerId: 0 }],
-    },
+    }
   ],
   expences: [
     {
       description: "",
       price: 0,
-    },
+    }
   ],
 };
 

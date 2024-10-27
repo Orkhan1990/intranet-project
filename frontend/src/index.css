@@ -1,65 +1,80 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
-@import 'tailwindcss/utilities'; 
+@import 'tailwindcss/utilities';
 @import 'flowbite';
 
 
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing: border-box;
-    font-family: "Roboto", sans-serif;
-  }
-  
-  .image{
-    background: url("../public/images/mantruck.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-  .bgFon{
-    background-color: rgba(0, 0, 0,0.7);
-  }
-  
-  .servis_list{
-    list-style: none;
-    padding: unset;
-    margin: unset;
-  }
-  .servis_list li{
-    padding: 14px;
-    transition: all linear 0.3s;
-  }
-  
-  .servis_list li:hover{
-    background: gray;
-    cursor: pointer;
-    color: #fff;
-    border-radius: 10px;
-  
-  }
-  .dropdow_menu{
-    box-shadow: 0px 10px 30px 0px rgba(82, 63, 105, 0.05);
-    transition: all linear 0.3s;
-    background: rgb(98, 86, 86);
-    width: 200px;
-    border-radius: 10px;
-  }
-  
-  .home_image{
-    background: url("../public/images/improtex.webp");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-  }
-  .backgroundFon{
-    height: 100%;
-    width: 100%;
-    background-color: rgba(0, 0, 0,0.5);
-  }
-  .dropdown{
-    display: none;
-  }
-  .show{
-    display: block;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+}
+
+.image {
+  background: url("../public/images/mantruck.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bgFon {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.servis_list {
+  list-style: none;
+  padding: unset;
+  margin: unset;
+}
+
+.servis_list li {
+  padding: 14px;
+  transition: all linear 0.3s;
+}
+
+.servis_list li:hover {
+  background: gray;
+  cursor: pointer;
+  color: #fff;
+  border-radius: 10px;
+
+}
+
+.dropdow_menu {
+  box-shadow: 0px 10px 30px 0px rgba(82, 63, 105, 0.05);
+  transition: all linear 0.3s;
+  background: rgb(98, 86, 86);
+  width: 200px;
+  border-radius: 10px;
+}
+
+.home_image {
+  background: url("../public/images/improtex.webp");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.backgroundFon {
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dropdown {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+.flowbite-table {
+  font-size: 0.875rem; /* Change this value to your desired font size (14px) */
+}
+
+.flowbite-table th,
+.flowbite-table td{
+    font-size: x-small; /* Adjust padding if necessary */
+}

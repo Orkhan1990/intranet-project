@@ -56,7 +56,7 @@ export const navbarList:NavbarListInterface[] = [
           },
           {
               title:"Anbara daxil etmek",
-              url:"/inportWearhouse"
+              url:"/importWarehouse"
           },
           {
               title:"Anbarı təsdiqləmək",
