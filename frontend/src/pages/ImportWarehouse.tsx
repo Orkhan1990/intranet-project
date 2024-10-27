@@ -1,8 +1,10 @@
 import { Field, FieldArray, Form, Formik } from "formik";
-import { WarehouseInterface } from "../types";
+import { PartsInterface, WarehouseInterface } from "../types";
 import { Liquidity, Market, PayType } from "../enums/projectEnums";
 import { Button, Select, Table, Textarea, TextInput } from "flowbite-react";
 import NewPartsComponent from "../components/NewPartsComponent";
+import * as XLSX from 'xlsx';
+
 
 const ImportWarehouse = () => {
   const wareHouseInitialValues: WarehouseInterface = {
@@ -27,6 +29,33 @@ const ImportWarehouse = () => {
     message: "",
   };
 
+  const handleFileChange=(event:any,setFieldValue:any)=>{
+      const file=event.target.files[0];
+      const reader=new FileReader();
+
+      reader.onload=()=>{
+         const data=new Uint8Array(event.target.result);
+         const workbook= XLSX.read(data,{type:"array"});
+         const firstSheet=workbook.Sheets[workbook.SheetNames[0]];
+         const jsonData=XLSX.utils.sheet_to_json(firstSheet);
+
+         const partsData = jsonData.map((item:any) => ({
+            kod: item.Kod || "",
+            origKod: item.OriginalKod || "",
+            nameParts: item.Name || "",
+            brand: item.Brand || 0,
+            liquidity: item.Liquidity || Liquidity.Fast,
+            count: item.Count || 0,
+            price: item.Price || 0,
+            salesPrice: item.SalesPrice || 0,
+          }));
+
+          setFieldValue("parts",partsData)
+      }
+
+      reader.readAsArrayBuffer(file);
+  }
+
   const onsubmit = (values: WarehouseInterface) => {
     console.log(values);
   };
@@ -37,7 +66,7 @@ const ImportWarehouse = () => {
       </h2>
 
       <Formik initialValues={wareHouseInitialValues} onSubmit={onsubmit}>
-        {({ values }) => (
+        {({ values,setFieldValue }) => (
           <Form className="ml-[90px] w-full">
             <div className="flex  items-center ">
               <label htmlFor="" className="text-sm  w-[200px]">
@@ -155,7 +184,18 @@ const ImportWarehouse = () => {
               </FieldArray>
             </div>
             <div className="mt-10 flex justify-between mr-[130px] ">
-              <input type="file" className="text-sm" />
+            <div className="flex items-center">
+                <label htmlFor="fileUpload" className="text-sm w-[200px]">
+                  Excel Fayl Yüklə
+                </label>
+                <input
+                  type="file"
+                  id="fileUpload"
+                  accept=".xlsx, .xls"
+                  onChange={(event) => handleFileChange(event, setFieldValue)}
+                  className="ml-2 text-sm"
+                />
+              </div>
               <div>
                 <div className="w-[400px] flex flex-col gap-2">
                   <h2>Mesaj</h2>
