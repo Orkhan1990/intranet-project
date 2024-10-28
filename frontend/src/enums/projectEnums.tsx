@@ -16,8 +16,8 @@ export enum Market{
 
 
 export enum PayType{
-    Cash="Nagd",
-    Transfer="Kocurulme"
+    Cash="cash",
+    Transfer="transfer"
 }
 
 
@@ -25,4 +25,17 @@ export enum Liquidity{
     Fast="fast",
     Normal="normal",
     Slow="slow"
+}
+
+
+export enum OrderType{
+    Standart_Client="standart",
+    Local_Market="local",
+    Stok="stok"
+}
+
+export enum DeliverType{
+    Fast="fast",
+    Normal_Fast="normal",
+    Planned="plannned"
 }
