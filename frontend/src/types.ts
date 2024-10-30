@@ -120,7 +120,7 @@ export interface OrdersInterface {
   engineNumber: string;
   produceDate: string;
   probeg: string;
-  gosNumberL: string;
+  gosNumber: string;
   payType: PayType;
   deliverPeriod: DeliverType;
   deliverMethod: string;

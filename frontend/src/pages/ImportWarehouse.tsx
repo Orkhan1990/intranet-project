@@ -67,7 +67,7 @@ const ImportWarehouse = () => {
 
       <Formik initialValues={wareHouseInitialValues} onSubmit={onsubmit}>
         {({ values,setFieldValue }) => (
-          <Form className="ml-[90px] w-full">
+          <Form className="ml-[90px]">
             <div className="flex  items-center ">
               <label htmlFor="" className="text-sm  w-[200px]">
                 Zayavka nömrəsi
