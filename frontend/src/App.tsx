@@ -12,6 +12,7 @@ import ClientList from './pages/ClientList';
 import UpdateClient from './pages/UpdateClient';
 import ImportWarehouse from './pages/ImportWarehouse';
 import Suppliers from './pages/Suppliers';
+import AddSuppliers from './pages/AddSuppliers';
 
 
 
@@ -27,7 +28,9 @@ function App() {
       <Route path="/clientList" element={<Layout><ClientList/></Layout>} />   
       <Route path="/updateClient/:id" element={<Layout><UpdateClient/></Layout>} />
       <Route path="/importWarehouse" element={<Layout><ImportWarehouse/></Layout>} />    
-      <Route path="/suppliers" element={<Layout><Suppliers/></Layout>} />       
+      <Route path="/suppliers" element={<Layout><Suppliers/></Layout>} /> 
+      <Route path="/newSuppliers" element={<Layout><AddSuppliers/></Layout>} />       
+      
    
        
       </Route>

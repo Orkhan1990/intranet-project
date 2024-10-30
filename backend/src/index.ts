@@ -3,6 +3,7 @@ import express,{Response,Request, NextFunction} from "express";
 import userRouter from "./routes/userRouter";
 import authRouter from "./routes/authRouter";
 import clientRouter from "./routes/clientRouter";
+import supplierRouter from "./routes/supplierRouter";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -27,6 +28,8 @@ app.use(cookieParser());
 app.use("/api/v1/user",userRouter);
 app.use("/api/v1/auth",authRouter)
 app.use("/api/v1/client",clientRouter)
+app.use("/api/v1/supplier",supplierRouter)
+
 
 
  

@@ -129,3 +129,18 @@ export interface OrdersInterface {
   oil: boolean;
   parts:OrderPartsInterface[]
 }
+
+
+export interface SupplierInterface{
+  supplier:string,
+  country:string,
+  contactPerson:string,
+  phone:string,
+  email:string,
+  paymentType:string,
+  deliverType:string,
+  deliverPeriod:string,
+  creditLine:string,
+  creditNote:string,
+  creditDuration:string;
+}
