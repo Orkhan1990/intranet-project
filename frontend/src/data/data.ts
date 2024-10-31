@@ -63,7 +63,7 @@ export const navbarList:NavbarListInterface[] = [
               url:"/submitWearhouse"
           },
           {
-              title:"Çatdıranlar",
+              title:"Təchizatçılar",
               url:"/suppliers"
           },
           {

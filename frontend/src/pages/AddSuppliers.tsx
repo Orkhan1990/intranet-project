@@ -1,8 +1,12 @@
 import { Field, Form, Formik } from "formik";
 import { SupplierInterface } from "../types";
 import { Button, Select, TextInput } from "flowbite-react";
+import { useState } from "react";
 
 const AddSuppliers = () => {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   const countries: string[] = [
     "USA",
     "Germany",
@@ -14,21 +18,50 @@ const AddSuppliers = () => {
   ];
   const SupplierInitialValue: SupplierInterface = {
     supplier: "",
-    country: "",
+    country: "USA",
     contactPerson: "",
     phone: "",
     email: "",
     paymentType: "",
-    deliverType: "",
+    deliverType: "cip",
     deliverPeriod: "",
     creditLine: "",
     creditNote: "",
     creditDuration: "",
   };
 
-  const onsubmit = (values: SupplierInterface) => {
+  const onsubmit = async (values: SupplierInterface) => {
     console.log(values);
+
+    const res = await fetch(
+      "http://localhost:3013/api/v1/supplier/createSupplier",
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success === false) {
+      setError(data.message);
+      return;
+    }
+
+    if (res.ok) {
+      setSuccess(`${data.supplier} yaradıldı.`);
+      setInterval(() => {
+        setSuccess("");
+      }, 5000);
+    }
+
+    setError("");
   };
+
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
       <h2 className="text-lg font-semibold text-center">Yeni Təchizatçı</h2>
@@ -39,7 +72,7 @@ const AddSuppliers = () => {
             <label htmlFor="" className="text-sm  w-[200px]">
               Təchizatçı
             </label>
-            <Field as={TextInput} name="supplier" className="w-96"/>
+            <Field as={TextInput} name="supplier" className="w-96" />
           </div>
 
           <div className="flex  items-center mt-5 ">
@@ -57,73 +90,77 @@ const AddSuppliers = () => {
 
           <div className="flex  items-center mt-5 ">
             <label htmlFor="" className="text-sm  w-[200px]">
-            Əlaqədar şəxs
+              Əlaqədar şəxs
             </label>
-            <Field as={TextInput} name="contactPerson" className="w-96"/>
+            <Field as={TextInput} name="contactPerson" className="w-96" />
           </div>
 
           <div className="flex  items-center mt-5 ">
             <label htmlFor="" className="text-sm  w-[200px]">
               Telefon
             </label>
-            <Field as={TextInput} name="phone" className="w-96"/>
+            <Field as={TextInput} name="phone" className="w-96" />
           </div>
 
           <div className="flex  items-center mt-5 ">
             <label htmlFor="" className="text-sm  w-[200px]">
               E-mail
             </label>
-            <Field as={TextInput} name="email" className="w-96"/>
+            <Field as={TextInput} name="email" className="w-96" />
           </div>
 
           <div className="flex  items-center mt-5 ">
             <label htmlFor="" className="text-sm  w-[200px]">
-            Ödəniş növü
+              Ödəniş növü
             </label>
-            <Field as={TextInput} name="paymentType" className="w-96"/>
+            <Field as={TextInput} name="paymentType" className="w-96" />
           </div>
 
           <div className="flex  items-center mt-5 ">
             <label htmlFor="" className="text-sm  w-[200px]">
-              Təchizatçı
+              Çatdırılma tipi
             </label>
             <Field as={Select} name="deliverType">
-                <option value="cip">CIP</option>
-                <option value="exw">EXW</option>
-                <option value="dap">DAP</option>
+              <option value="cip">CIP</option>
+              <option value="exw">EXW</option>
+              <option value="dap">DAP</option>
             </Field>
           </div>
 
           <div className="flex  items-center mt-5 ">
             <label htmlFor="" className="text-sm  w-[200px]">
-            Çatdırılma müddəti
+              Çatdırılma müddəti
             </label>
-            <Field as={TextInput} name="deliverPeriod" className="w-96"/>
+            <Field as={TextInput} name="deliverPeriod" className="w-96" />
           </div>
 
           <div className="flex  items-center mt-5 ">
             <label htmlFor="" className="text-sm  w-[200px]">
               Kredit xətti
             </label>
-            <Field as={TextInput} name="creditLine" className="w-96"/>
+            <Field as={TextInput} name="creditLine" className="w-96" />
           </div>
 
           <div className="flex  items-center mt-5 ">
             <label htmlFor="" className="text-sm  w-[200px]">
               Kredit qeydiyyatı
             </label>
-            <Field as={TextInput} name="creditNote" className="w-96"/>
+            <Field as={TextInput} name="creditNote" className="w-96" />
           </div>
 
           <div className="flex  items-center mt-5 ">
             <label htmlFor="" className="text-sm  w-[200px]">
-            Kredit müddəti
+              Kredit müddəti
             </label>
-            <Field as={TextInput} name="creditDuration" className="w-96"/>
+            <Field as={TextInput} name="creditDuration" className="w-96" />
           </div>
-           <Button color={"blue"} className="mt-10">Yadda Saxla</Button>
+          <Button color={"blue"} type="submit" className="mt-10">
+            Yadda Saxla
+          </Button>
         </Form>
       </Formik>
+      {!error && success && <p className="text-md text-green-700 ml-10 mt-10 ">{success}</p>}
+      {error && !success && <p className="text-lg text-red-700">{error}</p>}
     </div>
   );
 };
