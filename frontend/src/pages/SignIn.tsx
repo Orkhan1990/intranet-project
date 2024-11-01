@@ -52,6 +52,9 @@ const SignIn = () => {
       }
       if (data.userRole ===UserRole.ServiceUser) {
         setError("Zəhmət olmasa administratorla əlaqə saxlayın !");
+        setInterval(() => {
+          setError("")
+        }, 5000);
         return;
       }
       if (res.ok) {

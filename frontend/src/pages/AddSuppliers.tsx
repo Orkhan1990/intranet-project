@@ -106,7 +106,7 @@ const AddSuppliers = () => {
             <label htmlFor="" className="text-sm  w-[200px]">
               E-mail
             </label>
-            <Field as={TextInput} name="email" className="w-96" />
+            <Field as={TextInput} type="email" name="email" className="w-96" />
           </div>
 
           <div className="flex  items-center mt-5 ">

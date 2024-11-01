@@ -1,7 +1,43 @@
 import { Button } from "flowbite-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { SupplierInterface } from "../types";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { FaRegEdit } from "react-icons/fa";
 
 const Suppliers = () => {
+  const [error, setError] = useState("");
+  const [suppliersList, setSupplierList] = useState([]);
+
+  console.log(suppliersList);
+  
+
+  useEffect(() => {
+    const getSuppliers = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:3013/api/v1/supplier/getSuppliers",
+          {
+            method: "GET",
+            credentials: "include", // added this part
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await res.json();
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+        }
+        setSupplierList(data);
+      } catch (error: any) {
+        setError(error.message);
+      }
+    };
+    getSuppliers();
+  }, []);
+
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
       <h2 className="text-center text-lg font-semibold">Təchizatçılar</h2>
@@ -18,10 +54,10 @@ const Suppliers = () => {
             <th scope="col" className="px-6 py-3 text-center">
               Əlaqədar şəxs
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-6 py-3 text-center">
               Telefon
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-6 py-3 text-center">
               Email
             </th>
             <th scope="col" className="px-6 py-3 text-center">
@@ -48,63 +84,43 @@ const Suppliers = () => {
             <th scope="col" className="py-4 px-2">
               #
             </th>
+            <th scope="col" className="py-4 px-2">
+              #
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-            <th
-              scope="row"
-              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          {suppliersList.map((item: SupplierInterface, index: number) => (
+            <tr
+              key={index}
+              className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
             >
-              Apple MacBook Pro 17"
-            </th>
-            <td className="px-6 py-4">Silver</td>
-            <td className="px-6 py-4">Laptop</td>
-            <td className="px-6 py-4">$2999</td>
-            <td className="px-6 py-4">Silver</td>
-            <td className="px-6 py-4">Laptop</td>
-            <td className="px-6 py-4">$2999</td>
-            <td className="px-6 py-4">Silver</td>
-            <td className="px-6 py-4">Laptop</td>
-            <td className="px-6 py-4">$2999</td>
-            <td className="px-6 py-4">Silver</td>
-            <td className="px-6 py-4">Laptop</td>
-            <Link to="">
-            <td className="py-4 px-2 text-blue-700">Bax</td>
+              <td className="px-6 py-4 text-center">{item.supplier}</td>
+              <td className="px-6 py-4 text-center">{item.country}</td>
+              <td className="px-6 py-4 text-center">{item.contactPerson}</td>
+              <td className="px-6 py-4 text-center">{item.phone}</td>
+              <td className="px-6 py-4 text-center">{item.email}</td>
+              <td className="px-6 py-4 text-center">{item.paymentType}</td>
+              <td className="px-6 py-4 text-center">{item.deliverType}</td>
+              <td className="px-6 py-4 text-center">{item.deliverPeriod}</td>
+              <td className="px-6 py-4 text-center">{item.creditLine}</td>
+              <td className="px-6 py-4 text-center">0</td>
+              <td className="px-6 py-4 text-center">{item.creditNote}</td>
+              <td className="px-6 py-4 text-center">{item.creditDuration}</td>
+              <Link to="">
+              <td className="py-4 px-2 text-blue-700 pt-5"><FaRegEdit /></td>
             </Link>
-          </tr>
-          <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-            <th
-              scope="row"
-              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              Microsoft Surface Pro
-            </th>
-            <td className="px-6 py-4">White</td>
-            <td className="px-6 py-4">Laptop PC</td>
-            <td className="px-6 py-4">$1999</td>
-          </tr>
-          <tr className="bg-white dark:bg-gray-800">
-            <th
-              scope="row"
-              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              Magic Mouse 2
-            </th>
-            <td className="px-6 py-4">Black</td>
-            <td className="px-6 py-4">Accessories</td>
-            <td className="px-6 py-4">$99</td>
-          </tr>
+              <td className="py-4 px-2 text-red-700"><FaRegTrashAlt /></td>
+            </tr>
+          ))}
         </tbody>
       </table>
 
       <Link to="/newSuppliers">
-      <Button color={"blue"} className="mt-10 flex gap-5 ml-5">
-        Əlavə et
-        <span className="ml-2">
-          +
-        </span>
-      </Button>
+        <Button color={"blue"} className="mt-10 flex gap-5 ml-5">
+          Əlavə et
+          <span className="ml-2">+</span>
+        </Button>
       </Link>
     </div>
   );

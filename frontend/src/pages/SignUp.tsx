@@ -50,7 +50,10 @@ const SignUp = () => {
             return;
           }
           if(res.ok){
-            setSuccess("İstifadəçi uğurla qeydiyyatdan keçdi!")
+            setSuccess("İstifadəçi uğurla qeydiyyatdan keçdi!");
+            setInterval(() => {
+              setSuccess("")
+            },4000);
           }
           setError("")
          } catch (error:any) {

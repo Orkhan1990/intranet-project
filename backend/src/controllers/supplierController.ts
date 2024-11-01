@@ -45,3 +45,26 @@ export const createSupplier=async(req:Request,res:Response,next:NextFunction)=>{
         next(errorHandler(401,error))
     }
 }
+
+
+
+export const getSuppliers=async(req:Request,res:Response,next:NextFunction)=>{
+    try {
+
+        const supplierRepository = AppDataSource.getRepository(Supplier);
+
+        const suppliers= await supplierRepository.find();
+
+        if(!suppliers){
+            next(errorHandler(401,"Təchizatçılar mövcud deyil!"));
+            return;
+        }
+
+        res.status(200).json(suppliers);
+
+
+        
+    } catch (error) {
+        next(errorHandler(401,error))
+    }
+}
