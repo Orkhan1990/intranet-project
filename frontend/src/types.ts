@@ -132,6 +132,7 @@ export interface OrdersInterface {
 
 
 export interface SupplierInterface{
+  id:number,
   supplier:string,
   country:string,
   contactPerson:string,

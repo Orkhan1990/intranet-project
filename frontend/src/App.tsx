@@ -3,16 +3,17 @@ import Layout from "./components/Layout";
 import NoPage from "./pages/NoPage";
 import Protected from "./components/Protected";
 import Home from './pages/Home';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
+import SignUp from './pages/Auth/SignUp';
 import Orders from './pages/OrderParts';
 import NewCard from './pages/NewCard';
 import NewClient from './pages/NewClient';
-import ClientList from './pages/ClientList';
-import UpdateClient from './pages/UpdateClient';
+import ClientList from './pages/Client/ClientList';
 import ImportWarehouse from './pages/ImportWarehouse';
-import Suppliers from './pages/Suppliers';
-import AddSuppliers from './pages/AddSuppliers';
+import Suppliers from './pages/Supplier/Suppliers';
+import UpdateClient from './pages/Client/UpdateClient';
+import AddSuppliers from './pages/Supplier/AddSuppliers';
+import SignIn from './pages/Auth/SignIn';
+import UpdateSupplier from './pages/Supplier/UpdateSupplier';
 
 
 
@@ -29,13 +30,15 @@ function App() {
       <Route path="/updateClient/:id" element={<Layout><UpdateClient/></Layout>} />
       <Route path="/importWarehouse" element={<Layout><ImportWarehouse/></Layout>} />    
       <Route path="/suppliers" element={<Layout><Suppliers/></Layout>} /> 
-      <Route path="/newSuppliers" element={<Layout><AddSuppliers/></Layout>} />       
+      <Route path="/newSuppliers" element={<Layout><AddSuppliers/></Layout>} /> 
+      <Route path="/updateSupplier/:id" element={<Layout><UpdateSupplier/></Layout>} />       
+      
       
    
        
       </Route>
       <Route path="*" element={<NoPage />} />
-      <Route path="/sign-in" element={<SignIn />} />
+      <Route path="/sign-in" element={<SignIn/>} />
       <Route path="/sign-up" element={<SignUp />} />
 
       </Routes>

@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Button, Label, TextInput } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { successStart } from "../redux-toolkit/features/auth/authSlice";
+import { successStart } from "../../redux-toolkit/features/auth/authSlice";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { UserRole } from "../enums/projectEnums";
+import { UserRole } from "../../enums/projectEnums";
 
 
 

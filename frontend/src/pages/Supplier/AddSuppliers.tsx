@@ -1,7 +1,7 @@
 import { Field, Form, Formik } from "formik";
-import { SupplierInterface } from "../types";
 import { Button, Select, TextInput } from "flowbite-react";
 import { useState } from "react";
+import { SupplierInterface } from "../../types";
 
 const AddSuppliers = () => {
   const [error, setError] = useState("");
@@ -17,6 +17,7 @@ const AddSuppliers = () => {
     "United Kingdom",
   ];
   const SupplierInitialValue: SupplierInterface = {
+    id:0,
     supplier: "",
     country: "USA",
     contactPerson: "",
@@ -30,7 +31,7 @@ const AddSuppliers = () => {
     creditDuration: "",
   };
 
-  const onsubmit = async (values: SupplierInterface) => {
+  const onsubmit = async (values: SupplierInterface,props:any) => {
     console.log(values);
 
     const res = await fetch(
@@ -53,10 +54,12 @@ const AddSuppliers = () => {
     }
 
     if (res.ok) {
-      setSuccess(`${data.supplier} yaradıldı.`);
-      setInterval(() => {
-        setSuccess("");
-      }, 5000);
+      setSuccess(`${data.supplier} yaradıldı`);
+      setTimeout(() => {
+        props.resetForm();
+        props.setSubmitting(false);
+        setSuccess("")
+      }, 3000);
     }
 
     setError("");
@@ -160,7 +163,7 @@ const AddSuppliers = () => {
         </Form>
       </Formik>
       {!error && success && <p className="text-md text-green-700 ml-10 mt-10 ">{success}</p>}
-      {error && !success && <p className="text-lg text-red-700">{error}</p>}
+      {error && !success && <p className="text-lg text-red-700 ml-10 mt-10">{error}</p>}
     </div>
   );
 };

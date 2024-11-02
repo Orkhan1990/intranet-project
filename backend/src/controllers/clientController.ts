@@ -169,6 +169,7 @@ export const updateClient=async(req:Request,res:Response,next:NextFunction)=>{
       next(errorHandler(401,"Müştəri mövcud deyil!"))
     }
 
+    
     clientDataUpdate.companyName = companyName;
     clientDataUpdate.companyRepresentative = companyRepresentative;
     clientDataUpdate.phoneNumber = phoneNumber;

@@ -68,3 +68,98 @@ export const getSuppliers=async(req:Request,res:Response,next:NextFunction)=>{
         next(errorHandler(401,error))
     }
 }
+
+
+
+export const getSupplier=async(req:Request,res:Response,next:NextFunction)=>{
+    try {
+
+        const {id}=req.params;
+        const supplierRepository = AppDataSource.getRepository(Supplier);
+
+        const supplier=await supplierRepository.findOneBy({id:+id})
+
+
+        if(!supplier){
+            next(errorHandler(401,"Belə təchizatçı yoxdur"));
+            return;
+        }
+
+        res.status(200).json(supplier);
+        
+    } catch (error) {
+        next(errorHandler(401,error.message));
+    }
+}
+
+
+export const updateSuplier=async(req:Request,res:Response,next:NextFunction)=>{
+    try {
+
+        const{id}=req.params;
+        
+        const {
+            supplier,
+            country,
+            contactPerson,
+            phone,
+            email,
+            paymentType,
+            deliverType,
+            deliverPeriod,
+            creditLine,
+            creditNote,
+            creditDuration
+        }=req.body;
+        
+        const supplierRepository = AppDataSource.getRepository(Supplier);
+        const supplierData=await supplierRepository.findOneBy({id:+id});
+        
+
+        if(!supplierData){
+            next(errorHandler(401,"Belə təchizatçı yoxdur"));
+            return;
+        }
+
+        supplierData.supplier=supplier;
+        supplierData.contactPerson=contactPerson;
+        supplierData.country=country;
+        supplierData.phone=phone;
+        supplierData.email=email;
+        supplierData.paymentType=paymentType;
+        supplierData.deliverPeriod=deliverPeriod;
+        supplierData.deliverType=deliverType;
+        supplierData.creditDuration=creditDuration;
+        supplierData.creditLine=creditLine;
+        supplierData.creditNote=creditNote;
+
+         await supplierRepository.save(supplierData)
+         res.status(200).json(supplierData);
+
+
+    } catch (error) {
+        next(errorHandler(401,error.message));
+ 
+    }
+}
+
+
+export const deleteSupplier=async(req:Request,res:Response,next:NextFunction)=>{
+    try {
+
+        const {id}=req.params;
+
+        const supplierRepository = AppDataSource.getRepository(Supplier);
+        const result=await supplierRepository.delete(id);
+
+        if(result.affected===0){
+            next(errorHandler(401,"Təchizatçı tapılmadı!"));
+            return;
+        }
+
+        res.status(200).json({message:"Təchizatçı uğurla silindi!"})
+
+    } catch (error) {
+        next(errorHandler(401,error.message))
+    }
+}
