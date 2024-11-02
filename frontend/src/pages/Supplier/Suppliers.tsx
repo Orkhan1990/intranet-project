@@ -157,7 +157,7 @@ const Suppliers = () => {
                     {item.creditDuration}
                   </td>
                   <Link to={`/updateSupplier/${item.id}`}>
-                    <td className="py-4 px-2 text-blue-700 pt-5">
+                    <td className="pt-6 px-2 text-blue-700 ">
                       <FaRegEdit />
                     </td>
                   </Link>

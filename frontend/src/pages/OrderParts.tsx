@@ -2,7 +2,6 @@ import {
   Button,
   Checkbox,
   Select,
-  Table,
   Textarea,
   TextInput,
 } from "flowbite-react";
@@ -57,18 +56,14 @@ const Orders = () => {
 
   return (
     <div className="min-h-screen mt-[100px] mb-[100px] ml-[90px] ">
-      <h2 className="font-semibold text-xl text-center  mb-[50px]">
-        Sifariş
-      </h2>
+      <h2 className="font-semibold text-xl text-center  mb-[50px]">Sifariş</h2>
       <Formik initialValues={ordersInitialValue} onSubmit={onsubmit}>
         {({ values, setFieldValue }) => {
           const deletePart = (index: number) => {
-      
-              setFieldValue(
-                "parts",
-                values.parts.filter((_, i) => i !== index)
-              );
-         
+            setFieldValue(
+              "parts",
+              values.parts.filter((_, i) => i !== index)
+            );
           };
           return (
             <Form>
@@ -247,17 +242,31 @@ const Orders = () => {
 
               <div className="mt-10 ">
                 <FieldArray name="parts">
-                  {({ push, remove }) => (
-                    <div className="border text-sm w-[50%] p-5 rounded-md ">
-                      <Table className="flowbite-table">
-                        <Table.Head>
-                          <Table.HeadCell>№</Table.HeadCell>
-                          <Table.HeadCell>Detalın nömrəsi</Table.HeadCell>
-                          <Table.HeadCell>Sayı</Table.HeadCell>
-                          <Table.HeadCell>Anbarda varmı</Table.HeadCell>
-                          <Table.HeadCell>Detalın adı</Table.HeadCell>
-                          <Table.HeadCell>#</Table.HeadCell>
-                        </Table.Head>
+                  {({ push}) => (
+                    <div className="border text-sm  w-3/4 p-5 rounded-md ">
+                      <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                          <tr>
+                            <th scope="col" className="px-6 py-3">
+                              №
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                              Detalın nömrəsi
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                              Sayı
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                              Anbarda varmı
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                              Detalın adı
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                              #
+                            </th>
+                          </tr>
+                        </thead>
                         {values.parts.map((_, index) => (
                           <OrderPartsComponent
                             name={`parts[${index}]`}
@@ -267,7 +276,8 @@ const Orders = () => {
                             value={values.parts[index]}
                           />
                         ))}
-                      </Table>
+                      </table>
+
                       <div className="flex gap-5">
                         <Button
                           color="blue"
@@ -300,7 +310,7 @@ const Orders = () => {
                     <h2>Geri qaytarma səbəbi</h2>
                     <Field as={Textarea} rows={5} name="message" />
                     <div className="flex gap-2">
-                    <Field as={Select} className="flex-1">
+                      <Field as={Select} className="flex-1">
                         <option value="">Cavabdehliyi dəyişmək</option>
                         <option value="">Sifarişin yerləşdirilməsi</option>
                         <option value="">Təchizatçıya müraciət</option>
@@ -309,16 +319,14 @@ const Orders = () => {
                         <option value="">Mühasibatlığın təsdiqi</option>
                         <option value="">Sifarişi bağlamaq</option>
                         <option value="">Çatdırıldı</option>
-
-
-                    </Field>
-                    <Field as={Select} className="flex-1">
+                      </Field>
+                      <Field as={Select} className="flex-1">
                         <option value="">Heybet Cebrayilov</option>
                         <option value="">Royal Amirli</option>
                         <option value="">Ilkin Mammadov</option>
-                        <option value="">Aqil  Huseyniv</option>
-                    </Field>
-                  </div>
+                        <option value="">Aqil Huseyniv</option>
+                      </Field>
+                    </div>
                   </div>
 
                   <div className="w-[400px] flex flex-col gap-2">
@@ -328,7 +336,6 @@ const Orders = () => {
                       Mesaj Yaz
                     </Button>
                   </div>
-                 
                 </div>
               </div>
               <div className="flex gap-2 mt-20">
@@ -344,7 +351,7 @@ const Orders = () => {
         }}
       </Formik>
 
-      <OrderHistory/>
+      <OrderHistory />
     </div>
   );
 };

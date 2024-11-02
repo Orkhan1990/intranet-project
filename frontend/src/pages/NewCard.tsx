@@ -46,7 +46,7 @@ const newCardInitialValues: NewCardInterface = {
     {
       description: "",
       serviceWorkers: [""],
-    }
+    },
   ],
   jobs: [
     {
@@ -57,13 +57,13 @@ const newCardInitialValues: NewCardInterface = {
       discount: 0,
       oil: "",
       jobWorkers: [{ workerAv: "", workerId: 0 }],
-    }
+    },
   ],
   expences: [
     {
       description: "",
       price: 0,
-    }
+    },
   ],
 };
 
@@ -76,8 +76,6 @@ const NewCard = () => {
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
   const [expencePrice, setExpencePrice] = useState<number[]>([0]);
-
-
 
   const handlePriceUpdate = (index: number, price: number) => {
     const newPrice = [...jobPrices];
@@ -93,12 +91,13 @@ const NewCard = () => {
 
   const totalPrice = jobPrices.reduce((accum, price) => accum + price, 0);
   const totalExpencesPrice = expencePrice.reduce(
-    (accum, price) => accum + price,0);
+    (accum, price) => accum + price,
+    0
+  );
 
-    const totalPriceWithoutNds=totalExpencesPrice+totalPrice;
-    const totalPriceNds=totalPriceWithoutNds*0.18;
-    const totalPriceWithNds=totalPriceWithoutNds+totalPriceNds;
-  
+  const totalPriceWithoutNds = totalExpencesPrice + totalPrice;
+  const totalPriceNds = totalPriceWithoutNds * 0.18;
+  const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
   useEffect(() => {
     const getWorkers = async () => {
@@ -493,18 +492,35 @@ const NewCard = () => {
             {/* JOBS SECTION */}
             <FieldArray name="jobs">
               {({ push, remove }) => (
-                <div className="border p-5 rounded-md  overflow-x-scroll">
+                <div className="border p-5 rounded-md  ">
                   <h2 className="mb-4">İşçilik</h2>
-                  <Table>
-                    <Table.Head>
-                      <Table.HeadCell>İşin kodu (MAN)</Table.HeadCell>
-                      <Table.HeadCell>İşin adı</Table.HeadCell>
-                      <Table.HeadCell>AV</Table.HeadCell>
-                      <Table.HeadCell>Qiymət</Table.HeadCell>
-                      <Table.HeadCell>Endirim(%)</Table.HeadCell>
-                      <Table.HeadCell>Yağ</Table.HeadCell>
-                      <Table.HeadCell>Görüldü</Table.HeadCell>
-                    </Table.Head>
+                  <table className="w-full text-xs text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                      <tr>
+                        <th scope="col" className="text-center">
+                          İşin kodu (MAN)
+                        </th>
+                        <th scope="col" className="text-center">
+                          İşin adı
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center">
+                          AV
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center">
+                          Qiymət
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center">
+                          Endirim(%)
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center">
+                          Yağ
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center">
+                          Görüldü
+                        </th>
+                      </tr>
+                    </thead>
+
                     {values.jobs.map((_, index) => (
                       <NewCardWorkers
                         workers={workers}
@@ -515,7 +531,8 @@ const NewCard = () => {
                         }
                       />
                     ))}
-                  </Table>
+                  </table>
+
                   <div className="flex  gap-2 mt-5 items-center justify-center">
                     <h2 className="font-bold">Cəmi:</h2>
                     <span className="font-semibold">{totalPrice} AZN</span>
@@ -560,7 +577,7 @@ const NewCard = () => {
             {/*EXPENCES*/}
 
             <FieldArray name="expences">
-              {({ push,remove }) => (
+              {({ push, remove }) => (
                 <>
                   {values.expences.map((_, index) => (
                     <AddCharges
