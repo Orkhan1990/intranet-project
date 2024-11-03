@@ -2,7 +2,7 @@ import { Button, Label, Select, TextInput, Textarea } from "flowbite-react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useState } from "react";
 import * as Yup from "yup";
-import { ClientInterface } from "../types";
+import { ClientInterface } from "../../types";
 
 
 
@@ -11,6 +11,7 @@ const NewClient = () => {
   const [success, setSuccess] = useState("");
 
   const initialValues: ClientInterface = {
+    id:0,
     companyName: "",
     companyRepresentative: "",
     phoneNumber: "",
@@ -38,9 +39,7 @@ const NewClient = () => {
     voen: Yup.string().required("Xananı doldur!"),
     contractNumber: Yup.string().required("Xananı doldur!"),
     contractDate: Yup.string().required("Xananı doldur!"),
-    approver: Yup.string().required("Xananı doldur!"),
-    type: Yup.string().required("Verilənlərdən birini seç!"),
-    typeOfStatus: Yup.string().required("Verilənlərdən birini seç!"),
+    approver: Yup.string().required("Xananı doldur!")
   });
 
   const onSubmit = async ( values: any) => {
@@ -261,11 +260,6 @@ const NewClient = () => {
                   <option value={"boss"}>Təsisçi</option>
                   <option value={"itb"}>İTB</option>
                 </Field>
-                <ErrorMessage
-                name="type"
-                component="div"
-                className="text-red-700"
-              />
               </div>
               <div>
                 <Label htmlFor="typeOfStatus" value="FizikiHüquqi" />
@@ -273,11 +267,7 @@ const NewClient = () => {
                   <option value={"phisical"}>Fiziki</option>
                   <option value={"legal"}>Hüquqi</option>
                 </Field>
-                <ErrorMessage
-                name="typeOfStatus"
-                component="div"
-                className="text-red-700"
-              />
+               
               </div>
             </div>
             <Button type="submit" color="blue" className="w-[200px]">

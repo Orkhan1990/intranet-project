@@ -6,7 +6,7 @@ import Home from './pages/Home';
 import SignUp from './pages/Auth/SignUp';
 import Orders from './pages/OrderParts';
 import NewCard from './pages/NewCard';
-import NewClient from './pages/NewClient';
+import NewClient from './pages/Client/NewClient';
 import ClientList from './pages/Client/ClientList';
 import ImportWarehouse from './pages/ImportWarehouse';
 import Suppliers from './pages/Supplier/Suppliers';

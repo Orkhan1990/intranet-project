@@ -1,71 +1,68 @@
-import { Select, Table, TextInput } from "flowbite-react";
+import { Button, Select,TextInput } from "flowbite-react";
+import { FaRegTrashAlt } from "react-icons/fa";
 import { Field } from "formik";
 import { Liquidity } from "../enums/projectEnums";
+import { BrandInterface } from "../types";
+
+
+
 
 interface NewPartInterface {
   name: string;
   index: number;
+  deletePart:(index:number)=>void
+  brands:BrandInterface[]
 }
-const NewPartsComponent = ({ name,index }: NewPartInterface) => {
+const NewPartsComponent = ({ name, index,deletePart,brands }: NewPartInterface) => {
   return (
-    <Table.Body>
-      <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+    <tbody>
+      <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <td className="px-6 py-4">
           <span>{index + 1}</span>
-        </Table.Cell>
+        </td>
 
-        <Table.Cell>
-          <div className="flex gap-2 items-center">
+        <td className="px-1 py-4">
             <Field
               as={TextInput}
               type="text"
               name={`${name}.kod`}
               sizing="sm"
             />
-          </div>
-        </Table.Cell>
+        </td>
 
-        <Table.Cell>
+        <td className="px-1 py-4">
           <Field
             as={TextInput}
             type="text"
             name={`${name}.origKod`}
             sizing="sm"
           />
-        </Table.Cell>
+        </td>
 
-        <Table.Cell>
+        <td className="px-1 py-4">
           <TextInput type="text" name={`${name}.nameParts`} sizing="sm" />
-        </Table.Cell>
+        </td>
 
-        <Table.Cell>
-          <Field
-            as={Select}
-            type="text"
-            name={`${name}.brand`}
-            sizing="sm"
-          >
-            <option value="man">Man</option>
-            <option value="bobcat">Bobcat</option>
-            <option value="sumitomo">Sumitomo</option>
+        <td className="px-1 py-4">
+          <Field as={Select} type="text" name={`${name}.brand`} sizing="sm">
+            {
+              brands.length>0&&brands.map((item:any,index:number)=>(
+                <option value={item.name} key={index}>{item.name}</option>
+
+              ))
+            }
           </Field>
-        </Table.Cell>
+        </td>
 
-        <Table.Cell>
-          <Field
-            as={Select}
-            type="text"
-            name={`${name}.liquidity`}
-            sizing="sm"
-          >
+        <td >
+          <Field as={Select} type="text" name={`${name}.liquidity`} sizing="sm">
             <option value={Liquidity.Fast}>Təcili</option>
             <option value={Liquidity.Normal}>Normal</option>
             <option value={Liquidity.Slow}>Gec</option>
-
           </Field>
-        </Table.Cell>
+        </td>
 
-        <Table.Cell>
+        <td className="px-3 py-4">
           <Field
             as={TextInput}
             type="text"
@@ -73,9 +70,9 @@ const NewPartsComponent = ({ name,index }: NewPartInterface) => {
             sizing="sm"
             className="w-14"
           />
-        </Table.Cell>
+        </td>
 
-        <Table.Cell>
+        <td className="px-3 py-4">
           <Field
             as={TextInput}
             type="text"
@@ -83,20 +80,28 @@ const NewPartsComponent = ({ name,index }: NewPartInterface) => {
             sizing="sm"
             className="w-20"
           />
-        </Table.Cell>
+        </td>
 
-        <Table.Cell>
+        <td className="px-3 py-4">
           <Field
             as={TextInput}
             type="text"
             name={`${name}.salesPrice`}
             sizing="sm"
             className="w-20"
-
           />
-        </Table.Cell>
-      </Table.Row>
-    </Table.Body>
+        </td>
+        <td className="px-3 py-4">
+        <Button
+            className="text-white bg-red-600 hover:!bg-red-800 "
+            size={"xs"}
+            onClick={() => deletePart(index)}
+          >
+            <FaRegTrashAlt />
+          </Button>
+        </td>
+      </tr>
+    </tbody>
   );
 };
 

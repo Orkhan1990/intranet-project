@@ -145,3 +145,10 @@ export interface SupplierInterface{
   creditNote:string,
   creditDuration:string;
 }
+
+
+
+export interface BrandInterface{
+  id:number,
+  name:string
+}

@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class FistMigration1730459863636 implements MigrationInterface {
-    name = 'FistMigration1730459863636'
+export class FirstMigration1730652276231 implements MigrationInterface {
+    name = 'FirstMigration1730652276231'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`newCardProblems\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`description\` varchar(255) NOT NULL, \`newCardId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -11,6 +11,7 @@ export class FistMigration1730459863636 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE \`clients\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`companyName\` varchar(255) NOT NULL, \`companyRepresentative\` varchar(255) NOT NULL, \`phoneNumber\` varchar(255) NOT NULL, \`email\` varchar(255) NOT NULL, \`address\` varchar(255) NOT NULL, \`requisite\` varchar(255) NOT NULL, \`voen\` varchar(255) NOT NULL, \`contractNumber\` varchar(255) NOT NULL, \`contractDate\` varchar(255) NOT NULL, \`approver\` varchar(255) NOT NULL, \`oneCCode\` varchar(255) NULL, \`type\` varchar(255) NOT NULL DEFAULT 'customer', \`typeOfStatus\` varchar(255) NOT NULL DEFAULT 'phisical', \`av\` int NULL, \`partsDiscount\` int NULL, \`userId\` int NOT NULL, UNIQUE INDEX \`IDX_c31234694811c83541603176b1\` (\`companyName\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`users\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`userName\` varchar(255) NOT NULL, \`firstName\` varchar(255) NULL, \`lastName\` varchar(255) NULL, \`email\` varchar(255) NOT NULL, \`userRole\` varchar(255) NOT NULL DEFAULT 'ServiceUser', \`password\` varchar(255) NOT NULL, \`workerIdId\` int NULL, UNIQUE INDEX \`IDX_226bb9aa7aa8a69991209d58f5\` (\`userName\`), UNIQUE INDEX \`IDX_97672ac88f789774dd47f7c8be\` (\`email\`), UNIQUE INDEX \`REL_a27d711f098cb1a7a7b7ac6f5b\` (\`workerIdId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`suppliers\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`supplier\` varchar(255) NOT NULL, \`country\` varchar(255) NULL, \`contact_person\` varchar(255) NOT NULL, \`phone\` varchar(255) NOT NULL, \`email\` varchar(255) NOT NULL, \`paymnet_type\` varchar(255) NOT NULL, \`deliver_type\` varchar(255) NOT NULL, \`deliver_period\` varchar(255) NOT NULL, \`credit_line\` varchar(255) NULL, \`credit_note\` varchar(255) NULL, \`credit_duration\` varchar(255) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`brands\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`name\` varchar(255) NOT NULL, UNIQUE INDEX \`IDX_96db6bbbaa6f23cad26871339b\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`new_card_problems_service_workers_users\` (\`newCardProblemsId\` int NOT NULL, \`usersId\` int NOT NULL, INDEX \`IDX_53214fc43aaed5274cc0422a8e\` (\`newCardProblemsId\`), INDEX \`IDX_258c2269bb5f958d82f4b66f5f\` (\`usersId\`), PRIMARY KEY (\`newCardProblemsId\`, \`usersId\`)) ENGINE=InnoDB`);
         await queryRunner.query(`ALTER TABLE \`newCardProblems\` ADD CONSTRAINT \`FK_ff2179df34db64dba9ec4de8dab\` FOREIGN KEY (\`newCardId\`) REFERENCES \`newCards\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`newCardJobsWorker\` ADD CONSTRAINT \`FK_bc4d8489c51dc109c3e3f79773b\` FOREIGN KEY (\`newCardJobId\`) REFERENCES \`newCardJobs\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -34,6 +35,8 @@ export class FistMigration1730459863636 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX \`IDX_258c2269bb5f958d82f4b66f5f\` ON \`new_card_problems_service_workers_users\``);
         await queryRunner.query(`DROP INDEX \`IDX_53214fc43aaed5274cc0422a8e\` ON \`new_card_problems_service_workers_users\``);
         await queryRunner.query(`DROP TABLE \`new_card_problems_service_workers_users\``);
+        await queryRunner.query(`DROP INDEX \`IDX_96db6bbbaa6f23cad26871339b\` ON \`brands\``);
+        await queryRunner.query(`DROP TABLE \`brands\``);
         await queryRunner.query(`DROP TABLE \`suppliers\``);
         await queryRunner.query(`DROP INDEX \`REL_a27d711f098cb1a7a7b7ac6f5b\` ON \`users\``);
         await queryRunner.query(`DROP INDEX \`IDX_97672ac88f789774dd47f7c8be\` ON \`users\``);
