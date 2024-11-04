@@ -4,6 +4,7 @@ import { UserRole } from "../enums/userRole"
 import { Client } from "./Client"
 import { NewCardProblems } from "./NewCardProblems"
 import { NewCardJobsWorker } from "./NewCardJobWorkers"
+import { Warehouse } from "./Warehouse"
 
 @Entity({name:"users"})
 export class User extends AllEntities {
@@ -46,4 +47,7 @@ export class User extends AllEntities {
     @OneToOne(() => NewCardJobsWorker)
     @JoinColumn()
     workerId: NewCardJobsWorker
+
+    @OneToMany(()=>Warehouse,(warehouse)=>warehouse.user,{cascade:true})
+    warehouses:Warehouse[]
 }
