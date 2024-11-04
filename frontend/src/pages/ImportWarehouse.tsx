@@ -1,5 +1,5 @@
 import { Field, FieldArray, Form, Formik } from "formik";
-import {  WarehouseInterface } from "../types";
+import {  SupplierInterface, WarehouseInterface } from "../types";
 import { Liquidity, Market, PayType } from "../enums/projectEnums";
 import { Button, Select,Textarea, TextInput } from "flowbite-react";
 import NewPartsComponent from "../components/NewPartsComponent";
@@ -10,6 +10,7 @@ const ImportWarehouse = () => {
  
   const[brands,setBrands]=useState([]);
   const[error,setError]=useState<string>("")
+  const[suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
 
 
   useEffect(()=>{
@@ -36,6 +37,32 @@ const ImportWarehouse = () => {
         }
        }
        getBrands();
+
+       const getSuplliers=async()=>{
+        try {
+          const res = await fetch(
+            "http://localhost:3013/api/v1/supplier/getSuppliers",
+            {
+              method: "GET",
+              credentials: "include", // added this part
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+  
+          const data = await res.json();
+          if (!res.ok || data.success === false) {
+            setError(data.message);
+          }
+          setSuppliers(data);
+          
+        } catch (error:any) {
+          setError(error.message)
+        }
+       }
+
+       getSuplliers();
   },[])
 
   const wareHouseInitialValues: WarehouseInterface = {
@@ -120,8 +147,11 @@ const ImportWarehouse = () => {
                   Təchizatçı
                 </label>
                 <Field as={Select} name="supplierId" className="w-96">
-                  <option value="1">DHL</option>
-                  <option value="2">Forex</option>
+                  {
+                    suppliers.length>0&&suppliers.map((item:SupplierInterface,index:number)=>(
+                      <option value={item.id} key={index}>{item.supplier}</option>
+                    ))
+                  }
                 </Field>
               </div>
 
@@ -190,16 +220,16 @@ const ImportWarehouse = () => {
                             <th scope="col" className="px-6 py-3 text-center">
                               Likvidlik
                             </th>
-                            <th scope="col" className="px-6 py-3 text-center">
+                            <th scope="col" className="px-6 py-3 ">
                               Say
                             </th>
-                            <th scope="col" className="px-6 py-3 text-center">
+                            <th scope="col" className="px-6 py-3 ">
                               Qiymet
                             </th>
-                            <th scope="col" className="px-6 py-3 text-center">
+                            <th scope="col" className="px-6 py-3">
                               Satış Qiyməti
                             </th>
-                            <th scope="col" className="px-6 py-3 text-center">
+                            <th scope="col" className="px-6 py-3">
                               #
                             </th>
                           </tr>

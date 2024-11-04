@@ -46,9 +46,8 @@ const NewPartsComponent = ({ name, index,deletePart,brands }: NewPartInterface) 
         <td className="px-1 py-4">
           <Field as={Select} type="text" name={`${name}.brand`} sizing="sm">
             {
-              brands.length>0&&brands.map((item:any,index:number)=>(
-                <option value={item.name} key={index}>{item.name}</option>
-
+              brands.length>0&&brands.map((item:BrandInterface,index:number)=>(
+                <option value={item.id} key={index}>{item.name}</option>
               ))
             }
           </Field>
