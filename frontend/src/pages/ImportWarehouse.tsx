@@ -1,5 +1,5 @@
 import { Field, FieldArray, Form, Formik } from "formik";
-import {  SupplierInterface, WarehouseInterface } from "../types";
+import {  BrandInterface, SupplierInterface, WarehouseInterface } from "../types";
 import { Liquidity, Market, PayType } from "../enums/projectEnums";
 import { Button, Select,Textarea, TextInput } from "flowbite-react";
 import NewPartsComponent from "../components/NewPartsComponent";
@@ -8,8 +8,9 @@ import { useEffect, useState } from "react";
 
 const ImportWarehouse = () => {
  
-  const[brands,setBrands]=useState([]);
-  const[error,setError]=useState<string>("")
+  const[brands,setBrands]=useState<BrandInterface[]>([]);
+  const[error,setError]=useState<string>("");
+  const[success,setSuccess]=useState<string>("")
   const[suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
 
 
@@ -67,7 +68,7 @@ const ImportWarehouse = () => {
 
   const wareHouseInitialValues: WarehouseInterface = {
     requestId: 0,
-    supplierId: 0,
+    supplierId: suppliers[0]?.id||0,
     invoice: "",
     market: Market.Local,
     paymentType: PayType.Cash,
@@ -77,7 +78,7 @@ const ImportWarehouse = () => {
         kod: "",
         origKod: "",
         nameParts: "",
-        brand: 0,
+        brand:brands[0]?.id||0,
         liquidity: Liquidity.Fast,
         count: 0,
         price: 0,
@@ -114,8 +115,32 @@ const ImportWarehouse = () => {
     reader.readAsArrayBuffer(file);
   };
 
-  const onsubmit = (values: WarehouseInterface) => {
+  const onsubmit =async (values: WarehouseInterface) => {
     console.log(values);
+    try {
+      const res = await fetch("http://localhost:3013/api/v1/warehouse/createWarehouse", {
+        method: "POST",
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await res.json();
+
+      if(!res.ok||data.success===false){
+        setError(data.message);
+        return;
+      }else{
+        setSuccess(data.result);
+      }
+
+      
+      
+    } catch (error:any) {
+      setError(error)
+    }
   };
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
@@ -302,6 +327,14 @@ const ImportWarehouse = () => {
           );
         }}
       </Formik>
+      {
+        !error&&success&&(<p className="mt-10 ml-10 text-sm text-green-700">{success}</p>)
+
+      }
+      {
+        error&&!success&&(<p className="mt-10 ml-10 text-sm text-red-700">{error}</p>)
+
+      }
     </div>
   );
 };
