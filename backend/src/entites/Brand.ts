@@ -1,6 +1,6 @@
 import { Column, Entity, OneToOne } from 'typeorm';
 import { AllEntities } from './AllEntities';
-import { WarehouseParts } from './WarehouseParts';
+import { WarehouseParts } from './SparePart';
 
 
 @Entity({name:"brands"})

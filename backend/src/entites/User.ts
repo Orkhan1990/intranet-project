@@ -2,9 +2,9 @@ import { Entity, Column, OneToMany, OneToOne, JoinColumn} from "typeorm"
 import { AllEntities } from "./AllEntities"
 import { UserRole } from "../enums/userRole"
 import { Client } from "./Client"
-import { NewCardProblems } from "./NewCardProblems"
-import { NewCardJobsWorker } from "./NewCardJobWorkers"
-import { Warehouse } from "./Warehouse"
+import { CardProblem} from "./CardProblem"
+import { Invoice} from "./Invoice"
+import { CardWorkerJob } from "./CardWorkerJob"
 
 @Entity({name:"users"})
 export class User extends AllEntities {
@@ -38,16 +38,16 @@ export class User extends AllEntities {
     @Column()
     password: string
 
-    @OneToMany(() => Client, (client) => client.user,{cascade:true})
+    @OneToMany(() => Client, (client) => client.user)
     clients: Client[]
 
-    @OneToMany(() => NewCardProblems, (newCardproblem) => newCardproblem.serviceWorkers,{cascade:true})
-    newCardproblem: NewCardProblems[];
+    @OneToMany(() => CardProblem, (cardProblem) => cardProblem.serviceWorkers)
+    cardProblems: CardProblem[];
 
-    @OneToOne(() => NewCardJobsWorker)
+    @OneToOne(() => CardWorkerJob)
     @JoinColumn()
-    workerId: NewCardJobsWorker
+    cardWorkerJob: CardWorkerJob
 
-    @OneToMany(()=>Warehouse,(warehouse)=>warehouse.user,{cascade:true})
-    warehouses:Warehouse[]
+    @OneToMany(()=>Invoice,(warehouse)=>warehouse.user)
+    invoices:Invoice[]
 }

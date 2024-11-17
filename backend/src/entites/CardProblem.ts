@@ -1,17 +1,17 @@
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { User } from "./User";
-import { NewCard } from "./NewCard";
+import { Card } from "./Card";
 
-@Entity({ name: "newCardProblems" })
-export class NewCardProblems extends AllEntities {
+@Entity({ name: "card_problems" })
+export class CardProblem extends AllEntities {
   @Column()
   description: string;
 
-  @ManyToMany(() => User, (user) => user.newCardproblem)
+  @ManyToMany(() => User, (user) => user.cardProblems)
   @JoinTable() // This will create a junction table
   serviceWorkers: User[];
 
-  @ManyToOne(() => NewCard, (newCard) => newCard.newCardProblems)
-  newCard: NewCard;
+  @ManyToOne(() =>Card, (card) => card.cardProblem)
+  card:Card;
 }

@@ -1,12 +1,12 @@
 import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Client } from "./Client";
-import { NewCardProblems } from "./NewCardProblems";
-import { NewCardJobs } from "./NewCardJobs";
+import { CardProblem} from "./CardProblem";
+import { CardJob} from "./CardJob";
 
-@Entity({name:"newCards"})
+@Entity({name:"cards"})
 
-export class NewCard extends AllEntities{
+export class Card extends AllEntities{
    
     @Column()
     type:string;
@@ -57,9 +57,9 @@ export class NewCard extends AllEntities{
     @Column()
     clientId:number;
 
-    @OneToMany(()=>NewCardProblems,(newCardProblem)=>newCardProblem.newCard,{cascade:true})
-    newCardProblems:NewCardProblems[]
+    @OneToMany(()=>CardProblem,(cardProblem)=>cardProblem.card)
+    cardProblem:CardProblem[]
 
-    @OneToMany(()=>NewCardJobs,(newCardjob)=>newCardjob.newCard,{cascade:true})
-    newCardJobs:NewCardJobs[]
+    @OneToMany(()=>CardJob,(cardjob)=>cardjob.card)
+    cardJobs:CardJob[]
 }

@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class FistMigration1731339837365 implements MigrationInterface {
-    name = 'FistMigration1731339837365'
+export class FirstMigration1731700064071 implements MigrationInterface {
+    name = 'FirstMigration1731700064071'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`newCardProblems\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`description\` varchar(255) NOT NULL, \`newCardId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -12,8 +12,8 @@ export class FistMigration1731339837365 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE \`brands\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`name\` varchar(255) NOT NULL, UNIQUE INDEX \`IDX_96db6bbbaa6f23cad26871339b\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`warehouse_parts\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`code\` varchar(255) NOT NULL, \`origCode\` varchar(255) NOT NULL, \`name\` varchar(255) NOT NULL, \`liquidity\` varchar(255) NOT NULL, \`count\` int NOT NULL, \`price\` int NOT NULL, \`sell_price\` int NOT NULL, \`brandId\` int NULL, \`warehouseId\` int NULL, UNIQUE INDEX \`REL_d1ccf1186b3628af6c7c186cb4\` (\`brandId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`suppliers\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`supplier\` varchar(255) NOT NULL, \`country\` varchar(255) NULL, \`contact_person\` varchar(255) NOT NULL, \`phone\` varchar(255) NOT NULL, \`email\` varchar(255) NOT NULL, \`paymnet_type\` varchar(255) NOT NULL, \`deliver_type\` varchar(255) NOT NULL, \`deliver_period\` varchar(255) NOT NULL, \`credit_line\` varchar(255) NULL, \`credit_note\` varchar(255) NULL, \`credit_duration\` varchar(255) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`warehouses\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`requestId\` varchar(255) NOT NULL, \`invoice\` varchar(255) NOT NULL, \`market\` varchar(255) NOT NULL, \`paymentType\` varchar(255) NOT NULL, \`comment\` varchar(255) NOT NULL, \`message\` varchar(255) NULL, \`supplierId\` int NULL, \`userId\` int NULL, UNIQUE INDEX \`REL_624768a438d9862609f7c449cd\` (\`supplierId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`users\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`userName\` varchar(255) NOT NULL, \`firstName\` varchar(255) NULL, \`lastName\` varchar(255) NULL, \`email\` varchar(255) NOT NULL, \`userRole\` varchar(255) NOT NULL DEFAULT 'ServiceUser', \`password\` varchar(255) NOT NULL, \`workerIdId\` int NULL, UNIQUE INDEX \`IDX_226bb9aa7aa8a69991209d58f5\` (\`userName\`), UNIQUE INDEX \`IDX_97672ac88f789774dd47f7c8be\` (\`email\`), UNIQUE INDEX \`REL_a27d711f098cb1a7a7b7ac6f5b\` (\`workerIdId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`warehouses\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`requestId\` varchar(255) NOT NULL, \`invoice\` varchar(255) NOT NULL, \`market\` varchar(255) NOT NULL, \`paymentType\` varchar(255) NOT NULL, \`comment\` varchar(255) NOT NULL, \`message\` varchar(255) NULL, \`supplierId\` int NULL, \`userId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`users\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`userName\` varchar(255) NOT NULL, \`firstName\` varchar(255) NULL, \`lastName\` varchar(255) NULL, \`email\` varchar(255) NOT NULL, \`userRole\` varchar(255) NOT NULL DEFAULT 'ServiceUser', \`password\` varchar(255) NOT NULL, \`newCardJobsWorkerId\` int NULL, UNIQUE INDEX \`IDX_226bb9aa7aa8a69991209d58f5\` (\`userName\`), UNIQUE INDEX \`IDX_97672ac88f789774dd47f7c8be\` (\`email\`), UNIQUE INDEX \`REL_e5bf5580e6c2a8499343447a91\` (\`newCardJobsWorkerId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`new_card_problems_service_workers_users\` (\`newCardProblemsId\` int NOT NULL, \`usersId\` int NOT NULL, INDEX \`IDX_53214fc43aaed5274cc0422a8e\` (\`newCardProblemsId\`), INDEX \`IDX_258c2269bb5f958d82f4b66f5f\` (\`usersId\`), PRIMARY KEY (\`newCardProblemsId\`, \`usersId\`)) ENGINE=InnoDB`);
         await queryRunner.query(`ALTER TABLE \`newCardProblems\` ADD CONSTRAINT \`FK_ff2179df34db64dba9ec4de8dab\` FOREIGN KEY (\`newCardId\`) REFERENCES \`newCards\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`newCardJobsWorker\` ADD CONSTRAINT \`FK_bc4d8489c51dc109c3e3f79773b\` FOREIGN KEY (\`newCardJobId\`) REFERENCES \`newCardJobs\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -22,9 +22,9 @@ export class FistMigration1731339837365 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`clients\` ADD CONSTRAINT \`FK_59c1e5e51addd6ebebf76230b37\` FOREIGN KEY (\`userId\`) REFERENCES \`users\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`warehouse_parts\` ADD CONSTRAINT \`FK_d1ccf1186b3628af6c7c186cb4d\` FOREIGN KEY (\`brandId\`) REFERENCES \`brands\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`warehouse_parts\` ADD CONSTRAINT \`FK_59e6c70580b1cdcedbc4a09d0b4\` FOREIGN KEY (\`warehouseId\`) REFERENCES \`warehouses\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`warehouses\` ADD CONSTRAINT \`FK_624768a438d9862609f7c449cd6\` FOREIGN KEY (\`supplierId\`) REFERENCES \`suppliers\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`warehouses\` ADD CONSTRAINT \`FK_624768a438d9862609f7c449cd6\` FOREIGN KEY (\`supplierId\`) REFERENCES \`suppliers\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`warehouses\` ADD CONSTRAINT \`FK_f5885122ba5d7743711ae964bc7\` FOREIGN KEY (\`userId\`) REFERENCES \`users\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`users\` ADD CONSTRAINT \`FK_a27d711f098cb1a7a7b7ac6f5b2\` FOREIGN KEY (\`workerIdId\`) REFERENCES \`newCardJobsWorker\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`users\` ADD CONSTRAINT \`FK_e5bf5580e6c2a8499343447a918\` FOREIGN KEY (\`newCardJobsWorkerId\`) REFERENCES \`newCardJobsWorker\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`new_card_problems_service_workers_users\` ADD CONSTRAINT \`FK_53214fc43aaed5274cc0422a8e1\` FOREIGN KEY (\`newCardProblemsId\`) REFERENCES \`newCardProblems\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE \`new_card_problems_service_workers_users\` ADD CONSTRAINT \`FK_258c2269bb5f958d82f4b66f5fc\` FOREIGN KEY (\`usersId\`) REFERENCES \`users\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
     }
@@ -32,7 +32,7 @@ export class FistMigration1731339837365 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE \`new_card_problems_service_workers_users\` DROP FOREIGN KEY \`FK_258c2269bb5f958d82f4b66f5fc\``);
         await queryRunner.query(`ALTER TABLE \`new_card_problems_service_workers_users\` DROP FOREIGN KEY \`FK_53214fc43aaed5274cc0422a8e1\``);
-        await queryRunner.query(`ALTER TABLE \`users\` DROP FOREIGN KEY \`FK_a27d711f098cb1a7a7b7ac6f5b2\``);
+        await queryRunner.query(`ALTER TABLE \`users\` DROP FOREIGN KEY \`FK_e5bf5580e6c2a8499343447a918\``);
         await queryRunner.query(`ALTER TABLE \`warehouses\` DROP FOREIGN KEY \`FK_f5885122ba5d7743711ae964bc7\``);
         await queryRunner.query(`ALTER TABLE \`warehouses\` DROP FOREIGN KEY \`FK_624768a438d9862609f7c449cd6\``);
         await queryRunner.query(`ALTER TABLE \`warehouse_parts\` DROP FOREIGN KEY \`FK_59e6c70580b1cdcedbc4a09d0b4\``);
@@ -45,11 +45,10 @@ export class FistMigration1731339837365 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX \`IDX_258c2269bb5f958d82f4b66f5f\` ON \`new_card_problems_service_workers_users\``);
         await queryRunner.query(`DROP INDEX \`IDX_53214fc43aaed5274cc0422a8e\` ON \`new_card_problems_service_workers_users\``);
         await queryRunner.query(`DROP TABLE \`new_card_problems_service_workers_users\``);
-        await queryRunner.query(`DROP INDEX \`REL_a27d711f098cb1a7a7b7ac6f5b\` ON \`users\``);
+        await queryRunner.query(`DROP INDEX \`REL_e5bf5580e6c2a8499343447a91\` ON \`users\``);
         await queryRunner.query(`DROP INDEX \`IDX_97672ac88f789774dd47f7c8be\` ON \`users\``);
         await queryRunner.query(`DROP INDEX \`IDX_226bb9aa7aa8a69991209d58f5\` ON \`users\``);
         await queryRunner.query(`DROP TABLE \`users\``);
-        await queryRunner.query(`DROP INDEX \`REL_624768a438d9862609f7c449cd\` ON \`warehouses\``);
         await queryRunner.query(`DROP TABLE \`warehouses\``);
         await queryRunner.query(`DROP TABLE \`suppliers\``);
         await queryRunner.query(`DROP INDEX \`REL_d1ccf1186b3628af6c7c186cb4\` ON \`warehouse_parts\``);

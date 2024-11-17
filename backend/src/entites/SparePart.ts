@@ -1,12 +1,12 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 import { AllEntities } from "./AllEntities";
-import { Warehouse } from "./Warehouse";
+import { Invoice } from "./Invoice";
 import { Brand } from "./Brand";
 
 
 
-@Entity({name:"warehouse_parts"})
-export class WarehouseParts extends AllEntities{
+@Entity({name:"spare_parts"})
+export class SparePart extends AllEntities{
 
   @Column()
   code:string
@@ -30,12 +30,12 @@ export class WarehouseParts extends AllEntities{
   @Column({name:"sell_price"})
   sellPrice:number
 
-  @OneToOne(() => Brand, (brand) => brand.warehouseParts, { cascade: true })
+  @OneToOne(() => Brand, (brand) => brand.warehouseParts)
   @JoinColumn() // This will create a foreign key in the Brand table
   brand: Brand;
 
-  @ManyToOne(() => Warehouse, (warehouse) =>warehouse.parts) // specify inverse side as a second parameter
-  warehouse: Warehouse
+  @ManyToOne(() => Invoice, (invoice) =>invoice.spareParts) // specify inverse side as a second parameter
+  invoice: Invoice
 
   
 

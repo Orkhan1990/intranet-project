@@ -78,7 +78,7 @@ const ImportWarehouse = () => {
         kod: "",
         origKod: "",
         nameParts: "",
-        brand:brands[0]?.id||0,
+        brand:Number(brands[0]?.id||0),
         liquidity: Liquidity.Fast,
         count: 0,
         price: 0,
@@ -118,7 +118,8 @@ const ImportWarehouse = () => {
   const onsubmit =async (values: WarehouseInterface) => {
     console.log(values);
     try {
-      const res = await fetch("http://localhost:3013/api/v1/warehouse/createWarehouse", {
+      const res = await fetch("http://localhost:3013/api/v1/warehouse/createWarehouse", 
+        {
         method: "POST",
         credentials: 'include',
         headers: {
@@ -128,7 +129,8 @@ const ImportWarehouse = () => {
       });
 
       const data = await res.json();
-
+        console.log(data);
+        
       if(!res.ok||data.success===false){
         setError(data.message);
         return;
@@ -148,7 +150,7 @@ const ImportWarehouse = () => {
         Anbara daxil etmək
       </h2>
 
-      <Formik initialValues={wareHouseInitialValues} onSubmit={onsubmit}>
+      <Formik initialValues={wareHouseInitialValues} onSubmit={onsubmit} enableReinitialize>
         {({ values, setFieldValue }) => {
           const deletePart = (index: number) => {
             setFieldValue(
@@ -278,7 +280,7 @@ const ImportWarehouse = () => {
                             kod: "",
                             origKod: "",
                             nameParts: "",
-                            brand: 0,
+                            brand:Number(brands[0]?.id || 0),
                             liquidity: Liquidity.Fast,
                             count: 0,
                             price: 0,
@@ -316,7 +318,7 @@ const ImportWarehouse = () => {
                 </div>
               </div>
               <div className="flex gap-2 mt-20">
-                <Button size={"sm"} color={"blue"}>
+                <Button size={"sm"} color={"blue"} type="submit">
                   Yadda Saxla
                 </Button>
                 <Button size={"sm"} color={"blue"}>

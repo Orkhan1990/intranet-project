@@ -4,9 +4,9 @@ import { CustomRequest } from "../middleware/verifyToken";
 import { AppDataSource } from "../database";
 import { Supplier } from "../entites/Supplier";
 import { Brand } from "../entites/Brand";
-import { Warehouse } from "../entites/Warehouse";
+import { Warehouse } from "../entites/Invoice";
 import { User } from "../entites/User";
-import { WarehouseParts } from "../entites/WarehouseParts";
+import { WarehouseParts } from "../entites/SparePart";
 
 
 
@@ -65,19 +65,14 @@ export const createWarehouse = async (
     const warehousePartsRepository = AppDataSource.getRepository(WarehouseParts);
 
 
-    const getSupplier=await supplierRepository.findOneBy({id:supplierId});
+    const getSupplier=await supplierRepository.findOneBy({id:+supplierId});
 
     if(!getSupplier){
         next(errorHandler(401,"Təchizatçı yoxdur!!"));
         return;
     }
 
-    const getBrand=await brandRepository.findOneBy({id:supplierId});
-
-    if(!getBrand){
-        next(errorHandler(401,"Belə marka yoxdur!!"));
-        return;
-    }
+   
 
     const newWarehouse=new Warehouse();
     newWarehouse.requestId=requestId;
@@ -87,30 +82,44 @@ export const createWarehouse = async (
     newWarehouse.paymentType=paymentType;
     newWarehouse.message=message;
     newWarehouse.comment=comment
-    newWarehouse.user={id:userId} as User
+    newWarehouse.user={id:userId} as any;
 
     await warehouseRepository.save(newWarehouse);
+ 
+    // const newPartsArray = await Promise.all(
+    //   req.body.parts.map(async (part: PartsInterface) => {
 
-    const newPartsArray=req.body.parts.map((part:PartsInterface)=>{
-           const newWarehouseParts=new WarehouseParts();
-           newWarehouseParts.code=part.kod;
-           newWarehouseParts.origCode=part.origKod;
-           newWarehouseParts.count=part.count;
-           newWarehouseParts.brand=getBrand;
-           newWarehouseParts.liquidity=part.liquidity;
-           newWarehouseParts.name=part.nameParts;
-           newWarehouseParts.sellPrice=part.salesPrice;
-           newWarehouseParts.price=part.price;
-           newWarehouseParts.warehouse=newWarehouse
+    //     const getBrand=await brandRepository.findOneBy({id:part.brand});
 
-           return newWarehouseParts;
-    })
+    //     if(!getBrand){
+    //         next(errorHandler(401,"Belə marka yoxdur!!"));
+    //         return;
+    //     }
+
+    //     const newWarehouseParts = new WarehouseParts();
+    //     newWarehouseParts.code = part.kod;
+    //     newWarehouseParts.origCode = part.origKod;
+    //     newWarehouseParts.count = part.count;
+    //     newWarehouseParts.brand = getBrand;
+    //     newWarehouseParts.liquidity = part.liquidity;
+    //     newWarehouseParts.name = part.nameParts;
+    //     newWarehouseParts.sellPrice = part.salesPrice;
+    //     newWarehouseParts.price = part.price;
+    //     newWarehouseParts.warehouse=newWarehouse;
+
+    //     // Save the warehouse part
+    //     await warehousePartsRepository.save(newWarehouseParts);
+
+    //     return newWarehouseParts;
+    //   })
+    // );
 
 
+    // newWarehouse.parts = newPartsArray;
+    // await warehouseRepository.save(newWarehouse); // Update warehouse with linked parts
 
-      newPartsArray.forEach((item:any)=> {
-          warehousePartsRepository.save(item);
-    });
+
+    
     
     res.status(200).json({result:`${req.body.parts.length>1?"Məhsullar əlavə olundu":"Məhsul əlavə olundu"}`})
 

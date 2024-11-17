@@ -40,7 +40,7 @@ const NewPartsComponent = ({ name, index,deletePart,brands }: NewPartInterface) 
         </td>
 
         <td className="px-1 py-4">
-          <TextInput type="text" name={`${name}.nameParts`} sizing="sm" />
+          <Field as={TextInput} type="text" name={`${name}.nameParts`} sizing="sm" />
         </td>
 
         <td className="px-1 py-4">

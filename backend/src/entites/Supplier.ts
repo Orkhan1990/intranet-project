@@ -1,6 +1,6 @@
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { AllEntities } from './AllEntities';
-import { Warehouse } from './Warehouse';
+import { Warehouse } from './Invoice';
 
 
 @Entity({name:"suppliers"})
@@ -40,7 +40,7 @@ export class Supplier extends AllEntities{
     creditDuration: string;
 
 
-    @OneToOne(() => Warehouse, (warehouse) => warehouse.supplier)
-    warehouse: Warehouse;
+    @OneToMany(() => Warehouse, (warehouse) => warehouse.supplier)
+    warehouses: Warehouse[];
 
 }

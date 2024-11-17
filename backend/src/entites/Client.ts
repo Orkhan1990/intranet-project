@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { User } from "./User";
-import { NewCard } from "./NewCard";
+import { NewCard } from "./Card";
 
 
 @Entity({name:"clients"})

@@ -3,14 +3,14 @@ import { DataSource } from "typeorm"
 import { User } from "./entites/User"
 import dotenv from "dotenv";
 import { Client } from "./entites/Client";
-import { NewCard } from "./entites/NewCard";
-import { NewCardProblems } from "./entites/NewCardProblems";
-import { NewCardJobs } from "./entites/NewCardJobs";
-import { NewCardJobsWorker } from "./entites/NewCardJobWorkers";
+import { NewCard } from "./entites/Card";
+import { NewCardProblems } from "./entites/CardProblem";
+import { NewCardJobs } from "./entites/CardJob";
+import { NewCardJobsWorker } from "./entites/CardWorkerJob";
 import { Supplier } from "./entites/Supplier";
 import { Brand } from "./entites/Brand";
-import { Warehouse } from "./entites/Warehouse";
-import { WarehouseParts } from "./entites/WarehouseParts";
+import { Warehouse } from "./entites/Invoice";
+import { WarehouseParts } from "./entites/SparePart";
 dotenv.config();
 
 
