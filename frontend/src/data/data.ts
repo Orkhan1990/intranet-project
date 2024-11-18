@@ -68,7 +68,7 @@ export const navbarList:NavbarListInterface[] = [
           },
           {
               title:"Anbarın siyahısı",
-              url:"/wearHouse"
+              url:"/wareHouse"
           },
           {
               title:"Alətlər",

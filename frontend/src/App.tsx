@@ -8,12 +8,13 @@ import Orders from './pages/OrderParts';
 import NewCard from './pages/NewCard';
 import NewClient from './pages/Client/NewClient';
 import ClientList from './pages/Client/ClientList';
-import ImportWarehouse from './pages/ImportWarehouse';
+import ImportWarehouse from './pages/Warehouse/ImportWarehouse';
 import Suppliers from './pages/Supplier/Suppliers';
 import UpdateClient from './pages/Client/UpdateClient';
 import AddSuppliers from './pages/Supplier/AddSuppliers';
 import SignIn from './pages/Auth/SignIn';
 import UpdateSupplier from './pages/Supplier/UpdateSupplier';
+import Warehouse from './pages/Warehouse/Warehouse';
 
 
 
@@ -28,7 +29,8 @@ function App() {
       <Route path="/newClient" element={<Layout><NewClient/></Layout>} />       
       <Route path="/clientList" element={<Layout><ClientList/></Layout>} />   
       <Route path="/updateClient/:id" element={<Layout><UpdateClient/></Layout>} />
-      <Route path="/importWarehouse" element={<Layout><ImportWarehouse/></Layout>} />    
+      <Route path="/importWarehouse" element={<Layout><ImportWarehouse/></Layout>} />  
+      <Route path="/wareHouse" element={<Layout><Warehouse/></Layout>} />    
       <Route path="/suppliers" element={<Layout><Suppliers/></Layout>} /> 
       <Route path="/newSuppliers" element={<Layout><AddSuppliers/></Layout>} /> 
       <Route path="/updateSupplier/:id" element={<Layout><UpdateSupplier/></Layout>} />       

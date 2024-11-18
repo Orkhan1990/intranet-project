@@ -1,8 +1,8 @@
 import { Field, FieldArray, Form, Formik } from "formik";
-import {  BrandInterface, SupplierInterface, WarehouseInterface } from "../types";
-import { Liquidity, Market, PayType } from "../enums/projectEnums";
+import {  BrandInterface, SupplierInterface, WarehouseInterface } from "../../types";
+import { Liquidity, Market, PayType } from "../../enums/projectEnums";
 import { Button, Select,Textarea, TextInput } from "flowbite-react";
-import NewPartsComponent from "../components/NewPartsComponent";
+import NewPartsComponent from "../../components/NewPartsComponent";
 import * as XLSX from "xlsx";
 import { useEffect, useState } from "react";
 
