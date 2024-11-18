@@ -1,12 +1,12 @@
 import express from "express";
-import { createWarehouse } from "../controllers/warehouseController";
+import { createInvoice } from "../controllers/invoiceController";
 import verifyToken from "../middleware/verifyToken";
 
 
 const router=express.Router();
 
 
-router.post("/createWarehouse",verifyToken,createWarehouse)
+router.post("/createInvoice",verifyToken,createInvoice)
 
 
 

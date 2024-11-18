@@ -3,14 +3,14 @@ import { DataSource } from "typeorm"
 import { User } from "./entites/User"
 import dotenv from "dotenv";
 import { Client } from "./entites/Client";
-import { NewCard } from "./entites/Card";
-import { NewCardProblems } from "./entites/CardProblem";
-import { NewCardJobs } from "./entites/CardJob";
-import { NewCardJobsWorker } from "./entites/CardWorkerJob";
+import { Card} from "./entites/Card";
+import { CardProblem } from "./entites/CardProblem";
+import { CardJob} from "./entites/CardJob";
+import { CardWorkerJob} from "./entites/CardWorkerJob";
 import { Supplier } from "./entites/Supplier";
 import { Brand } from "./entites/Brand";
-import { Warehouse } from "./entites/Invoice";
-import { WarehouseParts } from "./entites/SparePart";
+import { Invoice} from "./entites/Invoice";
+import { SparePart} from "./entites/SparePart";
 dotenv.config();
 
 
@@ -22,7 +22,7 @@ export const AppDataSource = new DataSource({
     username:DATABASE_USERNAME,
     password:DATABASE_PASSWORD,
     database:DATABASE,
-    entities: [User,Client,NewCard,NewCardProblems,NewCardJobs,NewCardJobsWorker,Supplier,Brand,Warehouse,WarehouseParts],
+    entities: [User,Client,Card,CardProblem,CardJob,CardWorkerJob,Supplier,Brand,Invoice,SparePart],
     synchronize: false,
     migrations: ["./src/migrations/**/*.ts"],
 

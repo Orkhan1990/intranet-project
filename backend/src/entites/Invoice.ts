@@ -28,7 +28,7 @@ export class Invoice extends AllEntities {
   @OneToMany(() => SparePart, (part) => part.invoice) // specify inverse side as a second parameter
   spareParts: SparePart[];
 
-  @ManyToOne(() => Supplier, (supplier) => supplier.warehouses,{onDelete:"CASCADE"})
+  @ManyToOne(() => Supplier, (supplier) => supplier.invoices,{onDelete:"CASCADE"})
   supplier: Supplier;
 
   @ManyToOne(()=>User,(user)=>user.invoices)

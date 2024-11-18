@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Invoice } from "./Invoice";
 import { Brand } from "./Brand";
@@ -30,7 +30,7 @@ export class SparePart extends AllEntities{
   @Column({name:"sell_price"})
   sellPrice:number
 
-  @OneToOne(() => Brand, (brand) => brand.warehouseParts)
+  @ManyToOne(() => Brand, (brand) => brand.spareParts)
   @JoinColumn() // This will create a foreign key in the Brand table
   brand: Brand;
 

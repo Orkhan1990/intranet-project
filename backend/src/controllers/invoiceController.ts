@@ -4,15 +4,15 @@ import { CustomRequest } from "../middleware/verifyToken";
 import { AppDataSource } from "../database";
 import { Supplier } from "../entites/Supplier";
 import { Brand } from "../entites/Brand";
-import { Warehouse } from "../entites/Invoice";
+import { Invoice } from "../entites/Invoice";
 import { User } from "../entites/User";
-import { WarehouseParts } from "../entites/SparePart";
+import { SparePart } from "../entites/SparePart";
 
 
 
 
 
-interface PartsInterface{
+interface SparePartInterface{
     kod:string,
     origKod:string,
     nameParts:string,
@@ -24,7 +24,7 @@ interface PartsInterface{
 }
 
 
-interface WarehouseInterface{
+interface InvoiceInterface{
     requestId:string,
       supplierId:number,
       invoice:string,
@@ -32,10 +32,10 @@ interface WarehouseInterface{
       paymentType:string,
       comment:string
       message:string,
-      parts:PartsInterface[]
+      parts:SparePartInterface[]
 }
 
-export const createWarehouse = async (
+export const createInvoice = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
@@ -57,12 +57,12 @@ export const createWarehouse = async (
         { kod, origKod, nameParts, brand, liquidity, count, price, salesPrice },
       ],
       message,
-    }:WarehouseInterface = req.body;
+    }:InvoiceInterface = req.body;
 
     const supplierRepository = AppDataSource.getRepository(Supplier);
     const brandRepository = AppDataSource.getRepository(Brand);
-    const warehouseRepository = AppDataSource.getRepository(Warehouse);
-    const warehousePartsRepository = AppDataSource.getRepository(WarehouseParts);
+    const invoiceRepository = AppDataSource.getRepository(Invoice);
+    const sparePartRepository = AppDataSource.getRepository(SparePart);
 
 
     const getSupplier=await supplierRepository.findOneBy({id:+supplierId});
@@ -74,17 +74,17 @@ export const createWarehouse = async (
 
    
 
-    const newWarehouse=new Warehouse();
-    newWarehouse.requestId=requestId;
-    newWarehouse.supplier=getSupplier;
-    newWarehouse.invoice=invoice;
-    newWarehouse.market=market;
-    newWarehouse.paymentType=paymentType;
-    newWarehouse.message=message;
-    newWarehouse.comment=comment
-    newWarehouse.user={id:userId} as any;
+    const newInvoice=new Invoice();
+    newInvoice.requestId=requestId;
+    newInvoice.supplier=getSupplier;
+    newInvoice.invoice=invoice;
+    newInvoice.market=market;
+    newInvoice.paymentType=paymentType;
+    newInvoice.message=message;
+    newInvoice.comment=comment
+    newInvoice.user={id:userId} as any;
 
-    await warehouseRepository.save(newWarehouse);
+    await invoiceRepository.save(newInvoice);
  
     // const newPartsArray = await Promise.all(
     //   req.body.parts.map(async (part: PartsInterface) => {

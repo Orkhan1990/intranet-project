@@ -118,7 +118,7 @@ const ImportWarehouse = () => {
   const onsubmit =async (values: WarehouseInterface) => {
     console.log(values);
     try {
-      const res = await fetch("http://localhost:3013/api/v1/warehouse/createWarehouse", 
+      const res = await fetch("http://localhost:3013/api/v1/invoice/createInvoice", 
         {
         method: "POST",
         credentials: 'include',

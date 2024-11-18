@@ -51,7 +51,7 @@ export class Card extends AllEntities{
     recommendation:string;
 
     
-    @ManyToOne(() => Client, (client) => client.newCards)
+    @ManyToOne(() => Client, (client) => client.cards)
     client: Client
     
     @Column()
