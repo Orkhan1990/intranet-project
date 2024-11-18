@@ -86,37 +86,35 @@ export const createInvoice = async (
 
     await invoiceRepository.save(newInvoice);
  
-    // const newPartsArray = await Promise.all(
-    //   req.body.parts.map(async (part: PartsInterface) => {
+    const newPartsArray = await Promise.all(
+      req.body.parts.map(async (part:SparePartInterface) => {
 
-    //     const getBrand=await brandRepository.findOneBy({id:part.brand});
+        const getBrand=await brandRepository.findOneBy({id:part.brand});
 
-    //     if(!getBrand){
-    //         next(errorHandler(401,"Belə marka yoxdur!!"));
-    //         return;
-    //     }
+        if(!getBrand){
+            next(errorHandler(401,"Belə marka yoxdur!!"));
+            return;
+        }
 
-    //     const newWarehouseParts = new WarehouseParts();
-    //     newWarehouseParts.code = part.kod;
-    //     newWarehouseParts.origCode = part.origKod;
-    //     newWarehouseParts.count = part.count;
-    //     newWarehouseParts.brand = getBrand;
-    //     newWarehouseParts.liquidity = part.liquidity;
-    //     newWarehouseParts.name = part.nameParts;
-    //     newWarehouseParts.sellPrice = part.salesPrice;
-    //     newWarehouseParts.price = part.price;
-    //     newWarehouseParts.warehouse=newWarehouse;
+        const newSparePart = new SparePart();
+        newSparePart.code = part.kod;
+        newSparePart.origCode = part.origKod;
+        newSparePart.count = part.count;
+        newSparePart.brand = getBrand;
+        newSparePart.liquidity = part.liquidity;
+        newSparePart.name = part.nameParts;
+        newSparePart.sellPrice = part.salesPrice;
+        newSparePart.price = part.price;
+        newSparePart.invoice=newInvoice;
 
-    //     // Save the warehouse part
-    //     await warehousePartsRepository.save(newWarehouseParts);
+        // Save the warehouse part
+        await sparePartRepository.save(newSparePart);
 
-    //     return newWarehouseParts;
-    //   })
-    // );
+        return newSparePart;
+      })
+    );
 
 
-    // newWarehouse.parts = newPartsArray;
-    // await warehouseRepository.save(newWarehouse); // Update warehouse with linked parts
 
 
     
