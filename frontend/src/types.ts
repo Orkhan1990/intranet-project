@@ -89,6 +89,7 @@ export interface PartsInterface {
   count: number;
   price: number;
   salesPrice: number;
+  barcode:string
 }
 
 export interface WarehouseInterface {

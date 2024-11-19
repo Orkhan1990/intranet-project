@@ -83,6 +83,7 @@ const ImportWarehouse = () => {
         count: 0,
         price: 0,
         salesPrice: 0,
+        barcode:""
       },
     ],
     message: "",

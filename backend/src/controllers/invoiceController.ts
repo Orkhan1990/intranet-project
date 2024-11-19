@@ -125,3 +125,25 @@ export const createInvoice = async (
     next(errorHandler(401, error));
   }
 };
+
+
+export const getInvoices=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    const invoiceRepository = AppDataSource.getRepository(Invoice);
+
+    const allInvoices=await invoiceRepository.find({
+      relations: ["spareParts", "spareParts.brand", "user", "supplier"]
+    })
+
+
+    if(allInvoices.length===0){
+      next(errorHandler(401,"Sifarişlər yoxdur!"));
+      return;
+    }
+   
+    res.status(200).json(allInvoices);
+    
+  } catch (error) {
+    next(errorHandler(401,error));
+  }
+}

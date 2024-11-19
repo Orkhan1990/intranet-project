@@ -6,6 +6,7 @@ import clientRouter from "./routes/clientRouter";
 import supplierRouter from "./routes/supplierRouter";
 import brandRouter from "./routes/brandRouter";
 import invoiceRouter from "./routes/invoiceRouter";
+import sparePartRouter from "./routes/sparePartRouter";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -33,6 +34,8 @@ app.use("/api/v1/client",clientRouter);
 app.use("/api/v1/supplier",supplierRouter);
 app.use("/api/v1/brand",brandRouter);
 app.use("/api/v1/invoice",invoiceRouter);
+app.use("/api/v1/sparePart",sparePartRouter);
+
 
 
 

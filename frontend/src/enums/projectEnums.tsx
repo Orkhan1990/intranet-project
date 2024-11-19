@@ -22,9 +22,9 @@ export enum PayType{
 
 
 export enum Liquidity{
-    Fast="fast",
+    Fast="təcili",
     Normal="normal",
-    Slow="slow"
+    Slow="gec"
 }
 
 
