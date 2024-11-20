@@ -3,6 +3,7 @@ import { Liquidity } from "../../enums/projectEnums";
 import { BrandInterface } from "../../types";
 import { FcOk } from "react-icons/fc";
 import { FaXmark } from "react-icons/fa6";
+import { Button } from "flowbite-react";
 
 interface SparePartInterafce {
   code: string;
@@ -16,10 +17,21 @@ interface SparePartInterafce {
   barcode: string;
   createdAt: Date;
 }
-
+const numbers:number[]=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
 const Warehouse = () => {
   const [error, setError] = useState("");
   const [sparePartData, setSparePartData] = useState<SparePartInterafce[]>([]);
+  const [queryData,setQueryData]=useState({
+    code:"",
+    origCode:"",
+    brand:"",
+    name:"",
+    count:0,
+    liquidity:"",
+    price:0,
+    sellPrice:0,
+    barcode:""
+  })
   useEffect(() => {
     const getAllInvoice = async () => {
       try {
@@ -93,7 +105,9 @@ const Warehouse = () => {
               <th scope="col" className="px-6 py-3">
                 Yerləşmə yeri
               </th>
-              <th scope="col" className="px-6 py-3"></th>
+              <th scope="col" className="px-6 py-3">
+                Çap
+              </th>
               <th scope="col" className="px-6 py-3">
                 Yaradılma tarixi
               </th>
@@ -102,32 +116,32 @@ const Warehouse = () => {
           <tbody>
             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <td className="px-6 py-4">
-                <input className="border w-24" />
+                <input className="border w-24 pl-1" />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24" />
+                <input className="border w-24 pl-1" />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24" />
+                <input className="border w-24 pl-1" />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24" />
+                <input className="border w-24 pl-1" />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-20" />
+                <input className="border w-20 pl-1" />
               </td>
               <td className="px-6 py-4"></td>
               <td className="px-6 py-4">
-                <input className="border w-24" />
+                <input className="border w-24 pl-1" />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24" />
+                <input className="border w-24 pl-1" />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24" />
+                <input className="border w-24 pl-1" />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24" />
+                <input className="border w-24 pl-1" />
               </td>
             </tr>
             {sparePartData.length > 0 &&
@@ -146,11 +160,66 @@ const Warehouse = () => {
                   <td className="px-6 py-4">{data.price}</td>
                   <td className="px-6 py-4">{data.sellPrice}</td>
                   <td className="px-6 py-4">{data.barcode}</td>
-                  <td className="px-6 py-4">{data.barcode}</td>
-                  <td className="px-6 py-4"></td>
+                  <td className="px-6 py-4">
+                    <div className="flex  gap-2">
+                      <div className="flex gap-1 items-center">
+                      <label htmlFor="">Rəf</label>
+                      <select name="" id="" className="w-15 h-10 rounded-md ">
+                        <option value=""></option>
+                      {
+                       numbers.map((item:number,index:number)=>(
+                        <option key={index} value={item}>{item}</option>
+                       ))
+                      }
+                      </select>
+                      </div>
+                      <div className="flex gap-1 items-center">
+                      <label htmlFor="">Yer</label>
+                      <select name="" id="" className="w-15 h-10 rounded-md ">
+                        <option value=""></option>
+                      {
+                       numbers.map((item:number,index:number)=>(
+                        <option key={index} value={item}>{item}</option>
+                       ))
+                      }
+                      </select>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="flex gap-2">
+                    <div className="flex  gap-2">
+                      <div className="flex gap-1 items-center">
+                      <label htmlFor="">Say</label>
+                      <select name="" id="" className="w-15 h-10 rounded-md ">
+                        <option value=""></option>
+                      {
+                       numbers.map((item:number,index:number)=>(
+                        <option key={index} value={item}>{item}</option>
+                       ))
+                      }
+                      </select>
+                      </div>
+                      <div className="flex">
+                      <div className="flex gap-1 items-center">
+                      <label htmlFor="">Çap sayı</label>
+                      <select name="" id="" className="w-15 h-10 rounded-md ">
+                        <option value=""></option>
+                      {
+                       numbers.map((item:number,index:number)=>(
+                        <option key={index} value={item}>{item}</option>
+                       ))
+                      }
+                      </select>
+                      </div>
+                    </div>
+                      <button className="bg-blue-500 text-white rounded-md p-1 hover:bg-blue-700">Çap et</button>
+                      </div>
+                    </div>   
+                  </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
-                      <span>{data.barcode ? <FcOk /> : <FaXmark />}</span>
+                      <span>{data.barcode ? <FcOk className=" w-5 h-5"/> : <FaXmark  className="text-white bg-red-700 w-5 h-5 p-1 rounded-full"/>}</span>
                       <span>{getCreatedDate(data.createdAt)}</span>
                     </div>
                   </td>
