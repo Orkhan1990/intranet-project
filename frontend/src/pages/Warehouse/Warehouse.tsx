@@ -3,7 +3,6 @@ import { Liquidity } from "../../enums/projectEnums";
 import { BrandInterface } from "../../types";
 import { FcOk } from "react-icons/fc";
 import { FaXmark } from "react-icons/fa6";
-import { Button } from "flowbite-react";
 
 interface SparePartInterafce {
   code: string;
@@ -66,6 +65,30 @@ const Warehouse = () => {
     const d = new Date(date);
     return d.toLocaleDateString("en-GB");
   };
+   console.log(queryData);
+   
+  const handleChange=(e:any)=>{
+    const{id,value}=e.target;
+     setQueryData((prev)=>({...prev,[id]:value}))
+  }
+
+
+
+  const filteredData = sparePartData.filter((data) => {
+    return (
+      (queryData.code ? (data.code.toLocaleLowerCase()||"").includes(queryData.code) : true) &&
+      (queryData.origCode ? (data.origCode.toLocaleLowerCase()||"").includes(queryData.origCode) : true) &&
+      (queryData.brand ? (data.brand.name.toLowerCase()||"").includes(queryData.brand.toLowerCase()) : true) &&
+      (queryData.name ? (data.name.toLowerCase()||"").includes(queryData.name.toLowerCase()) : true) &&
+      (queryData.liquidity ? (data.liquidity.toLowerCase()||"").includes(queryData.liquidity.toLowerCase()) : true) &&
+      (queryData.barcode ? (data.barcode || "").includes(queryData.barcode) : true) &&
+      (queryData.count ? data.count.toString().includes(queryData.count.toString()) : true) &&
+      (queryData.price ? data.price.toString().includes(queryData.price.toString()) : true) &&
+      (queryData.sellPrice ? data.sellPrice.toString().includes(queryData.sellPrice.toString()) : true)
+    );
+  });
+
+
   return (
     <div className="min-h-screen relative overflow-x-auto">
       <form>
@@ -116,36 +139,36 @@ const Warehouse = () => {
           <tbody>
             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" />
+                <input className="border w-24 pl-1"  name="code" id="code" onChange={handleChange}/>
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" />
+                <input className="border w-24 pl-1" name="origCode" id="origCode" onChange={handleChange}/>
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" />
+                <input className="border w-24 pl-1" name="brand" id="brand" onChange={handleChange}/>
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" />
+                <input className="border w-24 pl-1" name="name" id="name" onChange={handleChange}/>
               </td>
               <td className="px-6 py-4">
-                <input className="border w-20 pl-1" />
+                <input className="border w-20 pl-1" name="count" id="count" onChange={handleChange}/>
               </td>
               <td className="px-6 py-4"></td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" />
+                <input className="border w-24 pl-1" name="liquidity" id="liquidity" onChange={handleChange}/>
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" />
+                <input className="border w-24 pl-1" name="price" id="price" onChange={handleChange}/>
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" />
+                <input className="border w-24 pl-1" name="sellPrice" id="sellPrice" onChange={handleChange}/>
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" />
+                <input className="border w-24 pl-1" name="barcode" id="barcode" onChange={handleChange}/>
               </td>
             </tr>
-            {sparePartData.length > 0 &&
-              sparePartData.map((data: SparePartInterafce, index: number) => (
+            {filteredData.length > 0 &&
+              filteredData.map((data: SparePartInterafce, index: number) => (
                 <tr
                   key={index}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
