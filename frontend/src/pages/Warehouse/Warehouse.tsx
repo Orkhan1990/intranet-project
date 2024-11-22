@@ -175,19 +175,29 @@ const Warehouse = () => {
                 >
                   <td className="px-6 py-4">{data.code}</td>
                   <td className="px-6 py-4">{data.origCode}</td>
-                  <td className="px-6 py-4">{data.brand.name}</td>
-                  <td className="px-6 py-4">{data.name}</td>
-                  <td className="px-6 py-4">{data.count}</td>
+                  <td className="px-6 py-4">
+                  {data.brand.name}
+                  </td>
+                  <td className="px-6 py-4">
+                    <input type="text" value={data.name} className="rounded-lg text-xs"/>
+                  </td>
+                  <td className="px-6 py-4">
+                  <input type="text" value={data.count} className="rounded-lg text-xs w-20" />
+                  </td>
                   <td className="px-6 py-4"></td>
                   <td className="px-6 py-4">{data.liquidity}</td>
-                  <td className="px-6 py-4">{data.price}</td>
-                  <td className="px-6 py-4">{data.sellPrice}</td>
+                  <td className="px-6 py-4">
+                  <input type="text" value={data.price} className="rounded-lg text-xs w-20" />
+                  </td>
+                  <td className="px-6 py-4">
+                  <input type="text" value={data.sellPrice} className="rounded-lg text-xs w-20"/>
+                  </td>
                   <td className="px-6 py-4">{data.barcode}</td>
                   <td className="px-6 py-4">
                     <div className="flex  gap-2">
                       <div className="flex gap-1 items-center">
                       <label htmlFor="">Rəf</label>
-                      <select name="" id="" className="w-15 h-10 rounded-md ">
+                      <select name="" id="" className="text-xs rounded-md ">
                         <option value=""></option>
                       {
                        numbers.map((item:number,index:number)=>(
@@ -198,7 +208,7 @@ const Warehouse = () => {
                       </div>
                       <div className="flex gap-1 items-center">
                       <label htmlFor="">Yer</label>
-                      <select name="" id="" className="w-15 h-10 rounded-md ">
+                      <select name="" id="" className="text-xs rounded-md ">
                         <option value=""></option>
                       {
                        numbers.map((item:number,index:number)=>(
@@ -214,7 +224,7 @@ const Warehouse = () => {
                     <div className="flex  gap-2">
                       <div className="flex gap-1 items-center">
                       <label htmlFor="">Say</label>
-                      <select name="" id="" className="w-15 h-10 rounded-md ">
+                      <select name="" id="" className="text-xs rounded-md ">
                         <option value=""></option>
                       {
                        numbers.map((item:number,index:number)=>(
@@ -226,7 +236,7 @@ const Warehouse = () => {
                       <div className="flex">
                       <div className="flex gap-1 items-center">
                       <label htmlFor="">Çap sayı</label>
-                      <select name="" id="" className="w-15 h-10 rounded-md ">
+                      <select name="" id="" className=" rounded-md text-xs">
                         <option value=""></option>
                       {
                        numbers.map((item:number,index:number)=>(
@@ -236,7 +246,7 @@ const Warehouse = () => {
                       </select>
                       </div>
                     </div>
-                      <button className="bg-blue-500 text-white rounded-md p-1 hover:bg-blue-700">Çap et</button>
+                      <button className="bg-blue-500 text-xs text-white rounded-md p-1 hover:bg-blue-700 ">Çap et</button>
                       </div>
                     </div>   
                   </td>

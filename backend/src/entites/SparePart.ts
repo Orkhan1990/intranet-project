@@ -33,6 +33,12 @@ export class SparePart extends AllEntities{
   @Column({nullable:true})
   barcode:string
 
+  @Column({nullable:true})
+  row:string
+
+  @Column({nullable:true})
+  column:string
+
   @ManyToOne(() => Brand, (brand) => brand.spareParts)
   @JoinColumn() // This will create a foreign key in the Brand table
   brand: Brand;
