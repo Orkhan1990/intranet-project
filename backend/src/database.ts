@@ -11,6 +11,8 @@ import { Supplier } from "./entites/Supplier";
 import { Brand } from "./entites/Brand";
 import { Invoice} from "./entites/Invoice";
 import { SparePart} from "./entites/SparePart";
+import { Order } from "./entites/Order";
+import { OrderPart } from "./entites/OrderPart";
 dotenv.config();
 
 
@@ -22,7 +24,7 @@ export const AppDataSource = new DataSource({
     username:DATABASE_USERNAME,
     password:DATABASE_PASSWORD,
     database:DATABASE,
-    entities: [User,Client,Card,CardProblem,CardJob,CardWorkerJob,Supplier,Brand,Invoice,SparePart],
+    entities: [User,Client,Card,CardProblem,CardJob,CardWorkerJob,Supplier,Brand,Invoice,SparePart,Order,OrderPart],
     synchronize: false,
     migrations: ["./src/migrations/**/*.ts"],
 

@@ -6,12 +6,12 @@ import {
   TextInput,
 } from "flowbite-react";
 import { Field, FieldArray, Form, Formik } from "formik";
-import { DeliverType, OrderType, PayType } from "../enums/projectEnums";
-import { OrdersInterface } from "../types";
-import OrderPartsComponent from "../components/OrderPartsComponent";
-import OrderHistory from "../components/OrderHistory";
+import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
+import { OrdersInterface } from "../../types";
+import OrderPartsComponent from "../../components/OrderPartsComponent";
+import OrderHistory from "../../components/OrderHistory";
 
-const Orders = () => {
+const CreateOrders= () => {
   const produceDateData: string[] = [
     "2024",
     "2023",
@@ -356,4 +356,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default CreateOrders;

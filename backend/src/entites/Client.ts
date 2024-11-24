@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { User } from "./User";
 import { Card} from "./Card";
+import { Order } from "./Order";
 
 
 @Entity({name:"clients"})
@@ -66,6 +67,9 @@ export class Client extends AllEntities{
 
     @OneToMany(() =>Card, (card) => card.client)
     cards:Card[]
+
+    @OneToMany(()=>Order,(order=>order.clients))
+    order:Order
     
    
 }

@@ -3,6 +3,10 @@ import { Liquidity } from "../../enums/projectEnums";
 import { BrandInterface } from "../../types";
 import { FcOk } from "react-icons/fc";
 import { FaXmark } from "react-icons/fa6";
+import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
+import { MdKeyboardDoubleArrowRight } from "react-icons/md";
+
+
 
 interface SparePartInterafce {
   code: string;
@@ -16,21 +20,83 @@ interface SparePartInterafce {
   barcode: string;
   createdAt: Date;
 }
-const numbers:number[]=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
+const numbers: number[] = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+];
 const Warehouse = () => {
   const [error, setError] = useState("");
   const [sparePartData, setSparePartData] = useState<SparePartInterafce[]>([]);
-  const [queryData,setQueryData]=useState({
-    code:"",
-    origCode:"",
-    brand:"",
-    name:"",
-    count:0,
-    liquidity:"",
-    price:0,
-    sellPrice:0,
-    barcode:""
-  })
+  // const [currentPage,setCurrentPage]=useState(1);
+  // const[itemsPerPage]=useState(7);
+  const [queryData, setQueryData] = useState({
+    code: "",
+    origCode: "",
+    brand: "",
+    name: "",
+    count: 0,
+    liquidity: "",
+    price: 0,
+    sellPrice: 0,
+    barcode: "",
+  });
+
+
+  const filteredData = sparePartData.filter((data) => {
+    return (
+      (queryData.code
+        ? (data.code.toLocaleLowerCase() || "").includes(queryData.code)
+        : true) &&
+      (queryData.origCode
+        ? (data.origCode.toLocaleLowerCase() || "").includes(queryData.origCode)
+        : true) &&
+      (queryData.brand
+        ? (data.brand.name.toLowerCase() || "").includes(
+            queryData.brand.toLowerCase()
+          )
+        : true) &&
+      (queryData.name
+        ? (data.name.toLowerCase() || "").includes(queryData.name.toLowerCase())
+        : true) &&
+      (queryData.liquidity
+        ? (data.liquidity.toLowerCase() || "").includes(
+            queryData.liquidity.toLowerCase()
+          )
+        : true) &&
+      (queryData.barcode
+        ? (data.barcode || "").includes(queryData.barcode)
+        : true) &&
+      (queryData.count
+        ? data.count.toString().includes(queryData.count.toString())
+        : true) &&
+      (queryData.price
+        ? data.price.toString().includes(queryData.price.toString())
+        : true) &&
+      (queryData.sellPrice
+        ? data.sellPrice.toString().includes(queryData.sellPrice.toString())
+        : true)
+    );
+  });
+
+  // const totalPages=Math.ceil(sparePartData.length/itemsPerPage);
+  // const paginate=(pageNumber:number)=>setCurrentPage(pageNumber);
+
+  // const indexOfLastItem = currentPage * itemsPerPage;
+  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+
+
+
+  const countAllParts = filteredData.reduce((accumluator, currentValue) => {
+    return accumluator + currentValue.price;
+  }, 0);
+  const countAllSellPrice = filteredData.reduce(
+    (accumluator, currentValue) => {
+      return accumluator + currentValue.sellPrice;
+    },
+    0
+  );
+
   useEffect(() => {
     const getAllInvoice = async () => {
       try {
@@ -65,29 +131,14 @@ const Warehouse = () => {
     const d = new Date(date);
     return d.toLocaleDateString("en-GB");
   };
-   console.log(queryData);
-   
-  const handleChange=(e:any)=>{
-    const{id,value}=e.target;
-     setQueryData((prev)=>({...prev,[id]:value}))
-  }
+  console.log(queryData);
 
+  const handleChange = (e: any) => {
+    const { id, value } = e.target;
+    setQueryData((prev) => ({ ...prev, [id]: value }));
+  };
 
-
-  const filteredData = sparePartData.filter((data) => {
-    return (
-      (queryData.code ? (data.code.toLocaleLowerCase()||"").includes(queryData.code) : true) &&
-      (queryData.origCode ? (data.origCode.toLocaleLowerCase()||"").includes(queryData.origCode) : true) &&
-      (queryData.brand ? (data.brand.name.toLowerCase()||"").includes(queryData.brand.toLowerCase()) : true) &&
-      (queryData.name ? (data.name.toLowerCase()||"").includes(queryData.name.toLowerCase()) : true) &&
-      (queryData.liquidity ? (data.liquidity.toLowerCase()||"").includes(queryData.liquidity.toLowerCase()) : true) &&
-      (queryData.barcode ? (data.barcode || "").includes(queryData.barcode) : true) &&
-      (queryData.count ? data.count.toString().includes(queryData.count.toString()) : true) &&
-      (queryData.price ? data.price.toString().includes(queryData.price.toString()) : true) &&
-      (queryData.sellPrice ? data.sellPrice.toString().includes(queryData.sellPrice.toString()) : true)
-    );
-  });
-
+ 
 
   return (
     <div className="min-h-screen relative overflow-x-auto">
@@ -139,32 +190,77 @@ const Warehouse = () => {
           <tbody>
             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1"  name="code" id="code" onChange={handleChange}/>
+                <input
+                  className="border w-24 pl-1"
+                  name="code"
+                  id="code"
+                  onChange={handleChange}
+                />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" name="origCode" id="origCode" onChange={handleChange}/>
+                <input
+                  className="border w-24 pl-1"
+                  name="origCode"
+                  id="origCode"
+                  onChange={handleChange}
+                />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" name="brand" id="brand" onChange={handleChange}/>
+                <input
+                  className="border w-24 pl-1"
+                  name="brand"
+                  id="brand"
+                  onChange={handleChange}
+                />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" name="name" id="name" onChange={handleChange}/>
+                <input
+                  className="border w-24 pl-1"
+                  name="name"
+                  id="name"
+                  onChange={handleChange}
+                />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-20 pl-1" name="count" id="count" onChange={handleChange}/>
+                <input
+                  className="border w-20 pl-1"
+                  name="count"
+                  id="count"
+                  onChange={handleChange}
+                />
               </td>
               <td className="px-6 py-4"></td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" name="liquidity" id="liquidity" onChange={handleChange}/>
+                <input
+                  className="border w-24 pl-1"
+                  name="liquidity"
+                  id="liquidity"
+                  onChange={handleChange}
+                />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" name="price" id="price" onChange={handleChange}/>
+                <input
+                  className="border w-24 pl-1"
+                  name="price"
+                  id="price"
+                  onChange={handleChange}
+                />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" name="sellPrice" id="sellPrice" onChange={handleChange}/>
+                <input
+                  className="border w-24 pl-1"
+                  name="sellPrice"
+                  id="sellPrice"
+                  onChange={handleChange}
+                />
               </td>
               <td className="px-6 py-4">
-                <input className="border w-24 pl-1" name="barcode" id="barcode" onChange={handleChange}/>
+                <input
+                  className="border w-24 pl-1"
+                  name="barcode"
+                  id="barcode"
+                  onChange={handleChange}
+                />
               </td>
             </tr>
             {filteredData.length > 0 &&
@@ -175,92 +271,156 @@ const Warehouse = () => {
                 >
                   <td className="px-6 py-4">{data.code}</td>
                   <td className="px-6 py-4">{data.origCode}</td>
+                  <td className="px-6 py-4">{data.brand.name}</td>
                   <td className="px-6 py-4">
-                  {data.brand.name}
+                    <input
+                      type="text"
+                      value={data.name}
+                      className="rounded-lg text-xs"
+                    />
                   </td>
                   <td className="px-6 py-4">
-                    <input type="text" value={data.name} className="rounded-lg text-xs"/>
-                  </td>
-                  <td className="px-6 py-4">
-                  <input type="text" value={data.count} className="rounded-lg text-xs w-20" />
+                    <input
+                      type="text"
+                      value={data.count}
+                      className="rounded-lg text-xs w-20"
+                    />
                   </td>
                   <td className="px-6 py-4"></td>
                   <td className="px-6 py-4">{data.liquidity}</td>
                   <td className="px-6 py-4">
-                  <input type="text" value={data.price} className="rounded-lg text-xs w-20" />
+                    <input
+                      type="text"
+                      value={data.price}
+                      className="rounded-lg text-xs w-20"
+                    />
                   </td>
                   <td className="px-6 py-4">
-                  <input type="text" value={data.sellPrice} className="rounded-lg text-xs w-20"/>
+                    <input
+                      type="text"
+                      value={data.sellPrice}
+                      className="rounded-lg text-xs w-20"
+                    />
                   </td>
                   <td className="px-6 py-4">{data.barcode}</td>
                   <td className="px-6 py-4">
                     <div className="flex  gap-2">
                       <div className="flex gap-1 items-center">
-                      <label htmlFor="">Rəf</label>
-                      <select name="" id="" className="text-xs rounded-md ">
-                        <option value=""></option>
-                      {
-                       numbers.map((item:number,index:number)=>(
-                        <option key={index} value={item}>{item}</option>
-                       ))
-                      }
-                      </select>
+                        <label htmlFor="">Rəf</label>
+                        <select name="" id="" className="text-xs rounded-md ">
+                          <option value=""></option>
+                          {numbers.map((item: number, index: number) => (
+                            <option key={index} value={item}>
+                              {item}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div className="flex gap-1 items-center">
-                      <label htmlFor="">Yer</label>
-                      <select name="" id="" className="text-xs rounded-md ">
-                        <option value=""></option>
-                      {
-                       numbers.map((item:number,index:number)=>(
-                        <option key={index} value={item}>{item}</option>
-                       ))
-                      }
-                      </select>
+                        <label htmlFor="">Yer</label>
+                        <select name="" id="" className="text-xs rounded-md ">
+                          <option value=""></option>
+                          {numbers.map((item: number, index: number) => (
+                            <option key={index} value={item}>
+                              {item}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   </td>
                   <td>
                     <div className="flex gap-2">
-                    <div className="flex  gap-2">
-                      <div className="flex gap-1 items-center">
-                      <label htmlFor="">Say</label>
-                      <select name="" id="" className="text-xs rounded-md ">
-                        <option value=""></option>
-                      {
-                       numbers.map((item:number,index:number)=>(
-                        <option key={index} value={item}>{item}</option>
-                       ))
-                      }
-                      </select>
-                      </div>
-                      <div className="flex">
-                      <div className="flex gap-1 items-center">
-                      <label htmlFor="">Çap sayı</label>
-                      <select name="" id="" className=" rounded-md text-xs">
-                        <option value=""></option>
-                      {
-                       numbers.map((item:number,index:number)=>(
-                        <option key={index} value={item}>{item}</option>
-                       ))
-                      }
-                      </select>
+                      <div className="flex  gap-2">
+                        <div className="flex gap-1 items-center">
+                          <label htmlFor="">Say</label>
+                          <select name="" id="" className="text-xs rounded-md ">
+                            <option value=""></option>
+                            {numbers.map((item: number, index: number) => (
+                              <option key={index} value={item}>
+                                {item}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="flex">
+                          <div className="flex gap-1 items-center">
+                            <label htmlFor="">Çap sayı</label>
+                            <select
+                              name=""
+                              id=""
+                              className=" rounded-md text-xs"
+                            >
+                              <option value=""></option>
+                              {numbers.map((item: number, index: number) => (
+                                <option key={index} value={item}>
+                                  {item}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                        <button className="bg-blue-500 text-xs text-white rounded-md p-1 hover:bg-blue-700 ">
+                          Çap et
+                        </button>
                       </div>
                     </div>
-                      <button className="bg-blue-500 text-xs text-white rounded-md p-1 hover:bg-blue-700 ">Çap et</button>
-                      </div>
-                    </div>   
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
-                      <span>{data.barcode ? <FcOk className=" w-5 h-5"/> : <FaXmark  className="text-white bg-red-700 w-5 h-5 p-1 rounded-full"/>}</span>
+                      <span>
+                        {data.barcode ? (
+                          <FcOk className=" w-5 h-5" />
+                        ) : (
+                          <FaXmark className="text-white bg-red-700 w-5 h-5 p-1 rounded-full" />
+                        )}
+                      </span>
                       <span>{getCreatedDate(data.createdAt)}</span>
                     </div>
                   </td>
                 </tr>
               ))}
+            <tr>
+              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4">{countAllParts}</td>
+              <td className="px-6 py-4">{countAllSellPrice}</td>
+            </tr>
           </tbody>
         </table>
       </form>
+      {/* <div className="flex justify-center mb-20">
+        <button
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="text-white bg-blue-600 px-5 py-1 rounded-md cursor-pointer hover:bg-blue-800 mr-1"
+        >
+          <MdKeyboardDoubleArrowLeft className="text-2xl"/>
+        </button>
+
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index}
+            onClick={() => paginate(index + 1)}
+            className={currentPage === index + 1 ? "active text-white bg-blue-600 px-5 py-1 rounded-md cursor-pointer hover:bg-blue-800 mr-1" : " bg-blue-300 px-5 py-1 rounded-md cursor-pointer hover:bg-blue-800 mr-1"}
+          >
+            {index + 1}
+          </button>
+        ))}
+
+        <button
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="text-white bg-blue-600 px-5 py-1 rounded-md cursor-pointer hover:bg-blue-800"
+        >
+          <MdKeyboardDoubleArrowRight className="text-2xl"/>
+        </button>
+      </div> */}
     </div>
   );
 };

@@ -48,7 +48,7 @@ export const navbarList:NavbarListInterface[] = [
       subItems:[
           {
               title:"Ehtiyyat hissəsi sifarişi",
-              url:"/orderParts"
+              url:"/createOrder"
           },
           {
               title:"Sifarişlər",
