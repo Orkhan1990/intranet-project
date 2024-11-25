@@ -7,11 +7,15 @@ import {
 } from "flowbite-react";
 import { Field, FieldArray, Form, Formik } from "formik";
 import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
-import { OrdersInterface } from "../../types";
+import { ClientInterface, OrdersInterface } from "../../types";
 import OrderPartsComponent from "../../components/OrderPartsComponent";
 import OrderHistory from "../../components/OrderHistory";
+import { useEffect, useState } from "react";
 
 const CreateOrders= () => {
+
+  const[clients,setClients]=useState([]);
+  const[error,setError]=useState("");
   const produceDateData: string[] = [
     "2024",
     "2023",
@@ -50,6 +54,34 @@ const CreateOrders= () => {
     ],
   };
 
+  useEffect(()=>{
+    const getAllClients=async()=>{
+      try {
+        const res = await fetch(
+          "http://localhost:3013/api/v1/client/getClients",
+          {
+            method: "GET",
+            credentials: "include", // added this part
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await res.json();
+        console.log(data);
+
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+        } else {
+          setClients(data);
+        }
+      } catch (error: any) {
+        setError(error);
+      }
+    };
+    getAllClients();
+  },[])
   const onsubmit = (values: OrdersInterface) => {
     console.log(values);
   };
@@ -107,8 +139,11 @@ const CreateOrders= () => {
                   Müştəri
                 </label>
                 <Field as={Select} name="clientId" className="w-32">
-                  <option value="zqan">Zqan</option>
-                  <option value="avrora">Avrora</option>
+                  {
+                    clients.length>0&&clients.map((client:ClientInterface,index:number)=>(
+                      <option key={index} value={client.id}>{client.companyName}</option>
+                    ))
+                  }
                 </Field>
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>

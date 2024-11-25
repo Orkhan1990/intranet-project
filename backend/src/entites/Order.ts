@@ -57,8 +57,8 @@ export class Order extends AllEntities{
     oil:boolean;
 
 
-    @ManyToOne(()=>Client,(client=>client.order))
-    clients:Client[];
+    @ManyToOne(()=>Client,(client=>client.orders))
+    client:Client;
 
     @OneToMany(()=>OrderPart,orderPart=>orderPart.order)
      orderParts:OrderPart[]

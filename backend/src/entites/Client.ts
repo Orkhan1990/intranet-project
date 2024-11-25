@@ -68,8 +68,8 @@ export class Client extends AllEntities{
     @OneToMany(() =>Card, (card) => card.client)
     cards:Card[]
 
-    @OneToMany(()=>Order,(order=>order.clients))
-    order:Order
+    @OneToMany(()=>Order,(order=>order.client))
+    orders:Order[]
     
    
 }
