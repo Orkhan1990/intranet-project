@@ -115,7 +115,7 @@ export interface OrdersInterface {
   cardNumberId: number;
   orderType: OrderType;
   clientId: number;
-  brandId: number;
+  manufacturer: string;
   model: string;
   chassisNumber: string;
   engineNumber: string;

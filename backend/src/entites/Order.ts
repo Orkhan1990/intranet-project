@@ -2,6 +2,7 @@ import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Client } from "./Client";
 import { OrderPart } from "./OrderPart";
+import { User } from "./User";
 
 
 @Entity({name:"orders"})
@@ -16,10 +17,11 @@ export class Order extends AllEntities{
     @Column({name:"order_type"})
     orderType:string;
 
-
-
     @Column()
     manufacturer:string;
+
+    @Column()
+    model:string;
 
     @Column({name:"chassis_number"})
     chassisNumber:string;
@@ -56,6 +58,9 @@ export class Order extends AllEntities{
     @Column()
     oil:boolean;
 
+
+    @ManyToOne(()=>User,user=>user.orders)
+    user:User
 
     @ManyToOne(()=>Client,(client=>client.orders))
     client:Client;

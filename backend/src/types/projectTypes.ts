@@ -35,6 +35,7 @@ export interface OrderInterface {
   cardNumber: string;
   orderType: string;
   manufacturer: string;
+  model:string;
   chassisNumber: string;
   engineNumber: string;
   produceYear: string;
@@ -46,6 +47,8 @@ export interface OrderInterface {
   initialPayment: string;
   comment: string;
   oil: boolean;
-  clients: ClientInterface[];
+  clientId:number;
+  userId:number,
   orderParts: OrderPartInterface[];
 }
+

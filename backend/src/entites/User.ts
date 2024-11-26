@@ -5,6 +5,7 @@ import { Client } from "./Client"
 import { CardProblem} from "./CardProblem"
 import { Invoice} from "./Invoice"
 import { CardWorkerJob } from "./CardWorkerJob"
+import { Order } from "./Order"
 
 @Entity({name:"users"})
 export class User extends AllEntities {
@@ -49,5 +50,8 @@ export class User extends AllEntities {
     cardWorkerJob: CardWorkerJob
 
     @OneToMany(()=>Invoice,(warehouse)=>warehouse.user)
-    invoices:Invoice[]
+    invoices:Invoice[];
+
+    @OneToMany(()=>Order,order=>order.user)
+    orders:Order[]
 }

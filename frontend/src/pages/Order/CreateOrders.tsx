@@ -31,7 +31,7 @@ const CreateOrders= () => {
     cardNumberId: 0,
     orderType: OrderType.Local_Market,
     clientId: 0,
-    brandId: 0,
+    manufacturer:"",
     model: "",
     chassisNumber: "",
     engineNumber: "",
@@ -152,7 +152,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Istehsalçı
                 </label>
-                <Field as={Select} name="brandId" className="w-32">
+                <Field as={Select} name="manufacturer" className="w-32">
                   <option value="man">Man</option>
                   <option value="bobcat">Bobcat</option>
                   <option value="sumitomo">Sumitomo</option>
