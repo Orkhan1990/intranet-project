@@ -112,20 +112,20 @@ export interface OrderPartsInterface {
 
 export interface OrdersInterface {
   project: string;
-  cardNumberId: number;
+  cardNumber:string;
   orderType: OrderType;
   clientId: number;
   manufacturer: string;
   model: string;
   chassisNumber: string;
   engineNumber: string;
-  produceDate: string;
-  probeg: string;
-  gosNumber: string;
-  payType: PayType;
-  deliverPeriod: DeliverType;
-  deliverMethod: string;
-  prepayment: number;
+  produceYear: string;
+  km: string;
+  vehicleNumber: string;
+  paymentType: PayType;
+  delivering: DeliverType;
+  deliveringType: string;
+  initialPayment: number;
   comment: string;
   oil: boolean;
   parts:OrderPartsInterface[]

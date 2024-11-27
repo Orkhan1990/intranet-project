@@ -55,7 +55,7 @@ export class Order extends AllEntities{
     @Column()
     comment:string;
 
-    @Column()
+    @Column({default:false})
     oil:boolean;
 
 

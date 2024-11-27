@@ -32,7 +32,7 @@ export const createOrder = async (
       initialPayment,
       comment,
       oil,
-      orderParts
+      parts
     }: OrderInterface = req.body;
 
     const userId = req.userId;
@@ -54,6 +54,17 @@ export const createOrder = async (
       return;
     }
 
+    const newOrderArray=await Promise.all(parts.map(async(part)=>{
+      const newOrderPart=new OrderPart();
+           newOrderPart.partName=part.partName;
+           newOrderPart.count=part.count;
+           newOrderPart.partNumber=part.partNumber;
+
+           await orderPartRepositroy.save(newOrderPart);
+           return newOrderPart;
+    }
+    ))
+
     const newOrder = new Order();
     newOrder.project = project;
     newOrder.cardNumber = cardNumber;
@@ -73,8 +84,11 @@ export const createOrder = async (
     newOrder.comment = comment;
     newOrder.oil = oil;
     newOrder.user = getUser;
+    newOrder.orderParts=newOrderArray;
 
     await orderRepository.save(newOrder);
+
+   res.status(200).json({result:`${newOrderArray.length>0?"Sifarişlər əlavə olundu":"Sifariş əlavə olundu!"}`});
 
   } catch (error) {
     next(errorHandler(401, error));

@@ -16,6 +16,9 @@ const CreateOrders= () => {
 
   const[clients,setClients]=useState([]);
   const[error,setError]=useState("");
+  const[success,setSuccess]=useState("");
+
+
   const produceDateData: string[] = [
     "2024",
     "2023",
@@ -27,21 +30,21 @@ const CreateOrders= () => {
   ];
 
   const ordersInitialValue: OrdersInterface = {
-    project: "",
-    cardNumberId: 0,
+    project: "project1",
+    cardNumber:"1",
     orderType: OrderType.Local_Market,
-    clientId: 0,
-    manufacturer:"",
+    clientId: 1,
+    manufacturer:"man",
     model: "",
     chassisNumber: "",
     engineNumber: "",
-    produceDate: "",
-    probeg: "",
-    gosNumber: "",
-    payType: PayType.Transfer,
-    deliverPeriod: DeliverType.Fast,
-    deliverMethod: "",
-    prepayment: 0,
+    produceYear: "2024",
+    km: "",
+    vehicleNumber: "",
+    paymentType: PayType.Transfer,
+    delivering: DeliverType.Fast,
+    deliveringType: "simplified",
+    initialPayment: 0,
     comment: "",
     oil: false,
     parts: [
@@ -53,6 +56,8 @@ const CreateOrders= () => {
       },
     ],
   };
+
+  //GET ALL CLIENTS 
 
   useEffect(()=>{
     const getAllClients=async()=>{
@@ -82,8 +87,37 @@ const CreateOrders= () => {
     };
     getAllClients();
   },[])
-  const onsubmit = (values: OrdersInterface) => {
+
+
+  //SUMBIT FORM TO BACKEND
+  const onsubmit = async(values: OrdersInterface) => {
     console.log(values);
+    try {
+      const res = await fetch("http://localhost:3013/api/v1/order/createOrder", 
+        {
+        method: "POST",
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await res.json();
+        console.log(data);
+        
+      if(!res.ok||data.success===false){
+        setError(data.message);
+        return;
+      }else{
+        setSuccess(data.result);
+      }
+
+      
+      
+    } catch (error:any) {
+      setError(error)
+    }
   };
 
   return (
@@ -113,7 +147,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Kart nömrəsi
                 </label>
-                <Field as={Select} name="cardNumberId">
+                <Field as={Select} name="cardNumber">
                   <option value="1">1</option>
                   <option value="2">2</option>
                 </Field>
@@ -200,7 +234,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Km/saat
                 </label>
-                <Field as={TextInput} name="probeg" className="w-64" />
+                <Field as={TextInput} name="km" className="w-64" />
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
 
@@ -208,7 +242,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Maşın nömrəsi
                 </label>
-                <Field as={TextInput} name="gosNumber" className="w-64" />
+                <Field as={TextInput} name="vehicleNumber" className="w-64" />
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
 
@@ -216,7 +250,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Ödəniş üsulu
                 </label>
-                <Field as={Select} name="payType" className="w-32">
+                <Field as={Select} name="paymentType" className="w-32">
                   <option value={PayType.Transfer}>Köçürmə</option>
                   <option value={PayType.Cash}>Nağd</option>
                 </Field>
@@ -227,7 +261,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Çatdırılma
                 </label>
-                <Field as={Select} name="deliverPeriod">
+                <Field as={Select} name="delivering">
                   <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
                   <option value={DeliverType.Normal_Fast}>
                     Orta (15-30 gün)
@@ -243,7 +277,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Çatdırılma üsulu
                 </label>
-                <Field as={Select} name="deliverMethod">
+                <Field as={Select} name="deliveringType">
                   <option value="simplified">Sadələşmiş</option>
                   <option value="standart">Standart</option>
                 </Field>
@@ -254,7 +288,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   İlkin ödəniş
                 </label>
-                <Field as={Select} name="prepayment">
+                <Field as={Select} name="initialPayment">
                   <option value="0">0%</option>
                   <option value="65">65%</option>
                 </Field>
@@ -374,7 +408,7 @@ const CreateOrders= () => {
                 </div>
               </div>
               <div className="flex gap-2 mt-20">
-                <Button size={"sm"} color={"blue"}>
+                <Button type="submit" size={"sm"} color={"blue"}>
                   Yadda Saxla
                 </Button>
                 <Button size={"sm"} color={"blue"}>

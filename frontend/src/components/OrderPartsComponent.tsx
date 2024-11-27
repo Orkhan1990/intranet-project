@@ -27,7 +27,7 @@ const OrderPartsComponent = ({
             <Field
               as={TextInput}
               type="text"
-              name={`${name}.kod`}
+              name={`${name}.partNumber`}
               sizing="sm"
             />
           </div>
@@ -36,7 +36,7 @@ const OrderPartsComponent = ({
           <Field
             as={TextInput}
             type="text"
-            name={`${name}.origKod`}
+            name={`${name}.count`}
             sizing="sm"
             className="w-20"
             value={value.count}
@@ -49,7 +49,7 @@ const OrderPartsComponent = ({
           <Field
             as={TextInput}
             type="text"
-            name={`${name}.price`}
+            name={`${name}.partName`}
             sizing="sm"
             className="w-60"
           />

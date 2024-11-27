@@ -49,6 +49,6 @@ export interface OrderInterface {
   oil: boolean;
   clientId:number;
   userId:number,
-  orderParts: OrderPartInterface[];
+  parts: OrderPartInterface[];
 }
 
