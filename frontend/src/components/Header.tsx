@@ -46,7 +46,7 @@ const Header = () => {
             ))
            }
           </ul>
-          {currentUser ? <Button>{currentUser.userName}</Button> : "Daxil ol"}
+          {currentUser ? <Button>{currentUser.firstName} {currentUser.lastName}</Button> : "Daxil ol"}
 
           <Button
             className="cursor-pointer bg-blue-500"

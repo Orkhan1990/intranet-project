@@ -4,7 +4,6 @@ import NoPage from "./pages/NoPage";
 import Protected from "./components/Protected";
 import Home from './pages/Home';
 import SignUp from './pages/Auth/SignUp';
-import Orders from './pages/Order/CreateOrders';
 import NewCard from './pages/NewCard';
 import NewClient from './pages/Client/NewClient';
 import ClientList from './pages/Client/ClientList';
@@ -16,6 +15,7 @@ import SignIn from './pages/Auth/SignIn';
 import UpdateSupplier from './pages/Supplier/UpdateSupplier';
 import Warehouse from './pages/Warehouse/Warehouse';
 import CreateOrders from './pages/Order/CreateOrders';
+import Order from './pages/Order/Order';
 
 
 
@@ -34,7 +34,9 @@ function App() {
       <Route path="/wareHouse" element={<Layout><Warehouse/></Layout>} />    
       <Route path="/suppliers" element={<Layout><Suppliers/></Layout>} /> 
       <Route path="/newSuppliers" element={<Layout><AddSuppliers/></Layout>} /> 
-      <Route path="/updateSupplier/:id" element={<Layout><UpdateSupplier/></Layout>} />       
+      <Route path="/updateSupplier/:id" element={<Layout><UpdateSupplier/></Layout>} />
+      <Route path="/orders" element={<Layout><Order/></Layout>} />       
+       
       
       
    

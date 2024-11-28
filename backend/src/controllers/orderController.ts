@@ -88,7 +88,7 @@ export const createOrder = async (
 
     await orderRepository.save(newOrder);
 
-   res.status(200).json({result:`${newOrderArray.length>0?"Sifarişlər əlavə olundu":"Sifariş əlavə olundu!"}`});
+   res.status(200).json({result:`${parts.length>1?"Sifarişlər əlavə olundu":"Sifariş əlavə olundu!"}`});
 
   } catch (error) {
     next(errorHandler(401, error));

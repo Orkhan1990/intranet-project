@@ -1,10 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Select,
-  Textarea,
-  TextInput,
-} from "flowbite-react";
+import { Button, Checkbox, Select, Textarea, TextInput } from "flowbite-react";
 import { Field, FieldArray, Form, Formik } from "formik";
 import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
 import { ClientInterface, OrdersInterface } from "../../types";
@@ -12,12 +6,10 @@ import OrderPartsComponent from "../../components/OrderPartsComponent";
 import OrderHistory from "../../components/OrderHistory";
 import { useEffect, useState } from "react";
 
-const CreateOrders= () => {
-
-  const[clients,setClients]=useState([]);
-  const[error,setError]=useState("");
-  const[success,setSuccess]=useState("");
-
+const CreateOrders = () => {
+  const [clients, setClients] = useState([]);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const produceDateData: string[] = [
     "2024",
@@ -31,10 +23,10 @@ const CreateOrders= () => {
 
   const ordersInitialValue: OrdersInterface = {
     project: "project1",
-    cardNumber:"1",
+    cardNumber: "1",
     orderType: OrderType.Local_Market,
     clientId: 1,
-    manufacturer:"man",
+    manufacturer: "man",
     model: "",
     chassisNumber: "",
     engineNumber: "",
@@ -57,10 +49,10 @@ const CreateOrders= () => {
     ],
   };
 
-  //GET ALL CLIENTS 
+  //GET ALL CLIENTS
 
-  useEffect(()=>{
-    const getAllClients=async()=>{
+  useEffect(() => {
+    const getAllClients = async () => {
       try {
         const res = await fetch(
           "http://localhost:3013/api/v1/client/getClients",
@@ -86,37 +78,35 @@ const CreateOrders= () => {
       }
     };
     getAllClients();
-  },[])
-
+  }, []);
 
   //SUMBIT FORM TO BACKEND
-  const onsubmit = async(values: OrdersInterface) => {
+  const onsubmit = async (values: OrdersInterface) => {
     console.log(values);
     try {
-      const res = await fetch("http://localhost:3013/api/v1/order/createOrder", 
+      const res = await fetch(
+        "http://localhost:3013/api/v1/order/createOrder",
         {
-        method: "POST",
-        credentials: 'include',
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
 
       const data = await res.json();
-        console.log(data);
-        
-      if(!res.ok||data.success===false){
+      console.log(data);
+
+      if (!res.ok || data.success === false) {
         setError(data.message);
         return;
-      }else{
+      } else {
         setSuccess(data.result);
       }
-
-      
-      
-    } catch (error:any) {
-      setError(error)
+    } catch (error: any) {
+      setError(error);
     }
   };
 
@@ -137,7 +127,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Proyekt
                 </label>
-                <Field as={Select} name="project" required>
+                <Field as={Select} name="project" required sizing="sm">
                   <option value="project1">Project 1</option>
                 </Field>
                 <span className="text-red-700 ml-4 text-lg">*</span>
@@ -147,7 +137,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Kart nömrəsi
                 </label>
-                <Field as={Select} name="cardNumber">
+                <Field as={Select} name="cardNumber" sizing="sm">
                   <option value="1">1</option>
                   <option value="2">2</option>
                 </Field>
@@ -158,7 +148,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Sifarişin tipi
                 </label>
-                <Field as={Select} name="orderType">
+                <Field as={Select} name="orderType" sizing="sm">
                   <option value={OrderType.Standart_Client}>
                     Standart (müştəri)
                   </option>
@@ -172,12 +162,13 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Müştəri
                 </label>
-                <Field as={Select} name="clientId" className="w-32">
-                  {
-                    clients.length>0&&clients.map((client:ClientInterface,index:number)=>(
-                      <option key={index} value={client.id}>{client.companyName}</option>
-                    ))
-                  }
+                <Field as={Select} name="clientId" className="w-32" sizing="sm">
+                  {clients.length > 0 &&
+                    clients.map((client: ClientInterface, index: number) => (
+                      <option key={index} value={client.id}>
+                        {client.companyName}
+                      </option>
+                    ))}
                 </Field>
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
@@ -186,7 +177,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Istehsalçı
                 </label>
-                <Field as={Select} name="manufacturer" className="w-32">
+                <Field as={Select} name="manufacturer" className="w-32" sizing="sm">
                   <option value="man">Man</option>
                   <option value="bobcat">Bobcat</option>
                   <option value="sumitomo">Sumitomo</option>
@@ -198,7 +189,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Model
                 </label>
-                <Field as={TextInput} name="model" className="w-64" />
+                <Field as={TextInput} name="model" className="w-64" sizing="sm" />
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
 
@@ -206,7 +197,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Şassi nömrəsi
                 </label>
-                <Field as={TextInput} name="chassisNumber" className="w-64" />
+                <Field as={TextInput} name="chassisNumber" className="w-64" sizing="sm"/>
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
 
@@ -214,7 +205,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Mühərrik nömrəsi
                 </label>
-                <Field as={TextInput} name="engineNumber" className="w-64" />
+                <Field as={TextInput} name="engineNumber" className="w-64" sizing="sm"/>
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
 
@@ -222,7 +213,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Buraxılış ili
                 </label>
-                <Field as={Select} name="produceDate" className="w-32">
+                <Field as={Select} name="produceDate" className="w-32" sizing="sm">
                   {produceDateData.map((item: string) => (
                     <option value={item}>{item}</option>
                   ))}
@@ -234,7 +225,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Km/saat
                 </label>
-                <Field as={TextInput} name="km" className="w-64" />
+                <Field as={TextInput} name="km" className="w-64" sizing="sm"/>
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
 
@@ -242,7 +233,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Maşın nömrəsi
                 </label>
-                <Field as={TextInput} name="vehicleNumber" className="w-64" />
+                <Field as={TextInput} name="vehicleNumber" className="w-64" sizing="sm"/>
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
 
@@ -250,7 +241,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Ödəniş üsulu
                 </label>
-                <Field as={Select} name="paymentType" className="w-32">
+                <Field as={Select} name="paymentType" className="w-32" sizing="sm">
                   <option value={PayType.Transfer}>Köçürmə</option>
                   <option value={PayType.Cash}>Nağd</option>
                 </Field>
@@ -261,7 +252,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Çatdırılma
                 </label>
-                <Field as={Select} name="delivering">
+                <Field as={Select} name="delivering" sizing="sm">
                   <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
                   <option value={DeliverType.Normal_Fast}>
                     Orta (15-30 gün)
@@ -277,7 +268,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Çatdırılma üsulu
                 </label>
-                <Field as={Select} name="deliveringType">
+                <Field as={Select} name="deliveringType" sizing="sm">
                   <option value="simplified">Sadələşmiş</option>
                   <option value="standart">Standart</option>
                 </Field>
@@ -288,7 +279,7 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   İlkin ödəniş
                 </label>
-                <Field as={Select} name="initialPayment">
+                <Field as={Select} name="initialPayment" sizing="sm">
                   <option value="0">0%</option>
                   <option value="65">65%</option>
                 </Field>
@@ -299,19 +290,19 @@ const CreateOrders= () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Şərh
                 </label>
-                <Field as={Textarea} rows={5} name="comment" className="w-96" />
+                <Field as={Textarea} rows={5} name="comment" className="w-96" sizing="sm"/>
               </div>
 
               <div className="flex  items-center mt-5">
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Yağ
                 </label>
-                <Field as={Checkbox} name="oil" />
+                <Field as={Checkbox} name="oil" sizing="sm"/>
               </div>
 
               <div className="mt-10 ">
                 <FieldArray name="parts">
-                  {({ push}) => (
+                  {({ push }) => (
                     <div className="border text-sm  w-3/4 p-5 rounded-md ">
                       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -355,7 +346,7 @@ const CreateOrders= () => {
                           onClick={() =>
                             push({
                               partNumber: "",
-                              count: 0,
+                              count: 1,
                               checkOnWarehouse: false,
                               partName: "",
                             })
@@ -415,6 +406,12 @@ const CreateOrders= () => {
                   Təsdiqlə
                 </Button>
               </div>
+              {!error && success && (
+                <p className="my-10 text-sm text-green-700">{success}</p>
+              )}
+              {error && !success && (
+                <p className="my-10 text-sm text-red-700">{error}</p>
+              )}
             </Form>
           );
         }}
