@@ -4,6 +4,7 @@ import { Response, Request, NextFunction } from "express";
 import bcrypt from "bcrypt";
 import errorHandler from "../middleware/errorHandler";
 import { UserRole } from "../enums/userRole";
+import { In } from "typeorm";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -50,6 +51,32 @@ export const getWorkers=async(req:Request,res:Response,next:NextFunction)=>{
     }
 
     res.status(201).json(serviceWorkers);
+
+    
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}
+
+
+
+export const getOfficeWorkers=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+
+    const userRepository=AppDataSource.getRepository(User);
+
+    const officeWorkers=await userRepository.find({
+      where:{
+        userRole:In([UserRole.Admin,UserRole.OfficeUser])
+      }
+    })
+     
+    if(!officeWorkers){
+      next(errorHandler(401,"Ofis işçiləri mövcud deyil!"));
+      return;
+    }
+
+    res.status(201).json(officeWorkers);
 
     
   } catch (error) {

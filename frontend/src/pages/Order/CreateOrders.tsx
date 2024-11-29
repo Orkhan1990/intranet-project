@@ -1,13 +1,14 @@
 import { Button, Checkbox, Select, Textarea, TextInput } from "flowbite-react";
 import { Field, FieldArray, Form, Formik } from "formik";
 import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
-import { ClientInterface, OrdersInterface } from "../../types";
+import { ClientInterface, OrdersInterface, UserInterface } from "../../types";
 import OrderPartsComponent from "../../components/OrderPartsComponent";
 import OrderHistory from "../../components/OrderHistory";
 import { useEffect, useState } from "react";
 
 const CreateOrders = () => {
   const [clients, setClients] = useState([]);
+  const [officeUsers,setOfficeUsers]=useState<UserInterface[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -77,7 +78,34 @@ const CreateOrders = () => {
         setError(error);
       }
     };
+
+    const getAllOfficeWorkers=async()=>{
+      try {
+        const res = await fetch(
+          "http://localhost:3013/api/v1/user/getOfficeWorkers",
+          {
+            method: "GET",
+            credentials: "include", // added this part
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await res.json();
+        console.log(data);
+
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+        } else {
+          setOfficeUsers(data);
+        }
+      } catch (error: any) {
+        setError(error);
+      }
+    }
     getAllClients();
+    getAllOfficeWorkers();
   }, []);
 
   //SUMBIT FORM TO BACKEND
@@ -367,10 +395,10 @@ const CreateOrders = () => {
 
                 <div className="flex flex-col gap-5 border p-5 rounded-md">
                   <div className="w-[400px] flex flex-col gap-2">
-                    <h2>Geri qaytarma səbəbi</h2>
+                    <h2 className="text-sm">Geri qaytarma səbəbi</h2>
                     <Field as={Textarea} rows={5} name="message" />
                     <div className="flex gap-2">
-                      <Field as={Select} className="flex-1">
+                      <Field as={Select} className="flex-1" sizing="sm">
                         <option value="">Cavabdehliyi dəyişmək</option>
                         <option value="">Sifarişin yerləşdirilməsi</option>
                         <option value="">Təchizatçıya müraciət</option>
@@ -380,17 +408,20 @@ const CreateOrders = () => {
                         <option value="">Sifarişi bağlamaq</option>
                         <option value="">Çatdırıldı</option>
                       </Field>
-                      <Field as={Select} className="flex-1">
-                        <option value="">Heybet Cebrayilov</option>
-                        <option value="">Royal Amirli</option>
-                        <option value="">Ilkin Mammadov</option>
-                        <option value="">Aqil Huseyniv</option>
+                      <Field as={Select} className="flex-1" sizing="sm">
+                      {
+                        officeUsers.length>0&&officeUsers.map((officeUser:UserInterface,index:number)=>(
+                          <option value={officeUser.id} key={index}>{officeUser.firstName} {officeUser.lastName}</option>
+
+                        ))
+                      }
+                      
                       </Field>
                     </div>
                   </div>
 
                   <div className="w-[400px] flex flex-col gap-2">
-                    <h2>Mesaj</h2>
+                    <h2 className="text-sm">Mesaj</h2>
                     <Field as={Textarea} rows={5} name="message" />
                     <Button color={"blue"} className="w-20" size={"xs"}>
                       Mesaj Yaz
