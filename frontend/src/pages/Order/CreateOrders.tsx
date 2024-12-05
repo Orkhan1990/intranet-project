@@ -3,14 +3,16 @@ import { Field, FieldArray, Form, Formik } from "formik";
 import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
 import { ClientInterface, OrdersInterface, UserInterface } from "../../types";
 import OrderPartsComponent from "../../components/OrderPartsComponent";
-import OrderHistory from "../../components/OrderHistory";
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 const CreateOrders = () => {
   const [clients, setClients] = useState([]);
   const [officeUsers,setOfficeUsers]=useState<UserInterface[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const navigate=useNavigate();
 
   const produceDateData: string[] = [
     "2024",
@@ -23,11 +25,12 @@ const CreateOrders = () => {
   ];
 
   const ordersInitialValue: OrdersInterface = {
+    id:0,
     project: "project1",
     cardNumber: "1",
     orderType: OrderType.Local_Market,
     clientId: 1,
-    manufacturer: "man",
+    manufacturer: "Man",
     model: "",
     chassisNumber: "",
     engineNumber: "",
@@ -132,6 +135,8 @@ const CreateOrders = () => {
         return;
       } else {
         setSuccess(data.result);
+        navigate("/orders");
+        window.scrollTo(0, 0)
       }
     } catch (error: any) {
       setError(error);
@@ -206,9 +211,9 @@ const CreateOrders = () => {
                   Istehsalçı
                 </label>
                 <Field as={Select} name="manufacturer" className="w-32" sizing="sm">
-                  <option value="man">Man</option>
-                  <option value="bobcat">Bobcat</option>
-                  <option value="sumitomo">Sumitomo</option>
+                  <option value="Man">Man</option>
+                  <option value="Bobcat">Bobcat</option>
+                  <option value="Sumitomo">Sumitomo</option>
                 </Field>
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
@@ -448,7 +453,6 @@ const CreateOrders = () => {
         }}
       </Formik>
 
-      <OrderHistory />
     </div>
   );
 };

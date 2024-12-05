@@ -16,8 +16,8 @@ export enum Market{
 
 
 export enum PayType{
-    Cash="cash",
-    Transfer="transfer"
+    Cash="nağd",
+    Transfer="köçürmə"
 }
 
 
@@ -35,7 +35,7 @@ export enum OrderType{
 }
 
 export enum DeliverType{
-    Fast="fast",
+    Fast="təcili",
     Normal_Fast="normal",
-    Planned="plannned"
+    Planned="planlaşdırılmış"
 }

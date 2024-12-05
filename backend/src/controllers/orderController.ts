@@ -94,3 +94,34 @@ export const createOrder = async (
     next(errorHandler(401, error));
   }
 };
+
+
+
+export const getAllOrders=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+
+
+    const orderRepository= AppDataSource.getRepository(Order);
+
+
+    const allOrders=await orderRepository.find(
+      {
+        relations: [
+          'client',        
+          'user',
+          'orderParts'
+        ]
+      }
+    )
+
+    if(!allOrders){
+      next(errorHandler(401,"Sifarişlər mövcud deyil!"));
+      return;
+    }
+
+    res.status(200).json(allOrders);
+    
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}

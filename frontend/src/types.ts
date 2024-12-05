@@ -111,6 +111,7 @@ export interface OrderPartsInterface {
 }
 
 export interface OrdersInterface {
+  id:number,
   project: string;
   cardNumber:string;
   orderType: OrderType;

@@ -1,4 +1,95 @@
+import { useEffect, useState } from "react";
+import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
+import {
+  ClientInterface,
+  OrderPartsInterface,
+  UserInterface,
+} from "../../types";
+
 const Order = () => {
+  const [orders, setOrders] = useState<AllOrdersInterface[]>([]);
+  const [error, setError] = useState("");
+
+  console.log(orders);
+
+  interface AllOrdersInterface {
+    id: number;
+    project: string;
+    cardNumber: string;
+    orderType: OrderType;
+    client: ClientInterface;
+    manufacturer: string;
+    model: string;
+    chassisNumber: string;
+    engineNumber: string;
+    produceYear: string;
+    km: string;
+    vehicleNumber: string;
+    paymentType: PayType;
+    delivering: DeliverType;
+    deliveringType: string;
+    initialPayment: number;
+    comment: string;
+    oil: boolean;
+    user: UserInterface;
+    parts: OrderPartsInterface[];
+    createdAt:string
+  }
+
+  useEffect(() => {
+    const getAllOrders = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:3013/api/v1/order/getAllOrders",
+          {
+            method: "GET",
+            credentials: "include", // added this part
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await res.json();
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+        }
+        setOrders(data);
+      } catch (error: any) {
+        setError(error.message);
+      }
+    };
+
+    getAllOrders();
+  }, []);
+
+    //  console.log(orders[0].createdAt);
+     
+ 
+
+   //Change TIME FORMAT
+
+  const getHour=(time:string)=>{
+
+    const localDate = new Date(time);
+    console.log(localDate);
+    
+    
+    // Convert to local time and extract the hour and minute
+    const hours = localDate.getHours().toString().padStart(2, '0');
+    const minutes = localDate.getMinutes().toString().padStart(2, '0');
+
+    return `${hours}:${minutes}`;
+   }
+
+ const getFullDate=(time:string)=>{
+  const date=time.substring(0,10);
+  const dateArray=date.split("-");
+  const reverseDate=`${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`
+
+  return reverseDate;
+ }
+
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]  ">
       <div className="relative">
@@ -52,40 +143,62 @@ const Order = () => {
                 Məsuliyyətli və başlanğıc tarixi
               </th>
               <th scope="col" className="px-6 py-3 text-[10px]">
-              Təchizatçıya müraciət
+                Təchizatçıya müraciət
               </th>
               <th scope="col" className="px-6 py-3 text-[10px]">
-              Təchizatçının cavabı 
+                Təchizatçının cavabı
               </th>
               <th scope="col" className="px-6 py-3 text-[10px]">
-              Sifariş
+                Sifariş
               </th>
               <th scope="col" className="px-6 py-3 text-[10px]">
-              Mühasibat təsdiqi 
+                Mühasibat təsdiqi
               </th>
               <th scope="col" className="px-6 py-3 text-[10px]">
-              Ödəniş
+                Ödəniş
               </th>
               <th scope="col" className="px-6 py-3 text-[10px]">
-              Göndərmə
+                Göndərmə
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-              
-              <td className="px-6 py-4">Silver</td>
-              <td className="px-6 py-4">Laptop</td>
-              <td className="px-6 py-4">$2999</td>
-              <td className="px-6 py-4">
-                <a
-                  href="#"
-                  className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+            {orders.length > 0 &&
+              orders.map((order: AllOrdersInterface, index: number) => (
+                <tr
+                  className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+                  key={index}
                 >
-                  Edit
-                </a>
-              </td>
-            </tr>
+                  <td className="px-6 py-4"></td>
+                  <td className="px-6 py-4">{order.id}</td>
+                  <td className="px-6 py-4">{order.client.companyName}</td>
+                  <td className="px-6 py-4">{order.manufacturer}</td>
+                  <td className="px-6 py-4"></td>
+                  <td className="px-6 py-4">
+                    <input
+                      type="text"
+                      className="text-xs w-20 py-1 rounded-sm outline-none "
+                    />
+                  </td>
+                  <td className="px-6 py-4">{order.paymentType}</td>
+                  <td className="px-6 py-4">{order.delivering}</td>
+                  <td className="px-3 py-4 text-xs">
+                    {order.user.firstName} {order.user.lastName}
+                  </td>
+                  <td className=" px-6 py-4 text-xs">
+                    {order.initialPayment} %
+                  </td>
+                  <td className=" px-6 py-4 text-xs">0</td>
+                  <td className=" px-6 py-4 text-xs"></td>
+                  <td className=" px-6 py-4 text-xs"></td>
+                  <td className="flex flex-col px-4 py-4 text-xs">
+                    <span>{getHour(order.createdAt)}</span>
+                    <span>{getFullDate(order.createdAt)}</span>
+                  </td>
+
+
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
