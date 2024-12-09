@@ -3,6 +3,7 @@ import { Button, Select, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { SupplierInterface } from "../../types";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const UpdateSupplier = () => {
   const [error, setError] = useState("");
@@ -21,6 +22,8 @@ const UpdateSupplier = () => {
     creditNote: "",
     creditDuration: "",
   });
+
+  const navigate=useNavigate();
 
   const { id } = useParams();
 
@@ -91,11 +94,15 @@ const UpdateSupplier = () => {
   
       if (res.ok) {
         setSuccess(`${data.supplier} məlumatı yeniləndi`);
-        setInterval(() => {
-          setSuccess("");
-        }, 7000);
+        setTimeout(()=>
+          {
+            () => setSuccess(""); 
+            navigate('/suppliers');
+          }, 3000); // Reset success message after 3 seconds
+        
+        // Navigate to the Suppliers page after a successful update
       }
-  
+      
       setError("");
   };
 

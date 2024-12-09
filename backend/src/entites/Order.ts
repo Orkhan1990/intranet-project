@@ -3,69 +3,84 @@ import { AllEntities } from "./AllEntities";
 import { Client } from "./Client";
 import { OrderPart } from "./OrderPart";
 import { User } from "./User";
+import { OrderHistory } from "./OrderHistory";
+import { OrderStage, OrderStatus } from "../enums/allEnums";
 
+@Entity({ name: "orders" })
+export class Order extends AllEntities {
+  @Column({ nullable: true })
+  project: string;
 
-@Entity({name:"orders"})
-export class Order extends AllEntities{
+  @Column({ nullable: true, name: "card_number" })
+  cardNumber: string;
 
-    @Column({nullable:true})
-    project:string;
+  @Column({ name: "order_type" })
+  orderType: string;
 
-    @Column({nullable:true,name:"card_number"})
-    cardNumber:string;
+  @Column()
+  manufacturer: string;
 
-    @Column({name:"order_type"})
-    orderType:string;
+  @Column()
+  model: string;
 
-    @Column()
-    manufacturer:string;
+  @Column({ name: "chassis_number" })
+  chassisNumber: string;
 
-    @Column()
-    model:string;
+  @Column({ name: "engine_number" })
+  engineNumber: string;
 
-    @Column({name:"chassis_number"})
-    chassisNumber:string;
+  @Column({ name: "produce_year" })
+  produceYear: string;
 
-    @Column({name:"engine_number"})
-    engineNumber:string;
+  @Column()
+  km: string;
 
-    @Column({name:"produce_year"})
-    produceYear:string;
+  @Column({ name: "vehicle_number" })
+  vehicleNumber: string;
 
-    @Column()
-    km:string;
+  @Column({ name: "payment_type" })
+  paymentType: string;
 
-    @Column({name:"vehicle_number"})
-    vehicleNumber:string;
+  @Column({ name: "delivering" })
+  delivering: string;
 
-    @Column({name:"payment_type"})
-    paymentType:string;
+  @Column({ name: "delivering_type" })
+  deliveringType: string;
 
-    @Column({name:"delivering"})
-    delivering:string;
+  @Column({ name: "initial_payment" })
+  initialPayment: string;
 
-    
-    @Column({name:"delivering_type"})
-    deliveringType:string;
+  @Column({
+    type: "enum",
+    enum: OrderStatus,
+    enumName: "order_status",
+    default: OrderStatus.Open,
+  })
+  status = OrderStatus;
 
-    @Column({name:"initial_payment"})
-    initialPayment:string;
+  @Column({
+    type: "enum",
+    enum: OrderStage,
+    enumName: "order_stage",
+    default: OrderStage.Created,
+  })
+  stage = OrderStage;
 
+  @Column()
+  comment: string;
 
-    @Column()
-    comment:string;
+  @Column({ default: false })
+  oil: boolean;
 
-    @Column({default:false})
-    oil:boolean;
+  @ManyToOne(() => User, (user) => user.orders)
+  user: User;
 
+  @ManyToOne(() => Client, (client) => client.orders)
+  client: Client;
 
-    @ManyToOne(()=>User,user=>user.orders)
-    user:User
+  @OneToMany(() => OrderPart, (orderPart) => orderPart.order)
+  orderParts: OrderPart[];
 
-    @ManyToOne(()=>Client,(client=>client.orders))
-    client:Client;
-
-    @OneToMany(()=>OrderPart,orderPart=>orderPart.order)
-     orderParts:OrderPart[]
-
+  @OneToMany(() => OrderHistory, (orderHistory) => orderHistory.order)
+  orderHistory: OrderHistory[];
 }

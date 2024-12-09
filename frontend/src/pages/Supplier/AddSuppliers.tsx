@@ -2,10 +2,14 @@ import { Field, Form, Formik } from "formik";
 import { Button, Select, TextInput } from "flowbite-react";
 import { useState } from "react";
 import { SupplierInterface } from "../../types";
+import { useNavigate } from "react-router-dom";
 
 const AddSuppliers = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+
+  const navigate=useNavigate();
 
   const countries: string[] = [
     "USA",
@@ -58,7 +62,8 @@ const AddSuppliers = () => {
       setTimeout(() => {
         props.resetForm();
         props.setSubmitting(false);
-        setSuccess("")
+        setSuccess("");
+        navigate("/suppliers")
       }, 3000);
     }
 

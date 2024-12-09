@@ -5,6 +5,8 @@ import {
   OrderPartsInterface,
   UserInterface,
 } from "../../types";
+import { Link } from "react-router-dom";
+import { Button } from "flowbite-react";
 
 const Order = () => {
   const [orders, setOrders] = useState<AllOrdersInterface[]>([]);
@@ -92,116 +94,130 @@ const Order = () => {
 
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]  ">
-      <div className="relative">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-[10px]"></th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                #
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Müştəri
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Maşın üçün
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Faktura
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Faktura №
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Ödəniş növü
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Çatdırılma üsulu
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Yaradılıb
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                İlkin ödəniş (%)
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Say
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Satış qiyməti
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Mərhələ
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Müraciət tarixi
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Anbar təsdiqi
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Məsuliyyətli və başlanğıc tarixi
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Təchizatçıya müraciət
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Təchizatçının cavabı
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Sifariş
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Mühasibat təsdiqi
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Ödəniş
-              </th>
-              <th scope="col" className="px-6 py-3 text-[10px]">
-                Göndərmə
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.length > 0 &&
-              orders.map((order: AllOrdersInterface, index: number) => (
-                <tr
-                  className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
-                  key={index}
-                >
-                  <td className="px-6 py-4"></td>
-                  <td className="px-6 py-4">{order.id}</td>
-                  <td className="px-6 py-4">{order.client.companyName}</td>
-                  <td className="px-6 py-4">{order.manufacturer}</td>
-                  <td className="px-6 py-4"></td>
-                  <td className="px-6 py-4">
-                    <input
-                      type="text"
-                      className="text-xs w-20 py-1 rounded-sm outline-none "
-                    />
-                  </td>
-                  <td className="px-6 py-4">{order.paymentType}</td>
-                  <td className="px-6 py-4">{order.delivering}</td>
-                  <td className="px-3 py-4 text-xs">
-                    {order.user.firstName} {order.user.lastName}
-                  </td>
-                  <td className=" px-6 py-4 text-xs">
-                    {order.initialPayment} %
-                  </td>
-                  <td className=" px-6 py-4 text-xs">0</td>
-                  <td className=" px-6 py-4 text-xs"></td>
-                  <td className=" px-6 py-4 text-xs"></td>
-                  <td className="flex flex-col px-4 py-4 text-xs">
-                    <span>{getHour(order.createdAt)}</span>
-                    <span>{getFullDate(order.createdAt)}</span>
-                  </td>
 
-
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
+      {
+         orders.length>0?(
+          <div className="relative">
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-[10px]"></th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  #
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Müştəri
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Maşın üçün
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Faktura
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Faktura №
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Ödəniş növü
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Çatdırılma üsulu
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Yaradılıb
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  İlkin ödəniş (%)
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Say
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Satış qiyməti
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Mərhələ
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Müraciət tarixi
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Anbar təsdiqi
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Məsuliyyətli və başlanğıc tarixi
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Təchizatçıya müraciət
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Təchizatçının cavabı
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Sifariş
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Mühasibat təsdiqi
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Ödəniş
+                </th>
+                <th scope="col" className="px-6 py-3 text-[10px]">
+                  Göndərmə
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.length > 0 &&(
+                orders.map((order: AllOrdersInterface, index: number) => (
+                  <tr
+                    className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+                    key={index}
+                  >
+                    <td className="px-6 py-4"></td>
+                    <td className="px-6 py-4">{order.id}</td>
+                    <td className="px-6 py-4">{order.client.companyName}</td>
+                    <td className="px-6 py-4">{order.manufacturer}</td>
+                    <td className="px-6 py-4"></td>
+                    <td className="px-6 py-4">
+                      <input
+                        type="text"
+                        className="text-xs w-20 py-1 rounded-sm outline-none "
+                      />
+                    </td>
+                    <td className="px-6 py-4">{order.paymentType}</td>
+                    <td className="px-6 py-4">{order.delivering}</td>
+                    <td className="px-3 py-4 text-xs">
+                      {order.user.firstName} {order.user.lastName}
+                    </td>
+                    <td className=" px-6 py-4 text-xs">
+                      {order.initialPayment} %
+                    </td>
+                    <td className=" px-6 py-4 text-xs">0</td>
+                    <td className=" px-6 py-4 text-xs"></td>
+                    <td className=" px-6 py-4 text-xs"></td>
+                    <td className="flex flex-col px-4 py-4 text-xs">
+                      <span>{getHour(order.createdAt)}</span>
+                      <span>{getFullDate(order.createdAt)}</span>
+                    </td>
+  
+  
+                  </tr>
+                )))}
+            </tbody>
+          </table>
+        </div>
+         ):(<div className="ml-20">
+          <p className="text-black">Sifarişlər mövcud deyil</p>
+          <Link to="/createOrder">
+        <Button color={"blue"} className="mt-2 flex gap-5" size={"xs"}>
+          Əlavə et
+          <span className="ml-2">+</span>
+        </Button>
+      </Link>
+         </div>)
+      }
+       
     </div>
   );
 };
