@@ -5,6 +5,8 @@ import { FcOk } from "react-icons/fc";
 import { FaXmark } from "react-icons/fa6";
 import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import { MdKeyboardDoubleArrowRight } from "react-icons/md";
+import { Button } from "flowbite-react";
+import { Link } from "react-router-dom";
 
 
 
@@ -141,7 +143,7 @@ const Warehouse = () => {
  
 
   return (
-    <div className="min-h-screen relative overflow-x-auto">
+    <div className="min-h-screen relative">
       <form>
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -394,6 +396,8 @@ const Warehouse = () => {
           </tbody>
         </table>
       </form>
+       <Link to="/importWarehouse" ><Button color={"blue"} className="mx-5" size={"sm"}>Əlavə et +</Button></Link>
+      
       {/* <div className="flex justify-center mb-20">
         <button
           onClick={() => paginate(currentPage - 1)}

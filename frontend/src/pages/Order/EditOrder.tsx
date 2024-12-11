@@ -4,15 +4,20 @@ import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
 import { ClientInterface, OrderInterface, UserInterface } from "../../types";
 import OrderPartsComponent from "../../components/OrderPartsComponent";
 import { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const CreateOrders = () => {
+const EditOrder = () => {
   const [clients, setClients] = useState([]);
   const [officeUsers,setOfficeUsers]=useState<UserInterface[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const[order,setOrder]=useState<OrderInterface|null>(null);
+
+  console.log(order);
+  
 
   const navigate=useNavigate();
+  const{id}=useParams();
 
   const produceDateData: string[] = [
     "2024",
@@ -24,7 +29,7 @@ const CreateOrders = () => {
     "2018",
   ];
 
-  const ordersInitialValue: OrderInterface = {
+  const orderInitialValue: OrderInterface = {
     id:0,
     project: "project1",
     cardNumber: "1",
@@ -53,13 +58,13 @@ const CreateOrders = () => {
     ],
   };
 
-  //GET ALL CLIENTS
+  //GET ORDER
 
   useEffect(() => {
-    const getAllClients = async () => {
+    const getOrder = async () => {
       try {
         const res = await fetch(
-          "http://localhost:3013/api/v1/client/getClients",
+          `http://localhost:3013/api/v1/order/getOrder/${id}`,
           {
             method: "GET",
             credentials: "include", // added this part
@@ -75,41 +80,69 @@ const CreateOrders = () => {
         if (!res.ok || data.success === false) {
           setError(data.message);
         } else {
-          setClients(data);
+          setOrder(data);
         }
       } catch (error: any) {
         setError(error);
       }
     };
 
-    const getAllOfficeWorkers=async()=>{
-      try {
-        const res = await fetch(
-          "http://localhost:3013/api/v1/user/getOfficeWorkers",
-          {
-            method: "GET",
-            credentials: "include", // added this part
-            headers: {
-              "Content-Type": "application/json",
-            },
+    const getAllClients = async () => {
+        try {
+          const res = await fetch(
+            "http://localhost:3013/api/v1/client/getClients",
+            {
+              method: "GET",
+              credentials: "include", // added this part
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+  
+          const data = await res.json();
+          console.log(data);
+  
+          if (!res.ok || data.success === false) {
+            setError(data.message);
+          } else {
+            setClients(data);
           }
-        );
-
-        const data = await res.json();
-        console.log(data);
-
-        if (!res.ok || data.success === false) {
-          setError(data.message);
-        } else {
-          setOfficeUsers(data);
+        } catch (error: any) {
+          setError(error);
         }
-      } catch (error: any) {
-        setError(error);
+      };
+
+      const getAllOfficeWorkers=async()=>{
+        try {
+          const res = await fetch(
+            "http://localhost:3013/api/v1/user/getOfficeWorkers",
+            {
+              method: "GET",
+              credentials: "include", // added this part
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+  
+          const data = await res.json();
+          console.log(data);
+  
+          if (!res.ok || data.success === false) {
+            setError(data.message);
+          } else {
+            setOfficeUsers(data);
+          }
+        } catch (error: any) {
+          setError(error);
+        }
       }
-    }
+   
+    getOrder();
     getAllClients();
     getAllOfficeWorkers();
-  }, []);
+  }, [id]);
 
   //SUMBIT FORM TO BACKEND
   const onsubmit = async (values: OrderInterface) => {
@@ -146,7 +179,7 @@ const CreateOrders = () => {
   return (
     <div className="min-h-screen mt-[100px] mb-[100px] ml-[90px] ">
       <h2 className="font-semibold text-xl text-center  mb-[50px]">Sifariş</h2>
-      <Formik initialValues={ordersInitialValue} onSubmit={onsubmit}>
+      <Formik initialValues={orderInitialValue} onSubmit={onsubmit}>
         {({ values, setFieldValue }) => {
           const deletePart = (index: number) => {
             setFieldValue(
@@ -457,4 +490,4 @@ const CreateOrders = () => {
   );
 };
 
-export default CreateOrders;
+export default EditOrder;

@@ -186,8 +186,8 @@ const Order = () => {
                     key={index}
                   >
                     <td className="px-6 py-4"></td>
-                     <td className="px-6 py-4"><Link to="" >{order.id}</Link></td>
-                    <td className="px-6 py-4"><Link to="" >{order.client.companyName}</Link></td>
+                     <td className="px-6 py-4"><Link to={`/editOrder/${order.id}`} >{order.id}</Link></td>
+                    <td className="px-6 py-4"><Link to={`/editOrder/${order.id}`} >{order.client.companyName}</Link></td>
                     <td className="px-6 py-4">{order.manufacturer}</td>
                     <td className="px-6 py-4"></td>
                     <td className="px-6 py-4">
@@ -217,6 +217,8 @@ const Order = () => {
                 ))}
             </tbody>
           </table>
+          <Link to="/createOrder" ><Button color={"blue"} className="mx-16 my-5" size={"sm"}>Əlavə et +</Button></Link>
+
         </div>
       ) : (
         <div className="ml-20">

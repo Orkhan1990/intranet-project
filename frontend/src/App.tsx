@@ -16,6 +16,7 @@ import UpdateSupplier from './pages/Supplier/UpdateSupplier';
 import Warehouse from './pages/Warehouse/Warehouse';
 import CreateOrders from './pages/Order/CreateOrders';
 import Order from './pages/Order/Order';
+import EditOrder from './pages/Order/EditOrder';
 
 
 
@@ -35,7 +36,9 @@ function App() {
       <Route path="/suppliers" element={<Layout><Suppliers/></Layout>} /> 
       <Route path="/newSuppliers" element={<Layout><AddSuppliers/></Layout>} /> 
       <Route path="/updateSupplier/:id" element={<Layout><UpdateSupplier/></Layout>} />
-      <Route path="/orders" element={<Layout><Order/></Layout>} />       
+      <Route path="/orders" element={<Layout><Order/></Layout>} />  
+      <Route path="/editOrder/:id" element={<Layout><EditOrder/></Layout>} />       
+     
        
       
       

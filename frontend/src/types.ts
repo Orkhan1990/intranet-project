@@ -110,7 +110,7 @@ export interface OrderPartsInterface {
   partName: string;
 }
 
-export interface OrdersInterface {
+export interface OrderInterface {
   id:number,
   project: string;
   cardNumber:string;

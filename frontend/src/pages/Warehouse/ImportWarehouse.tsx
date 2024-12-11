@@ -5,6 +5,7 @@ import { Button, Select,Textarea, TextInput } from "flowbite-react";
 import NewPartsComponent from "../../components/NewPartsComponent";
 import * as XLSX from "xlsx";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ImportWarehouse = () => {
  
@@ -12,6 +13,7 @@ const ImportWarehouse = () => {
   const[error,setError]=useState<string>("");
   const[success,setSuccess]=useState<string>("")
   const[suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
+  const navigate=useNavigate();
 
 
   useEffect(()=>{
@@ -137,6 +139,8 @@ const ImportWarehouse = () => {
         return;
       }else{
         setSuccess(data.result);
+        navigate('/warehouse');
+        window.scrollTo(0,0);
       }
 
       

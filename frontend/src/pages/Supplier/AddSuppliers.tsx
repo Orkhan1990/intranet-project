@@ -63,8 +63,9 @@ const AddSuppliers = () => {
         props.resetForm();
         props.setSubmitting(false);
         setSuccess("");
-        navigate("/suppliers")
-      }, 3000);
+        navigate("/suppliers");
+        window.scrollTo(0,0);
+      }, 1000);
     }
 
     setError("");

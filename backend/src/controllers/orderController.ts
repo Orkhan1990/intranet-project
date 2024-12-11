@@ -127,3 +127,29 @@ export const getAllOrders=async(req:Request,res:Response,next:NextFunction)=>{
     next(errorHandler(401,error))
   }
 }
+
+
+export const getOrder=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    // const {id}=req.params;
+
+
+
+    const orderRepository=AppDataSource.getRepository(Order);
+    const order=await orderRepository.findOne({
+      where:{id:Number(req.params.id)},
+      relations:['user','client','orderParts']
+      
+    });
+
+    if(!order){
+      next(errorHandler(401,"Sifariş mövcud deyil!"));
+      return;
+    }
+    
+    res.status(200).json(order);
+    
+  } catch (error) {
+    next(errorHandler(401,error));
+  }
+}

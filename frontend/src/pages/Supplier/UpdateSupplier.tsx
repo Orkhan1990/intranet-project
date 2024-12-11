@@ -98,7 +98,8 @@ const UpdateSupplier = () => {
           {
             () => setSuccess(""); 
             navigate('/suppliers');
-          }, 3000); // Reset success message after 3 seconds
+            window.scrollTo(0,0);
+          }, 1000); // Reset success message after 3 seconds
         
         // Navigate to the Suppliers page after a successful update
       }
