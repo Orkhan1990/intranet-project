@@ -26,6 +26,8 @@ const Order = () => {
     engineNumber: string;
     produceYear: string;
     km: string;
+    status: string;
+    stage: string;
     vehicleNumber: string;
     paymentType: PayType;
     delivering: DeliverType;
@@ -35,8 +37,23 @@ const Order = () => {
     oil: boolean;
     user: UserInterface;
     parts: OrderPartsInterface[];
-    createdAt:string
+    createdAt: string;
   }
+
+  const getStageResult = (result: string) => {
+    switch (result) {
+      case "created":
+        return "Sifariş yaradıldı";
+      case "invastigation":
+        return "Bazar araşdırması aparılır";
+      case "calculation":
+        return "Hesablama aparılır";
+        case "finish":
+          return "Sifariş tamamlandı"
+      default:
+        return "";
+    }
+  };
 
   useEffect(() => {
     const getAllOrders = async () => {
@@ -65,39 +82,33 @@ const Order = () => {
     getAllOrders();
   }, []);
 
-    //  console.log(orders[0].createdAt);
-     
- 
+  //  console.log(orders[0].createdAt);
 
-   //Change TIME FORMAT
+  //Change TIME FORMAT
 
-  const getHour=(time:string)=>{
-
+  const getHour = (time: string) => {
     const localDate = new Date(time);
     console.log(localDate);
-    
-    
+
     // Convert to local time and extract the hour and minute
-    const hours = localDate.getHours().toString().padStart(2, '0');
-    const minutes = localDate.getMinutes().toString().padStart(2, '0');
+    const hours = localDate.getHours().toString().padStart(2, "0");
+    const minutes = localDate.getMinutes().toString().padStart(2, "0");
 
     return `${hours}:${minutes}`;
-   }
+  };
 
- const getFullDate=(time:string)=>{
-  const date=time.substring(0,10);
-  const dateArray=date.split("-");
-  const reverseDate=`${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`
+  const getFullDate = (time: string) => {
+    const date = time.substring(0, 10);
+    const dateArray = date.split("-");
+    const reverseDate = `${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`;
 
-  return reverseDate;
- }
+    return reverseDate;
+  };
 
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]  ">
-
-      {
-         orders.length>0?(
-          <div className="relative">
+      {orders.length > 0 ? (
+        <div className="relative">
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
@@ -168,15 +179,15 @@ const Order = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.length > 0 &&(
+              {orders.length > 0 &&
                 orders.map((order: AllOrdersInterface, index: number) => (
                   <tr
-                    className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+                    className=" text-black odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
                     key={index}
                   >
                     <td className="px-6 py-4"></td>
-                    <td className="px-6 py-4">{order.id}</td>
-                    <td className="px-6 py-4">{order.client.companyName}</td>
+                     <td className="px-6 py-4"><Link to="" >{order.id}</Link></td>
+                    <td className="px-6 py-4"><Link to="" >{order.client.companyName}</Link></td>
                     <td className="px-6 py-4">{order.manufacturer}</td>
                     <td className="px-6 py-4"></td>
                     <td className="px-6 py-4">
@@ -195,29 +206,29 @@ const Order = () => {
                     </td>
                     <td className=" px-6 py-4 text-xs">0</td>
                     <td className=" px-6 py-4 text-xs"></td>
-                    <td className=" px-6 py-4 text-xs"></td>
+                    <td className=" px-6 py-4 text-xs">
+                      {getStageResult(order.stage)}
+                    </td>
                     <td className="flex flex-col px-4 py-4 text-xs">
                       <span>{getHour(order.createdAt)}</span>
                       <span>{getFullDate(order.createdAt)}</span>
                     </td>
-  
-  
                   </tr>
-                )))}
+                ))}
             </tbody>
           </table>
         </div>
-         ):(<div className="ml-20">
+      ) : (
+        <div className="ml-20">
           <p className="text-black">Sifarişlər mövcud deyil</p>
           <Link to="/createOrder">
-        <Button color={"blue"} className="mt-2 flex gap-5" size={"xs"}>
-          Əlavə et
-          <span className="ml-2">+</span>
-        </Button>
-      </Link>
-         </div>)
-      }
-       
+            <Button color={"blue"} className="mt-2 flex gap-5" size={"xs"}>
+              Əlavə et
+              <span className="ml-2">+</span>
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

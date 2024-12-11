@@ -7,6 +7,7 @@ import { Client } from "../entites/Client";
 import { OrderInterface } from "../types/projectTypes";
 import { User } from "../entites/User";
 import { CustomRequest } from "../middleware/verifyToken";
+import { OrderStatus } from "../enums/allEnums";
 
 export const createOrder = async (
   req: CustomRequest,
@@ -24,7 +25,7 @@ export const createOrder = async (
       chassisNumber,
       engineNumber,
       produceYear,
-      km,
+      km,      
       vehicleNumber,
       paymentType,
       delivering,
@@ -85,6 +86,7 @@ export const createOrder = async (
     newOrder.oil = oil;
     newOrder.user = getUser;
     newOrder.orderParts=newOrderArray;
+
 
     await orderRepository.save(newOrder);
 

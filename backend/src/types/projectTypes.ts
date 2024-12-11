@@ -1,3 +1,5 @@
+import { OrderStage, OrderStatus } from "../enums/allEnums";
+
 export interface UserInterface {
   userName: string;
   firstName: string;
@@ -46,6 +48,8 @@ export interface OrderInterface {
   deliveringType: string;
   initialPayment: string;
   comment: string;
+  status:OrderStatus,
+  stage:OrderStage,
   oil: boolean;
   clientId:number;
   userId:number,
