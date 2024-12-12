@@ -1,7 +1,7 @@
 import { Button, Checkbox, Select, Textarea, TextInput } from "flowbite-react";
 import { Field, FieldArray, Form, Formik } from "formik";
 import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
-import { ClientInterface, OrderInterface, UserInterface } from "../../types";
+import { ClientInterface, EditOrderInterface, UserInterface } from "../../types";
 import OrderPartsComponent from "../../components/OrderPartsComponent";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
@@ -11,30 +11,12 @@ const EditOrder = () => {
   const [officeUsers,setOfficeUsers]=useState<UserInterface[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const[order,setOrder]=useState<OrderInterface|null>(null);
-
-  console.log(order);
-  
-
-  const navigate=useNavigate();
-  const{id}=useParams();
-
-  const produceDateData: string[] = [
-    "2024",
-    "2023",
-    "2022",
-    "2021",
-    "2020",
-    "2019",
-    "2018",
-  ];
-
-  const orderInitialValue: OrderInterface = {
+  const[orderInitialValue,setOrderInitialValue]=useState<EditOrderInterface>({
     id:0,
     project: "project1",
     cardNumber: "1",
     orderType: OrderType.Local_Market,
-    clientId: 1,
+    clientId:1,
     manufacturer: "Man",
     model: "",
     chassisNumber: "",
@@ -56,7 +38,52 @@ const EditOrder = () => {
         partName: "",
       },
     ],
-  };
+  });
+
+  // console.log(order);
+  
+
+  const navigate=useNavigate();
+  const{id}=useParams();
+
+  const produceDateData: string[] = [
+    "2024",
+    "2023",
+    "2022",
+    "2021",
+    "2020",
+    "2019",
+    "2018",
+  ];
+
+  // const orderInitialValue: EditOrderInterface = {
+  //   id:0,
+  //   project: "project1",
+  //   cardNumber: "1",
+  //   orderType: OrderType.Local_Market,
+  //   client:null,
+  //   manufacturer: "Man",
+  //   model: "",
+  //   chassisNumber: "",
+  //   engineNumber: "",
+  //   produceYear: "2024",
+  //   km: "",
+  //   vehicleNumber: "",
+  //   paymentType: PayType.Transfer,
+  //   delivering: DeliverType.Fast,
+  //   deliveringType: "simplified",
+  //   initialPayment: 0,
+  //   comment: "",
+  //   oil: false,
+  //   parts: [
+  //     {
+  //       partNumber: "",
+  //       count: 1,
+  //       checkOnWarehouse: false,
+  //       partName: "",
+  //     },
+  //   ],
+  // };
 
   //GET ORDER
 
@@ -80,7 +107,7 @@ const EditOrder = () => {
         if (!res.ok || data.success === false) {
           setError(data.message);
         } else {
-          setOrder(data);
+          setOrderInitialValue(data);
         }
       } catch (error: any) {
         setError(error);
@@ -145,7 +172,7 @@ const EditOrder = () => {
   }, [id]);
 
   //SUMBIT FORM TO BACKEND
-  const onsubmit = async (values: OrderInterface) => {
+  const onsubmit = async (values: EditOrderInterface) => {
     console.log(values);
     try {
       const res = await fetch(
@@ -179,7 +206,7 @@ const EditOrder = () => {
   return (
     <div className="min-h-screen mt-[100px] mb-[100px] ml-[90px] ">
       <h2 className="font-semibold text-xl text-center  mb-[50px]">Sifariş</h2>
-      <Formik initialValues={orderInitialValue} onSubmit={onsubmit}>
+      <Formik initialValues={orderInitialValue} onSubmit={onsubmit} enableReinitialize={true}>
         {({ values, setFieldValue }) => {
           const deletePart = (index: number) => {
             setFieldValue(
@@ -214,7 +241,7 @@ const EditOrder = () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Sifarişin tipi
                 </label>
-                <Field as={Select} name="orderType" sizing="sm">
+                <Field as={Select} name="orderType" sizing="sm" >
                   <option value={OrderType.Standart_Client}>
                     Standart (müştəri)
                   </option>

@@ -3,12 +3,14 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useState } from "react";
 import * as Yup from "yup";
 import { ClientInterface } from "../../types";
+import { useNavigate } from "react-router-dom";
 
 
 
 const NewClient = () => {
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState("");
+  const navigate=useNavigate();
 
   const initialValues: ClientInterface = {
     id:0,
@@ -63,7 +65,10 @@ const NewClient = () => {
       }
       if (res.ok) {
         setSuccess(`${values.companyName} şirkəti yaradıldı`);
-        setError(false);
+        setTimeout(() => {
+          setError(false);
+          navigate("/clientList") 
+        }, 2000);
       }
     } catch (error: any) {
       setError(error.message);
@@ -270,7 +275,7 @@ const NewClient = () => {
                
               </div>
             </div>
-            <Button type="submit" color="blue" className="w-[200px]">
+            <Button type="submit" color="blue" className="w-[150px]" size={"sm"}>
               Yadda Saxla
             </Button>
           </Form>

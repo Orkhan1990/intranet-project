@@ -132,6 +132,35 @@ export interface OrderInterface {
   parts:OrderPartsInterface[]
 }
 
+export interface EditOrderInterface{
+  id:number,
+  project:string,
+  cardNumber:string,
+  orderType: OrderType,
+  clientId:number,
+  manufacturer:string,
+  model:string,
+  chassisNumber:string,
+  engineNumber:string,
+  produceYear:string,
+  km:string,
+  vehicleNumber:string,
+  paymentType: PayType,
+  delivering: DeliverType,
+  deliveringType:string,
+  initialPayment:number,
+  comment:string,
+  oil:boolean,
+  parts: [
+    {
+      partNumber:string,
+      count:number,
+      checkOnWarehouse:boolean,
+      partName:string,
+    },
+  ],
+}
+
 
 export interface SupplierInterface{
   id:number,

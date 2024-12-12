@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Table } from "flowbite-react";
+import { Button, Table } from "flowbite-react";
 
 interface ClientInterface {
   id: number;
@@ -158,6 +158,8 @@ const ClientList = () => {
           </Table.Body>
         </Table>
       </form>
+      <Link to="/newClient" ><Button color={"blue"} className="my-5" size={"xs"}>Əlavə et +</Button></Link>
+
     </div>
   );
 };
