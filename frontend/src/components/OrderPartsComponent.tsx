@@ -28,6 +28,7 @@ const OrderPartsComponent = ({
               as={TextInput}
               type="text"
               name={`${name}.partNumber`}
+              value={value.partNumber}
               sizing="sm"
             />
           </div>
@@ -52,6 +53,8 @@ const OrderPartsComponent = ({
             name={`${name}.partName`}
             sizing="sm"
             className="w-60"
+            value={value.partName}
+
           />
         </td>
         <td>

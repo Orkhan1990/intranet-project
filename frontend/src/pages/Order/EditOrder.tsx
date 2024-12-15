@@ -5,6 +5,7 @@ import { ClientInterface, EditOrderInterface, UserInterface } from "../../types"
 import OrderPartsComponent from "../../components/OrderPartsComponent";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
+import ActionsOnOrder from "../../components/ActionsOnOrder";
 
 const EditOrder = () => {
   const [clients, setClients] = useState([]);
@@ -30,7 +31,7 @@ const EditOrder = () => {
     initialPayment: 0,
     comment: "",
     oil: false,
-    parts: [
+    orderParts: [
       {
         partNumber: "",
         count: 1,
@@ -40,7 +41,7 @@ const EditOrder = () => {
     ],
   });
 
-  // console.log(order);
+  console.log(orderInitialValue);
   
 
   const navigate=useNavigate();
@@ -56,34 +57,6 @@ const EditOrder = () => {
     "2018",
   ];
 
-  // const orderInitialValue: EditOrderInterface = {
-  //   id:0,
-  //   project: "project1",
-  //   cardNumber: "1",
-  //   orderType: OrderType.Local_Market,
-  //   client:null,
-  //   manufacturer: "Man",
-  //   model: "",
-  //   chassisNumber: "",
-  //   engineNumber: "",
-  //   produceYear: "2024",
-  //   km: "",
-  //   vehicleNumber: "",
-  //   paymentType: PayType.Transfer,
-  //   delivering: DeliverType.Fast,
-  //   deliveringType: "simplified",
-  //   initialPayment: 0,
-  //   comment: "",
-  //   oil: false,
-  //   parts: [
-  //     {
-  //       partNumber: "",
-  //       count: 1,
-  //       checkOnWarehouse: false,
-  //       partName: "",
-  //     },
-  //   ],
-  // };
 
   //GET ORDER
 
@@ -102,7 +75,7 @@ const EditOrder = () => {
         );
 
         const data = await res.json();
-        console.log(data);
+        // console.log(data);
 
         if (!res.ok || data.success === false) {
           setError(data.message);
@@ -128,7 +101,6 @@ const EditOrder = () => {
           );
   
           const data = await res.json();
-          console.log(data);
   
           if (!res.ok || data.success === false) {
             setError(data.message);
@@ -154,7 +126,6 @@ const EditOrder = () => {
           );
   
           const data = await res.json();
-          console.log(data);
   
           if (!res.ok || data.success === false) {
             setError(data.message);
@@ -173,7 +144,7 @@ const EditOrder = () => {
 
   //SUMBIT FORM TO BACKEND
   const onsubmit = async (values: EditOrderInterface) => {
-    console.log(values);
+    // console.log(values);
     try {
       const res = await fetch(
         "http://localhost:3013/api/v1/order/createOrder",
@@ -188,7 +159,7 @@ const EditOrder = () => {
       );
 
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
 
       if (!res.ok || data.success === false) {
         setError(data.message);
@@ -204,14 +175,17 @@ const EditOrder = () => {
   };
 
   return (
+    <div>
     <div className="min-h-screen mt-[100px] mb-[100px] ml-[90px] ">
       <h2 className="font-semibold text-xl text-center  mb-[50px]">Sifariş</h2>
       <Formik initialValues={orderInitialValue} onSubmit={onsubmit} enableReinitialize={true}>
         {({ values, setFieldValue }) => {
+          // console.log(values.parts,"salam");
+          
           const deletePart = (index: number) => {
             setFieldValue(
               "parts",
-              values.parts.filter((_, i) => i !== index)
+              values.orderParts.filter((_, i) => i !== index)
             );
           };
           return (
@@ -307,7 +281,7 @@ const EditOrder = () => {
                   Buraxılış ili
                 </label>
                 <Field as={Select} name="produceDate" className="w-32" sizing="sm">
-                  {produceDateData.map((item: string) => (
+                  {produceDateData?.map((item: string) => (
                     <option value={item}>{item}</option>
                   ))}
                 </Field>
@@ -420,13 +394,14 @@ const EditOrder = () => {
                             </th>
                           </tr>
                         </thead>
-                        {values.parts.map((_, index) => (
+                        {values.orderParts?.map((_, index) => (
+                          
                           <OrderPartsComponent
                             name={`parts[${index}]`}
                             key={index}
                             index={index}
                             deletePart={() => deletePart(index)}
-                            value={values.parts[index]}
+                            value={values.orderParts[index]}
                           />
                         ))}
                       </table>
@@ -475,7 +450,7 @@ const EditOrder = () => {
                       </Field>
                       <Field as={Select} className="flex-1" sizing="sm">
                       {
-                        officeUsers.length>0&&officeUsers.map((officeUser:UserInterface,index:number)=>(
+                        officeUsers.length>0&&officeUsers?.map((officeUser:UserInterface,index:number)=>(
                           <option value={officeUser.id} key={index}>{officeUser.firstName} {officeUser.lastName}</option>
 
                         ))
@@ -513,6 +488,8 @@ const EditOrder = () => {
         }}
       </Formik>
 
+      </div>
+      <ActionsOnOrder order={orderInitialValue}/>
     </div>
   );
 };

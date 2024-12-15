@@ -151,7 +151,7 @@ export interface EditOrderInterface{
   initialPayment:number,
   comment:string,
   oil:boolean,
-  parts: [
+  orderParts: [
     {
       partNumber:string,
       count:number,
