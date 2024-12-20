@@ -7,7 +7,8 @@ import { Client } from "../entites/Client";
 import { OrderInterface } from "../types/projectTypes";
 import { User } from "../entites/User";
 import { CustomRequest } from "../middleware/verifyToken";
-import { OrderStatus } from "../enums/allEnums";
+import { OrderStage, OrderStatus } from "../enums/allEnums";
+import { OrderHistory } from "../entites/OrderHistory";
 
 export const createOrder = async (
   req: CustomRequest,
@@ -42,6 +43,7 @@ export const createOrder = async (
     const orderPartRepositroy = AppDataSource.getRepository(OrderPart);
     const clientRepository = AppDataSource.getRepository(Client);
     const userRepository = AppDataSource.getRepository(User);
+    const orderHistoryRepository=AppDataSource.getRepository(OrderHistory);
     const getclient = await clientRepository.findOneBy({ id: clientId });
     const getUser = await userRepository.findOneBy({ id: userId });
 
@@ -64,7 +66,10 @@ export const createOrder = async (
            await orderPartRepositroy.save(newOrderPart);
            return newOrderPart;
     }
-    ))
+    ));
+
+    
+
 
     const newOrder = new Order();
     newOrder.project = project;
@@ -89,6 +94,19 @@ export const createOrder = async (
 
 
     await orderRepository.save(newOrder);
+
+    const newOrderHistory=new OrderHistory();
+    newOrderHistory.accept=false;
+    newOrderHistory.acceptDate=new Date();
+    newOrderHistory.stage=OrderStage.Created;
+    newOrderHistory.confirm=false;
+    newOrderHistory.user=getUser;
+    newOrderHistory.confirmDate=new Date();
+    newOrderHistory.responsibleBeginDate=new Date();
+    newOrderHistory.responsibleDate=new Date();
+    newOrderHistory.order=newOrder;
+
+    await orderHistoryRepository.save(newOrderHistory);
 
    res.status(200).json({result:`${parts.length>1?"Sifarişlər əlavə olundu":"Sifariş əlavə olundu!"}`});
 

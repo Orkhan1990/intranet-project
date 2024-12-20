@@ -59,13 +59,7 @@ export class Order extends AllEntities {
   })
   status = OrderStatus.Open;
 
-  @Column({
-    type: "enum",
-    enum: OrderStage,
-    enumName: "order_stage",
-    default:OrderStage.Created
-  })
-  stage = OrderStage.Created;
+  
 
   @Column()
   comment: string;
@@ -85,27 +79,8 @@ export class Order extends AllEntities {
   @OneToMany(() => OrderHistory, (orderHistory) => orderHistory.order)
   orderHistory: OrderHistory[];
 
-  @Column({default:false})
-  confirm:boolean;
+ 
 
-  @Column({name:"confirm_date"})
-  confirmDate:Date;
+ 
 
-  @Column()
-  accept:boolean;
-
-  @Column({name:"accept_date"})
-  acceptDate:Date;
-
-  @Column({name:"accept_message"})
-  acceptMessage:string;
-
-  @ManyToOne(() => User, (user) => user.responsibleOrders)
-  responsibleUser: User;
-
-  @Column({name:"responsible_date"})
-  responsibleDate:Date;
-
-  @Column({name:"responsible_begin_date"})
-  responsibleBeginDate:Date
 }
