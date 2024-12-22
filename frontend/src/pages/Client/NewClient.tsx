@@ -67,7 +67,8 @@ const NewClient = () => {
         setSuccess(`${values.companyName} şirkəti yaradıldı`);
         setTimeout(() => {
           setError(false);
-          navigate("/clientList") 
+          navigate("/clientList");
+          window.scrollTo(0,0); 
         }, 2000);
       }
     } catch (error: any) {
