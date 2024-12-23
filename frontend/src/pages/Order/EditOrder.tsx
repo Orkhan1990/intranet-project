@@ -87,6 +87,12 @@ const EditOrder = () => {
       }
     };
 
+    const handleSubmitButton=(id:string)=>{
+  
+     
+
+    }
+
     const getAllClients = async () => {
         try {
           const res = await fetch(
@@ -473,7 +479,7 @@ const EditOrder = () => {
                 <Button type="submit" size={"sm"} color={"blue"}>
                   Yadda Saxla
                 </Button>
-                <Button size={"sm"} color={"blue"}>
+                <Button size={"sm"} color={"blue"} onClick={()=>handleSubmitButton(id)}>
                   Təsdiqlə
                 </Button>
               </div>

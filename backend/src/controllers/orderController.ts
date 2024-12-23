@@ -98,10 +98,7 @@ export const createOrder = async (
     const newOrderHistory=new OrderHistory();
     newOrderHistory.accept=false;
     newOrderHistory.acceptDate=new Date();
-    newOrderHistory.stage=OrderStage.Created;
-    newOrderHistory.confirm=false;
     newOrderHistory.user=getUser;
-    newOrderHistory.confirmDate=new Date();
     newOrderHistory.responsibleBeginDate=new Date();
     newOrderHistory.responsibleDate=new Date();
     newOrderHistory.order=newOrder;
@@ -129,7 +126,8 @@ export const getAllOrders=async(req:Request,res:Response,next:NextFunction)=>{
         relations: [
           'client',        
           'user',
-          'orderParts'
+          'orderParts',
+          'orderHistory'
         ]
       }
     )

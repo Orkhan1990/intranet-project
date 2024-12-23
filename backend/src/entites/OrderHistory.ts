@@ -9,20 +9,6 @@ import { OrderStage } from "../enums/allEnums";
 @Entity({name:"order_history"})
 export class OrderHistory extends AllEntities{
  
-    @Column({
-        type: "enum",
-        enum: OrderStage,
-        enumName: "order_stage",
-        default:OrderStage.Created
-      })
-      stage = OrderStage.Created;
-
-    @Column({default:false})
-    confirm:boolean;
-  
-    @Column({name:"confirm_date",nullable:true})
-    confirmDate:Date;
-  
     @Column()
     accept:boolean;
   

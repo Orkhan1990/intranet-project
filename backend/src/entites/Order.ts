@@ -6,7 +6,6 @@ import { User } from "./User";
 import { OrderHistory } from "./OrderHistory";
 import { OrderStage, OrderStatus } from "../enums/allEnums";
 
-
 @Entity({ name: "orders" })
 export class Order extends AllEntities {
   @Column({ nullable: true })
@@ -55,17 +54,29 @@ export class Order extends AllEntities {
     type: "enum",
     enum: OrderStatus,
     enumName: "order_status",
-    default:OrderStatus.Open
+    default: OrderStatus.Open,
   })
   status = OrderStatus.Open;
-
-  
 
   @Column()
   comment: string;
 
   @Column({ default: false })
   oil: boolean;
+
+  @Column({
+    type: "enum",
+    enum: OrderStage,
+    enumName: "order_stage",
+    default: OrderStage.Created,
+  })
+  stage = OrderStage.Created;
+
+  @Column({ default: false })
+  confirm: boolean;
+
+  @Column({ name: "confirm_date", nullable: true })
+  confirmDate: Date;
 
   @ManyToOne(() => User, (user) => user.orders)
   user: User;
@@ -78,9 +89,4 @@ export class Order extends AllEntities {
 
   @OneToMany(() => OrderHistory, (orderHistory) => orderHistory.order)
   orderHistory: OrderHistory[];
-
- 
-
- 
-
 }

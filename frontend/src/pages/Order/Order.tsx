@@ -14,6 +14,15 @@ const Order = () => {
 
   console.log(orders);
 
+  interface OrderHistory{
+    stage:string,
+    confirm:boolean,
+    confirmDate:string,
+    accept:boolean,
+    acceptDate:string,
+    acceptMessage:string
+  }
+
   interface AllOrdersInterface {
     id: number;
     project: string;
@@ -33,12 +42,15 @@ const Order = () => {
     delivering: DeliverType;
     deliveringType: string;
     initialPayment: number;
+    orderHistory:OrderHistory[],
     comment: string;
     oil: boolean;
     user: UserInterface;
     parts: OrderPartsInterface[];
     createdAt: string;
   }
+
+  
 
   const getStageResult = (result: string) => {
     switch (result) {
