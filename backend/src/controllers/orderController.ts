@@ -169,3 +169,56 @@ export const getOrder=async(req:Request,res:Response,next:NextFunction)=>{
     next(errorHandler(401,error));
   }
 }
+
+
+export const confirmOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+  try {
+
+    const {id}=req.params;
+    const userId = req.userId;
+    const userRepository=AppDataSource.getRepository(User);
+    const orderRepository=AppDataSource.getRepository(Order);
+
+    const user=await userRepository.findOneBy({id:userId});
+    const order=await orderRepository.findOneBy({id:Number(id)});
+
+    if(!user){
+      next(errorHandler(401,"Belə istifadəçi yoxdur!"));
+    }
+
+    if(!order){
+      next(errorHandler(401,"Belə istifadəçi yoxdur!"));
+    }
+   
+    order.confirm=true;
+    order.confirmDate=new Date();
+    order.user=user;
+
+    await orderRepository.save(order);
+
+    res.status(201).json(order);
+    
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}
+
+
+export const uploadExcelFile=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    const orderPartsRepository=AppDataSource.getRepository(OrderPart);
+
+    const newOrderPart=new OrderPart();
+    newOrderPart.partNumber=req.body.partNumber;
+    newOrderPart.count=req.body.count;
+    newOrderPart.partName=req.body.partName;
+
+    await orderPartsRepository.save(newOrderPart);
+
+    res.status(200).json(newOrderPart);
+    
+  }
+   catch (error) {
+    next(errorHandler(401,error))
+  }
+}

@@ -1,14 +1,21 @@
 const ActionsOnOrder = ({ order }: any) => {
-  const resultDate = order.createdAt;
-  const date = new Date(resultDate);
-  let hours = date.getHours().toString().padStart(2, "0");
-  let minutes = date.getMinutes().toString().padStart(2, "0");
 
-  let day = date.getDate().toString().padStart(2, "0");
-  let month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-based month
-  let year = date.getFullYear();
 
-  let formattedDate = `${hours}:${minutes} ${day}-${month}-${year}`;
+    const changeFormatDate=(resultDate:Date)=>{
+      const date = new Date(resultDate);
+      let hours = date.getHours().toString().padStart(2, "0");
+      let minutes = date.getMinutes().toString().padStart(2, "0");
+    
+      let day = date.getDate().toString().padStart(2, "0");
+      let month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-based month
+      let year = date.getFullYear();
+    
+      let formattedDate = `${hours}:${minutes} ${day}-${month}-${year}`;
+      return formattedDate
+    }
+
+  // const resultDate = order.createdAt;
+
 
   return (
     <div className="mt-5">
@@ -40,7 +47,7 @@ const ActionsOnOrder = ({ order }: any) => {
           <tbody>
             <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
               <td className="px-6 py-4 text-black">Müraciət tarixi</td>
-              <td className="px-6 py-4">{formattedDate}</td>
+              <td className="px-6 py-4">{changeFormatDate(order.createdAt)}</td>
               <td className="px-6 py-4"></td>
               <td className="px-20 py-4"></td>
               <td className="px-20 py-4"></td>
@@ -49,7 +56,7 @@ const ActionsOnOrder = ({ order }: any) => {
             </tr>
             {(order.confirm)?(<tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                <td className="px-6 py-4 text-black flex flex-col"><span>Bölmə rəhbərin təsdiqi</span><span>logistika və xidmətin inkişafı</span></td>
-               <td className="px-6 py-4"></td>
+               <td className="px-6 py-4">{changeFormatDate(order.confirmDate)}</td>
                <td className="px-6 py-4"></td>
                <td className="px-20 py-4"></td>
                <td className="px-20 py-4"></td>
