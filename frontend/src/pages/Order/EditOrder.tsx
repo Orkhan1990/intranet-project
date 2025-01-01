@@ -19,16 +19,33 @@ const EditOrder = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [refreshData, setRefreshData] = useState(false);
-  const[orderParts,setOrderParts]=useState<any[]>([]);
-  const[fileError,setFileError]=useState("");
-  const[fileName,setFileName]=useState("");
+  const [orderParts, setOrderParts] = useState<any[]>([]);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
   const [orderInitialValue, setOrderInitialValue] =
     useState<EditOrderInterface>({
       id: 0,
       project: "project1",
       cardNumber: "1",
       orderType: OrderType.Local_Market,
-      clientId: 1,
+      client: {
+        id: 1,
+        companyName: "",
+        companyRepresentative: "",
+        phoneNumber: "",
+        email: "",
+        address: "",
+        requisite: "",
+        voen: "",
+        contractNumber: "",
+        contractDate: "",
+        approver: "",
+        oneCCode: "",
+        type: "",
+        typeOfStatus: "",
+        av: 0,
+        partsDiscount: 0
+      },
       manufacturer: "Man",
       model: "",
       chassisNumber: "",
@@ -46,6 +63,7 @@ const EditOrder = () => {
       oil: false,
       orderParts: [
         {
+          id: 0,
           partNumber: "",
           count: 1,
           checkOnWarehouse: false,
@@ -54,83 +72,90 @@ const EditOrder = () => {
       ],
     });
 
-    const produceDateData: string[] = [
-      "2024",
-      "2023",
-      "2022",
-      "2021",
-      "2020",
-      "2019",
-      "2018",
-    ];
+  const produceDateData: string[] = [
+    "2024",
+    "2023",
+    "2022",
+    "2021",
+    "2020",
+    "2019",
+    "2018",
+  ];
 
-  console.log(orderParts,"salam");
+  console.log(orderInitialValue, "salam");
 
   const navigate = useNavigate();
   const { id } = useParams();
-  const fileInputRef=useRef<HTMLInputElement>(null);
-  const handleFileUploadClick=()=>{
-      fileInputRef.current?.click();
-  }
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleFileUploadClick = () => {
+    fileInputRef.current?.click();
+  };
 
   //EXCELL DEPLOYMENT
 
-  const handleFileChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
-     const file=e.target.files?.[0];
-     if(file){
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const fileExtension = file.name.split(".").pop()?.toLowerCase();
+      console.log(fileExtension);
+
+      if (fileExtension !== "xlsx") {
+        setFileError(".xlsx faylı seçin!");
+      }
       setFileName(file.name);
-      const reader=new FileReader();
-      reader.onload=(event:any)=>{
-        const binaryStr=event.target.result;
-        const workbook=XLSX.read(binaryStr,{type:"binary"});
+
+      const reader = new FileReader();
+      reader.onload = (event: any) => {
+        const binaryStr = event.target.result;
+        const workbook = XLSX.read(binaryStr, { type: "binary" });
         // Assuming the data is in the first sheet
 
-        const sheet=workbook.Sheets[workbook.SheetNames[0]];
-        const data=XLSX.utils.sheet_to_json(sheet);
-        
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(sheet);
 
         // Convert data into the format of `orderParts`
-        const parsedOrderParts=data.map((item:any)=>({
-          partNumber:item["Part Number"]||"",
-          count:item["Count"]||1,
-          partName:item["Part Name"]||""
-        }))
-         setOrderParts(parsedOrderParts);
+        const parsedOrderParts = data.map((item: any) => ({
+          partNumber: item["Part Number"] || "",
+          count: item["Count"] || 1,
+          partName: item["Part Name"] || "",
+        }));
+        // console.log(parsedOrderParts);
+
+        setOrderParts(parsedOrderParts);
       };
       reader.readAsArrayBuffer(file);
-     }
-  }
+    }
+  };
 
-  const uploadExcelFile=async()=>{
-    if(!fileInputRef.current?.files?.[0]){
-      setFileError("Excel faylı seç!")
+  const uploadExcelFile = async (id: number) => {
+    if (!fileInputRef.current?.files?.[0]) {
+      setFileError("Excel faylı seç!");
       return;
     }
     setFileError("");
     try {
-      
-        const res = await fetch(
-          "http://localhost:3013/api/v1/order/uploadExcellFile",
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(orderParts),
-          }
-        );
-  
-        const data = await res.json();
-        console.log(data,"salam");
-        
-      
-    } catch (error:any) {
-      setError(error)
+      const res = await fetch(
+        `http://localhost:3013/api/v1/order/updateOrderParts/${id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderParts }),
+        }
+      );
+
+      const data = await res.json();
+      if (res.ok) {
+        setRefreshData(true);
+        setFileName("");
+      }
+      console.log(data);
+    } catch (error: any) {
+      setFileError(error.message);
     }
-  }
-
-
+  };
 
   //GET ORDER
 
@@ -221,7 +246,7 @@ const EditOrder = () => {
     // console.log(values);
     try {
       const res = await fetch(
-        "http://localhost:3013/api/v1/order/createOrder",
+        `http://localhost:3013/api/v1/order/updateOrder/${id}`,
         {
           method: "POST",
           credentials: "include",
@@ -239,12 +264,13 @@ const EditOrder = () => {
         setError(data.message);
         return;
       } else {
-        setSuccess(data.result);
+        setOrderInitialValue(data.result);
+        setSuccess(data.message);
         navigate("/orders");
         window.scrollTo(0, 0);
       }
     } catch (error: any) {
-      setError(error);
+      setError(error.message);
     }
   };
 
@@ -260,11 +286,7 @@ const EditOrder = () => {
           enableReinitialize={true}
         >
           {({ values, setFieldValue }) => {
-            // console.log(values.parts,"salam");
-
             const handleSubmitButton = async (id: any) => {
-              console.log(id);
-
               const res = await fetch(
                 `http://localhost:3013/api/v1/order/confirmOrder/${id}`,
                 {
@@ -273,22 +295,21 @@ const EditOrder = () => {
                   headers: {
                     "Content-Type": "application/json",
                   },
-                  // body: JSON.stringify(values),
                 }
               );
 
               const data = await res.json();
-              console.log(data, "salam");
               if (res.ok) {
                 setRefreshData((prev) => !prev);
               }
             };
-            const deletePart = (index: number) => {
+            const deletePart = async (index: number) => {
               setFieldValue(
-                "parts",
+                "orderParts",
                 values.orderParts.filter((_, i) => i !== index)
               );
             };
+
             return (
               <Form>
                 <div className="flex  items-center ">
@@ -332,9 +353,10 @@ const EditOrder = () => {
                   </label>
                   <Field
                     as={Select}
-                    name="clientId"
+                    name="client"
                     className="w-32"
                     sizing="sm"
+                    value={values.client.companyName}
                   >
                     {clients.length > 0 &&
                       clients.map((client: ClientInterface, index: number) => (
@@ -520,7 +542,7 @@ const EditOrder = () => {
                 </div>
 
                 <div className="mt-10 ">
-                  <FieldArray name="parts">
+                  <FieldArray name="orderParts">
                     {({ push }) => (
                       <div className="border text-sm  w-3/4 p-5 rounded-md ">
                         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -548,7 +570,7 @@ const EditOrder = () => {
                           </thead>
                           {values.orderParts?.map((_, index) => (
                             <OrderPartsComponent
-                              name={`parts[${index}]`}
+                              name={`orderParts[${index}]`}
                               key={index}
                               index={index}
                               deletePart={() => deletePart(index)}
@@ -595,24 +617,40 @@ const EditOrder = () => {
                 </div>
                 {values.confirm && (
                   <div className="mt-5 flex flex-col gap-2 ">
-                    <p className="text-xs">Faylın formatı .xls olamlıdır.</p>
+                    <p className="text-xs">Faylın formatı .xlsx olamlıdır.</p>
                     <div className="flex gap-36 items-center">
                       <div className="flex gap-2 items-center">
                         <span>Faylı seçin</span>
-                        <FiUpload className="text-2xl cursor-pointer hover:text-blue-700" onClick={handleFileUploadClick}/>
-                      {fileName&&(<span className="text-sm text-blue-600">{fileName} faylı seçildi</span>)}
+                        <FiUpload
+                          className="text-2xl cursor-pointer hover:text-blue-700"
+                          onClick={handleFileUploadClick}
+                        />
+                        {fileName && (
+                          <span className="text-sm text-blue-600">
+                            {fileName} faylı seçildi
+                          </span>
+                        )}
                       </div>
-                      <input type="file" className="hidden" accept=".xls" ref={fileInputRef}  onChange={handleFileChange}/>
-                      <Button color="blue" size={"xs"} onClick={uploadExcelFile}>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept=".xlsx"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                      />
+                      <Button
+                        color="blue"
+                        size={"xs"}
+                        onClick={() => uploadExcelFile(values.id)}
+                      >
                         Yüklə
                       </Button>
                     </div>
-                  
                   </div>
                 )}
-                  {
-                      fileError&&(<p className="text-xs text-red-700">{fileError}</p>)
-                  }
+                {fileError && (
+                  <p className="text-xs text-red-700">{fileError}</p>
+                )}
                 <div className="mt-10 flex justify-between mr-[190px] ">
                   <div></div>
 

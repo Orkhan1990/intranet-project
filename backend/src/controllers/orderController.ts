@@ -204,21 +204,125 @@ export const confirmOrder=async(req:CustomRequest,res:Response,next:NextFunction
 }
 
 
-export const uploadExcelFile=async(req:Request,res:Response,next:NextFunction)=>{
+export const updateOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+  try {
+    const {id}=req.params;
+    const userId=req.userId
+    console.log(req.body);
+
+    const orderRepository=AppDataSource.getRepository(Order);
+    const orderPartRepository=AppDataSource.getRepository(OrderPart);
+    const userRepository=AppDataSource.getRepository(User);
+    const clientRepository=AppDataSource.getRepository(Client);
+
+    const user=await userRepository.findOneBy({id:userId});
+    if(!user){
+      next(errorHandler(401,"İstifadəçi mövcud deyil!"));
+      return;
+    }
+    
+    const client=await clientRepository.findOneBy({id:req.body.clientId});
+    console.log(client);
+    
+    if(!client){
+      next(errorHandler(401,"Müştəri mövcud deyil!"));
+      return;
+    }
+    const order=await orderRepository.findOneBy({id:Number(id)});
+
+     
+    if(!order){
+      next(errorHandler(401,"Sifariş mövcud deyil!"));
+      return;
+    }
+    await orderPartRepository.delete({order:order});
+
+
+    const newOrderParts = req.body.orderParts.map(async (item: any) => {
+      const newOrderPart = new OrderPart();
+      newOrderPart.partNumber = String(item.partNumber);
+      newOrderPart.count = item.count;
+      newOrderPart.partName = item.partName;
+      newOrderPart.order = order;
+     await orderPartRepository.save(newOrderPart);
+     return newOrderPart;
+    });
+
+    order.project = req.body.project;
+    order.cardNumber = req.body.cardNumber;
+    order.orderType = req.body.orderType;
+    order.client =client;
+    order.manufacturer = req.body.manufacturer;
+    order.model = req.body.model;
+    order.chassisNumber = req.body.chassisNumber;
+    order.engineNumber = req.body.engineNumber;
+    order.produceYear = req.body.produceYear;
+    order.km = req.body.km;
+    order.vehicleNumber = req.body.vehicleNumber;
+    order.paymentType = req.body.paymentType;
+    order.delivering = req.body.delivering;
+    order.deliveringType = req.body.deliveringType;
+    order.initialPayment = req.body.initialPayment;
+    order.comment = req.body.comment;
+    order.oil = req.body.oil;
+    order.user = user;
+    order.orderParts=newOrderParts;
+
+    await orderRepository.save(order);
+    res.status(201).json({result:order,message:"Uğurla yeniləndi!"})
+  } catch (error) {
+    next(errorHandler(401,error.message));
+  }
+}
+
+export const updateOrderParts=async(req:Request,res:Response,next:NextFunction)=>{
+  const{id}=req.params;
+  console.log(req.body,id);
+  
   try {
     const orderPartsRepository=AppDataSource.getRepository(OrderPart);
+    const orderRepository=AppDataSource.getRepository(Order);
 
-    const newOrderPart=new OrderPart();
-    newOrderPart.partNumber=req.body.partNumber;
-    newOrderPart.count=req.body.count;
-    newOrderPart.partName=req.body.partName;
+    const existOrder=await orderRepository.findOneBy({id:Number(id)});
 
-    await orderPartsRepository.save(newOrderPart);
+    if(!existOrder){
+      next(errorHandler(401,"Sifariş mövcud deyil!"));
+      return;
+    }
 
-    res.status(200).json(newOrderPart);
+
+    const newOrderPartsPromises = req.body.orderParts.map(async (item: any) => {
+      const newOrderPart = new OrderPart();
+      newOrderPart.partNumber = String(item.partNumber);
+      newOrderPart.count = item.count;
+      newOrderPart.partName = item.partName;
+      newOrderPart.order = existOrder;
+      return await orderPartsRepository.save(newOrderPart);
+    });
+    
+    const newOrderParts = await Promise.all(newOrderPartsPromises);
+    res.status(200).json({ message: "Elave olundu", orderParts: newOrderParts });
+
+  
+
+    res.status(200).json({message:"Elave olundu"});
     
   }
    catch (error) {
+    next(errorHandler(401,error))
+  }
+}
+
+export const deleteOrderParts=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    const {id}=req.params;
+    
+    const orderPartsRepository=AppDataSource.getRepository(OrderPart);
+    await orderPartsRepository.delete({id:Number(id)});
+
+    res.status(200).json({message:"Ehtiyyat hissəsi silindi!"})
+    
+  } catch (error) {
     next(errorHandler(401,error))
   }
 }

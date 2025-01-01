@@ -7,7 +7,7 @@ interface OrderPartsComponentInterface {
   name: string;
   index: number;
   value: OrderPartsInterface;
-  deletePart: (index: number) => void;
+  deletePart: (id: number) => void;
 }
 
 const OrderPartsComponent = ({

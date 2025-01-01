@@ -104,6 +104,7 @@ export interface WarehouseInterface {
 }
 
 export interface OrderPartsInterface {
+  id:number,
   partNumber: string;
   count: number;
   checkOnWarehouse: boolean;
@@ -137,7 +138,7 @@ export interface EditOrderInterface{
   project:string,
   cardNumber:string,
   orderType: OrderType,
-  clientId:number,
+  client:ClientInterface,
   manufacturer:string,
   model:string,
   chassisNumber:string,
@@ -155,6 +156,7 @@ export interface EditOrderInterface{
   oil:boolean,
   orderParts: [
     {
+      id:number,
       partNumber:string,
       count:number,
       checkOnWarehouse:boolean,

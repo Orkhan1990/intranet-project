@@ -45,6 +45,7 @@ const CreateOrders = () => {
     oil: false,
     parts: [
       {
+        id:0,
         partNumber: "",
         count: 1,
         checkOnWarehouse: false,
