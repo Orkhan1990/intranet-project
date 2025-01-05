@@ -221,7 +221,7 @@ export const updateOrder=async(req:CustomRequest,res:Response,next:NextFunction)
       return;
     }
     
-    const client=await clientRepository.findOneBy({id:req.body.clientId});
+    const client=await clientRepository.findOneBy({id:req.body.client.id});
     console.log(client);
     
     if(!client){

@@ -11,6 +11,8 @@ import { Button } from "flowbite-react";
 const Order = () => {
   const [orders, setOrders] = useState<AllOrdersInterface[]>([]);
   const [error, setError] = useState("");
+  console.log(orders,"salaaaa");
+  
 
   console.log(orders);
 
@@ -94,7 +96,6 @@ const Order = () => {
     getAllOrders();
   }, []);
 
-  //  console.log(orders[0].createdAt);
 
   //Change TIME FORMAT
 

@@ -29,7 +29,7 @@ const EditOrder = () => {
       cardNumber: "1",
       orderType: OrderType.Local_Market,
       client: {
-        id: 1,
+        id: 0,
         companyName: "",
         companyRepresentative: "",
         phoneNumber: "",
@@ -82,7 +82,7 @@ const EditOrder = () => {
     "2018",
   ];
 
-  console.log(orderInitialValue, "salam");
+  console.log(orderInitialValue);
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -243,7 +243,7 @@ const EditOrder = () => {
 
   //SUMBIT FORM TO BACKEND
   const onsubmit = async (values: EditOrderInterface) => {
-    // console.log(values);
+    console.log(values,"ala");
     try {
       const res = await fetch(
         `http://localhost:3013/api/v1/order/updateOrder/${id}`,
@@ -258,7 +258,6 @@ const EditOrder = () => {
       );
 
       const data = await res.json();
-      // console.log(data);
 
       if (!res.ok || data.success === false) {
         setError(data.message);
@@ -281,9 +280,9 @@ const EditOrder = () => {
           Sifariş
         </h2>
         <Formik
+          enableReinitialize={true}
           initialValues={orderInitialValue}
           onSubmit={onsubmit}
-          enableReinitialize={true}
         >
           {({ values, setFieldValue }) => {
             const handleSubmitButton = async (id: any) => {
@@ -353,10 +352,9 @@ const EditOrder = () => {
                   </label>
                   <Field
                     as={Select}
-                    name="client"
+                    name="client.id"
                     className="w-32"
                     sizing="sm"
-                    value={values.client.companyName}
                   >
                     {clients.length > 0 &&
                       clients.map((client: ClientInterface, index: number) => (
