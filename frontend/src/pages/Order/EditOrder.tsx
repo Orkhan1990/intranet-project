@@ -53,6 +53,7 @@ const EditOrder = () => {
       produceYear: "2024",
       km: "",
       confirm: false,
+      accept:true,
       confirmDate: new Date(),
       vehicleNumber: "",
       paymentType: PayType.Transfer,
@@ -82,7 +83,7 @@ const EditOrder = () => {
     "2018",
   ];
 
-  console.log(orderInitialValue);
+  console.log(orderInitialValue,"qaqa");
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -428,7 +429,7 @@ const EditOrder = () => {
                   </label>
                   <Field
                     as={Select}
-                    name="produceDate"
+                    name="produceYear"
                     className="w-32"
                     sizing="sm"
                   >
@@ -609,6 +610,15 @@ const EditOrder = () => {
                     size={"xs"}
                     color={"blue"}
                     onClick={() => handleSubmitButton(id)}
+                    className={`${values.confirm&&!values.accept &&"hidden"}`}
+                  >
+                    Təsdiqlə
+                  </Button>
+                  <Button
+                    size={"xs"}
+                    color={"blue"}
+                    // onClick={() => handleSubmitButton(id)}
+                    className={`${!values.confirm&&values.accept &&"hidden"}`}
                   >
                     Təsdiqlə
                   </Button>

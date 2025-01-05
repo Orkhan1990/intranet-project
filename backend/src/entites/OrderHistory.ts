@@ -9,14 +9,7 @@ import { OrderStage } from "../enums/allEnums";
 @Entity({name:"order_history"})
 export class OrderHistory extends AllEntities{
  
-    @Column()
-    accept:boolean;
-  
-    @Column({name:"accept_date",nullable:true})
-    acceptDate:Date;
-  
-    @Column({name:"accept_message",nullable:true})
-    acceptMessage:string;
+   
 
     @ManyToOne(() => User, (user) => user.responsibleOrders,{nullable:true})
     responsibleUser: User|null=null;

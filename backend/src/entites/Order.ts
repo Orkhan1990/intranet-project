@@ -78,6 +78,15 @@ export class Order extends AllEntities {
   @Column({ name: "confirm_date", nullable: true })
   confirmDate: Date;
 
+  @Column({default:true})
+  accept:boolean;
+
+  @Column({name:"accept_date",nullable:true})
+  acceptDate:Date;
+
+  @Column({name:"accept_message",nullable:true})
+  acceptMessage:string;
+
   @ManyToOne(() => User, (user) => user.orders)
   user: User;
 

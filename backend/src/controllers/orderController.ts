@@ -91,13 +91,11 @@ export const createOrder = async (
     newOrder.oil = oil;
     newOrder.user = getUser;
     newOrder.orderParts=newOrderArray;
-
+   
 
     await orderRepository.save(newOrder);
 
-    const newOrderHistory=new OrderHistory();
-    newOrderHistory.accept=false;
-    newOrderHistory.acceptDate=new Date();
+    const newOrderHistory=new OrderHistory()
     newOrderHistory.user=getUser;
     newOrderHistory.responsibleBeginDate=new Date();
     newOrderHistory.responsibleDate=new Date();
@@ -222,7 +220,6 @@ export const updateOrder=async(req:CustomRequest,res:Response,next:NextFunction)
     }
     
     const client=await clientRepository.findOneBy({id:req.body.client.id});
-    console.log(client);
     
     if(!client){
       next(errorHandler(401,"Müştəri mövcud deyil!"));

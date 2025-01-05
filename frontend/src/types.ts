@@ -147,6 +147,7 @@ export interface EditOrderInterface{
   km:string,
   vehicleNumber:string,
   confirm:boolean,
+  accept:boolean,
   confirmDate:Date,
   paymentType: PayType,
   delivering: DeliverType,
