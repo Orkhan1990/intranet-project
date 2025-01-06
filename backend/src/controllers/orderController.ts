@@ -88,6 +88,7 @@ export const createOrder = async (
     newOrder.deliveringType = deliveringType;
     newOrder.initialPayment = initialPayment;
     newOrder.comment = comment;
+    newOrder.confirm=true;
     newOrder.oil = oil;
     newOrder.user = getUser;
     newOrder.orderParts=newOrderArray;

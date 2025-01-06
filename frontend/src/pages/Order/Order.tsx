@@ -230,7 +230,7 @@ const Order = () => {
                 ))}
             </tbody>
           </table>
-          <Link to="/createOrder" ><Button color={"blue"} className="mx-16 my-5" size={"sm"}>Əlavə et +</Button></Link>
+          <Link to="/createOrder" ><Button color={"blue"} className="mx-16 my-5" size={"xs"}>Əlavə et +</Button></Link>
 
         </div>
       ) : (

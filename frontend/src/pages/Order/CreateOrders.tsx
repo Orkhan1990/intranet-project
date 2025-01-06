@@ -372,7 +372,7 @@ const CreateOrders = () => {
                         ))}
                       </table>
 
-                      <div className="flex gap-5">
+                      <div className="flex gap-2 justify-end w-full">
                         <Button
                           color="blue"
                           size="xs"
@@ -395,6 +395,14 @@ const CreateOrders = () => {
                     </div>
                   )}
                 </FieldArray>
+              </div>
+              <div className="flex gap-2 mt-10">
+                <Button type="submit" size={"xs"} color={"blue"}>
+                  Yadda Saxla
+                </Button>
+                {/* <Button size={"xs"} color={"blue"}>
+                  Təsdiqlə
+                </Button> */}
               </div>
               <div className="mt-10 flex justify-between mr-[190px] ">
                 <div></div>
@@ -435,14 +443,7 @@ const CreateOrders = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex gap-2 mt-20">
-                <Button type="submit" size={"sm"} color={"blue"}>
-                  Yadda Saxla
-                </Button>
-                <Button size={"sm"} color={"blue"}>
-                  Təsdiqlə
-                </Button>
-              </div>
+             
               {!error && success && (
                 <p className="my-10 text-sm text-green-700">{success}</p>
               )}

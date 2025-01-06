@@ -78,7 +78,7 @@ export class Order extends AllEntities {
   @Column({ name: "confirm_date", nullable: true })
   confirmDate: Date;
 
-  @Column({default:true})
+  @Column({default:false})
   accept:boolean;
 
   @Column({name:"accept_date",nullable:true})

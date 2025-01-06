@@ -10,8 +10,29 @@ const Suppliers = () => {
   const [error, setError] = useState("");
   const [suppliersList, setSupplierList] = useState<SupplierInterface[]>([]);
   const [openModal, setOpenModal] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState<SupplierInterface>({
+    id:0,
+    supplier:"",
+    country:"",
+    contactPerson:"",
+    phone:"",
+    email:"",
+    paymentType:"",
+    deliverType:"",
+    deliverPeriod:"",
+    creditLine:"",
+    creditNote:"",
+    creditDuration:""
+  }); 
 
-  console.log(suppliersList);
+
+  const handleDeleteClick = (item:any) => {
+    setSelectedSupplier(item); // Set the selected supplier for deletion
+    setOpenModal(true); // Open the modal
+  };
+
+  console.log(selectedSupplier);
+  
 
   useEffect(() => {
     const getSuppliers = async () => {
@@ -40,6 +61,8 @@ const Suppliers = () => {
   }, []);
 
   const deleteSupplier = async (id: number) => {
+    console.log(id,"qaqa");
+    
     try {
       const res = await fetch(
         `http://localhost:3013/api/v1/supplier/deleteSupplier/${id}`,
@@ -163,7 +186,7 @@ const Suppliers = () => {
                   </Link>
                   <td
                     className="py-4 px-2 text-red-600 cursor-pointer hover:!text-red-900"
-                    onClick={() => setOpenModal(true)}
+                    onClick={() => handleDeleteClick(item)}
                   >
                     <FaRegTrashAlt />
                   </td>
@@ -180,12 +203,12 @@ const Suppliers = () => {
                     <div className="text-center">
                       <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
                       <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                        Təchizatçını silməyə əminsinizmi?
+                        {selectedSupplier?.supplier} silməyə əminsinizmi?
                       </h3>
                       <div className="flex justify-center gap-4">
                         <Button
                           color="failure"
-                          onClick={() => deleteSupplier(item.id)}
+                          onClick={()=>deleteSupplier(selectedSupplier?.id)}
                         >
                           {"Bəli, sil"}
                         </Button>

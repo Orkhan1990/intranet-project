@@ -610,15 +610,6 @@ const EditOrder = () => {
                     size={"xs"}
                     color={"blue"}
                     onClick={() => handleSubmitButton(id)}
-                    className={`${values.confirm&&!values.accept &&"hidden"}`}
-                  >
-                    Təsdiqlə
-                  </Button>
-                  <Button
-                    size={"xs"}
-                    color={"blue"}
-                    // onClick={() => handleSubmitButton(id)}
-                    className={`${!values.confirm&&values.accept &&"hidden"}`}
                   >
                     Təsdiqlə
                   </Button>
