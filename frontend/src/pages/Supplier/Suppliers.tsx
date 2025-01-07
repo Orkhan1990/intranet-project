@@ -229,7 +229,7 @@ const Suppliers = () => {
   
 
       <Link to="/newSuppliers">
-        <Button color={"blue"} className="mt-10 flex gap-5 ml-5">
+        <Button color={"blue"}  className="mt-10 flex gap-5 ml-5" size={"xs"}>
           Əlavə et
           <span className="ml-2">+</span>
         </Button>

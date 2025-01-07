@@ -54,9 +54,9 @@ const ActionsOnOrder = ({ order }: any) => {
               <td className="px-20 py-4"></td>
               <td className="px-20 py-4"></td>
             </tr>
-            {(order.confirm)?(<tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+            {(order.accept)?(<tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                <td className="px-6 py-4 text-black flex flex-col"><span>Bölmə rəhbərin təsdiqi</span><span>logistika və xidmətin inkişafı</span></td>
-               <td className="px-6 py-4">{changeFormatDate(order.confirmDate)}</td>
+               <td className="px-6 py-4"></td>
                <td className="px-6 py-4"></td>
                <td className="px-20 py-4"></td>
                <td className="px-20 py-4"></td>

@@ -83,7 +83,7 @@ const EditOrder = () => {
     "2018",
   ];
 
-  console.log(orderInitialValue,"qaqa");
+  // console.log(orderInitialValue,"qaqa");
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -152,7 +152,6 @@ const EditOrder = () => {
         setRefreshData(true);
         setFileName("");
       }
-      console.log(data);
     } catch (error: any) {
       setFileError(error.message);
     }
@@ -274,6 +273,29 @@ const EditOrder = () => {
     }
   };
 
+  //CHECK IN STOCK
+ 
+  const checkInStock=async()=>{
+    try {
+      const res = await fetch(
+        "http://localhost:3013/api/v1/oder/checkInStock",
+        {
+          method: "GET",
+          credentials: "include", // added this part
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await res.json(); 
+
+
+  } catch (error: any) {
+    setError(error.message);
+  }
+}
+
   return (
     <div>
       <div className="min-h-screen mt-[100px] mb-[100px] ml-[90px] ">
@@ -288,7 +310,7 @@ const EditOrder = () => {
           {({ values, setFieldValue }) => {
             const handleSubmitButton = async (id: any) => {
               const res = await fetch(
-                `http://localhost:3013/api/v1/order/confirmOrder/${id}`,
+                `http://localhost:3013/api/v1/order/acceptOrder/${id}`,
                 {
                   method: "POST",
                   credentials: "include",
@@ -594,7 +616,7 @@ const EditOrder = () => {
                           >
                             Əlavə et <span className="ml-2 ">+</span>
                           </Button>
-                          <Button color="blue" size="xs" className="mt-5">
+                          <Button color="blue" size="xs" className="mt-5" onClick={()=>checkInStock()}>
                             Anbarda yoxla
                           </Button>
                         </div>

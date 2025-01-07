@@ -94,6 +94,7 @@ const NewClient = () => {
                 placeholder="Şirkət adı"
                 name="companyName"
                 required
+                sizing={"sm"}
               />
               <ErrorMessage
                 name="companyName"
@@ -113,6 +114,7 @@ const NewClient = () => {
                 placeholder="Şirkət nümayəndəsi"
                 name="companyRepresentative"
                 required
+                sizing={"sm"}
               />
               <ErrorMessage
                 name="companyRepresentative"
@@ -128,6 +130,7 @@ const NewClient = () => {
                 placeholder="Telefon nömrəsi"
                 required
                 name="phoneNumber"
+                sizing={"sm"}
               />
               <ErrorMessage
                 name="phoneNumber"
@@ -138,7 +141,7 @@ const NewClient = () => {
 
             <div>
               <Label htmlFor="email" value="Email" />
-              <Field as={TextInput} id="email" type="email" placeholder="Email" required name="email"/>
+              <Field as={TextInput} id="email" type="email" placeholder="Email" required name="email" sizing={"sm"}/>
               <ErrorMessage
                 name="email"
                 component="div"
@@ -154,6 +157,7 @@ const NewClient = () => {
                 placeholder="Ünvan"
                 required
                 name="address"
+                sizing={"sm"}
               />
                <ErrorMessage
                 name="address"
@@ -172,6 +176,7 @@ const NewClient = () => {
                 rows={4}
                 required
                 name="requisite"
+                sizing={"sm"}
               />
               <ErrorMessage
                 name="requisite"
@@ -188,6 +193,7 @@ const NewClient = () => {
                 placeholder="Vöen"
                 required
                 name="voen"
+                sizing={"sm"}
               />
                <ErrorMessage
                 name="voen"
@@ -205,6 +211,7 @@ const NewClient = () => {
                 placeholder="Müqavilə nömrəsi"
                 required
                 name="contractNumber"
+                sizing={"sm"}
               />
                 <ErrorMessage
                 name="contractNumber"
@@ -222,6 +229,7 @@ const NewClient = () => {
                 placeholder="Müqavilə tarixi"
                 required
                 name="contractDate"
+                sizing={"sm"}
               />
                <ErrorMessage
                 name="contractDate"
@@ -238,6 +246,7 @@ const NewClient = () => {
                 placeholder="Təsdiq edən şəxs"
                 required
                 name="approver"
+                sizing={"sm"}
               />
               <ErrorMessage
                 name="approver"
@@ -255,12 +264,13 @@ const NewClient = () => {
                 placeholder="1C kod"
                 required
                 name="oneCCode"
+                sizing={"sm"}
               />
             </div>
             <div className="flex gap-20">
               <div>
                 <Label htmlFor="type" value="Tipi" />
-                <Field as={Select} id="type" required name="type">
+                <Field as={Select} id="type" required name="type" sizing={"sm"}>
                   <option value={"customer"}>Müştəri</option>
                   <option value={"worker"}>Işçi</option>
                   <option value={"boss"}>Təsisçi</option>
@@ -269,14 +279,14 @@ const NewClient = () => {
               </div>
               <div>
                 <Label htmlFor="typeOfStatus" value="FizikiHüquqi" />
-                <Field as={Select} id="typeOfStatus" required name="typeOfStatus">
+                <Field as={Select} id="typeOfStatus" required name="typeOfStatus" sizing={"sm"}>
                   <option value={"phisical"}>Fiziki</option>
                   <option value={"legal"}>Hüquqi</option>
                 </Field>
                
               </div>
             </div>
-            <Button type="submit" color="blue" className="w-[150px]" size={"sm"}>
+            <Button type="submit" color="blue" className="w-[150px]" size={"xs"}>
               Yadda Saxla
             </Button>
           </Form>

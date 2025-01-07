@@ -23,6 +23,7 @@ export class Order extends AllEntities {
   @Column()
   model: string;
 
+
   @Column({ name: "chassis_number" })
   chassisNumber: string;
 

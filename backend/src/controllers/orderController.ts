@@ -89,6 +89,7 @@ export const createOrder = async (
     newOrder.initialPayment = initialPayment;
     newOrder.comment = comment;
     newOrder.confirm=true;
+    newOrder.confirmDate=new Date();
     newOrder.oil = oil;
     newOrder.user = getUser;
     newOrder.orderParts=newOrderArray;
@@ -170,7 +171,7 @@ export const getOrder=async(req:Request,res:Response,next:NextFunction)=>{
 }
 
 
-export const confirmOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+export const acceptOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
   try {
 
     const {id}=req.params;
@@ -189,8 +190,8 @@ export const confirmOrder=async(req:CustomRequest,res:Response,next:NextFunction
       next(errorHandler(401,"Belə istifadəçi yoxdur!"));
     }
    
-    order.confirm=true;
-    order.confirmDate=new Date();
+    order.accept=true;
+    order.acceptDate=new Date();
     order.user=user;
 
     await orderRepository.save(order);
@@ -319,6 +320,16 @@ export const deleteOrderParts=async(req:Request,res:Response,next:NextFunction)=
     await orderPartsRepository.delete({id:Number(id)});
 
     res.status(200).json({message:"Ehtiyyat hissəsi silindi!"})
+    
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}
+
+export const checkInStock=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    const orderPartsRepository=AppDataSource.getRepository(OrderPart);
+    const order=AppDataSource.getRepository(Order);
     
   } catch (error) {
     next(errorHandler(401,error))
