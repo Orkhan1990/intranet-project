@@ -298,6 +298,31 @@ const EditOrder = () => {
     setError(error.message);
   }
 }
+ 
+
+  //  //REJECT ORDER
+
+  //  const rejectOrder=async(id:any,rejectMessage:string)=>{
+     
+  //  }
+
+   const handleSubmitButton = async (id: any) => {
+    const res = await fetch(
+      `http://localhost:3013/api/v1/order/confirmOrder/${id}`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const data = await res.json();
+    if (res.ok) {
+      setRefreshData(prev=>!prev);
+    }
+  };
 
   return (
     <div>
@@ -310,24 +335,8 @@ const EditOrder = () => {
           initialValues={orderInitialValue}
           onSubmit={onsubmit}
         >
-          {({ values, setFieldValue }) => {
-            const handleSubmitButton = async (id: any) => {
-              const res = await fetch(
-                `http://localhost:3013/api/v1/order/acceptOrder/${id}`,
-                {
-                  method: "POST",
-                  credentials: "include",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-
-              const data = await res.json();
-              if (res.ok) {
-                setRefreshData((prev) => !prev);
-              }
-            };
+          {({ values, setFieldValue,resetForm}) => {
+           
             const deletePart = async (index: number) => {
               setFieldValue(
                 "orderParts",
@@ -725,12 +734,12 @@ const EditOrder = () => {
                 {error && !success && (
                   <p className="my-10 text-sm text-red-700">{error}</p>
                 )}
-               <ActionsOnOrder order={orderInitialValue}/>
               </Form>
             );
           }}
         </Formik>
       </div>
+          <ActionsOnOrder order={orderInitialValue} setRefreshData={setRefreshData}/>
     </div>
   );
 };

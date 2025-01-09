@@ -9,6 +9,7 @@ import { User } from "../entites/User";
 import { CustomRequest } from "../middleware/verifyToken";
 // import { OrderStage, OrderStatus } from "../enums/allEnums";
 import { OrderHistory } from "../entites/OrderHistory";
+import { log } from "console";
 
 export const createOrder = async (
   req: CustomRequest,
@@ -170,7 +171,7 @@ export const getOrder=async(req:Request,res:Response,next:NextFunction)=>{
 }
 
 
-export const acceptOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+export const confirmOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
   try {
 
     const {id}=req.params;
@@ -187,10 +188,13 @@ export const acceptOrder=async(req:CustomRequest,res:Response,next:NextFunction)
 
     if(!order){
       next(errorHandler(401,"Belə istifadəçi yoxdur!"));
+      return;
     }
    
     order.confirm=true;
+    order.confirmDate=new Date();
     order.isExcellFile=false;
+    order.rejectMessage=null;
     order.user=user;
 
     await orderRepository.save(order);
@@ -330,6 +334,44 @@ export const checkInStock=async(req:Request,res:Response,next:NextFunction)=>{
     const orderPartsRepository=AppDataSource.getRepository(OrderPart);
     const order=AppDataSource.getRepository(Order);
     
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}
+
+
+export const rejectOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+  try {
+   const {id}=req.params;
+   const userId = req.userId;
+
+   console.log(id,req.body);
+   
+
+   const userRepository=AppDataSource.getRepository(User);
+   const orderRepository=AppDataSource.getRepository(Order);
+
+   const user=await userRepository.findOneBy({id:userId});
+
+
+   if(!user){
+     next(errorHandler(401,"Belə istifadəçi yoxdur!"));
+   }
+
+   const order=await orderRepository.findOneBy({id:(Number(id))});
+   if(!order){
+    next(errorHandler(401,"Sifariş mövcud deyil!"));
+    return;
+   }
+    
+    order.isExcellFile=true;
+    order.confirm=false;
+    order.confirmDate=null;
+    order.rejectMessage=req.body.orderRejectMessage;
+
+    await orderRepository.save(order);
+    res.status(201).json(order);
+
   } catch (error) {
     next(errorHandler(401,error))
   }

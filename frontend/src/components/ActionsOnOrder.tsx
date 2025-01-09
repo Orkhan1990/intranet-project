@@ -1,8 +1,53 @@
 import { Button, Textarea } from "flowbite-react";
-import { Field } from "formik";
+import { useState } from "react";
 
-const ActionsOnOrder = ({ order }: any) => {
 
+interface ActionsOnOrderInterface{
+  order:any,
+  setRefreshData:(item:any)=>void
+}
+
+const ActionsOnOrder = ({ order,setRefreshData}:ActionsOnOrderInterface ) => {
+  const [orderRejectMessage,setOrderRejectMessage]=useState("");
+  const [orderId,setOrderId]=useState(0);
+
+  console.log(orderId,orderRejectMessage);
+  
+
+ const handleChange=(e:any)=>{
+      const rejectMessage=e.target.value;
+      setOrderRejectMessage(rejectMessage);
+      setOrderId(order.id);
+ }
+  const handleReject=async()=>{
+
+    try {
+      const res = await fetch(
+        `http://localhost:3013/api/v1/order/rejectOrder/${orderId}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body:JSON.stringify({orderRejectMessage})
+        }
+      );
+      const data=await res.json();
+      if(res.ok){
+        setRefreshData((prev:any)=>!prev)
+      }
+      console.log(data);      
+    } catch (error) {
+      console.log(error);
+      
+    }
+
+    // const rejectMessage=values.rejectMessage;
+    // rejectOrder(values.id,rejectMessage);
+
+    // values.rejectMessage="";
+  }
 
     const changeFormatDate=(resultDate:Date)=>{
       const date = new Date(resultDate);
@@ -18,9 +63,6 @@ const ActionsOnOrder = ({ order }: any) => {
     }
 
   // const resultDate = order.createdAt;
- const rejectOrder=async()=>{
-  
- }
 
   return (
     <div className="mt-5">
@@ -64,15 +106,15 @@ const ActionsOnOrder = ({ order }: any) => {
                <td className="px-6 py-4">
                 <div>
                   <h2 className="text-black">Mesaj</h2>
-                  <Field as={Textarea} rows={5} className="my-2" name="order.acceptMessage"/>
-                  <Button color={"blue"} size={"xs"} >Təsdiqlə</Button>
+                  <Textarea rows={5} className="my-2" name="acceptMessage"/>
+                  <Button type="button" color={"blue"} size={"xs"} >Təsdiqlə</Button>
                 </div>
                </td>
                <td className="px-6 py-4">
                <div>
                   <h2 className="text-black">İmtina səbəbi</h2>
-                  <Field as={Textarea} rows={5} className="my-2" name="order.rejectMessage"/>
-                  <Button color={"blue"} size={"xs"} onClick={rejectOrder} >İmtina et</Button>
+                  <Textarea rows={5} className="my-2" name="rejectMessage" onChange={handleChange}/>
+                  <Button type="button" color={"blue"} size={"xs"} onClick={handleReject} >İmtina et</Button>
                 </div>
                </td>
                <td className="px-20 py-4"></td>
