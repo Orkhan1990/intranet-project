@@ -54,12 +54,15 @@ const EditOrder = () => {
       km: "",
       confirm: false,
       accept:true,
+      acceptMessage:"",
+      rejectMessage:"",
       confirmDate: new Date(),
       vehicleNumber: "",
       paymentType: PayType.Transfer,
       delivering: DeliverType.Fast,
       deliveringType: "simplified",
       initialPayment: 0,
+      isExcellFile:false,
       comment: "",
       oil: false,
       orderParts: [
@@ -628,15 +631,18 @@ const EditOrder = () => {
                   <Button type="submit" size={"xs"} color={"blue"}>
                     Yadda Saxla
                   </Button>
-                  <Button
-                    size={"xs"}
-                    color={"blue"}
-                    onClick={() => handleSubmitButton(id)}
-                  >
-                    Təsdiqlə
-                  </Button>
+                  {
+                    values.isExcellFile&&(<Button
+                      size={"xs"}
+                      color={"blue"}
+                      onClick={() => handleSubmitButton(id)}
+                    >
+                      Təsdiqlə
+                    </Button>)
+                  }
+                  
                 </div>
-                {values.confirm && (
+                {values.isExcellFile && (
                   <div className="mt-5 flex flex-col gap-2 ">
                     <p className="text-xs">Faylın formatı .xlsx olamlıdır.</p>
                     <div className="flex gap-36 items-center">
@@ -719,12 +725,12 @@ const EditOrder = () => {
                 {error && !success && (
                   <p className="my-10 text-sm text-red-700">{error}</p>
                 )}
+               <ActionsOnOrder order={orderInitialValue}/>
               </Form>
             );
           }}
         </Formik>
       </div>
-      <ActionsOnOrder order={orderInitialValue} />
     </div>
   );
 };

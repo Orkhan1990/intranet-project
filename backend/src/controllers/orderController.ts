@@ -7,7 +7,7 @@ import { Client } from "../entites/Client";
 import { OrderInterface } from "../types/projectTypes";
 import { User } from "../entites/User";
 import { CustomRequest } from "../middleware/verifyToken";
-import { OrderStage, OrderStatus } from "../enums/allEnums";
+// import { OrderStage, OrderStatus } from "../enums/allEnums";
 import { OrderHistory } from "../entites/OrderHistory";
 
 export const createOrder = async (
@@ -88,8 +88,7 @@ export const createOrder = async (
     newOrder.deliveringType = deliveringType;
     newOrder.initialPayment = initialPayment;
     newOrder.comment = comment;
-    newOrder.confirm=true;
-    newOrder.confirmDate=new Date();
+    newOrder.isExcellFile=true;
     newOrder.oil = oil;
     newOrder.user = getUser;
     newOrder.orderParts=newOrderArray;
@@ -190,8 +189,8 @@ export const acceptOrder=async(req:CustomRequest,res:Response,next:NextFunction)
       next(errorHandler(401,"Belə istifadəçi yoxdur!"));
     }
    
-    order.accept=true;
-    order.acceptDate=new Date();
+    order.confirm=true;
+    order.isExcellFile=false;
     order.user=user;
 
     await orderRepository.save(order);

@@ -36,6 +36,9 @@ export class Order extends AllEntities {
   @Column()
   km: string;
 
+  @Column({default:false})
+  isExcellFile: boolean;
+
   @Column({ name: "vehicle_number" })
   vehicleNumber: string;
 
@@ -87,6 +90,9 @@ export class Order extends AllEntities {
 
   @Column({name:"accept_message",nullable:true})
   acceptMessage:string;
+
+  @Column({name:"reject_message",nullable:true})
+  rejectMessage:string;
 
   @ManyToOne(() => User, (user) => user.orders)
   user: User;

@@ -1,3 +1,6 @@
+import { Button, Textarea } from "flowbite-react";
+import { Field } from "formik";
+
 const ActionsOnOrder = ({ order }: any) => {
 
 
@@ -15,7 +18,9 @@ const ActionsOnOrder = ({ order }: any) => {
     }
 
   // const resultDate = order.createdAt;
-
+ const rejectOrder=async()=>{
+  
+ }
 
   return (
     <div className="mt-5">
@@ -54,10 +59,22 @@ const ActionsOnOrder = ({ order }: any) => {
               <td className="px-20 py-4"></td>
               <td className="px-20 py-4"></td>
             </tr>
-            {(order.accept)?(<tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+            {(order.confirm)?(<tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                <td className="px-6 py-4 text-black flex flex-col"><span>Bölmə rəhbərin təsdiqi</span><span>logistika və xidmətin inkişafı</span></td>
-               <td className="px-6 py-4"></td>
-               <td className="px-6 py-4"></td>
+               <td className="px-6 py-4">
+                <div>
+                  <h2 className="text-black">Mesaj</h2>
+                  <Field as={Textarea} rows={5} className="my-2" name="order.acceptMessage"/>
+                  <Button color={"blue"} size={"xs"} >Təsdiqlə</Button>
+                </div>
+               </td>
+               <td className="px-6 py-4">
+               <div>
+                  <h2 className="text-black">İmtina səbəbi</h2>
+                  <Field as={Textarea} rows={5} className="my-2" name="order.rejectMessage"/>
+                  <Button color={"blue"} size={"xs"} onClick={rejectOrder} >İmtina et</Button>
+                </div>
+               </td>
                <td className="px-20 py-4"></td>
                <td className="px-20 py-4"></td>
                <td className="px-20 py-4"></td>
