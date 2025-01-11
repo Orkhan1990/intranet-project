@@ -7,9 +7,8 @@ import { Client } from "../entites/Client";
 import { OrderInterface } from "../types/projectTypes";
 import { User } from "../entites/User";
 import { CustomRequest } from "../middleware/verifyToken";
-// import { OrderStage, OrderStatus } from "../enums/allEnums";
 import { OrderHistory } from "../entites/OrderHistory";
-import { log } from "console";
+import { OrderStage } from "../enums/allEnums";
 
 export const createOrder = async (
   req: CustomRequest,
@@ -195,6 +194,7 @@ export const confirmOrder=async(req:CustomRequest,res:Response,next:NextFunction
     order.confirmDate=new Date();
     order.isExcellFile=false;
     order.rejectMessage=null;
+    order.stage=OrderStage.WarehouseConfirm;
     order.user=user;
 
     await orderRepository.save(order);
@@ -368,6 +368,7 @@ export const rejectOrder=async(req:CustomRequest,res:Response,next:NextFunction)
     order.confirm=false;
     order.confirmDate=null;
     order.rejectMessage=req.body.orderRejectMessage;
+    order.stage=OrderStage.Created;
 
     await orderRepository.save(order);
     res.status(201).json(order);

@@ -58,6 +58,8 @@ const Order = () => {
     switch (result) {
       case "created":
         return "Sifariş yaradıldı";
+      case "warehouseConfirm":
+      return "Anbardar təsdiqi";
       case "invastigation":
         return "Bazar araşdırması aparılır";
       case "calculation":

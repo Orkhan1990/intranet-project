@@ -60,7 +60,7 @@ export class Order extends AllEntities {
     enumName: "order_status",
     default: OrderStatus.Open,
   })
-  status = OrderStatus.Open;
+  status:OrderStatus;
 
   @Column()
   comment: string;
@@ -74,7 +74,7 @@ export class Order extends AllEntities {
     enumName: "order_stage",
     default: OrderStage.Created,
   })
-  stage = OrderStage.Created;
+  stage: OrderStage;
 
   @Column({ default: false })
   confirm: boolean;

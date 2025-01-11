@@ -319,9 +319,13 @@ const EditOrder = () => {
     );
 
     const data = await res.json();
-    if (res.ok) {
+    if (!res.ok || data.success === false) {
+      setError(data.message);
+      return;
+    } else {
       setRefreshData(prev=>!prev);
     }
+    
   };
 
   return (

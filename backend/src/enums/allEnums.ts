@@ -10,7 +10,8 @@ export enum OrderStatus{
   
   export enum OrderStage{
     Created="created",
-    Invastigation="invastigation",
+    WarehouseConfirm="warehouseConfirm",
+    Investigation="investigation",
     Calculation="calculation",
     Finish="finish"
   }
