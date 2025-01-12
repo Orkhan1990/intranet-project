@@ -9,6 +9,16 @@ import { User } from "../entites/User";
 import { CustomRequest } from "../middleware/verifyToken";
 import { OrderHistory } from "../entites/OrderHistory";
 import { OrderStage } from "../enums/allEnums";
+import { SparePart } from "../entites/SparePart";
+
+
+const orderPartsRepository=AppDataSource.getRepository(OrderPart);
+const orderRepository=AppDataSource.getRepository(Order);
+const clientRepository = AppDataSource.getRepository(Client);
+const userRepository = AppDataSource.getRepository(User);
+const orderHistoryRepository=AppDataSource.getRepository(OrderHistory);
+const sparePartsRepository=AppDataSource.getRepository(SparePart);
+
 
 export const createOrder = async (
   req: CustomRequest,
@@ -39,11 +49,7 @@ export const createOrder = async (
 
     const userId = req.userId;
 
-    const orderRepository = AppDataSource.getRepository(Order);
-    const orderPartRepositroy = AppDataSource.getRepository(OrderPart);
-    const clientRepository = AppDataSource.getRepository(Client);
-    const userRepository = AppDataSource.getRepository(User);
-    const orderHistoryRepository=AppDataSource.getRepository(OrderHistory);
+ 
     const getclient = await clientRepository.findOneBy({ id: clientId });
     const getUser = await userRepository.findOneBy({ id: userId });
 
@@ -63,7 +69,7 @@ export const createOrder = async (
            newOrderPart.count=part.count;
            newOrderPart.partNumber=part.partNumber;
 
-           await orderPartRepositroy.save(newOrderPart);
+           await orderPartsRepository.save(newOrderPart);
            return newOrderPart;
     }
     ));
@@ -116,10 +122,6 @@ export const createOrder = async (
 export const getAllOrders=async(req:Request,res:Response,next:NextFunction)=>{
   try {
 
-
-    const orderRepository= AppDataSource.getRepository(Order);
-
-
     const allOrders=await orderRepository.find(
       {
         relations: [
@@ -146,11 +148,6 @@ export const getAllOrders=async(req:Request,res:Response,next:NextFunction)=>{
 
 export const getOrder=async(req:Request,res:Response,next:NextFunction)=>{
   try {
-    // const {id}=req.params;
-
-
-
-    const orderRepository=AppDataSource.getRepository(Order);
     const order=await orderRepository.findOne({
       where:{id:Number(req.params.id)},
       relations:['user','client','orderParts']
@@ -213,11 +210,6 @@ export const updateOrder=async(req:CustomRequest,res:Response,next:NextFunction)
     const userId=req.userId
     console.log(req.body);
 
-    const orderRepository=AppDataSource.getRepository(Order);
-    const orderPartRepository=AppDataSource.getRepository(OrderPart);
-    const userRepository=AppDataSource.getRepository(User);
-    const clientRepository=AppDataSource.getRepository(Client);
-
     const user=await userRepository.findOneBy({id:userId});
     if(!user){
       next(errorHandler(401,"İstifadəçi mövcud deyil!"));
@@ -237,7 +229,7 @@ export const updateOrder=async(req:CustomRequest,res:Response,next:NextFunction)
       next(errorHandler(401,"Sifariş mövcud deyil!"));
       return;
     }
-    await orderPartRepository.delete({order:order});
+    await orderPartsRepository.delete({order:order});
 
 
     const newOrderParts = req.body.orderParts.map(async (item: any) => {
@@ -246,7 +238,7 @@ export const updateOrder=async(req:CustomRequest,res:Response,next:NextFunction)
       newOrderPart.count = item.count;
       newOrderPart.partName = item.partName;
       newOrderPart.order = order;
-     await orderPartRepository.save(newOrderPart);
+     await orderPartsRepository.save(newOrderPart);
      return newOrderPart;
     });
 
@@ -282,8 +274,6 @@ export const updateOrderParts=async(req:Request,res:Response,next:NextFunction)=
   console.log(req.body,id);
   
   try {
-    const orderPartsRepository=AppDataSource.getRepository(OrderPart);
-    const orderRepository=AppDataSource.getRepository(Order);
 
     const existOrder=await orderRepository.findOneBy({id:Number(id)});
 
@@ -319,7 +309,6 @@ export const deleteOrderParts=async(req:Request,res:Response,next:NextFunction)=
   try {
     const {id}=req.params;
     
-    const orderPartsRepository=AppDataSource.getRepository(OrderPart);
     await orderPartsRepository.delete({id:Number(id)});
 
     res.status(200).json({message:"Ehtiyyat hissəsi silindi!"})
@@ -331,9 +320,48 @@ export const deleteOrderParts=async(req:Request,res:Response,next:NextFunction)=
 
 export const checkInStock=async(req:Request,res:Response,next:NextFunction)=>{
   try {
-    const orderPartsRepository=AppDataSource.getRepository(OrderPart);
-    const order=AppDataSource.getRepository(Order);
-    
+       const orderId=req.params.id;
+
+       const orderParts = await orderPartsRepository.find({
+        where: { order:{id:Number(orderId)} },
+        select:["partNumber","count"]
+      });
+
+      const orderPartsDetails=orderParts.map((item)=>({
+        partNumber:item.partNumber,
+        requiredQuantity:item.count
+      }));
+
+       const spareParts=await sparePartsRepository.find();
+      
+
+       const sparePartsMap=spareParts.reduce((acc:any,item)=>{
+         acc[item.code]=item.count;
+         return acc;
+       },{});
+
+       console.log(sparePartsMap);
+       
+
+       const stockInfo=orderPartsDetails.map((orderPart)=>{
+        const{partNumber,requiredQuantity}=orderPart;
+        const inStockQuantity=sparePartsMap[partNumber]||0;
+        console.log(inStockQuantity);
+        
+
+        return {
+          partNumber,
+          requiredQuantity,
+          inStockQuantity,
+          inStock:inStockQuantity>=requiredQuantity
+        }
+       })
+       
+        console.log(stockInfo);
+        
+
+  res.status(201).json(stockInfo);
+
   } catch (error) {
     next(errorHandler(401,error))
   }
@@ -347,10 +375,6 @@ export const rejectOrder=async(req:CustomRequest,res:Response,next:NextFunction)
 
    console.log(id,req.body);
    
-
-   const userRepository=AppDataSource.getRepository(User);
-   const orderRepository=AppDataSource.getRepository(Order);
-
    const user=await userRepository.findOneBy({id:userId});
 
 
@@ -373,6 +397,23 @@ export const rejectOrder=async(req:CustomRequest,res:Response,next:NextFunction)
     await orderRepository.save(order);
     res.status(201).json(order);
 
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}
+
+
+export const getAllOrderParts=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+       
+    const allOrderParts=await orderPartsRepository.find();
+    
+    if(allOrderParts.length===0){
+      next(errorHandler(401,"Ehtiyyat hissələri mövcud deyil!"));
+      return;
+    }
+
+    res.status(201).json(allOrderParts);
   } catch (error) {
     next(errorHandler(401,error))
   }

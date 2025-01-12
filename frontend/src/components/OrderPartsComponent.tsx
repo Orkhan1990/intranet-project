@@ -43,8 +43,7 @@ const OrderPartsComponent = ({
             value={value.count}
           />
         </td>
-
-        <td className="px-6 py-4"></td>
+        <td className="px-6 py-4">{/* Chechin result here */}</td>
 
         <td className="px-6 py-4">
           <Field

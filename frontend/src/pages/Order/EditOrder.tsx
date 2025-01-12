@@ -4,6 +4,7 @@ import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
 import {
   ClientInterface,
   EditOrderInterface,
+  StockInfoInterface,
   UserInterface,
 } from "../../types";
 import OrderPartsComponent from "../../components/OrderPartsComponent";
@@ -19,9 +20,11 @@ const EditOrder = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [refreshData, setRefreshData] = useState(false);
+  const [excellOrderParts, setExcellOrderParts] = useState<any[]>([]);
   const [orderParts, setOrderParts] = useState<any[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [stockInfo, setStockInfo] = useState<StockInfoInterface[]>([]);
   const [orderInitialValue, setOrderInitialValue] =
     useState<EditOrderInterface>({
       id: 0,
@@ -44,7 +47,7 @@ const EditOrder = () => {
         type: "",
         typeOfStatus: "",
         av: 0,
-        partsDiscount: 0
+        partsDiscount: 0,
       },
       manufacturer: "Man",
       model: "",
@@ -53,16 +56,16 @@ const EditOrder = () => {
       produceYear: "2024",
       km: "",
       confirm: false,
-      accept:true,
-      acceptMessage:"",
-      rejectMessage:"",
+      accept: true,
+      acceptMessage: "",
+      rejectMessage: "",
       confirmDate: new Date(),
       vehicleNumber: "",
       paymentType: PayType.Transfer,
       delivering: DeliverType.Fast,
       deliveringType: "simplified",
       initialPayment: 0,
-      isExcellFile:false,
+      isExcellFile: false,
       comment: "",
       oil: false,
       orderParts: [
@@ -75,6 +78,8 @@ const EditOrder = () => {
         },
       ],
     });
+
+  // console.log(orderParts,"sala");
 
   const produceDateData: string[] = [
     "2024",
@@ -101,7 +106,7 @@ const EditOrder = () => {
     const file = e.target.files?.[0];
     if (file) {
       const fileExtension = file.name.split(".").pop()?.toLowerCase();
-      console.log(fileExtension);
+      // console.log(fileExtension);
 
       if (fileExtension !== "xlsx") {
         setFileError(".xlsx faylı seçin!");
@@ -125,7 +130,7 @@ const EditOrder = () => {
         }));
         // console.log(parsedOrderParts);
 
-        setOrderParts(parsedOrderParts);
+        setExcellOrderParts(parsedOrderParts);
       };
       reader.readAsArrayBuffer(file);
     }
@@ -146,7 +151,7 @@ const EditOrder = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ orderParts }),
+          body: JSON.stringify({ excellOrderParts }),
         }
       );
 
@@ -183,6 +188,31 @@ const EditOrder = () => {
           setError(data.message);
         } else {
           setOrderInitialValue(data);
+        }
+      } catch (error: any) {
+        setError(error);
+      }
+    };
+
+    const getAllOrderParts = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:3013/api/v1/order/getAllOrderParts",
+          {
+            method: "GET",
+            credentials: "include", // added this part
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+        } else {
+          setOrderParts(data);
         }
       } catch (error: any) {
         setError(error);
@@ -242,11 +272,12 @@ const EditOrder = () => {
     getOrder();
     getAllClients();
     getAllOfficeWorkers();
+    getAllOrderParts();
   }, [id, refreshData]);
 
   //SUMBIT FORM TO BACKEND
   const onsubmit = async (values: EditOrderInterface) => {
-    console.log(values,"ala");
+    // console.log(values,"ala");
     try {
       const res = await fetch(
         `http://localhost:3013/api/v1/order/updateOrder/${id}`,
@@ -277,13 +308,13 @@ const EditOrder = () => {
   };
 
   //CHECK IN STOCK
- 
-  const checkInStock=async()=>{
+
+  const checkInStock = async (id: any) => {
     try {
       const res = await fetch(
-        "http://localhost:3013/api/v1/oder/checkInStock",
+        `http://localhost:3013/api/v1/order/checkInStock/${id}`,
         {
-          method: "GET",
+          method: "POST",
           credentials: "include", // added this part
           headers: {
             "Content-Type": "application/json",
@@ -291,22 +322,20 @@ const EditOrder = () => {
         }
       );
 
-      const data = await res.json(); 
+      const data = await res.json();
+      if (!res.ok || data.success === false) {
+        setError(data.message);
+      } else {
+        setStockInfo(data.stockInfo);
+      }
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
 
+  console.log(stockInfo);
 
-  } catch (error: any) {
-    setError(error.message);
-  }
-}
- 
-
-  //  //REJECT ORDER
-
-  //  const rejectOrder=async(id:any,rejectMessage:string)=>{
-     
-  //  }
-
-   const handleSubmitButton = async (id: any) => {
+  const handleSubmitButton = async (id: any) => {
     const res = await fetch(
       `http://localhost:3013/api/v1/order/confirmOrder/${id}`,
       {
@@ -323,9 +352,32 @@ const EditOrder = () => {
       setError(data.message);
       return;
     } else {
-      setRefreshData(prev=>!prev);
+      setRefreshData((prev) => !prev);
     }
-    
+  };
+
+  const updateOrderPartsWithStock = () => {
+    setOrderInitialValue((prevState: any) => {
+      const updatedOrderParts = prevState.orderParts.map((orderPart: any) => {
+        const matchingStock = stockInfo.find(
+          (stock) => stock.partNumber === orderPart.partNumber
+        );
+
+        if (matchingStock) {
+          return {
+            ...orderPart,
+            checkOnWarehouse: matchingStock.inStock, // true if in stock, false if out of stock
+            count: matchingStock.inStock
+              ? Math.min(orderPart.count, matchingStock.inStockQuantity)
+              : orderPart.count, // Limit count to inStockQuantity if stock is available
+          };
+        }
+
+        return orderPart;
+      });
+
+      return { ...prevState, orderParts: updatedOrderParts };
+    });
   };
 
   return (
@@ -339,8 +391,7 @@ const EditOrder = () => {
           initialValues={orderInitialValue}
           onSubmit={onsubmit}
         >
-          {({ values, setFieldValue,resetForm}) => {
-           
+          {({ values, setFieldValue, resetForm }) => {
             const deletePart = async (index: number) => {
               setFieldValue(
                 "orderParts",
@@ -632,7 +683,13 @@ const EditOrder = () => {
                           >
                             Əlavə et <span className="ml-2 ">+</span>
                           </Button>
-                          <Button color="blue" size="xs" className="mt-5" onClick={()=>checkInStock()}>
+                          <Button
+                            color="blue"
+                            size="xs"
+                            className="mt-5"
+                            type="button"
+                            onClick={() => checkInStock(values.id)}
+                          >
                             Anbarda yoxla
                           </Button>
                         </div>
@@ -644,16 +701,15 @@ const EditOrder = () => {
                   <Button type="submit" size={"xs"} color={"blue"}>
                     Yadda Saxla
                   </Button>
-                  {
-                    values.isExcellFile&&(<Button
+                  {values.isExcellFile && (
+                    <Button
                       size={"xs"}
                       color={"blue"}
                       onClick={() => handleSubmitButton(id)}
                     >
                       Təsdiqlə
-                    </Button>)
-                  }
-                  
+                    </Button>
+                  )}
                 </div>
                 {values.isExcellFile && (
                   <div className="mt-5 flex flex-col gap-2 ">
@@ -743,7 +799,10 @@ const EditOrder = () => {
           }}
         </Formik>
       </div>
-          <ActionsOnOrder order={orderInitialValue} setRefreshData={setRefreshData}/>
+      <ActionsOnOrder
+        order={orderInitialValue}
+        setRefreshData={setRefreshData}
+      />
     </div>
   );
 };

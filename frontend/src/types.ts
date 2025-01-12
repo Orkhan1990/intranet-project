@@ -191,3 +191,11 @@ export interface BrandInterface{
   id:number,
   name:string
 }
+
+
+export interface StockInfoInterface{
+  partNumber: string;
+  inStock: boolean;
+  inStockQuantity: number;
+  requiredQuantity: number;
+}

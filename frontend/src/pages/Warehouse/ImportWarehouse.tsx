@@ -323,12 +323,12 @@ const ImportWarehouse = () => {
                 </div>
               </div>
               <div className="flex gap-2 mt-20">
-                <Button size={"sm"} color={"blue"} type="submit">
+                <Button size={"xs"} color={"blue"} type="submit">
                   Yadda Saxla
                 </Button>
-                <Button size={"sm"} color={"blue"}>
+                {/* <Button size={"sm"} color={"blue"}>
                   Təsdiqlə
-                </Button>
+                </Button> */}
               </div>
             </Form>
           );
