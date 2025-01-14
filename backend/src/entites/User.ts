@@ -18,12 +18,14 @@ export class User extends AllEntities {
     userName: string
 
     @Column({
-        nullable:true
+        nullable:true,
+        name:"first_name"
     })
     firstName: string
 
     @Column({
-        nullable:true
+        nullable:true,
+        name:"last_name"
     })
     lastName: string
 
@@ -33,7 +35,8 @@ export class User extends AllEntities {
     email: string
 
     @Column({
-        default:UserRole.ServiceUser
+        default:UserRole.ServiceUser,
+        name:"user_role"
     })
     userRole: UserRole
 

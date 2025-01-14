@@ -11,7 +11,7 @@ export class SparePart extends AllEntities{
   @Column()
   code:string
 
-  @Column()
+  @Column({name:"orig_code"})
   origCode:string
 
   @Column()

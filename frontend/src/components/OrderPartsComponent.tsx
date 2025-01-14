@@ -27,8 +27,8 @@ const OrderPartsComponent = ({
             <Field
               as={TextInput}
               type="text"
-              name={`${name}.partNumber`}
-              value={value.partNumber}
+              name={`${name}.origCode`}
+              value={value.origCode}
               sizing="sm"
             />
           </div>

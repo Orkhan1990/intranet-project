@@ -4,6 +4,7 @@ import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
 import {
   ClientInterface,
   EditOrderInterface,
+  MergDataInterface,
   StockInfoInterface,
   UserInterface,
 } from "../../types";
@@ -24,7 +25,7 @@ const EditOrder = () => {
   const [orderParts, setOrderParts] = useState<any[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [stockInfo, setStockInfo] = useState<StockInfoInterface[]>([]);
+  const [stockInfos, setStockInfos] = useState<StockInfoInterface[]>([]);
   const [orderInitialValue, setOrderInitialValue] =
     useState<EditOrderInterface>({
       id: 0,
@@ -71,7 +72,7 @@ const EditOrder = () => {
       orderParts: [
         {
           id: 0,
-          partNumber: "",
+          origCode: "",
           count: 1,
           checkOnWarehouse: false,
           partName: "",
@@ -79,7 +80,7 @@ const EditOrder = () => {
       ],
     });
 
-  // console.log(orderParts,"sala");
+  console.log(orderParts,"sala");
 
   const produceDateData: string[] = [
     "2024",
@@ -124,7 +125,7 @@ const EditOrder = () => {
 
         // Convert data into the format of `orderParts`
         const parsedOrderParts = data.map((item: any) => ({
-          partNumber: item["Part Number"] || "",
+          partNumber: item["Orig Code"] || "",
           count: item["Count"] || 1,
           partName: item["Part Name"] || "",
         }));
@@ -309,31 +310,67 @@ const EditOrder = () => {
 
   //CHECK IN STOCK
 
-  const checkInStock = async (id: any) => {
-    try {
-      const res = await fetch(
-        `http://localhost:3013/api/v1/order/checkInStock/${id}`,
-        {
-          method: "POST",
-          credentials: "include", // added this part
-          headers: {
-            "Content-Type": "application/json",
-          },
+    const checkInStock = async (id: any) => {
+      try {
+        const res = await fetch(
+          `http://localhost:3013/api/v1/order/checkInStock/${id}`,
+          {
+            method: "POST",
+            credentials: "include", // added this part
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await res.json();
+        
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+        } else {
+          setStockInfos(data);
+            const mergedData=stockInfos.map(item1=>{
+                const matchingItem=orderParts.find((item2)=>item2.origCode===item1.origCode);
+
+                return {
+                  origCode:item1.origCode,
+                  requiredQuantity:item1.requiredQuantity,
+                  inStockQuantity:item1.inStockQuantity,
+                  inStock:item1.inStock,
+                  partName:matchingItem?matchingItem.partName:null,
+                  count:matchingItem?matchingItem.count:null,
+
+                }
+                
+              });
+              const updatedOrderParts = mergedData.map((part) => ({
+                
+                origCode: part.origCode,
+                count: part.count,
+                checkOnWarehouse: part.inStock, // Set based on stock availability
+                partName: part.partName
+              }));
+
+              console.log(updatedOrderParts,"yenilenmis");
+              
+              // setOrderInitialValue(prevState => ({
+              //   ...prevState,
+              //   orderParts: updatedOrderParts.length > 0 ? [updatedOrderParts[0]] : prevState.orderParts, // Ensure only 1 element
+              // }));
+              // Update `orderParts` in the state using `setOrderInitialValue`
+              // setOrderInitialValue(prevState => ({
+              //   ...prevState, // Spread previous state
+              //   orderParts: updatedOrderParts // Set the updated order parts
+              // }));
         }
-      );
-
-      const data = await res.json();
-      if (!res.ok || data.success === false) {
-        setError(data.message);
-      } else {
-        setStockInfo(data.stockInfo);
+      } catch (error: any) {
+        setError(error.message);
       }
-    } catch (error: any) {
-      setError(error.message);
-    }
-  };
+    };
 
-  console.log(stockInfo);
+  console.log(stockInfos,"stockInfo");
+  console.log(orderParts,"orderParts");
+  
 
   const handleSubmitButton = async (id: any) => {
     const res = await fetch(
@@ -356,29 +393,29 @@ const EditOrder = () => {
     }
   };
 
-  const updateOrderPartsWithStock = () => {
-    setOrderInitialValue((prevState: any) => {
-      const updatedOrderParts = prevState.orderParts.map((orderPart: any) => {
-        const matchingStock = stockInfo.find(
-          (stock) => stock.partNumber === orderPart.partNumber
-        );
+  // const updateOrderPartsWithStock = () => {
+  //   setOrderInitialValue((prevState: any) => {
+  //     const updatedOrderParts = prevState.orderParts.map((orderPart: any) => {
+  //       const matchingStock = stockInfo.find(
+  //         (stock) => stock.partNumber === orderPart.partNumber
+  //       );
 
-        if (matchingStock) {
-          return {
-            ...orderPart,
-            checkOnWarehouse: matchingStock.inStock, // true if in stock, false if out of stock
-            count: matchingStock.inStock
-              ? Math.min(orderPart.count, matchingStock.inStockQuantity)
-              : orderPart.count, // Limit count to inStockQuantity if stock is available
-          };
-        }
+  //       if (matchingStock) {
+  //         return {
+  //           ...orderPart,
+  //           checkOnWarehouse: matchingStock.inStock, // true if in stock, false if out of stock
+  //           count: matchingStock.inStock
+  //             ? Math.min(orderPart.count, matchingStock.inStockQuantity)
+  //             : orderPart.count, // Limit count to inStockQuantity if stock is available
+  //         };
+  //       }
 
-        return orderPart;
-      });
+  //       return orderPart;
+  //     });
 
-      return { ...prevState, orderParts: updatedOrderParts };
-    });
-  };
+  //     return { ...prevState, orderParts: updatedOrderParts };
+  //   });
+  // };
 
   return (
     <div>

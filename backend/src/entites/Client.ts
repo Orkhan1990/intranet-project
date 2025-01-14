@@ -8,14 +8,14 @@ import { Order } from "./Order";
 @Entity({name:"clients"})
 export class Client extends AllEntities{
 
-    @Column({unique:true})
+    @Column({unique:true,name:"company_name"})
      companyName:string
 
      
-    @Column()
+    @Column({name:"company_representative"})
     companyRepresentative:string
 
-    @Column()
+    @Column({name:"phone_number"})
     phoneNumber:string
 
     @Column()
@@ -30,10 +30,10 @@ export class Client extends AllEntities{
     @Column()
     voen:string
 
-    @Column()
+    @Column({name:"contract_number"})
     contractNumber:string
 
-    @Column()
+    @Column({name:"contract_date"})
     contractDate:string
 
     @Column()
@@ -49,13 +49,13 @@ export class Client extends AllEntities{
     type:string
 
 
-    @Column({default:"phisical"})
+    @Column({default:"phisical",name:"type_of_status"})
     typeOfStatus:string
 
     @Column({nullable:true})
     av:number
 
-    @Column({nullable:true})
+    @Column({nullable:true,name:"parts_discount"})
     partsDiscount:number;
 
     @Column()

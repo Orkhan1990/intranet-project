@@ -16,7 +16,7 @@ export class Invoice extends AllEntities {
   @Column()
   market: string;
 
-  @Column()
+  @Column({name:"payment_type"})
   paymentType: string;
 
   @Column()

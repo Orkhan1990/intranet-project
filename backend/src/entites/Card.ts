@@ -20,28 +20,28 @@ export class Card extends AllEntities{
     @Column()
     sassi:string;
 
-    @Column()
+    @Column({name:"car_number"})
     carNumber:string;
 
-    @Column()
+    @Column({name:"produce_date"})
     produceDate:string
 
     @Column()
     km:string;
 
-    @Column()
+    @Column({name:"qost_number"})
     qostNumber:string;
 
-    @Column()
+    @Column({name:"payment_type"})
     paymentType:string;
 
     @Column({default:false})
     nds: boolean;
 
-    @Column({default:false})
+    @Column({default:false,name:"repair_again"})
     repairAgain: boolean;
 
-    @Column({default:false})
+    @Column({default:false,name:"servis_info"})
     servisInfo: boolean;
 
     @Column({nullable:true})

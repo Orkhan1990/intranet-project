@@ -8,8 +8,8 @@ import { Order } from "./Order";
 @Entity({name:"order_parts"})
 export class OrderPart extends AllEntities{
 
-    @Column({name:"part_number"})
-    partNumber:string;
+    @Column({name:"orig_code"})
+    origCode:string;
 
     @Column()
     count:number;

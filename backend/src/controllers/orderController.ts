@@ -67,7 +67,7 @@ export const createOrder = async (
       const newOrderPart=new OrderPart();
            newOrderPart.partName=part.partName;
            newOrderPart.count=part.count;
-           newOrderPart.partNumber=part.partNumber;
+           newOrderPart.origCode=part.origCode;
 
            await orderPartsRepository.save(newOrderPart);
            return newOrderPart;
@@ -234,7 +234,7 @@ export const updateOrder=async(req:CustomRequest,res:Response,next:NextFunction)
 
     const newOrderParts = req.body.orderParts.map(async (item: any) => {
       const newOrderPart = new OrderPart();
-      newOrderPart.partNumber = String(item.partNumber);
+      newOrderPart.origCode = String(item.origCode);
       newOrderPart.count = item.count;
       newOrderPart.partName = item.partName;
       newOrderPart.order = order;
@@ -285,7 +285,7 @@ export const updateOrderParts=async(req:Request,res:Response,next:NextFunction)=
 
     const newOrderPartsPromises = req.body.orderParts.map(async (item: any) => {
       const newOrderPart = new OrderPart();
-      newOrderPart.partNumber = String(item.partNumber);
+      newOrderPart.origCode = String(item.origCode);
       newOrderPart.count = item.count;
       newOrderPart.partName = item.partName;
       newOrderPart.order = existOrder;
@@ -324,11 +324,11 @@ export const checkInStock=async(req:Request,res:Response,next:NextFunction)=>{
 
        const orderParts = await orderPartsRepository.find({
         where: { order:{id:Number(orderId)} },
-        select:["partNumber","count"]
+        select:["origCode","count"]
       });
 
       const orderPartsDetails=orderParts.map((item)=>({
-        partNumber:item.partNumber,
+        origCode:item.origCode,
         requiredQuantity:item.count
       }));
 
@@ -340,17 +340,17 @@ export const checkInStock=async(req:Request,res:Response,next:NextFunction)=>{
          return acc;
        },{});
 
-       console.log(sparePartsMap);
+      //  console.log(sparePartsMap);
        
 
        const stockInfo=orderPartsDetails.map((orderPart)=>{
-        const{partNumber,requiredQuantity}=orderPart;
-        const inStockQuantity=sparePartsMap[partNumber]||0;
-        console.log(inStockQuantity);
+        const{origCode,requiredQuantity}=orderPart;
+        const inStockQuantity=sparePartsMap[origCode]||0;
+        // console.log(inStockQuantity);
         
 
         return {
-          partNumber,
+          origCode,
           requiredQuantity,
           inStockQuantity,
           inStock:inStockQuantity>=requiredQuantity

@@ -6,10 +6,10 @@ import { CardJob } from './CardJob';
 @Entity({name:"card_worker_jobs"})
 export class CardWorkerJob extends AllEntities{
 
-@Column()
+@Column({name:"worker_av"})
 workerAv:string
 
-@Column()
+@Column({name:"worker_id"})
 workerId:number
 
 @ManyToOne(() =>CardJob, (job) => job.workers)

@@ -46,7 +46,7 @@ const CreateOrders = () => {
     parts: [
       {
         id:0,
-        partNumber: "",
+        origCode: "",
         count: 1,
         checkOnWarehouse: false,
         partName: "",

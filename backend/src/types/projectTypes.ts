@@ -27,7 +27,7 @@ export interface ClientInterface{
 }
 
 export interface OrderPartInterface{
-    partNumber:string;
+    origCode:string;
     count:number;
     partName:string;
 }

@@ -105,7 +105,7 @@ export interface WarehouseInterface {
 
 export interface OrderPartsInterface {
   id:number,
-  partNumber: string;
+  origCode: string;
   count: number;
   checkOnWarehouse: boolean;
   partName: string;
@@ -158,15 +158,7 @@ export interface EditOrderInterface{
   initialPayment:number,
   comment:string,
   oil:boolean,
-  orderParts: [
-    {
-      id:number,
-      partNumber:string,
-      count:number,
-      checkOnWarehouse:boolean,
-      partName:string,
-    },
-  ],
+  orderParts: OrderPartsInterface[];
 }
 
 
@@ -194,8 +186,18 @@ export interface BrandInterface{
 
 
 export interface StockInfoInterface{
-  partNumber: string;
+  origCode: string;
   inStock: boolean;
   inStockQuantity: number;
   requiredQuantity: number;
+}
+
+export interface MergDataInterface{
+  origCode:string,
+  requiredQuantity:number,
+  inStockQuantity:number,
+  inStock:boolean,
+  partName:string,
+  count:number,
+  isStockAvailable:boolean
 }
