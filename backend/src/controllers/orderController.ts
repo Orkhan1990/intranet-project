@@ -10,6 +10,7 @@ import { CustomRequest } from "../middleware/verifyToken";
 import { OrderHistory } from "../entites/OrderHistory";
 import { OrderStage } from "../enums/allEnums";
 import { SparePart } from "../entites/SparePart";
+import { log } from "console";
 
 
 const orderPartsRepository=AppDataSource.getRepository(OrderPart);
@@ -318,54 +319,7 @@ export const deleteOrderParts=async(req:Request,res:Response,next:NextFunction)=
   }
 }
 
-export const checkInStock=async(req:Request,res:Response,next:NextFunction)=>{
-  try {
-       const orderId=req.params.id;
 
-       const orderParts = await orderPartsRepository.find({
-        where: { order:{id:Number(orderId)} },
-        select:["origCode","count"]
-      });
-
-      const orderPartsDetails=orderParts.map((item)=>({
-        origCode:item.origCode,
-        requiredQuantity:item.count
-      }));
-
-       const spareParts=await sparePartsRepository.find();
-      
-
-       const sparePartsMap=spareParts.reduce((acc:any,item)=>{
-         acc[item.code]=item.count;
-         return acc;
-       },{});
-
-      //  console.log(sparePartsMap);
-       
-
-       const stockInfo=orderPartsDetails.map((orderPart)=>{
-        const{origCode,requiredQuantity}=orderPart;
-        const inStockQuantity=sparePartsMap[origCode]||0;
-        // console.log(inStockQuantity);
-        
-
-        return {
-          origCode,
-          requiredQuantity,
-          inStockQuantity,
-          inStock:inStockQuantity>=requiredQuantity
-        }
-       })
-       
-        console.log(stockInfo);
-        
-
-  res.status(201).json(stockInfo);
-
-  } catch (error) {
-    next(errorHandler(401,error))
-  }
-}
 
 
 export const rejectOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
@@ -418,3 +372,52 @@ export const getAllOrderParts=async(req:Request,res:Response,next:NextFunction)=
     next(errorHandler(401,error))
   }
 }
+export const checkInStock = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    const newOrderPartsArray=req.body.parts.map((item:{origCode:string,count:number,partName:string})=>(
+      {
+        code:item.origCode,
+        requiredCount:item.count,
+        partName:item.partName
+      }
+    ))
+
+    const sparePartsList = await sparePartsRepository.find();
+    const newSparePartsList = sparePartsList.map((item) => (
+      {
+        code: item.code,
+        existingCount: item.count,
+        partName: item.name
+      }
+    ));
+  
+    const result = newOrderPartsArray.map((item:{code:string,count:number,partName:string}) => {
+      // Find the matching spare part based on the code
+      const sparePart = newSparePartsList.find(spare => spare.code === item.code);
+      log(sparePart,"qaaaaqa");
+    
+      if (sparePart) {
+        // Return the object with inStock true if found
+        return {
+          code: sparePart.code,
+          count: sparePart.existingCount,
+          name: sparePart.partName,
+          inStock: true
+        };
+      } else {
+        return {
+          code: item.code,
+          count: 0, 
+          name: item.partName,
+          inStock: false
+        };
+      }
+    });
+    
+    log(result);
+     res.status(200).json(result);  
+  } catch (error) {
+    next(errorHandler(401, error)); // Handle error appropriately
+  }
+};
