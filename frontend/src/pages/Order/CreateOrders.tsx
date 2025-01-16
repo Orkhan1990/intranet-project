@@ -11,8 +11,11 @@ const CreateOrders = () => {
   const [officeUsers,setOfficeUsers]=useState<UserInterface[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
+ 
   const navigate=useNavigate();
+  
+
+ 
 
   const produceDateData: string[] = [
     "2024",
@@ -71,7 +74,7 @@ const CreateOrders = () => {
         );
 
         const data = await res.json();
-        console.log(data);
+        // console.log(data);
 
         if (!res.ok || data.success === false) {
           setError(data.message);
@@ -97,7 +100,7 @@ const CreateOrders = () => {
         );
 
         const data = await res.json();
-        console.log(data);
+        // console.log(data);
 
         if (!res.ok || data.success === false) {
           setError(data.message);
@@ -114,7 +117,7 @@ const CreateOrders = () => {
 
   //SUMBIT FORM TO BACKEND
   const onsubmit = async (values: OrderInterface) => {
-    console.log(values);
+    // console.log(values);
     try {
       const res = await fetch(
         "http://localhost:3013/api/v1/order/createOrder",
@@ -129,7 +132,7 @@ const CreateOrders = () => {
       );
 
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
 
       if (!res.ok || data.success === false) {
         setError(data.message);
@@ -143,6 +146,37 @@ const CreateOrders = () => {
       setError(error);
     }
   };
+
+  const checkInstock=async(values:any)=>{ 
+    console.log(values,"checkinStock");
+
+    const newPartsArray=values.parts;
+        
+    try {
+      const res = await fetch(
+        "http://localhost:3013/api/v1/order/checkInstock",
+        {
+          method: "POST",
+          credentials: "include", // added this part
+          headers: {
+            "Content-Type": "application/json",
+          },
+        body: JSON.stringify({parts:newPartsArray})
+        }
+      );
+
+      const data = await res.json();
+      // console.log(data);
+
+      if (!res.ok || data.success === false) {
+        setError(data.message);
+      } else {
+        setSuccess(data.result);
+      }
+    } catch (error: any) {
+      // setError(error);
+    }
+   }
 
   return (
     <div className="min-h-screen mt-[100px] mb-[100px] ml-[90px] ">
@@ -388,7 +422,7 @@ const CreateOrders = () => {
                         >
                           Əlavə et <span className="ml-2 ">+</span>
                         </Button>
-                        <Button color="blue" size="xs" className="mt-5">
+                        <Button color="blue" size="xs" className="mt-5" type="button" onClick={() =>checkInstock(values)}>
                           Anbarda yoxla
                         </Button>
                       </div>

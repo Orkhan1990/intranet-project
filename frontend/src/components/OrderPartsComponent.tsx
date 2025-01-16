@@ -15,7 +15,10 @@ const OrderPartsComponent = ({
   name,
   deletePart,
   value,
+
 }: OrderPartsComponentInterface) => {
+
+
   return (
     <tbody>
       <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
@@ -30,6 +33,7 @@ const OrderPartsComponent = ({
               name={`${name}.origCode`}
               value={value.origCode}
               sizing="sm"
+             
             />
           </div>
         </td>

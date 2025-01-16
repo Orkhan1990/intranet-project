@@ -13,7 +13,7 @@ router.post("/confirmOrder/:id",verifyToken,confirmOrder);
 router.post("/updateOrderParts/:id",updateOrderParts);
 router.post("/rejectOrder/:id",verifyToken,rejectOrder)
 router.delete("/deleteOrderParts/:id",deleteOrderParts);
-router.post("/checkInStock/:id",checkInStock);
+router.post("/checkInStock",checkInStock);
 router.get("/getAllOrderParts",getAllOrderParts);
 
 

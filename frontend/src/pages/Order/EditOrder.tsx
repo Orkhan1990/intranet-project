@@ -4,7 +4,6 @@ import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
 import {
   ClientInterface,
   EditOrderInterface,
-  MergDataInterface,
   StockInfoInterface,
   UserInterface,
 } from "../../types";
@@ -324,45 +323,7 @@ const EditOrder = () => {
         );
 
         const data = await res.json();
-        
-        if (!res.ok || data.success === false) {
-          setError(data.message);
-        } else {
-          setStockInfos(data);
-            const mergedData=stockInfos.map(item1=>{
-                const matchingItem=orderParts.find((item2)=>item2.origCode===item1.origCode);
-
-                return {
-                  origCode:item1.origCode,
-                  requiredQuantity:item1.requiredQuantity,
-                  inStockQuantity:item1.inStockQuantity,
-                  inStock:item1.inStock,
-                  partName:matchingItem?matchingItem.partName:null,
-                  count:matchingItem?matchingItem.count:null,
-
-                }
-                
-              });
-              const updatedOrderParts = mergedData.map((part) => ({
-                
-                origCode: part.origCode,
-                count: part.count,
-                checkOnWarehouse: part.inStock, // Set based on stock availability
-                partName: part.partName
-              }));
-
-              console.log(updatedOrderParts,"yenilenmis");
-              
-              // setOrderInitialValue(prevState => ({
-              //   ...prevState,
-              //   orderParts: updatedOrderParts.length > 0 ? [updatedOrderParts[0]] : prevState.orderParts, // Ensure only 1 element
-              // }));
-              // Update `orderParts` in the state using `setOrderInitialValue`
-              // setOrderInitialValue(prevState => ({
-              //   ...prevState, // Spread previous state
-              //   orderParts: updatedOrderParts // Set the updated order parts
-              // }));
-        }
+      
       } catch (error: any) {
         setError(error.message);
       }
