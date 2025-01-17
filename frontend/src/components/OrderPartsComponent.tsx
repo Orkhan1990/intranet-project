@@ -2,6 +2,9 @@ import { Button,TextInput } from "flowbite-react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { Field } from "formik";
 import { OrderPartsInterface } from "../types";
+import { FaUnlock } from "react-icons/fa";
+import { FaLock } from "react-icons/fa";
+
 
 interface OrderPartsComponentInterface {
   name: string;
@@ -17,7 +20,12 @@ const OrderPartsComponent = ({
   value,
 
 }: OrderPartsComponentInterface) => {
-
+ 
+  const isStockAvailable = value.checkOnWarehouse;
+  console.log(isStockAvailable,"isStockAvailable");
+  console.log(value,"value");
+  
+  
 
   return (
     <tbody>
@@ -47,7 +55,11 @@ const OrderPartsComponent = ({
             value={value.count}
           />
         </td>
-        <td className="px-6 py-4">{/* Chechin result here */}</td>
+        <td className="px-6 py-4">
+          {
+            isStockAvailable ? (<div className="flex gap-2"><FaUnlock className="text-green-500 cursor-pointer"/><span className="text-black">{value.stockQuantity}</span></div>):(<div className="flex gap-2"><FaLock className="text-red-500"/><span>0</span></div>)
+          }
+        </td>
 
         <td className="px-6 py-4">
           <Field

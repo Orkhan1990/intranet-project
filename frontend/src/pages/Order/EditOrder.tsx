@@ -25,7 +25,7 @@ const EditOrder = () => {
   const [fileError, setFileError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [stockInfos, setStockInfos] = useState<StockInfoInterface[]>([]);
-  const [orderInitialValue, setOrderInitialValue] =
+  const [orderInitialValue, setOrdersInitialValue] =
     useState<EditOrderInterface>({
       id: 0,
       project: "project1",
@@ -70,9 +70,10 @@ const EditOrder = () => {
       oil: false,
       orderParts: [
         {
-          id: 0,
+          id:0,
           origCode: "",
           count: 1,
+          stockQuantity:0,
           checkOnWarehouse: false,
           partName: "",
         },
@@ -187,7 +188,7 @@ const EditOrder = () => {
         if (!res.ok || data.success === false) {
           setError(data.message);
         } else {
-          setOrderInitialValue(data);
+          setOrdersInitialValue(data);
         }
       } catch (error: any) {
         setError(error);
@@ -297,7 +298,7 @@ const EditOrder = () => {
         setError(data.message);
         return;
       } else {
-        setOrderInitialValue(data.result);
+        setOrdersInitialValue(data.result);
         setSuccess(data.message);
         navigate("/orders");
         window.scrollTo(0, 0);
@@ -309,25 +310,48 @@ const EditOrder = () => {
 
   //CHECK IN STOCK
 
-    const checkInStock = async (id: any) => {
-      try {
-        const res = await fetch(
-          `http://localhost:3013/api/v1/order/checkInStock/${id}`,
-          {
-            method: "POST",
-            credentials: "include", // added this part
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+  const checkInstock=async()=>{ 
+    // console.log(values,"checkinStock");
 
-        const data = await res.json();
-      
-      } catch (error: any) {
-        setError(error.message);
+    const newPartsArray=orderInitialValue.orderParts;
+        
+    try {
+      const res = await fetch(
+        "http://localhost:3013/api/v1/order/checkInstock",
+        {
+          method: "POST",
+          credentials: "include", // added this part
+          headers: {
+            "Content-Type": "application/json",
+          },
+        body: JSON.stringify({parts:newPartsArray})
+        }
+      );
+
+      const data = await res.json();
+      // console.log(data);
+
+      if (!res.ok || data.success === false) {
+        setError(data.message);
+      } else {
+
+            const updatedPartsArray=data.map((part:{code:string,count:number,stockQuantity:number,name:string,inStock:boolean},index:number)=>{
+              return{
+                id:index,
+                origCode:part.code,
+                count:part.count,
+                stockQuantity:part.stockQuantity,
+                checkOnWarehouse:part.inStock,
+                partName:part.name
+              }
+            })
+
+           setOrdersInitialValue({...orderInitialValue,orderParts:updatedPartsArray});
       }
-    };
+    } catch (error: any) {
+      // setError(error);
+    }
+   }
 
   console.log(stockInfos,"stockInfo");
   console.log(orderParts,"orderParts");
@@ -354,29 +378,6 @@ const EditOrder = () => {
     }
   };
 
-  // const updateOrderPartsWithStock = () => {
-  //   setOrderInitialValue((prevState: any) => {
-  //     const updatedOrderParts = prevState.orderParts.map((orderPart: any) => {
-  //       const matchingStock = stockInfo.find(
-  //         (stock) => stock.partNumber === orderPart.partNumber
-  //       );
-
-  //       if (matchingStock) {
-  //         return {
-  //           ...orderPart,
-  //           checkOnWarehouse: matchingStock.inStock, // true if in stock, false if out of stock
-  //           count: matchingStock.inStock
-  //             ? Math.min(orderPart.count, matchingStock.inStockQuantity)
-  //             : orderPart.count, // Limit count to inStockQuantity if stock is available
-  //         };
-  //       }
-
-  //       return orderPart;
-  //     });
-
-  //     return { ...prevState, orderParts: updatedOrderParts };
-  //   });
-  // };
 
   return (
     <div>
@@ -389,7 +390,7 @@ const EditOrder = () => {
           initialValues={orderInitialValue}
           onSubmit={onsubmit}
         >
-          {({ values, setFieldValue, resetForm }) => {
+          {({ values, setFieldValue}) => {
             const deletePart = async (index: number) => {
               setFieldValue(
                 "orderParts",
@@ -686,7 +687,7 @@ const EditOrder = () => {
                             size="xs"
                             className="mt-5"
                             type="button"
-                            onClick={() => checkInStock(values.id)}
+                            onClick={() => checkInstock()}
                           >
                             Anbarda yoxla
                           </Button>

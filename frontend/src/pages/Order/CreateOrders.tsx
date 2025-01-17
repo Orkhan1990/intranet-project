@@ -11,23 +11,7 @@ const CreateOrders = () => {
   const [officeUsers,setOfficeUsers]=useState<UserInterface[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
- 
-  const navigate=useNavigate();
-  
-
- 
-
-  const produceDateData: string[] = [
-    "2024",
-    "2023",
-    "2022",
-    "2021",
-    "2020",
-    "2019",
-    "2018",
-  ];
-
-  const ordersInitialValue: OrderInterface = {
+  const [ordersInitialValue,setOrdersInitialValue]=useState<OrderInterface>({
     id:0,
     project: "project1",
     cardNumber: "1",
@@ -51,11 +35,30 @@ const CreateOrders = () => {
         id:0,
         origCode: "",
         count: 1,
+        stockQuantity:0,
         checkOnWarehouse: false,
         partName: "",
       },
     ],
-  };
+
+  });
+ 
+  console.log(ordersInitialValue,"orderInitialValue");
+  
+  const navigate=useNavigate();
+  
+
+ 
+
+  const produceDateData: string[] = [
+    "2024",
+    "2023",
+    "2022",
+    "2021",
+    "2020",
+    "2019",
+    "2018",
+  ];
 
   //GET ALL CLIENTS
 
@@ -148,7 +151,7 @@ const CreateOrders = () => {
   };
 
   const checkInstock=async(values:any)=>{ 
-    console.log(values,"checkinStock");
+    // console.log(values,"checkinStock");
 
     const newPartsArray=values.parts;
         
@@ -171,7 +174,19 @@ const CreateOrders = () => {
       if (!res.ok || data.success === false) {
         setError(data.message);
       } else {
-        setSuccess(data.result);
+
+            const updatedPartsArray=data.map((part:{code:string,count:number,stockQuantity:number,name:string,inStock:boolean},index:number)=>{
+              return{
+                id:index,
+                origCode:part.code,
+                count:part.count,
+                stockQuantity:part.stockQuantity,
+                checkOnWarehouse:part.inStock,
+                partName:part.name
+              }
+            })
+
+           setOrdersInitialValue({...values,parts:updatedPartsArray});
       }
     } catch (error: any) {
       // setError(error);
@@ -181,7 +196,7 @@ const CreateOrders = () => {
   return (
     <div className="min-h-screen mt-[100px] mb-[100px] ml-[90px] ">
       <h2 className="font-semibold text-xl text-center  mb-[50px]">Sifariş</h2>
-      <Formik initialValues={ordersInitialValue} onSubmit={onsubmit}>
+      <Formik initialValues={ordersInitialValue} onSubmit={onsubmit} enableReinitialize={true}>
         {({ values, setFieldValue }) => {
           const deletePart = (index: number) => {
             setFieldValue(

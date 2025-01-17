@@ -108,6 +108,7 @@ export interface OrderPartsInterface {
   origCode: string;
   count: number;
   checkOnWarehouse: boolean;
+  stockQuantity: number;
   partName: string;
 }
 
