@@ -8,13 +8,20 @@ import { Order } from "./Order";
 @Entity({name:"order_parts"})
 export class OrderPart extends AllEntities{
 
-    @Column({name:"orig_code"})
+    @Column({name:"orig_code",nullable:true})
     origCode:string;
 
-    @Column()
+    @Column({nullable:true})
     count:number;
 
-    @Column({name:"part_name"})
+    @Column({name:"check_in_stock",default:false})
+    checkInStock:boolean;
+
+    @Column({name:"stock_quantity",nullable:true})
+    stockQuantity:number;
+
+
+    @Column({name:"part_name",nullable:true})
     partName:string;
     
 

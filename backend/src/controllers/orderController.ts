@@ -425,8 +425,14 @@ export const checkInStock = async (
         }
       }
     );
-
-    log(result);
+      // orderPartsRepository.save(result);
+      await orderPartsRepository.clear();
+    result.forEach(async (item:any) => {
+      const newOrderPart = new OrderPart();
+      newOrderPart.stockQuantity = item.stockQuantity;
+      newOrderPart.checkInStock = item.inStock;
+      await orderPartsRepository.save(newOrderPart);
+    });
     res.status(200).json(result);
   } catch (error) {
     next(errorHandler(401, error)); // Handle error appropriately
