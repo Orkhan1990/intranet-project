@@ -502,8 +502,10 @@ export const responsibleOrder=async(req:CustomRequest,res:Response,next:NextFunc
     order.responsibleMessage=responsibleMessage;
     order.responsibleUser=responsibleUser;
     order.responsibleDate=new Date();
+    order.stage=OrderStage.ResponsibleUser;
     order.user=mainUser;
-    
+    await orderRepository.save(order);
+    res.status(200).json(order);
 
   } catch (error) {
     next(errorHandler(401,error.message))
