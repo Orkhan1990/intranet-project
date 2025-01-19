@@ -1,26 +1,29 @@
-import { Button, Textarea } from "flowbite-react";
-import { useState } from "react";
+import { Button, Select, Textarea } from "flowbite-react";
+import React, { useState } from "react";
 
-
-interface ActionsOnOrderInterface{
-  order:any,
-  setRefreshData:(item:any)=>void
+interface ActionsOnOrderInterface {
+  order: any;
+  setRefreshData: (item: any) => void;
+  officeUsers: any;
 }
 
-const ActionsOnOrder = ({ order,setRefreshData}:ActionsOnOrderInterface ) => {
-  const [orderRejectMessage,setOrderRejectMessage]=useState("");
-  const [orderId,setOrderId]=useState(0);
-
-  console.log(orderId,orderRejectMessage);
+const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInterface) => {
+  const [orderRejectMessage, setOrderRejectMessage] = useState("");
+  const [responsibleMessage, setResponsibleMessage] = useState(""); 
+  const [responsibleUser,setResponsibleUser]=useState(0);
+  const [orderId, setOrderId] = useState(0);
   
 
- const handleChange=(e:any)=>{
-      const rejectMessage=e.target.value;
-      setOrderRejectMessage(rejectMessage);
-      setOrderId(order.id);
- }
-  const handleReject=async()=>{
+  
 
+
+
+  const handleChange = (e: any) => {
+    const rejectMessage = e.target.value;
+    setOrderRejectMessage(rejectMessage);
+    setOrderId(order.id);
+  };
+  const handleReject = async () => {
     try {
       const res = await fetch(
         `http://localhost:3013/api/v1/order/rejectOrder/${orderId}`,
@@ -30,40 +33,84 @@ const ActionsOnOrder = ({ order,setRefreshData}:ActionsOnOrderInterface ) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body:JSON.stringify({orderRejectMessage})
+          body: JSON.stringify({ orderRejectMessage }),
         }
       );
-      const data=await res.json();
-      if(res.ok){
-        setRefreshData((prev:any)=>!prev)
+      const data = await res.json();
+      if (res.ok) {
+        setRefreshData((prev: any) => !prev);
       }
-      console.log(data);      
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const acceptOrder=async(id:any)=>{
+
+    try {
+      const res = await fetch(
+        `http://localhost:3013/api/v1/order/acceptOrder/${id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setRefreshData((prev: any) => !prev);
+      }
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const changeFormatDate = (resultDate: Date) => {
+    const date = new Date(resultDate);
+    let hours = date.getHours().toString().padStart(2, "0");
+    let minutes = date.getMinutes().toString().padStart(2, "0");
+
+    let day = date.getDate().toString().padStart(2, "0");
+    let month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-based month
+    let year = date.getFullYear();
+
+    let formattedDate = `${hours}:${minutes} ${day}-${month}-${year}`;
+    return formattedDate;
+  };
+
+  // const resultDate = order.createdAt;
+
+
+
+  const selectRepsonsibleUser = async (userId: any,orderId:any,messageValue?:any) => {
+    console.log(userId,orderId,messageValue,"userId,orderId,messageValue");
+    try {
+      const res = await fetch(
+        `http://localhost:3013/api/v1/order/resposibleOrder/${orderId}}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId,messageValue }),
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setRefreshData((prev: any) => !prev);
+      }
+      console.log(data);
+      
     } catch (error) {
       console.log(error);
       
     }
-
-    // const rejectMessage=values.rejectMessage;
-    // rejectOrder(values.id,rejectMessage);
-
-    // values.rejectMessage="";
   }
-
-    const changeFormatDate=(resultDate:Date)=>{
-      const date = new Date(resultDate);
-      let hours = date.getHours().toString().padStart(2, "0");
-      let minutes = date.getMinutes().toString().padStart(2, "0");
-    
-      let day = date.getDate().toString().padStart(2, "0");
-      let month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-based month
-      let year = date.getFullYear();
-    
-      let formattedDate = `${hours}:${minutes} ${day}-${month}-${year}`;
-      return formattedDate
-    }
-
-  // const resultDate = order.createdAt;
-
   return (
     <div className="mt-5">
       <h2 className=" bg-orange-300 py-5 px-5 rounded-sm font-semibold">
@@ -101,30 +148,104 @@ const ActionsOnOrder = ({ order,setRefreshData}:ActionsOnOrderInterface ) => {
               <td className="px-20 py-4"></td>
               <td className="px-20 py-4"></td>
             </tr>
-            {(order.confirm)?(<tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-               <td className="px-6 py-4 text-black flex flex-col"><span>Bölmə rəhbərin təsdiqi</span><span>logistika və xidmətin inkişafı</span></td>
-               <td className="px-6 py-4">
-                <div>
-                  <h2 className="text-black">Mesaj</h2>
-                  <Textarea rows={5} className="my-2" name="acceptMessage"/>
-                  <Button type="button" color={"blue"} size={"xs"} >Təsdiqlə</Button>
-                </div>
-               </td>
-               <td className="px-6 py-4">
-               <div>
-                  <h2 className="text-black">İmtina səbəbi</h2>
-                  <Textarea rows={5} className="my-2" name="rejectMessage" onChange={handleChange}/>
-                  <Button type="button" color={"blue"} size={"xs"} onClick={handleReject} >İmtina et</Button>
-                </div>
-               </td>
-               <td className="px-20 py-4"></td>
-               <td className="px-20 py-4"></td>
-               <td className="px-20 py-4"></td>
-               <td className="px-20 py-4"></td>
-             </tr>):("")
-               
+            {order.confirm &&!order.accept&& (
+              <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                <td className="px-6 py-4 text-black flex flex-col">
+                  <span>Bölmə rəhbərin təsdiqi</span>
+                  <span>logistika və xidmətin inkişafı</span>
+                </td>
+                <td className="px-6 py-4">
+                  <div>
+                    <h2 className="text-black">Mesaj</h2>
+                    <Textarea rows={5} className="my-2" name="acceptMessage" />
+                    <Button type="button" color={"blue"} size={"xs"} onClick={()=>acceptOrder(order.id)}>
+                      Təsdiqlə
+                    </Button>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div>
+                    <h2 className="text-black">İmtina səbəbi</h2>
+                    <Textarea
+                      rows={5}
+                      className="my-2"
+                      name="rejectMessage"
+                      onChange={handleChange}
+                    />
+                    <Button
+                      type="button"
+                      color={"blue"}
+                      size={"xs"}
+                      onClick={handleReject}
+                    >
+                      İmtina et
+                    </Button>
+                  </div>
+                </td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+              </tr>
+            )}
+
+            {!order.confirm &&order.accept&& (
+              <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                <td className="px-6 py-4 text-black flex flex-col">
+                  <span>Bölmə rəhbərin təsdiqi</span>
+                  <span>logistika və xidmətin inkişafı</span>
+                </td>
+                <td className="px-6 py-4">{changeFormatDate(order.confirmDate)}</td>
+                <td className="px-6 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+              </tr>
+            )}
+            {
+              !order.confirm &&order.accept&&(
+                <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                <td className="px-6 py-4 text-black flex flex-col">
+                  <span>Sifarişdən cavabdehdir</span>
+                </td>
+                <td className="px-6 py-4">
+                  <div>
+                    <div>
+                      <h2 className="text-black">Mesaj</h2>
+                      <Textarea rows={5} className="my-2" onChange={(e:React.ChangeEvent<HTMLTextAreaElement>)=>setResponsibleMessage(e.target.value)}/>
+                      <Select sizing="sm" onChange={(e:React.ChangeEvent<HTMLSelectElement>)=>{
+                         setResponsibleUser(parseInt(e.target.value));
+                         const selectedName = e.target.selectedOptions[0].text;
+                         if(responsibleUser){
+                           const confirm = window.confirm(
+                             `"${selectedName}" sifarişi davam etsin?`
+                            );
+                            if (confirm) {
+                              selectRepsonsibleUser(responsibleUser,order.id,responsibleMessage); // Send update to backend if confirmed
+                            }
+                            setRefreshData((prev: any) => !prev);
+                         }
+                      }}>
+                      <option value="#">Cavabdeh olan şəxsi seç</option>
+
+                        {
+                          officeUsers.map((user:any)=>(
+                            <option key={user.id} value={user.id}>{user.firstName} {user.lastName}</option>
+                          ))
+                        }
+                      </Select>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+              </tr>
+              )
             }
-           
           </tbody>
         </table>
       </div>

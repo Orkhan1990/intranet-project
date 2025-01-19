@@ -94,6 +94,22 @@ export class Order extends AllEntities {
   @Column({name:"reject_message",nullable:true})
   rejectMessage:string;
 
+  @Column({name:"is_responsible",default:false})
+  isResponsible:boolean;
+
+  
+  @Column({name:"responsible_date",nullable:true})
+  responsibleDate:Date;
+
+  @Column({name:"responsible_begin_date",nullable:true})
+  responsibleBeginDate:Date;
+
+  @Column({name:"responsible_message",nullable:true})
+  responsibleMessage:string;
+  
+  @ManyToOne(() => User, (user) => user.orders,{nullable: true})
+  responsibleUser: User;
+
   @ManyToOne(() => User, (user) => user.orders)
   user: User;
 

@@ -60,6 +60,10 @@ const Order = () => {
         return "Sifariş yaradıldı";
       case "warehouseConfirm":
       return "Anbardar təsdiqi";
+      case "orderresposibility":
+      return "Sifariş üçün cavabdehdir";
+      case "responsibleUser":
+        return "Məsul şəxs işə başladı";
       case "invastigation":
         return "Bazar araşdırması aparılır";
       case "calculation":

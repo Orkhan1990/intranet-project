@@ -426,15 +426,86 @@ export const checkInStock = async (
       }
     );
       // orderPartsRepository.save(result);
-      await orderPartsRepository.clear();
-    result.forEach(async (item:any) => {
-      const newOrderPart = new OrderPart();
-      newOrderPart.stockQuantity = item.stockQuantity;
-      newOrderPart.checkInStock = item.inStock;
-      await orderPartsRepository.save(newOrderPart);
-    });
+    //   await orderPartsRepository.clear();
+    // result.forEach(async (item:any) => {
+    //   const newOrderPart = new OrderPart();
+    //   newOrderPart.stockQuantity = item.stockQuantity;
+    //   newOrderPart.checkInStock = item.inStock;
+    //   await orderPartsRepository.save(newOrderPart);
+    // });
     res.status(200).json(result);
   } catch (error) {
     next(errorHandler(401, error)); // Handle error appropriately
   }
 };
+
+
+export const acceptOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+  try {
+
+    const{id}=req.params;
+    const userId=req.userId;
+
+    const order=await orderRepository.findOneBy({id:Number(id)});
+    const user=await userRepository.findOneBy({id:userId});
+    if(!order){
+      next(errorHandler(401,"Belə bir sifariş yoxdur!"));
+      return;
+    }
+
+    if(!user){
+      next(errorHandler(401,"Belə bir istifadəçi yoxdur!"));
+      return;
+    }
+
+
+    order.confirm=false;
+    order.accept=true;
+    order.acceptDate=new Date();
+    order.isExcellFile = false;
+    order.rejectMessage = null;
+    order.stage = OrderStage.OrderResponsibility;
+    order.user = user;
+
+    await orderRepository.save(order);
+    res.status(201).json(order);
+    
+  } catch (error) {
+    next(errorHandler(401,error.message))
+  }
+}
+
+export const responsibleOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+  try {
+    const {orderId}=req.params;
+    const mainUserId=req.userId;
+    const{userId,responsibleMessage}=req.body;
+
+    const order=await orderRepository.findOneBy({id:Number(orderId)});
+    const responsibleUser=await userRepository.findOneBy({id:Number(userId)});
+    const mainUser=await userRepository.findOneBy({id:Number(mainUserId)});
+    if(!order){
+       next(errorHandler(401,"Belə bir sifariş yoxdur!"));
+       return;
+    }
+    if (!responsibleUser) {
+      next(errorHandler(401,"Belə bir istifadəçi yoxdur!"));
+      return;
+    }
+    if (!mainUser) {
+      next(errorHandler(401,"Belə bir istifadəçi yoxdur!"));
+      return;
+    }
+
+
+    order.isResponsible=true;
+    order.responsibleMessage=responsibleMessage;
+    order.responsibleUser=responsibleUser;
+    order.responsibleDate=new Date();
+    order.user=mainUser;
+    
+
+  } catch (error) {
+    next(errorHandler(401,error.message))
+  }
+}

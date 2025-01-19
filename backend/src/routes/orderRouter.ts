@@ -1,5 +1,5 @@
 import express from "express";
-import {checkInStock,confirmOrder,createOrder, deleteOrderParts, getAllOrderParts, getAllOrders, getOrder, rejectOrder, updateOrder, updateOrderParts } from "../controllers/orderController";
+import {acceptOrder, checkInStock,confirmOrder,createOrder, deleteOrderParts, getAllOrderParts, getAllOrders, getOrder, rejectOrder, responsibleOrder, updateOrder, updateOrderParts } from "../controllers/orderController";
 import verifyToken from "../middleware/verifyToken";
 
 
@@ -15,6 +15,8 @@ router.post("/rejectOrder/:id",verifyToken,rejectOrder)
 router.delete("/deleteOrderParts/:id",deleteOrderParts);
 router.post("/checkInStock",checkInStock);
 router.get("/getAllOrderParts",getAllOrderParts);
+router.post("/acceptOrder/:id",verifyToken,acceptOrder);
+router.post("/responsibleOrder/:id",verifyToken,responsibleOrder);
 
 
 

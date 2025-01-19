@@ -56,7 +56,7 @@ const EditOrder = () => {
       produceYear: "2024",
       km: "",
       confirm: false,
-      accept: true,
+      accept: false,
       acceptMessage: "",
       rejectMessage: "",
       confirmDate: new Date(),
@@ -801,6 +801,7 @@ const EditOrder = () => {
       <ActionsOnOrder
         order={orderInitialValue}
         setRefreshData={setRefreshData}
+        officeUsers={officeUsers}
       />
     </div>
   );

@@ -57,7 +57,7 @@ const OrderPartsComponent = ({
         </td>
         <td className="px-6 py-4">
           {
-            isStockAvailable ? (<div className="flex gap-2"><FaUnlock className="text-green-500 cursor-pointer"/><span className="text-black">{value.stockQuantity}</span></div>):(<div className="flex gap-2"><FaLock className="text-red-500"/><span>0</span></div>)
+            isStockAvailable ? (<div className="flex gap-2"><FaUnlock className="text-green-500 cursor-pointer"/><span className="text-black">{value.stockQuantity}</span></div>):("")
           }
         </td>
 

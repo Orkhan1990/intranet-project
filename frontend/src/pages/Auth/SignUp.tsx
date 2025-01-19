@@ -7,6 +7,7 @@ import * as Yup from "yup";
 const SignUp = () => {
   const [error, setError] = useState(false||"");
   const [success, setSuccess] = useState(false||"");
+
  
 
   interface InitialValueInterface {
@@ -31,7 +32,7 @@ const SignUp = () => {
       .required("Xananı doldur!"),
   });
 
-  const onSubmit =async (values: any) => {
+  const onSubmit =async (values: any,{resetForm}:{resetForm:()=>void}) => {
     console.log(values);
     try {
           const res = await fetch("http://localhost:3013/api/v1/auth/signUp", {
@@ -45,20 +46,29 @@ const SignUp = () => {
           const data=await res.json();
           console.log(data);
           if(data.success===false){
-            setError(data.message);
             setSuccess("")
+            setError(data.message);
+            setTimeout(() => {
+              setError("")
+              resetForm();
+            },3000);
             return;
           }
           if(res.ok){
             setSuccess("İstifadəçi uğurla qeydiyyatdan keçdi!");
-            setInterval(() => {
+            setTimeout(() => {
               setSuccess("")
-            },4000);
+              resetForm();
+            },3000);
           }
           setError("")
          } catch (error:any) {
            setError(error.message)
            setSuccess("")
+           setTimeout(() => {
+            setError("")
+            resetForm();
+          },3000);
          }
   };
   return (
@@ -72,6 +82,7 @@ const SignUp = () => {
             initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={onSubmit}
+            enableReinitialize={true}
           >{
             ((props:any)=>(
               <Form className="flex flex-col gap-3 mt-5">

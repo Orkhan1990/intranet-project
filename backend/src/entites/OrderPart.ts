@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToOne} from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Order } from "./Order";
 
@@ -14,8 +14,6 @@ export class OrderPart extends AllEntities{
     @Column({nullable:true})
     count:number;
 
-    @Column({name:"check_in_stock",default:false})
-    checkInStock:boolean;
 
     @Column({name:"stock_quantity",nullable:true})
     stockQuantity:number;
