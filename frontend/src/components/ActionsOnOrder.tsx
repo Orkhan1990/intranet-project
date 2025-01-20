@@ -1,5 +1,6 @@
 import { Button, Select, Textarea } from "flowbite-react";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface ActionsOnOrderInterface {
   order: any;
@@ -8,10 +9,12 @@ interface ActionsOnOrderInterface {
 }
 
 const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInterface) => {
-  const [orderRejectMessage, setOrderRejectMessage] = useState("");
-  const [responsibleMessage, setResponsibleMessage] = useState(""); 
-  const [responsibleUser,setResponsibleUser]=useState(0);
-  const [orderId, setOrderId] = useState(0);
+  const [orderRejectMessage, setOrderRejectMessage] = useState<string>("");
+  const [responsibleMessage, setResponsibleMessage] = useState<string>(""); 
+  const [responsibleUser,setResponsibleUser]=useState<number>(0);
+  const [orderId, setOrderId] = useState<number>(0);
+
+  const navigate=useNavigate();
   
 
   
@@ -86,11 +89,11 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
 
 
 
-  const selectRepsonsibleUser = async (userId: any,orderId:any,messageValue?:any) => {
-    console.log(userId,orderId,messageValue,"userId,orderId,messageValue");
+  const selectRepsonsibleUser = async (userId:number,id:number,messageValue:string) => {
+    console.log(String(messageValue),"messageValue");
     try {
       const res = await fetch(
-        `http://localhost:3013/api/v1/order/resposibleOrder/${orderId}}`,
+        `http://localhost:3013/api/v1/order/responsibleOrder/${id}`,
         {
           method: "POST",
           credentials: "include",
@@ -103,6 +106,7 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
       const data = await res.json();
       if (res.ok) {
         setRefreshData((prev: any) => !prev);
+        navigate(`/editOrder/${order.id}`);
       }
       console.log(data);
       
@@ -111,6 +115,24 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
       
     }
   }
+
+  const handleSelectChange=(e:React.ChangeEvent<HTMLSelectElement>)=>{
+    const selectedValue = parseInt(e.target.value);
+    setResponsibleUser(selectedValue);
+    const selectedName = e.target.selectedOptions[0].text;
+       if(selectedValue){
+         const confirm = window.confirm(
+           `"${selectedName}" sifarişi davam etsin?`
+          );
+          console.log(confirm,"confirm");
+          
+          if (confirm) {
+            selectRepsonsibleUser(responsibleUser,order.id,responsibleMessage); // Send update to backend if confirmed
+            // setRefreshData((prev: any) => !prev);
+          }
+       }
+  }
+
   return (
     <div className="mt-5">
       <h2 className=" bg-orange-300 py-5 px-5 rounded-sm font-semibold">
@@ -189,7 +211,7 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
               </tr>
             )}
 
-            {!order.confirm &&order.accept&& (
+            {!order.confirm&&order.accept&& (
               <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                 <td className="px-6 py-4 text-black flex flex-col">
                   <span>Bölmə rəhbərin təsdiqi</span>
@@ -213,22 +235,9 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
                   <div>
                     <div>
                       <h2 className="text-black">Mesaj</h2>
-                      <Textarea rows={5} className="my-2" onChange={(e:React.ChangeEvent<HTMLTextAreaElement>)=>setResponsibleMessage(e.target.value)}/>
-                      <Select sizing="sm" onChange={(e:React.ChangeEvent<HTMLSelectElement>)=>{
-                         setResponsibleUser(parseInt(e.target.value));
-                         const selectedName = e.target.selectedOptions[0].text;
-                         if(responsibleUser){
-                           const confirm = window.confirm(
-                             `"${selectedName}" sifarişi davam etsin?`
-                            );
-                            if (confirm) {
-                              selectRepsonsibleUser(responsibleUser,order.id,responsibleMessage); // Send update to backend if confirmed
-                            }
-                            setRefreshData((prev: any) => !prev);
-                         }
-                      }}>
-                      <option value="#">Cavabdeh olan şəxsi seç</option>
-
+                      <Textarea rows={5} className="my-2" onChange={(e:any)=>setResponsibleMessage(e.target.value)}/>
+                      <Select sizing="sm" value={responsibleUser || ""} onChange={handleSelectChange}>
+                      {/* <option value=" ">Cavabdeh olan şəxsi seç</option> */}
                         {
                           officeUsers.map((user:any)=>(
                             <option key={user.id} value={user.id}>{user.firstName} {user.lastName}</option>

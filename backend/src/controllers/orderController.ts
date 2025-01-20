@@ -477,11 +477,12 @@ export const acceptOrder=async(req:CustomRequest,res:Response,next:NextFunction)
 
 export const responsibleOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
   try {
-    const {orderId}=req.params;
+    const {id}=req.params;
     const mainUserId=req.userId;
-    const{userId,responsibleMessage}=req.body;
+    const{userId,messageValue}=req.body;
+    log(userId,messageValue,id);
 
-    const order=await orderRepository.findOneBy({id:Number(orderId)});
+    const order=await orderRepository.findOneBy({id:Number(id)});
     const responsibleUser=await userRepository.findOneBy({id:Number(userId)});
     const mainUser=await userRepository.findOneBy({id:Number(mainUserId)});
     if(!order){
@@ -497,9 +498,9 @@ export const responsibleOrder=async(req:CustomRequest,res:Response,next:NextFunc
       return;
     }
 
-
+    order.accept=false;
     order.isResponsible=true;
-    order.responsibleMessage=responsibleMessage;
+    order.responsibleMessage=messageValue;
     order.responsibleUser=responsibleUser;
     order.responsibleDate=new Date();
     order.stage=OrderStage.ResponsibleUser;
