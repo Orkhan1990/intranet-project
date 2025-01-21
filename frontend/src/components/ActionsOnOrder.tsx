@@ -12,9 +12,12 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
   const [orderRejectMessage, setOrderRejectMessage] = useState<string>("");
   const [responsibleMessage, setResponsibleMessage] = useState<string>(""); 
   const [responsibleUser,setResponsibleUser]=useState<number>(0);
-  const [orderId, setOrderId] = useState<number>(0);
+  const [selectedName,setSelectedName] = useState<string>("");
 
   const navigate=useNavigate();
+
+  console.log(order,"order");
+  
   
 
   
@@ -24,12 +27,12 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
   const handleChange = (e: any) => {
     const rejectMessage = e.target.value;
     setOrderRejectMessage(rejectMessage);
-    setOrderId(order.id);
+    // setOrderId(order.id);
   };
   const handleReject = async () => {
     try {
       const res = await fetch(
-        `http://localhost:3013/api/v1/order/rejectOrder/${orderId}`,
+        `http://localhost:3013/api/v1/order/rejectOrder/${order.id}`,
         {
           method: "POST",
           credentials: "include",
@@ -120,6 +123,7 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
     const selectedValue = parseInt(e.target.value);
     setResponsibleUser(selectedValue);
     const selectedName = e.target.selectedOptions[0].text;
+    setSelectedName(selectedName);
        if(selectedValue){
          const confirm = window.confirm(
            `"${selectedName}" sifarişi davam etsin?`
@@ -127,7 +131,7 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
           console.log(confirm,"confirm");
           
           if (confirm) {
-            selectRepsonsibleUser(responsibleUser,order.id,responsibleMessage); // Send update to backend if confirmed
+            selectRepsonsibleUser(selectedValue,order.id,responsibleMessage); // Send update to backend if confirmed
             // setRefreshData((prev: any) => !prev);
           }
        }
@@ -170,7 +174,7 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
               <td className="px-20 py-4"></td>
               <td className="px-20 py-4"></td>
             </tr>
-            {order.confirm &&!order.accept&& (
+            {order.confirm && (
               <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                 <td className="px-6 py-4 text-black flex flex-col">
                   <span>Bölmə rəhbərin təsdiqi</span>
@@ -211,7 +215,7 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
               </tr>
             )}
 
-            {!order.confirm&&order.accept&& (
+            {order.accept&& (
               <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                 <td className="px-6 py-4 text-black flex flex-col">
                   <span>Bölmə rəhbərin təsdiqi</span>
@@ -226,7 +230,7 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
               </tr>
             )}
             {
-              !order.confirm &&order.accept&&(
+              order.isResponsible&&(
                 <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                 <td className="px-6 py-4 text-black flex flex-col">
                   <span>Sifarişdən cavabdehdir</span>
@@ -247,6 +251,26 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
                     </div>
                   </div>
                 </td>
+                <td className="px-6 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+              </tr>
+              )
+            }
+                {
+              !order.isResponsible&&order.accept&&(
+                <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                <td className="px-6 py-4 text-black flex flex-col">
+                  <span>Sifarişdən cavabdehdir</span>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex gap-2">
+                   <span>{changeFormatDate(order.responsibleDate)}</span>
+                  {/* <span>{`(${order.responsibleUser.firstName} ${order.responsibleUser.lastName})`}</span> */}
+                  </div>
+                  </td>
                 <td className="px-6 py-4"></td>
                 <td className="px-20 py-4"></td>
                 <td className="px-20 py-4"></td>

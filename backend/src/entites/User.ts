@@ -58,6 +58,9 @@ export class User extends AllEntities {
 
     @OneToMany(()=>Order,order=>order.user)
     orders:Order[];
+    
+    @OneToMany(() => Order, (order) => order.responsibleUser)
+    responsibleUserOrders: Order[];
 
     @OneToMany(()=>OrderHistory,(history)=>history.user)
     histories:OrderHistory[];

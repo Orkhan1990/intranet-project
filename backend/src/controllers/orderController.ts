@@ -464,6 +464,7 @@ export const acceptOrder=async(req:CustomRequest,res:Response,next:NextFunction)
     order.acceptDate=new Date();
     order.isExcellFile = false;
     order.rejectMessage = null;
+    order.isResponsible=true;
     order.stage = OrderStage.OrderResponsibility;
     order.user = user;
 
@@ -497,16 +498,25 @@ export const responsibleOrder=async(req:CustomRequest,res:Response,next:NextFunc
       next(errorHandler(401,"Belə bir istifadəçi yoxdur!"));
       return;
     }
-
-    order.accept=false;
-    order.isResponsible=true;
+    
+    order.accept=true;
+    order.isResponsible=false;
     order.responsibleMessage=messageValue;
     order.responsibleUser=responsibleUser;
     order.responsibleDate=new Date();
     order.stage=OrderStage.ResponsibleUser;
     order.user=mainUser;
     await orderRepository.save(order);
-    res.status(200).json(order);
+
+    const fullOrder=await orderRepository.find({
+      where:{
+        id:Number(id)
+      },
+      relations:["user","client","orderParts","responsibleUser"]
+    });
+
+    log(fullOrder);
+    res.status(200).json(fullOrder);
 
   } catch (error) {
     next(errorHandler(401,error.message))

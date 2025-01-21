@@ -107,8 +107,7 @@ export class Order extends AllEntities {
   @Column({name:"responsible_message",nullable:true})
   responsibleMessage:string;
   
-  @ManyToOne(() => User, (user) => user.orders,{nullable: true})
-  responsibleUser: User;
+ 
 
   @ManyToOne(() => User, (user) => user.orders)
   user: User;
@@ -121,4 +120,7 @@ export class Order extends AllEntities {
 
   @OneToMany(() => OrderHistory, (orderHistory) => orderHistory.order)
   orderHistory: OrderHistory[];
+
+  @ManyToOne(() => User, (user) => user.responsibleUserOrders, { nullable: true })
+  responsibleUser: User;
 }

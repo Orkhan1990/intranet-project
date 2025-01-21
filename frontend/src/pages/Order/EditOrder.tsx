@@ -66,6 +66,8 @@ const EditOrder = () => {
       deliveringType: "simplified",
       initialPayment: 0,
       isExcellFile: false,
+      isResponsible:false,
+      responsibleDate:new Date(),
       comment: "",
       oil: false,
       orderParts: [
@@ -80,7 +82,7 @@ const EditOrder = () => {
       ],
     });
 
-  console.log(orderParts,"sala");
+  // console.log(orderInitialValue,"orderInitialValue");
 
   const produceDateData: string[] = [
     "2024",
@@ -183,7 +185,7 @@ const EditOrder = () => {
         );
 
         const data = await res.json();
-        // console.log(data);
+        console.log(data,"orderInfo.......");
 
         if (!res.ok || data.success === false) {
           setError(data.message);

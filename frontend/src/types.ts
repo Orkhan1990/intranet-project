@@ -154,6 +154,8 @@ export interface EditOrderInterface{
   confirmDate:Date,
   paymentType: PayType,
   isExcellFile:boolean,
+  isResponsible:boolean,
+  responsibleDate:Date,
   delivering: DeliverType,
   deliveringType:string,
   initialPayment:number,
