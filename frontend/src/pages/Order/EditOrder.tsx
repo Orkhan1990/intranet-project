@@ -66,16 +66,24 @@ const EditOrder = () => {
       deliveringType: "simplified",
       initialPayment: 0,
       isExcellFile: false,
-      isResponsible:false,
-      responsibleDate:new Date(),
+      isResponsible: false,
+      responsibleDate: new Date(),
+      responsibleUser: {
+        id: 0,
+        userName: "",
+        email: "",
+        password: "",
+        lastName: "",
+        firstName: "",
+      },
       comment: "",
       oil: false,
       orderParts: [
         {
-          id:0,
+          id: 0,
           origCode: "",
           count: 1,
-          stockQuantity:0,
+          stockQuantity: 0,
           checkOnWarehouse: false,
           partName: "",
         },
@@ -185,7 +193,7 @@ const EditOrder = () => {
         );
 
         const data = await res.json();
-        console.log(data,"orderInfo.......");
+        console.log(data, "orderInfo.......");
 
         if (!res.ok || data.success === false) {
           setError(data.message);
@@ -312,11 +320,11 @@ const EditOrder = () => {
 
   //CHECK IN STOCK
 
-  const checkInstock=async()=>{ 
+  const checkInstock = async () => {
     // console.log(values,"checkinStock");
 
-    const newPartsArray=orderInitialValue.orderParts;
-        
+    const newPartsArray = orderInitialValue.orderParts;
+
     try {
       const res = await fetch(
         "http://localhost:3013/api/v1/order/checkInstock",
@@ -326,7 +334,7 @@ const EditOrder = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        body: JSON.stringify({parts:newPartsArray})
+          body: JSON.stringify({ parts: newPartsArray }),
         }
       );
 
@@ -336,28 +344,40 @@ const EditOrder = () => {
       if (!res.ok || data.success === false) {
         setError(data.message);
       } else {
+        const updatedPartsArray = data.map(
+          (
+            part: {
+              code: string;
+              count: number;
+              stockQuantity: number;
+              name: string;
+              inStock: boolean;
+            },
+            index: number
+          ) => {
+            return {
+              id: index,
+              origCode: part.code,
+              count: part.count,
+              stockQuantity: part.stockQuantity,
+              checkOnWarehouse: part.inStock,
+              partName: part.name,
+            };
+          }
+        );
 
-            const updatedPartsArray=data.map((part:{code:string,count:number,stockQuantity:number,name:string,inStock:boolean},index:number)=>{
-              return{
-                id:index,
-                origCode:part.code,
-                count:part.count,
-                stockQuantity:part.stockQuantity,
-                checkOnWarehouse:part.inStock,
-                partName:part.name
-              }
-            })
-
-           setOrdersInitialValue({...orderInitialValue,orderParts:updatedPartsArray});
+        setOrdersInitialValue({
+          ...orderInitialValue,
+          orderParts: updatedPartsArray,
+        });
       }
     } catch (error: any) {
       // setError(error);
     }
-   }
+  };
 
-  console.log(stockInfos,"stockInfo");
-  console.log(orderParts,"orderParts");
-  
+  console.log(stockInfos, "stockInfo");
+  console.log(orderParts, "orderParts");
 
   const handleSubmitButton = async (id: any) => {
     const res = await fetch(
@@ -380,7 +400,6 @@ const EditOrder = () => {
     }
   };
 
-
   return (
     <div>
       <div className="min-h-screen mt-[100px] mb-[100px] ml-[90px] ">
@@ -392,7 +411,7 @@ const EditOrder = () => {
           initialValues={orderInitialValue}
           onSubmit={onsubmit}
         >
-          {({ values, setFieldValue}) => {
+          {({ values, setFieldValue }) => {
             const deletePart = async (index: number) => {
               setFieldValue(
                 "orderParts",

@@ -159,6 +159,7 @@ export interface EditOrderInterface{
   delivering: DeliverType,
   deliveringType:string,
   initialPayment:number,
+  responsibleUser:UserInterface,
   comment:string,
   oil:boolean,
   orderParts: OrderPartsInterface[];

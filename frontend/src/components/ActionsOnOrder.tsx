@@ -1,6 +1,9 @@
 import { Button, Select, Textarea } from "flowbite-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserInterface } from "../types";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux-toolkit/store/store";
 
 interface ActionsOnOrderInterface {
   order: any;
@@ -14,11 +17,15 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
   const [responsibleUser,setResponsibleUser]=useState<number>(0);
   const [selectedName,setSelectedName] = useState<string>("");
 
+
+  const { currentUser } = useSelector((state:RootState) => state.auth);
+
   const navigate=useNavigate();
 
   console.log(order,"order");
   
-  
+  const fullName = `${order.responsibleUser.firstName} ${order.responsibleUser.lastName}`;
+  const checkUser=currentUser?.id===order.responsibleUser.id;
 
   
 
@@ -93,7 +100,6 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
 
 
   const selectRepsonsibleUser = async (userId:number,id:number,messageValue:string) => {
-    console.log(String(messageValue),"messageValue");
     try {
       const res = await fetch(
         `http://localhost:3013/api/v1/order/responsibleOrder/${id}`,
@@ -111,7 +117,6 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
         setRefreshData((prev: any) => !prev);
         navigate(`/editOrder/${order.id}`);
       }
-      console.log(data);
       
     } catch (error) {
       console.log(error);
@@ -260,7 +265,8 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
               )
             }
                 {
-              !order.isResponsible&&order.accept&&(
+              !order.isResponsible&&order.accept&&!checkUser&&(
+                <>
                 <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                 <td className="px-6 py-4 text-black flex flex-col">
                   <span>Sifarişdən cavabdehdir</span>
@@ -268,7 +274,7 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
                    <span>{changeFormatDate(order.responsibleDate)}</span>
-                  {/* <span>{`(${order.responsibleUser.firstName} ${order.responsibleUser.lastName})`}</span> */}
+                  <span>{`(${fullName})`}</span>
                   </div>
                   </td>
                 <td className="px-6 py-4"></td>
@@ -277,6 +283,58 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
                 <td className="px-20 py-4"></td>
                 <td className="px-20 py-4"></td>
               </tr>
+               <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+               <td className="px-6 py-4 text-grey-500 flex flex-col">
+                 <span>Cavabdeh işə başladı</span>
+               </td>
+               <td className="px-6 py-4"></td>
+               <td className="px-6 py-4"></td>
+               <td className="px-20 py-4"></td>
+               <td className="px-20 py-4"></td>
+               <td className="px-20 py-4"></td>
+               <td className="px-20 py-4"></td>
+             </tr>
+             </>
+              )
+            }
+
+           {
+              !order.isResponsible&&order.accept&&checkUser&&(
+                <>
+                <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                <td className="px-6 py-4 text-black flex flex-col">
+                  <span>Sifarişdən cavabdehdir</span>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex gap-2">
+                   <span>{changeFormatDate(order.responsibleDate)}</span>
+                  <span>{`(${fullName})`}</span>
+                  </div>
+                  </td>
+                <td className="px-6 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+                <td className="px-20 py-4"></td>
+              </tr>
+               <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+               <td className="px-6 py-4 text-grey-500 flex flex-col">
+                 <span>Cavabdeh işə başladı</span>
+               </td>
+               <td className="px-6 py-4">
+                <div>
+                  <h2>Mesaj</h2>
+                  <Textarea rows={5} className="my-2"/>
+                  <Button color={"blue"} size="xs">Başla</Button>
+                </div>
+               </td>
+               <td className="px-6 py-4"></td>
+               <td className="px-20 py-4"></td>
+               <td className="px-20 py-4"></td>
+               <td className="px-20 py-4"></td>
+               <td className="px-20 py-4"></td>
+             </tr>
+             </>
               )
             }
           </tbody>

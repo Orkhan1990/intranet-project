@@ -146,7 +146,7 @@ export const getOrder = async (
   try {
     const order = await orderRepository.findOne({
       where: { id: Number(req.params.id) },
-      relations: ["user", "client", "orderParts"],
+      relations: ["user", "client", "orderParts","responsibleUser"],
     });
 
     if (!order) {
@@ -508,7 +508,7 @@ export const responsibleOrder=async(req:CustomRequest,res:Response,next:NextFunc
     order.user=mainUser;
     await orderRepository.save(order);
 
-    const fullOrder=await orderRepository.find({
+    const fullOrder=await orderRepository.findOne({
       where:{
         id:Number(id)
       },
@@ -516,7 +516,7 @@ export const responsibleOrder=async(req:CustomRequest,res:Response,next:NextFunc
     });
 
     log(fullOrder);
-    res.status(200).json(fullOrder);
+    res.status(200).json(fullOrder.responsibleUser);
 
   } catch (error) {
     next(errorHandler(401,error.message))
