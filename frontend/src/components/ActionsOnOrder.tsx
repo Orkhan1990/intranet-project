@@ -23,8 +23,8 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
 
   console.log(order,"order");
   
-  const fullName = `${order.responsibleUser.firstName} ${order.responsibleUser.lastName}`;
-  const checkUser=currentUser?.id===order.responsibleUser.id;
+  const fullName = order?.responsibleUser?`${order.responsibleUser?.firstName} ${order.responsibleUser?.lastName}`:"";
+  const checkUser=currentUser?.id===order.responsibleUser?.id;
 
   
 

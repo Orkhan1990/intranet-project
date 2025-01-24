@@ -8,9 +8,6 @@ import { OrderStage, OrderStep } from "../enums/allEnums";
 
 @Entity({name:"order_history"})
 export class OrderHistory extends AllEntities{
- 
-   
-
     @Column({
          type: "enum",
             enum: OrderStep,
