@@ -17,3 +17,19 @@ export enum OrderStatus{
     Calculation="calculation",
     Finish="finish"
   }
+
+
+  export enum OrderStep{
+    OrderConfirm="orderConfirm",
+    OrderAccept="orderAccept",
+    DirectorAccept="directorAccept",
+    ResponsibleUserBegin="responsibleUserBegin",
+    CalculationBegin="calculationBegin",
+    CalculationAccept="calculationAccept",
+    CalculationEnd="calculationEnd",
+    RequestSupplier="requestSupplier",
+    ProcessingSupplier="processingSupplier",
+    AccountantAccept="accountantAccept",  
+    ClientConfirm="clientConfirm",
+    Reject="reject"
+  }

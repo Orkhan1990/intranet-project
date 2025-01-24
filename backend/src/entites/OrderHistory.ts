@@ -2,7 +2,7 @@ import { Column, Entity, ManyToOne } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { User } from "./User";
 import { Order } from "./Order";
-import { OrderStage } from "../enums/allEnums";
+import { OrderStage, OrderStep } from "../enums/allEnums";
 
 
 
@@ -11,15 +11,27 @@ export class OrderHistory extends AllEntities{
  
    
 
-    @ManyToOne(() => User, (user) => user.responsibleOrders,{nullable:true})
-    responsibleUser: User|null=null;
-  
+    @Column({
+         type: "enum",
+            enum: OrderStep,
+            enumName: "order_step"
+        })
+    step:OrderStep
 
-    @Column({name:"responsible_date",nullable:true})
-    responsibleDate:Date;
+    @Column({default:false})
+    confirm:boolean;
   
-    @Column({name:"responsible_begin_date",nullable:true})
-    responsibleBeginDate:Date
+    @Column({nullable:true})
+    message:string;
+
+    @Column({nullable:true})
+    reject:string
+
+    @Column({nullable:true})
+    file:string
+     
+    @Column({nullable:true})
+    date:Date;
 
     @ManyToOne(()=>User,(user)=>user.histories)
     user:User;

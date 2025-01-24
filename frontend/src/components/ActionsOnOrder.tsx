@@ -1,7 +1,6 @@
 import { Button, Select, Textarea } from "flowbite-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserInterface } from "../types";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux-toolkit/store/store";
 
@@ -12,7 +11,7 @@ interface ActionsOnOrderInterface {
 }
 
 const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInterface) => {
-  const [orderRejectMessage, setOrderRejectMessage] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
   const [responsibleMessage, setResponsibleMessage] = useState<string>(""); 
   const [responsibleUser,setResponsibleUser]=useState<number>(0);
   const [selectedName,setSelectedName] = useState<string>("");
@@ -33,7 +32,7 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
 
   const handleChange = (e: any) => {
     const rejectMessage = e.target.value;
-    setOrderRejectMessage(rejectMessage);
+    setMessage(rejectMessage);
     // setOrderId(order.id);
   };
   const handleReject = async () => {
@@ -46,7 +45,7 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ orderRejectMessage }),
+          body: JSON.stringify({ message }),
         }
       );
       const data = await res.json();
@@ -141,6 +140,30 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
           }
        }
   }
+ 
+  const startResponsibleUser=async()=>{
+    try {
+      const res = await fetch(
+        `http://localhost:3013/api/v1/order/startResponsibleOrder/${order.id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message }),
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setRefreshData((prev: any) => !prev);
+      }
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
 
   return (
     <div className="mt-5">
@@ -324,8 +347,8 @@ const ActionsOnOrder = ({ order, setRefreshData,officeUsers }: ActionsOnOrderInt
                <td className="px-6 py-4">
                 <div>
                   <h2>Mesaj</h2>
-                  <Textarea rows={5} className="my-2"/>
-                  <Button color={"blue"} size="xs">Başla</Button>
+                  <Textarea rows={5} className="my-2" onChange={handleChange} />
+                  <Button color={"blue"} size="xs" onClick={startResponsibleUser}>Başla</Button>
                 </div>
                </td>
                <td className="px-6 py-4"></td>

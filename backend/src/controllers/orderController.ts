@@ -99,8 +99,8 @@ export const createOrder = async (
 
     const newOrderHistory = new OrderHistory();
     newOrderHistory.user = getUser;
-    newOrderHistory.responsibleBeginDate = new Date();
-    newOrderHistory.responsibleDate = new Date();
+    // newOrderHistory.responsibleBeginDate = new Date();
+    // newOrderHistory.responsibleDate = new Date();
     newOrderHistory.order = newOrder;
 
     await orderHistoryRepository.save(newOrderHistory);
@@ -504,6 +504,7 @@ export const responsibleOrder=async(req:CustomRequest,res:Response,next:NextFunc
     order.responsibleMessage=messageValue;
     order.responsibleUser=responsibleUser;
     order.responsibleDate=new Date();
+    // order.responsibleBeginDate=new Date();
     order.stage=OrderStage.ResponsibleUser;
     order.user=mainUser;
     await orderRepository.save(order);
@@ -518,6 +519,15 @@ export const responsibleOrder=async(req:CustomRequest,res:Response,next:NextFunc
     log(fullOrder);
     res.status(200).json(fullOrder.responsibleUser);
 
+  } catch (error) {
+    next(errorHandler(401,error.message))
+  }
+}
+
+export const startResponsibleOrder=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+
+    
   } catch (error) {
     next(errorHandler(401,error.message))
   }
