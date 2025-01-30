@@ -1,10 +1,11 @@
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Client } from "./Client";
 import { OrderPart } from "./OrderPart";
 import { User } from "./User";
 import { OrderHistory } from "./OrderHistory";
 import { OrderStage, OrderStatus } from "../enums/allEnums";
+import { Supplier } from "./Supplier";
 
 @Entity({ name: "orders" })
 export class Order extends AllEntities {
@@ -107,7 +108,18 @@ export class Order extends AllEntities {
   @Column({name:"responsible_message",nullable:true})
   responsibleMessage:string;
   
- 
+  @Column({name:"is_request_suplier",default:false})
+  isBeginRequestSupplier:boolean;
+
+  @Column({name:"initial_message_to_supplier",nullable:true})
+  firstMessageToSupplier:string;
+
+  @Column({name:"second_message_to_supplier",nullable:true})
+  secondMessageToSupplier:string
+
+
+  @ManyToMany(()=>Supplier,(supplier)=>supplier.orders)
+  suppliers:Supplier[];
 
   @ManyToOne(() => User, (user) => user.orders)
   user: User;

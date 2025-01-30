@@ -1,3 +1,4 @@
+import { Order } from './../entites/Order';
 
 
 
@@ -22,8 +23,9 @@ export enum OrderStatus{
   export enum OrderStep{
     OrderConfirm="orderConfirm",
     OrderAccept="orderAccept",
-    DirectorAccept="directorAccept",
+    ResposibleFromOrder="responsibleFromOrder",
     ResponsibleUserBegin="responsibleUserBegin",
+    DirectorAccept="directorAccept",
     CalculationBegin="calculationBegin",
     CalculationAccept="calculationAccept",
     CalculationEnd="calculationEnd",

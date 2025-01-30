@@ -54,7 +54,8 @@ const Order = () => {
 
   
 
-  const getStageResult = (result: string) => {
+  const getStageResult = (result:any) => {
+    // const currentStep=result.orderHistory[result.orderHistory.length-1]?.step
     switch (result) {
       case "created":
         return "Sifariş yaradıldı";

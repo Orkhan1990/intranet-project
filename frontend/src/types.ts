@@ -134,6 +134,25 @@ export interface OrderInterface {
   parts:OrderPartsInterface[]
 }
 
+export interface ResponsibleUserInterface {
+  id:number;
+  userName:string;
+  email:string;
+  lastName:string;
+  firstName:string;
+}
+
+export interface OrderHistoryInterface{
+  id:number,
+  step:string,
+  confirm:boolean,
+  message:string,
+  reject:string,
+  file:string,
+  date:Date
+  user:ResponsibleUserInterface
+}
+
 export interface EditOrderInterface{
   id:number,
   project:string,
@@ -163,6 +182,7 @@ export interface EditOrderInterface{
   comment:string,
   oil:boolean,
   orderParts: OrderPartsInterface[];
+  orderHistory:OrderHistoryInterface[]
 }
 
 

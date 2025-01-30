@@ -88,6 +88,24 @@ const EditOrder = () => {
           partName: "",
         },
       ],
+      orderHistory: [
+        {
+          id:0,
+          step:"",
+          confirm:false,
+          message:"",
+          reject:"",
+          file:"",
+          date:new Date(),
+          user:{
+            id:0,
+            userName:"",
+            email:"",
+            lastName:"",
+            firstName:""
+          }
+        }
+      ]
     });
 
   // console.log(orderInitialValue,"orderInitialValue");
@@ -542,8 +560,8 @@ const EditOrder = () => {
                     className="w-32"
                     sizing="sm"
                   >
-                    {produceDateData?.map((item: string) => (
-                      <option value={item}>{item}</option>
+                    {produceDateData?.map((item: string,index:number) => (
+                      <option value={item} key={index}>{item}</option>
                     ))}
                   </Field>
                   <span className="text-red-700 ml-4 text-lg">*</span>

@@ -16,7 +16,7 @@ const Dropdown = ({ submenus, dropdown }:DropdownInterface) => {
       }  dropdow_menu absolute servis_list z-10`}
     >
       {submenus.map((submenu, index) => (
-        <Link to={submenu.url}>
+        <Link to={submenu.url} key={index}>
           <li key={index} className="">
             {submenu.title}
           </li>

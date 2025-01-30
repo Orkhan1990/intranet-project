@@ -8,7 +8,7 @@ import { OrderInterface } from "../types/projectTypes";
 import { User } from "../entites/User";
 import { CustomRequest } from "../middleware/verifyToken";
 import { OrderHistory } from "../entites/OrderHistory";
-import { OrderStage } from "../enums/allEnums";
+import { OrderStage, OrderStep } from "../enums/allEnums";
 import { SparePart } from "../entites/SparePart";
 import { log } from "console";
 
@@ -95,23 +95,21 @@ export const createOrder = async (
     newOrder.user = getUser;
     newOrder.orderParts = newOrderArray;
 
-    await orderRepository.save(newOrder);
-
     const newOrderHistory = new OrderHistory();
     newOrderHistory.user = getUser;
-    // newOrderHistory.responsibleBeginDate = new Date();
-    // newOrderHistory.responsibleDate = new Date();
+    newOrderHistory.date = new Date();
+    newOrderHistory.step = OrderStep.OrderConfirm;
+    newOrderHistory.confirm=true;
     newOrderHistory.order = newOrder;
 
+    await orderRepository.save(newOrder);
     await orderHistoryRepository.save(newOrderHistory);
 
-    res
-      .status(200)
-      .json({
-        result: `${
-          parts.length > 1 ? "Sifarişlər əlavə olundu" : "Sifariş əlavə olundu!"
-        }`,
-      });
+    res.status(200).json({
+      result: `${
+        parts.length > 1 ? "Sifarişlər əlavə olundu" : "Sifariş əlavə olundu!"
+      }`,
+    });
   } catch (error) {
     next(errorHandler(401, error));
   }
@@ -146,7 +144,14 @@ export const getOrder = async (
   try {
     const order = await orderRepository.findOne({
       where: { id: Number(req.params.id) },
-      relations: ["user", "client", "orderParts","responsibleUser"],
+      relations: [
+        "user",
+        "client",
+        "orderParts",
+        "responsibleUser",
+        "orderHistory",
+        "orderHistory.user"
+      ],
     });
 
     if (!order) {
@@ -191,6 +196,15 @@ export const confirmOrder = async (
     order.user = user;
 
     await orderRepository.save(order);
+
+    const newOrderHistory = new OrderHistory();
+    newOrderHistory.user = user;
+    newOrderHistory.date = new Date();
+    newOrderHistory.step = OrderStep.OrderAccept;
+    newOrderHistory.confirm=true;
+    newOrderHistory.order = order;
+
+    await orderHistoryRepository.save(newOrderHistory);
 
     res.status(201).json(order);
   } catch (error) {
@@ -332,19 +346,32 @@ export const rejectOrder = async (
 
     if (!user) {
       next(errorHandler(401, "Belə istifadəçi yoxdur!"));
-    }
-
-    const order = await orderRepository.findOneBy({ id: Number(id) });
-    if (!order) {
-      next(errorHandler(401, "Sifariş mövcud deyil!"));
       return;
     }
 
+    const order = await orderRepository.findOneBy({ id:req.body.orderId });
+
+    if (!order) {
+      next(errorHandler(401, "Belə sifariş yoxdur!"));
+    }
+
+    order.rejectMessage=req.body.message;
     order.isExcellFile = true;
-    order.confirm = false;
-    order.confirmDate = null;
-    order.rejectMessage = req.body.orderRejectMessage;
-    order.stage = OrderStage.Created;
+    order.user = user;
+
+    const orderHistory = await orderHistoryRepository.findOneBy({ id: Number(id) });
+    if (!orderHistory) {
+      next(errorHandler(401, "Sifariş tarixi mövcud deyil!"));
+      return;
+    }
+
+     await orderHistoryRepository.delete({ id: Number(id) });
+
+    // order.isExcellFile = true;
+    // order.confirm = false;
+    // order.confirmDate = null;
+    // order.rejectMessage = req.body.orderRejectMessage;
+    // order.stage = OrderStage.Created;
 
     await orderRepository.save(order);
     res.status(201).json(order);
@@ -378,7 +405,7 @@ export const checkInStock = async (
   next: NextFunction
 ) => {
   // console.log(req.body);
-  
+
   try {
     const newOrderPartsArray = req.body.parts.map(
       (item: { origCode: string; count: number; partName: string }) => ({
@@ -398,34 +425,33 @@ export const checkInStock = async (
     }));
 
     const result = newOrderPartsArray.map(
-      (item:{code:string,requiredCount:number,partName:string}) => {
+      (item: { code: string; requiredCount: number; partName: string }) => {
         log(item);
-      
+
         const matching = newSparePartsList.find(
-          (orderPart:any) => orderPart.code === item.code
+          (orderPart: any) => orderPart.code === item.code
         );
-        
 
         if (matching) {
-          return{
+          return {
             code: item.code,
             count: item.requiredCount,
             stockQuantity: matching?.existingCount,
             name: matching.partName,
             inStock: true,
-          }
+          };
         } else {
           return {
             code: item.code,
             count: item.requiredCount,
             name: item.partName,
-            stockQuantity:0,
+            stockQuantity: 0,
             inStock: false,
           };
         }
       }
     );
-      // orderPartsRepository.save(result);
+    // orderPartsRepository.save(result);
     //   await orderPartsRepository.clear();
     // result.forEach(async (item:any) => {
     //   const newOrderPart = new OrderPart();
@@ -439,96 +465,123 @@ export const checkInStock = async (
   }
 };
 
-
-export const acceptOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+export const acceptOrder = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+    const { id } = req.params;
+    const userId = req.userId;
 
-    const{id}=req.params;
-    const userId=req.userId;
-
-    const order=await orderRepository.findOneBy({id:Number(id)});
-    const user=await userRepository.findOneBy({id:userId});
-    if(!order){
-      next(errorHandler(401,"Belə bir sifariş yoxdur!"));
+    const order = await orderRepository.findOneBy({ id: req.body.orderId });
+    if (!order) {
+      next(errorHandler(401, "Belə bir sifariş yoxdur!"));
       return;
     }
-
-    if(!user){
-      next(errorHandler(401,"Belə bir istifadəçi yoxdur!"));
+    const user = await userRepository.findOneBy({ id: userId });
+    if (!user) {
+      next(errorHandler(401, "Belə bir istifadəçi yoxdur!"));
       return;
     }
-
-
-    order.confirm=false;
-    order.accept=true;
-    order.acceptDate=new Date();
-    order.isExcellFile = false;
-    order.rejectMessage = null;
-    order.isResponsible=true;
-    order.stage = OrderStage.OrderResponsibility;
-    order.user = user;
-
-    await orderRepository.save(order);
-    res.status(201).json(order);
+    const orderHistory=await orderHistoryRepository.findOneBy({id:Number(id)});
     
+    orderHistory.confirm=false;
+    orderHistory.date=new Date();
+    orderHistory.message=req.body.message;
+    orderHistory.user=user;
+    await orderHistoryRepository.save(orderHistory);
+
+
+
+
+    // order.confirm = false;
+    // order.accept = true;
+    // order.acceptDate = new Date();
+    // order.isExcellFile = false;
+    // order.rejectMessage = null;
+    // order.isResponsible = true;
+    // order.stage = OrderStage.OrderResponsibility;
+    // order.user = user;
+
+
+    const newOrderHistory = new OrderHistory();
+    newOrderHistory.user = user;
+    newOrderHistory.order = order;
+    newOrderHistory.date = new Date();
+    newOrderHistory.step = OrderStep.ResposibleFromOrder;
+    newOrderHistory.confirm=true;
+
+    await orderHistoryRepository.save(newOrderHistory);
+    res.status(201).json({order,newOrderHistory});
   } catch (error) {
-    next(errorHandler(401,error.message))
+    next(errorHandler(401, error.message));
   }
-}
+};
 
-export const responsibleOrder=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+export const responsibleOrder = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const {id}=req.params;
-    const mainUserId=req.userId;
-    const{userId,messageValue}=req.body;
-    log(userId,messageValue,id);
+    const { id } = req.params;
+    const mainUserId = req.userId;
+    const { userId, messageValue,historyId } = req.body;
+    log(userId, messageValue, id);
 
-    const order=await orderRepository.findOneBy({id:Number(id)});
-    const responsibleUser=await userRepository.findOneBy({id:Number(userId)});
-    const mainUser=await userRepository.findOneBy({id:Number(mainUserId)});
-    if(!order){
-       next(errorHandler(401,"Belə bir sifariş yoxdur!"));
-       return;
+    const order = await orderRepository.findOneBy({ id: Number(id) });
+    const responsibleUser = await userRepository.findOneBy({
+      id: Number(userId),
+    });
+    const mainUser = await userRepository.findOneBy({ id: Number(mainUserId) });
+    if (!order) {
+      next(errorHandler(401, "Belə bir sifariş yoxdur!"));
+      return;
     }
     if (!responsibleUser) {
-      next(errorHandler(401,"Belə bir istifadəçi yoxdur!"));
+      next(errorHandler(401, "Belə bir istifadəçi yoxdur!"));
       return;
     }
     if (!mainUser) {
-      next(errorHandler(401,"Belə bir istifadəçi yoxdur!"));
+      next(errorHandler(401, "Belə bir istifadəçi yoxdur!"));
       return;
     }
-    
-    order.accept=true;
-    order.isResponsible=false;
-    order.responsibleMessage=messageValue;
-    order.responsibleUser=responsibleUser;
-    order.responsibleDate=new Date();
-    // order.responsibleBeginDate=new Date();
-    order.stage=OrderStage.ResponsibleUser;
-    order.user=mainUser;
-    await orderRepository.save(order);
 
-    const fullOrder=await orderRepository.findOne({
-      where:{
-        id:Number(id)
-      },
-      relations:["user","client","orderParts","responsibleUser"]
-    });
+    const orderHistory=await orderHistoryRepository.findOneBy({id:Number(historyId)});
 
-    log(fullOrder);
-    res.status(200).json(fullOrder.responsibleUser);
+    if(!orderHistory){
+      next(errorHandler(401, "Belə bir sifariş tarixi yoxdur!"));
+      return;
+    }
 
+    orderHistory.confirm=false;
+    orderHistory.date=new Date();
+    orderHistory.user=responsibleUser;
+    orderHistory.message=messageValue;
+    await orderHistoryRepository.save(orderHistory);
+
+    const newOrderHistory=new OrderHistory();
+    newOrderHistory.confirm=true;
+    newOrderHistory.date=new Date();
+    newOrderHistory.user=responsibleUser;
+    newOrderHistory.step=OrderStep.ResponsibleUserBegin;
+    newOrderHistory.order=order;
+    await orderHistoryRepository.save(newOrderHistory);
+
+    res.status(200).json(orderHistory);
   } catch (error) {
-    next(errorHandler(401,error.message))
+    next(errorHandler(401, error.message));
   }
-}
+};
 
-export const startResponsibleOrder=async(req:Request,res:Response,next:NextFunction)=>{
+export const startResponsibleOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-
-    
   } catch (error) {
-    next(errorHandler(401,error.message))
+    next(errorHandler(401, error.message));
   }
-}
+};
