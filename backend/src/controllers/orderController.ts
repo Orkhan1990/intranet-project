@@ -485,6 +485,11 @@ export const acceptOrder = async (
       return;
     }
     const orderHistory=await orderHistoryRepository.findOneBy({id:Number(id)});
+
+    if (!orderHistory) {
+      next(errorHandler(401, "Belə bir sifariş tarixi yoxdur!"));
+      return;
+    }
     
     orderHistory.confirm=false;
     orderHistory.date=new Date();
@@ -531,25 +536,26 @@ export const responsibleOrder = async (
     log(userId, messageValue, id);
 
     const order = await orderRepository.findOneBy({ id: Number(id) });
-    const responsibleUser = await userRepository.findOneBy({
-      id: Number(userId),
-    });
-    const mainUser = await userRepository.findOneBy({ id: Number(mainUserId) });
     if (!order) {
       next(errorHandler(401, "Belə bir sifariş yoxdur!"));
       return;
     }
+
+
+    const responsibleUser = await userRepository.findOneBy({
+      id: Number(userId),
+    });
     if (!responsibleUser) {
       next(errorHandler(401, "Belə bir istifadəçi yoxdur!"));
       return;
     }
+    const mainUser = await userRepository.findOneBy({ id: Number(mainUserId) });
     if (!mainUser) {
       next(errorHandler(401, "Belə bir istifadəçi yoxdur!"));
       return;
     }
 
     const orderHistory=await orderHistoryRepository.findOneBy({id:Number(historyId)});
-
     if(!orderHistory){
       next(errorHandler(401, "Belə bir sifariş tarixi yoxdur!"));
       return;
@@ -576,11 +582,58 @@ export const responsibleOrder = async (
 };
 
 export const startResponsibleOrder = async (
-  req: Request,
+  req: CustomRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
+    
+   const userId=req.userId;
+   const {id}=req.params;
+   const{message,historyId}=req.body;
+
+
+   const user=await userRepository.findOneBy({id:userId});
+   if (!user) {
+    next(errorHandler(401, "Belə bir istifadəçi yoxdur!"));
+    return;
+  }
+
+  const order=await orderRepository.findOneBy({id:Number(id)});
+
+ if (!order) {
+    next(errorHandler(401, "Belə bir sifariş yoxdur!"));
+    return;
+  }
+
+  const orderHistory=await orderHistoryRepository.findOneBy({id:historyId});
+
+ if (!orderHistory) {
+    next(errorHandler(401, "Belə bir sifariş tarixi yoxdur!"));
+    return;
+  }
+
+
+  orderHistory.confirm=false;
+  orderHistory.date=new Date();
+  orderHistory.message=message;
+  orderHistory.user=user;
+  
+  await orderHistoryRepository.save(orderHistory);
+
+  const newHistory=new OrderHistory();
+  newHistory.confirm=true;
+  newHistory.order=order;
+  newHistory.user=user;
+  newHistory.date=new Date();
+  newHistory.step=OrderStep.RequestSupplier;
+
+  await orderHistoryRepository.save(newHistory);
+  res.status(201).json(newHistory);
+
+
+
+
   } catch (error) {
     next(errorHandler(401, error.message));
   }

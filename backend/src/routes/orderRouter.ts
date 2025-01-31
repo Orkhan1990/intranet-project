@@ -17,7 +17,7 @@ router.post("/checkInStock",checkInStock);
 router.get("/getAllOrderParts",getAllOrderParts);
 router.post("/acceptOrder/:id",verifyToken,acceptOrder);
 router.post("/responsibleOrder/:id",verifyToken,responsibleOrder);
-router.post("/startResponsibleOrder/:id",startResponsibleOrder);
+router.post("/startResponsibleOrder/:id",verifyToken,startResponsibleOrder);
 
 
 

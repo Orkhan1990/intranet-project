@@ -1,8 +1,9 @@
 import { Button, Select, Textarea } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux-toolkit/store/store";
+import { SupplierInterface } from "../types";
 
 interface ActionsOnOrderInterface {
   order: any;
@@ -19,6 +20,9 @@ const ActionsOnOrder = ({
   const [responsibleMessage, setResponsibleMessage] = useState<string>("");
   const [responsibleUser, setResponsibleUser] = useState<number>(0);
   const [selectedName, setSelectedName] = useState<string>("");
+  const [suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
+  const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
+  const[error,setError]=useState<string>("");
 
   const { currentUser } = useSelector((state: RootState) => state.auth);
 
@@ -31,6 +35,43 @@ const ActionsOnOrder = ({
   //   : "";
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
   console.log(checkUser, "checkUser");
+
+
+  useEffect(()=>{
+    
+    const getSuppliers=async()=>{
+      try {
+        const res = await fetch(
+          "http://localhost:3013/api/v1/supplier/getSuppliers",
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+         if(!res.ok||data.success===false){
+           setError(data.message)
+         }
+
+        if (res.ok) {
+          setSuppliers(data)
+        }
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    getSuppliers();
+  },[order.id])
+
+
+  const handleAddSelect = () => {
+    setSelectedSuppliers([...selectedSuppliers, ""]); // Add an empty select option
+  };
 
   const handleChange = (e: any) => {
     const rejectMessage = e.target.value;
@@ -96,7 +137,6 @@ const ActionsOnOrder = ({
     return formattedDate;
   };
 
-  // const resultDate = order.createdAt;
 
   const selectRepsonsibleUser = async (
     userId: number,
@@ -150,7 +190,7 @@ const ActionsOnOrder = ({
     }
   };
 
-  const startResponsibleUser = async () => {
+  const startResponsibleUser = async (historyId:any) => {
     try {
       const res = await fetch(
         `http://localhost:3013/api/v1/order/startResponsibleOrder/${order.id}`,
@@ -160,7 +200,7 @@ const ActionsOnOrder = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message }),
+          body: JSON.stringify({ message,historyId }),
         }
       );
       const data = await res.json();
@@ -180,39 +220,31 @@ const ActionsOnOrder = ({
       </h2>
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"></thead>
-          <tbody>
             {order.orderHistory &&
               order.orderHistory.map((item: any, index: number) => {
                 switch (item.step) {
                   case "orderConfirm":
                     return (
-                      <tr className="!w-full">
-                        <td className="py-6 px-6 text-black">
+                      <div className="flex text-sm">
+                        <div className="w-64 py-6 px-6 text-black">
                           Müraciət tarixi
-                        </td>
-                        <td className="py-6 px-6  ">
+                        </div>
+                        <div className="py-6 px-6  ">
                           {changeFormatDate(order.createdAt)}
-                        </td>
-                        {/* <td className="px-6 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        <td className="px-20 py-4"></td> */}
-                      </tr>
+                        </div>
+                      </div>
                     );
 
                   case "orderAccept":
                     return (
-                      <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                        <td className="px-6 py-4 text-black flex flex-col">
+                      <div className="flex text-sm  odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                        <div className="w-64 px-6 py-4 text-black flex flex-col">
                           <span>Bölmə rəhbərin təsdiqi</span>
                           <span>logistika və xidmətin inkişafı</span>
-                        </td>
+                        </div>
                         {item.confirm ? (
                           <>
-                            <td className="px-6 py-4">
+                            <div className="px-6 py-4">
                               <div>
                                 <h2 className="text-black">Mesaj</h2>
                                 <Textarea
@@ -229,8 +261,8 @@ const ActionsOnOrder = ({
                                   Təsdiqlə
                                 </Button>
                               </div>
-                            </td>
-                            <td className="px-6 py-4">
+                            </div>
+                            <div className="px-6 py-4">
                               <div>
                                 <h2 className="text-black">İmtina səbəbi</h2>
                                 <Textarea
@@ -248,37 +280,26 @@ const ActionsOnOrder = ({
                                   İmtina et
                                 </Button>
                               </div>
-                            </td>
+                            </div>
                           </>
                         ) : (
                           <>
-                            <td className="px-6 py-4 text-black flex flex-col"></td>
-                            <td className="px-6 py-4">
+                            <div className="px-6 py-4">
                               {changeFormatDate(item.date)}
-                            </td>
-                            <td className="px-6 py-4"></td>
-                            <td className="px-20 py-4"></td>
-                            {/* <td className="px-20 py-4"></td>
-                            <td className="px-20 py-4"></td>
-                            <td className="px-20 py-4"></td> */}
+                            </div>
                           </>
                         )}
-
-                        <td className="px-20 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        {/* <td className="px-20 py-4"></td>
-                        <td className="px-20 py-4"></td> */}
-                      </tr>
+                      </div>
                     );
 
                   case "responsibleFromOrder":
                     return (
-                      <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                        <td className="px-6 py-4 text-black flex flex-col">
+                      <div className=" flex  text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 ">
+                        <div className="w-64 px-6 py-4 text-black flex flex-col">
                           <span>Sifarişdən cavabdehdir</span>
-                        </td>
+                        </div>
                         {item.confirm ? (
-                          <td className="px-6 py-4">
+                          <div className="px-6 py-4">
                             <div>
                               <div>
                                 <h2 className="text-black">Mesaj</h2>
@@ -303,215 +324,101 @@ const ActionsOnOrder = ({
                                 </Select>
                               </div>
                             </div>
-                          </td>
+                          </div>
                         ) : (
                           <>
-                            <td className="px-6 py-4">
+                          <div className="flex items-center">
+                            <div className="px-6 py-4">
                               <div className="flex gap-2">
                                 <span>{changeFormatDate(item?.date)}</span>
                               </div>
-                            </td>
-                            <td>
+                            </div>
+                            <div>
                               <span>{`(${item?.user.firstName} ${item?.user.lastName})`}</span>
-                            </td>
+                            </div>
+                            </div>
                           </>
                         )}
-
-                        <td className="px-6 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        {/* <td className="px-20 py-4"></td>
-                        <td className="px-20 py-4"></td> */}
-                      </tr>
+                      </div>
                     );
 
                   case "responsibleUserBegin":
                     return checkUser ? (
                       item.confirm?(
-                        <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                        <td className="px-6 py-4 text-black ">
+                        <div className="flex text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                        <div className="w-64 px-6 py-4 text-black ">
                           Cavabdeh işə başladı
-                        </td>
-                        <td className="px-6 py-4">
+                        </div>
+                        <div className="px-6 py-4">
                           <div>
                             <h2>Mesaj</h2>
-                            <Textarea rows={5} className="my-2" />
-                            <Button color={"blue"} size={"xs"} >
+                            <Textarea rows={5} className="my-2" onChange={(e:React.ChangeEvent<HTMLTextAreaElement>)=>setMessage(e.target.value)}/>
+                            <Button color={"blue"} size={"xs"} onClick={()=>startResponsibleUser(item.id)}>
                               Başla
                             </Button>
                           </div>
-                        </td>
-                        <td className="px-6 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        <td className="px-6 py-4"></td>
-                      </tr>
+                        </div>
+                      </div>
                       ):(
-                        <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                        <td className="px-6 py-4 text-black ">
+                        <div className="flex text-sm items-center odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                        <div className="w-64 px-6 py-4 text-black ">
                           Cavabdeh işə başladı
-                        </td>
-                        <td className="px-6 py-4">
+                        </div>
+                        <div className="px-6 py-4">
                         <div className="flex gap-2">
                                 <span>{changeFormatDate(item?.date)}</span>
                               </div>
-                        </td>
-                        <td className="px-6 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        <td className="px-6 py-4"></td>
-                      </tr>
+                        </div>
+                      </div>
                       )
                       
                     ) : (
-                      <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                        <td className="px-6 py-4 text-black">
+                      <div className="text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                        <div className="w-64 px-6 py-4 text-black">
                           Cavabdeh işə başladı
-                        </td>
-                        <td className="px-6 py-4"></td>
-                        <td className="px-6 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        <td className="px-20 py-4"></td>
-                        <td className="px-6 py-4"></td>
-                      </tr>
+                        </div>
+                      </div>
                     );
+
+                    case "requestSupplier":
+
+                    return checkUser&&(
+                      <div className="flex text-sm">
+                        <div className="w-64 px-6 py-4 text-black">
+                          Təchizatçıya sorğu
+                        </div>
+                        <div className="px-6 py-4">
+                          <h2>Mesaj</h2>
+                          <Textarea rows={5} className="my-2 w-80"/>
+                          <div className="flex items-center gap-2">
+                            <div className="flex flex-col gap-2">
+
+                            {
+                              selectedSuppliers.map((_,index:number)=>(
+                                <Select className="w-[500px]" sizing={"sm"} key={index}>
+                                <option value="" disabled>Təchizatçını seç</option>
+                                {
+                                  suppliers.length>0&&suppliers.map((supplier)=>(
+                                    <option key={supplier.id} value={supplier.id}>{supplier.supplier}</option>
+                                  ))
+                                }
+                                
+                              </Select>
+                              ))
+                            }
+                            </div>
+                            
+                            <Button color={"white"} className="bg-yellow-400 outline-none rounded-full  text-white hover:bg-yellow-600 " size={"xs"} onClick={handleAddSelect}>+</Button>
+                            <Button color={"blue"} size={"xs"}>Göndər</Button>
+                          </div>
+                        </div>
+                      </div>
+                    )
 
                   default:
                     break;
                 }
               })}
-
-            {/* {order.confirm && (
-              <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                <td className="px-6 py-4 text-black flex flex-col">
-                  <span>Bölmə rəhbərin təsdiqi</span>
-                  <span>logistika və xidmətin inkişafı</span>
-                </td>
-                <td className="px-6 py-4">
-                  <div>
-                    <h2 className="text-black">Mesaj</h2>
-                    <Textarea rows={5} className="my-2" name="acceptMessage" />
-                    <Button type="button" color={"blue"} size={"xs"} onClick={()=>acceptOrder(order.id)}>
-                      Təsdiqlə
-                    </Button>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div>
-                    <h2 className="text-black">İmtina səbəbi</h2>
-                    <Textarea
-                      rows={5}
-                      className="my-2"
-                      name="rejectMessage"
-                      onChange={handleChange}
-                    />
-                    <Button
-                      type="button"
-                      color={"blue"}
-                      size={"xs"}
-                      onClick={handleReject}
-                    >
-                      İmtina et
-                    </Button>
-                  </div>
-                </td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-              </tr>
-            )} */}
-
-            {/* {order.accept&& (
-              <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                <td className="px-6 py-4 text-black flex flex-col">
-                  <span>Bölmə rəhbərin təsdiqi</span>
-                  <span>logistika və xidmətin inkişafı</span>
-                </td>
-                <td className="px-6 py-4">{changeFormatDate(order.confirmDate)}</td>
-                <td className="px-6 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-              </tr>
-            )} */}
-
-            {/* {
-              !order.isResponsible&&order.accept&&!checkUser&&(
-                <>
-                <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                <td className="px-6 py-4 text-black flex flex-col">
-                  <span>Sifarişdən cavabdehdir</span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
-                   <span>{changeFormatDate(order.responsibleDate)}</span>
-                  <span>{`(${fullName})`}</span>
-                  </div>
-                  </td>
-                <td className="px-6 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-              </tr>
-               <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-               <td className="px-6 py-4 text-grey-500 flex flex-col">
-                 <span>Cavabdeh işə başladı</span>
-               </td>
-               <td className="px-6 py-4"></td>
-               <td className="px-6 py-4"></td>
-               <td className="px-20 py-4"></td>
-               <td className="px-20 py-4"></td>
-               <td className="px-20 py-4"></td>
-               <td className="px-20 py-4"></td>
-             </tr>
-             </>
-              )
-            } */}
-
-            {/* {
-              !order.isResponsible&&order.accept&&checkUser&&(
-                <>
-                <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                <td className="px-6 py-4 text-black flex flex-col">
-                  <span>Sifarişdən cavabdehdir</span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
-                   <span>{changeFormatDate(order.responsibleDate)}</span>
-                  <span>{`(${fullName})`}</span>
-                  </div>
-                  </td>
-                <td className="px-6 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-                <td className="px-20 py-4"></td>
-              </tr>
-               <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-               <td className="px-6 py-4 text-grey-500 flex flex-col">
-                 <span>Cavabdeh işə başladı</span>
-               </td>
-               <td className="px-6 py-4">
-                <div>
-                  <h2>Mesaj</h2>
-                  <Textarea rows={5} className="my-2" onChange={handleChange} />
-                  <Button color={"blue"} size="xs" onClick={startResponsibleUser}>Başla</Button>
-                </div>
-               </td>
-               <td className="px-6 py-4"></td>
-               <td className="px-20 py-4"></td>
-               <td className="px-20 py-4"></td>
-               <td className="px-20 py-4"></td>
-               <td className="px-20 py-4"></td>
-             </tr>
-             </>
-              )
-            } */}
-          </tbody>
-        </table>
       </div>
     </div>
   );
