@@ -73,6 +73,12 @@ const ActionsOnOrder = ({
     setSelectedSuppliers([...selectedSuppliers, ""]); // Add an empty select option
   };
 
+  const handleReduceSelect=()=>{
+    if(selectedSuppliers.length>1){
+      setSelectedSuppliers(selectedSuppliers.slice(0,-1))
+    }
+  }
+
   const handleChange = (e: any) => {
     const rejectMessage = e.target.value;
     setMessage(rejectMessage);
@@ -409,6 +415,7 @@ const ActionsOnOrder = ({
                             </div>
                             
                             <Button color={"white"} className="bg-yellow-400 outline-none rounded-full  text-white hover:bg-yellow-600 " size={"xs"} onClick={handleAddSelect}>+</Button>
+                            <Button color={"white"} className=" bg-red-400 outline-none rounded-full  text-white hover:bg-red-600 " size={"xs"} onClick={handleReduceSelect}>-</Button>
                             <Button color={"blue"} size={"xs"}>Göndər</Button>
                           </div>
                         </div>
