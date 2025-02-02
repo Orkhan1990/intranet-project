@@ -15,7 +15,7 @@ const CreateOrders = () => {
     id: 0,
     project: "project1",
     cardNumber: "1",
-    orderType: OrderType.Local_Market,
+    orderType: OrderType.Standart_Client,
     clientId: 1,
     manufacturer: "Man",
     model: "",
@@ -215,8 +215,8 @@ const CreateOrders = () => {
             );
           };
 
-          const isForeignMarket =
-            values.orderType === OrderType.Standart_Client;
+          let isForeignMarket=false;
+          isForeignMarket =values.orderType === OrderType.Standart_Client;
           const isStock = values.orderType === OrderType.Stok;
           return (
             <Form>
@@ -396,39 +396,38 @@ const CreateOrders = () => {
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
 
-              {(isForeignMarket ||
-                isStock) && (
-                  <>
-                    <div className="flex  items-center mt-5">
-                      <label htmlFor="" className="text-sm  w-[200px]">
-                        Çatdırılma
-                      </label>
-                      <Field as={Select} name="delivering" sizing="sm">
-                        <option value={DeliverType.Fast}>
-                          Təcili (7-15 gün)
-                        </option>
-                        <option value={DeliverType.Normal_Fast}>
-                          Orta (15-30 gün)
-                        </option>
-                        <option value={DeliverType.Planned}>
-                          Planlaşdırılmış (40-60 gün)
-                        </option>
-                      </Field>
-                      <span className="text-red-700 ml-4 text-lg">*</span>
-                    </div>
+              {(isForeignMarket || isStock) && (
+                <>
+                  <div className="flex  items-center mt-5">
+                    <label htmlFor="" className="text-sm  w-[200px]">
+                      Çatdırılma
+                    </label>
+                    <Field as={Select} name="delivering" sizing="sm">
+                      <option value={DeliverType.Fast}>
+                        Təcili (7-15 gün)
+                      </option>
+                      <option value={DeliverType.Normal_Fast}>
+                        Orta (15-30 gün)
+                      </option>
+                      <option value={DeliverType.Planned}>
+                        Planlaşdırılmış (40-60 gün)
+                      </option>
+                    </Field>
+                    <span className="text-red-700 ml-4 text-lg">*</span>
+                  </div>
 
-                    <div className="flex  items-center mt-5">
-                      <label htmlFor="" className="text-sm  w-[200px]">
-                        Çatdırılma üsulu
-                      </label>
-                      <Field as={Select} name="deliveringType" sizing="sm">
-                        <option value="simplified">Sadələşmiş</option>
-                        <option value="standart">Standart</option>
-                      </Field>
-                      <span className="text-red-700 ml-4 text-lg">*</span>
-                    </div>
-                  </>
-                )}
+                  <div className="flex  items-center mt-5">
+                    <label htmlFor="" className="text-sm  w-[200px]">
+                      Çatdırılma üsulu
+                    </label>
+                    <Field as={Select} name="deliveringType" sizing="sm">
+                      <option value="simplified">Sadələşmiş</option>
+                      <option value="standart">Standart</option>
+                    </Field>
+                    <span className="text-red-700 ml-4 text-lg">*</span>
+                  </div>
+                </>
+              )}
 
               {!isStock && (
                 <div className="flex  items-center mt-5">
