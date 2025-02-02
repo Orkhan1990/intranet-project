@@ -25,6 +25,8 @@ const EditOrder = () => {
   const [fileError, setFileError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [stockInfos, setStockInfos] = useState<StockInfoInterface[]>([]);
+  // const [isStock,setIsStock]=useState<boolean>(false);
+  // const[isForeignMarket,setForeignMarket]=useState<boolean>(false);
   const [orderInitialValue, setOrdersInitialValue] =
     useState<EditOrderInterface>({
       id: 0,
@@ -90,37 +92,37 @@ const EditOrder = () => {
       ],
       orderHistory: [
         {
-          id:0,
-          step:"",
-          confirm:false,
-          message:"",
-          reject:"",
-          file:"",
-          date:new Date(),
-          user:{
-            id:0,
-            userName:"",
-            email:"",
-            lastName:"",
-            firstName:""
+          id: 0,
+          step: "",
+          confirm: false,
+          message: "",
+          reject: "",
+          file: "",
+          date: new Date(),
+          user: {
+            id: 0,
+            userName: "",
+            email: "",
+            lastName: "",
+            firstName: "",
           },
-          supplierOrderHistories:[{
-            id:0,
-            date:new Date(),
-            file:"",
-            supplier:{
-              id:0,
-              contactPerson:"",
-              country:"",
-              supplier:"",
-              email:""
-            }
-          }]
-        }
-      ]
+          supplierOrderHistories: [
+            {
+              id: 0,
+              date: new Date(),
+              file: "",
+              supplier: {
+                id: 0,
+                contactPerson: "",
+                country: "",
+                supplier: "",
+                email: "",
+              },
+            },
+          ],
+        },
+      ],
     });
-
-  // console.log(orderInitialValue,"orderInitialValue");
 
   const produceDateData: string[] = [
     "2024",
@@ -449,17 +451,26 @@ const EditOrder = () => {
               );
             };
 
+            let isForeignMarket=false;
+             isForeignMarket =
+              values.orderType === OrderType.Standart_Client;
+            const isStock = values.orderType === OrderType.Stok;
+
             return (
               <Form>
-                <div className="flex  items-center ">
-                  <label htmlFor="" className="text-sm  w-[200px]">
-                    Proyekt
-                  </label>
-                  <Field as={Select} name="project" required sizing="sm">
-                    <option value="project1">Project 1</option>
-                  </Field>
-                  <span className="text-red-700 ml-4 text-lg">*</span>
-                </div>
+                {!isStock && (
+                  <>
+                    <div className="flex  items-center ">
+                      <label htmlFor="" className="text-sm  w-[200px]">
+                        Proyekt
+                      </label>
+                      <Field as={Select} name="project" required sizing="sm">
+                        <option value="project1">Project 1</option>
+                      </Field>
+                      <span className="text-red-700 ml-4 text-lg">*</span>
+                    </div>
+                  </>
+                )}
 
                 <div className="flex  items-center mt-5 ">
                   <label htmlFor="" className="text-sm  w-[200px]">
@@ -522,88 +533,97 @@ const EditOrder = () => {
                   </Field>
                   <span className="text-red-700 ml-4 text-lg">*</span>
                 </div>
+                {!isStock && (
+                  <>
+                    <div className="flex  items-start mt-5">
+                      <label htmlFor="" className="text-sm  w-[200px]">
+                        Model
+                      </label>
+                      <Field
+                        as={TextInput}
+                        name="model"
+                        className="w-64"
+                        sizing="sm"
+                      />
+                      <span className="text-red-700 ml-4 text-lg">*</span>
+                    </div>
 
-                <div className="flex  items-start mt-5">
-                  <label htmlFor="" className="text-sm  w-[200px]">
-                    Model
-                  </label>
-                  <Field
-                    as={TextInput}
-                    name="model"
-                    className="w-64"
-                    sizing="sm"
-                  />
-                  <span className="text-red-700 ml-4 text-lg">*</span>
-                </div>
+                    <div className="flex  items-start mt-5">
+                      <label htmlFor="" className="text-sm  w-[200px]">
+                        Şassi nömrəsi
+                      </label>
+                      <Field
+                        as={TextInput}
+                        name="chassisNumber"
+                        className="w-64"
+                        sizing="sm"
+                      />
+                      <span className="text-red-700 ml-4 text-lg">*</span>
+                    </div>
 
-                <div className="flex  items-start mt-5">
-                  <label htmlFor="" className="text-sm  w-[200px]">
-                    Şassi nömrəsi
-                  </label>
-                  <Field
-                    as={TextInput}
-                    name="chassisNumber"
-                    className="w-64"
-                    sizing="sm"
-                  />
-                  <span className="text-red-700 ml-4 text-lg">*</span>
-                </div>
+                    <div className="flex  items-start mt-5">
+                      <label htmlFor="" className="text-sm  w-[200px]">
+                        Mühərrik nömrəsi
+                      </label>
+                      <Field
+                        as={TextInput}
+                        name="engineNumber"
+                        className="w-64"
+                        sizing="sm"
+                      />
+                      <span className="text-red-700 ml-4 text-lg">*</span>
+                    </div>
 
-                <div className="flex  items-start mt-5">
-                  <label htmlFor="" className="text-sm  w-[200px]">
-                    Mühərrik nömrəsi
-                  </label>
-                  <Field
-                    as={TextInput}
-                    name="engineNumber"
-                    className="w-64"
-                    sizing="sm"
-                  />
-                  <span className="text-red-700 ml-4 text-lg">*</span>
-                </div>
+                    <div className="flex  items-center mt-5">
+                      <label htmlFor="" className="text-sm  w-[200px]">
+                        Buraxılış ili
+                      </label>
+                      <Field
+                        as={Select}
+                        name="produceYear"
+                        className="w-32"
+                        sizing="sm"
+                      >
+                        {produceDateData?.map((item: string, index: number) => (
+                          <option value={item} key={index}>
+                            {item}
+                          </option>
+                        ))}
+                      </Field>
+                      <span className="text-red-700 ml-4 text-lg">*</span>
+                    </div>
+                  </>
+                )}
 
-                <div className="flex  items-center mt-5">
-                  <label htmlFor="" className="text-sm  w-[200px]">
-                    Buraxılış ili
-                  </label>
-                  <Field
-                    as={Select}
-                    name="produceYear"
-                    className="w-32"
-                    sizing="sm"
-                  >
-                    {produceDateData?.map((item: string,index:number) => (
-                      <option value={item} key={index}>{item}</option>
-                    ))}
-                  </Field>
-                  <span className="text-red-700 ml-4 text-lg">*</span>
-                </div>
+                {isForeignMarket && (
+                  <div className="flex  items-start mt-5">
+                    <label htmlFor="" className="text-sm  w-[200px]">
+                      Km/saat
+                    </label>
+                    <Field
+                      as={TextInput}
+                      name="km"
+                      className="w-64"
+                      sizing="sm"
+                    />
+                    <span className="text-red-700 ml-4 text-lg">*</span>
+                  </div>
+                )}
 
-                <div className="flex  items-start mt-5">
-                  <label htmlFor="" className="text-sm  w-[200px]">
-                    Km/saat
-                  </label>
-                  <Field
-                    as={TextInput}
-                    name="km"
-                    className="w-64"
-                    sizing="sm"
-                  />
-                  <span className="text-red-700 ml-4 text-lg">*</span>
-                </div>
-
-                <div className="flex  items-start mt-5">
-                  <label htmlFor="" className="text-sm  w-[200px]">
-                    Maşın nömrəsi
-                  </label>
-                  <Field
-                    as={TextInput}
-                    name="vehicleNumber"
-                    className="w-64"
-                    sizing="sm"
-                  />
-                  <span className="text-red-700 ml-4 text-lg">*</span>
-                </div>
+                {!isStock && (
+                  <div className="flex  items-start mt-5">
+                    <label htmlFor="" className="text-sm  w-[200px]">
+                      Maşın nömrəsi
+                    </label>
+                    <Field
+                      as={TextInput}
+                      name="vehicleNumber"
+                      className="w-64"
+                      sizing="sm"
+                    />
+                    <span className="text-red-700 ml-4 text-lg">*</span>
+                  </div>
+                )}
 
                 <div className="flex  items-center mt-5">
                   <label htmlFor="" className="text-sm  w-[200px]">
@@ -620,44 +640,49 @@ const EditOrder = () => {
                   </Field>
                   <span className="text-red-700 ml-4 text-lg">*</span>
                 </div>
-
-                <div className="flex  items-center mt-5">
-                  <label htmlFor="" className="text-sm  w-[200px]">
-                    Çatdırılma
-                  </label>
-                  <Field as={Select} name="delivering" sizing="sm">
-                    <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
-                    <option value={DeliverType.Normal_Fast}>
-                      Orta (15-30 gün)
-                    </option>
-                    <option value={DeliverType.Planned}>
-                      Planlaşdırılmış (40-60 gün)
-                    </option>
-                  </Field>
-                  <span className="text-red-700 ml-4 text-lg">*</span>
-                </div>
-
-                <div className="flex  items-center mt-5">
-                  <label htmlFor="" className="text-sm  w-[200px]">
-                    Çatdırılma üsulu
-                  </label>
-                  <Field as={Select} name="deliveringType" sizing="sm">
-                    <option value="simplified">Sadələşmiş</option>
-                    <option value="standart">Standart</option>
-                  </Field>
-                  <span className="text-red-700 ml-4 text-lg">*</span>
-                </div>
-
-                <div className="flex  items-center mt-5">
-                  <label htmlFor="" className="text-sm  w-[200px]">
-                    İlkin ödəniş
-                  </label>
-                  <Field as={Select} name="initialPayment" sizing="sm">
-                    <option value="0">0%</option>
-                    <option value="65">65%</option>
-                  </Field>
-                  <span className="text-red-700 ml-4 text-lg">*</span>
-                </div>
+                {(isForeignMarket||isStock) && (
+                    <>
+                      <div className="flex  items-center mt-5">
+                        <label htmlFor="" className="text-sm  w-[200px]">
+                          Çatdırılma
+                        </label>
+                        <Field as={Select} name="delivering" sizing="sm">
+                          <option value={DeliverType.Fast}>
+                            Təcili (7-15 gün)
+                          </option>
+                          <option value={DeliverType.Normal_Fast}>
+                            Orta (15-30 gün)
+                          </option>
+                          <option value={DeliverType.Planned}>
+                            Planlaşdırılmış (40-60 gün)
+                          </option>
+                        </Field>
+                        <span className="text-red-700 ml-4 text-lg">*</span>
+                      </div>
+                      <div className="flex  items-center mt-5">
+                        <label htmlFor="" className="text-sm  w-[200px]">
+                          Çatdırılma üsulu
+                        </label>
+                        <Field as={Select} name="deliveringType" sizing="sm">
+                          <option value="simplified">Sadələşmiş</option>
+                          <option value="standart">Standart</option>
+                        </Field>
+                        <span className="text-red-700 ml-4 text-lg">*</span>
+                      </div>
+                    </>
+                  )}
+                {!isStock && (
+                  <div className="flex  items-center mt-5">
+                    <label htmlFor="" className="text-sm  w-[200px]">
+                      İlkin ödəniş
+                    </label>
+                    <Field as={Select} name="initialPayment" sizing="sm">
+                      <option value="0">0%</option>
+                      <option value="65">65%</option>
+                    </Field>
+                    <span className="text-red-700 ml-4 text-lg">*</span>
+                  </div>
+                )}
 
                 <div className="flex  items-center mt-5">
                   <label htmlFor="" className="text-sm  w-[200px]">

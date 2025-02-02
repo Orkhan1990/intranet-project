@@ -4,15 +4,15 @@ import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
 import { ClientInterface, OrderInterface, UserInterface } from "../../types";
 import OrderPartsComponent from "../../components/OrderPartsComponent";
 import { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const CreateOrders = () => {
   const [clients, setClients] = useState([]);
-  const [officeUsers,setOfficeUsers]=useState<UserInterface[]>([]);
+  const [officeUsers, setOfficeUsers] = useState<UserInterface[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [ordersInitialValue,setOrdersInitialValue]=useState<OrderInterface>({
-    id:0,
+  const [ordersInitialValue, setOrdersInitialValue] = useState<OrderInterface>({
+    id: 0,
     project: "project1",
     cardNumber: "1",
     orderType: OrderType.Local_Market,
@@ -32,23 +32,19 @@ const CreateOrders = () => {
     oil: false,
     parts: [
       {
-        id:0,
+        id: 0,
         origCode: "",
         count: 1,
-        stockQuantity:0,
+        stockQuantity: 0,
         checkOnWarehouse: false,
         partName: "",
       },
     ],
-
   });
- 
-  console.log(ordersInitialValue,"orderInitialValue");
-  
-  const navigate=useNavigate();
-  
 
- 
+  console.log(ordersInitialValue, "orderInitialValue");
+
+  const navigate = useNavigate();
 
   const produceDateData: string[] = [
     "2024",
@@ -89,7 +85,7 @@ const CreateOrders = () => {
       }
     };
 
-    const getAllOfficeWorkers=async()=>{
+    const getAllOfficeWorkers = async () => {
       try {
         const res = await fetch(
           "http://localhost:3013/api/v1/user/getOfficeWorkers",
@@ -113,7 +109,7 @@ const CreateOrders = () => {
       } catch (error: any) {
         setError(error);
       }
-    }
+    };
     getAllClients();
     getAllOfficeWorkers();
   }, []);
@@ -143,18 +139,18 @@ const CreateOrders = () => {
       } else {
         setSuccess(data.result);
         navigate("/orders");
-        window.scrollTo(0, 0)
+        window.scrollTo(0, 0);
       }
     } catch (error: any) {
       setError(error);
     }
   };
 
-  const checkInstock=async(values:any)=>{ 
+  const checkInstock = async (values: any) => {
     // console.log(values,"checkinStock");
 
-    const newPartsArray=values.parts;
-        
+    const newPartsArray = values.parts;
+
     try {
       const res = await fetch(
         "http://localhost:3013/api/v1/order/checkInstock",
@@ -164,7 +160,7 @@ const CreateOrders = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        body: JSON.stringify({parts:newPartsArray})
+          body: JSON.stringify({ parts: newPartsArray }),
         }
       );
 
@@ -174,29 +170,43 @@ const CreateOrders = () => {
       if (!res.ok || data.success === false) {
         setError(data.message);
       } else {
+        const updatedPartsArray = data.map(
+          (
+            part: {
+              code: string;
+              count: number;
+              stockQuantity: number;
+              name: string;
+              inStock: boolean;
+            },
+            index: number
+          ) => {
+            return {
+              id: index,
+              origCode: part.code,
+              count: part.count,
+              stockQuantity: part.stockQuantity,
+              checkOnWarehouse: part.inStock,
+              partName: part.name,
+            };
+          }
+        );
 
-            const updatedPartsArray=data.map((part:{code:string,count:number,stockQuantity:number,name:string,inStock:boolean},index:number)=>{
-              return{
-                id:index,
-                origCode:part.code,
-                count:part.count,
-                stockQuantity:part.stockQuantity,
-                checkOnWarehouse:part.inStock,
-                partName:part.name
-              }
-            })
-
-           setOrdersInitialValue({...values,parts:updatedPartsArray});
+        setOrdersInitialValue({ ...values, parts: updatedPartsArray });
       }
     } catch (error: any) {
       // setError(error);
     }
-   }
+  };
 
   return (
     <div className="min-h-screen mt-[100px] mb-[100px] ml-[90px] ">
       <h2 className="font-semibold text-xl text-center  mb-[50px]">Sifariş</h2>
-      <Formik initialValues={ordersInitialValue} onSubmit={onsubmit} enableReinitialize={true}>
+      <Formik
+        initialValues={ordersInitialValue}
+        onSubmit={onsubmit}
+        enableReinitialize={true}
+      >
         {({ values, setFieldValue }) => {
           const deletePart = (index: number) => {
             setFieldValue(
@@ -204,17 +214,23 @@ const CreateOrders = () => {
               values.parts.filter((_, i) => i !== index)
             );
           };
+
+          const isForeignMarket =
+            values.orderType === OrderType.Standart_Client;
+          const isStock = values.orderType === OrderType.Stok;
           return (
             <Form>
-              <div className="flex  items-center ">
-                <label htmlFor="" className="text-sm  w-[200px]">
-                  Proyekt
-                </label>
-                <Field as={Select} name="project" required sizing="sm">
-                  <option value="project1">Project 1</option>
-                </Field>
-                <span className="text-red-700 ml-4 text-lg">*</span>
-              </div>
+              {!isStock && (
+                <div className="flex  items-center ">
+                  <label htmlFor="" className="text-sm  w-[200px]">
+                    Proyekt
+                  </label>
+                  <Field as={Select} name="project" required sizing="sm">
+                    <option value="project1">Project 1</option>
+                  </Field>
+                  <span className="text-red-700 ml-4 text-lg">*</span>
+                </div>
+              )}
 
               <div className="flex  items-center mt-5 ">
                 <label htmlFor="" className="text-sm  w-[200px]">
@@ -260,127 +276,191 @@ const CreateOrders = () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Istehsalçı
                 </label>
-                <Field as={Select} name="manufacturer" className="w-32" sizing="sm">
+                <Field
+                  as={Select}
+                  name="manufacturer"
+                  className="w-32"
+                  sizing="sm"
+                >
                   <option value="Man">Man</option>
                   <option value="Bobcat">Bobcat</option>
                   <option value="Sumitomo">Sumitomo</option>
                 </Field>
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
+              {!isStock && (
+                <>
+                  <div className="flex  items-start mt-5">
+                    <label htmlFor="" className="text-sm  w-[200px]">
+                      Model
+                    </label>
+                    <Field
+                      as={TextInput}
+                      name="model"
+                      className="w-64"
+                      sizing="sm"
+                    />
+                    <span className="text-red-700 ml-4 text-lg">*</span>
+                  </div>
 
-              <div className="flex  items-start mt-5">
-                <label htmlFor="" className="text-sm  w-[200px]">
-                  Model
-                </label>
-                <Field as={TextInput} name="model" className="w-64" sizing="sm" />
-                <span className="text-red-700 ml-4 text-lg">*</span>
-              </div>
+                  <div className="flex  items-start mt-5">
+                    <label htmlFor="" className="text-sm  w-[200px]">
+                      Şassi nömrəsi
+                    </label>
+                    <Field
+                      as={TextInput}
+                      name="chassisNumber"
+                      className="w-64"
+                      sizing="sm"
+                    />
+                    <span className="text-red-700 ml-4 text-lg">*</span>
+                  </div>
 
-              <div className="flex  items-start mt-5">
-                <label htmlFor="" className="text-sm  w-[200px]">
-                  Şassi nömrəsi
-                </label>
-                <Field as={TextInput} name="chassisNumber" className="w-64" sizing="sm"/>
-                <span className="text-red-700 ml-4 text-lg">*</span>
-              </div>
+                  <div className="flex  items-start mt-5">
+                    <label htmlFor="" className="text-sm  w-[200px]">
+                      Mühərrik nömrəsi
+                    </label>
+                    <Field
+                      as={TextInput}
+                      name="engineNumber"
+                      className="w-64"
+                      sizing="sm"
+                    />
+                    <span className="text-red-700 ml-4 text-lg">*</span>
+                  </div>
 
-              <div className="flex  items-start mt-5">
-                <label htmlFor="" className="text-sm  w-[200px]">
-                  Mühərrik nömrəsi
-                </label>
-                <Field as={TextInput} name="engineNumber" className="w-64" sizing="sm"/>
-                <span className="text-red-700 ml-4 text-lg">*</span>
-              </div>
+                  <div className="flex  items-center mt-5">
+                    <label htmlFor="" className="text-sm  w-[200px]">
+                      Buraxılış ili
+                    </label>
+                    <Field
+                      as={Select}
+                      name="produceDate"
+                      className="w-32"
+                      sizing="sm"
+                    >
+                      {produceDateData.map((item: string) => (
+                        <option value={item}>{item}</option>
+                      ))}
+                    </Field>
+                    <span className="text-red-700 ml-4 text-lg">*</span>
+                  </div>
+                </>
+              )}
 
-              <div className="flex  items-center mt-5">
-                <label htmlFor="" className="text-sm  w-[200px]">
-                  Buraxılış ili
-                </label>
-                <Field as={Select} name="produceDate" className="w-32" sizing="sm">
-                  {produceDateData.map((item: string) => (
-                    <option value={item}>{item}</option>
-                  ))}
-                </Field>
-                <span className="text-red-700 ml-4 text-lg">*</span>
-              </div>
+              {isForeignMarket && (
+                <>
+                  <div className="flex  items-start mt-5">
+                    <label htmlFor="" className="text-sm  w-[200px]">
+                      Km/saat
+                    </label>
+                    <Field
+                      as={TextInput}
+                      name="km"
+                      className="w-64"
+                      sizing="sm"
+                    />
+                    <span className="text-red-700 ml-4 text-lg">*</span>
+                  </div>
+                </>
+              )}
 
-              <div className="flex  items-start mt-5">
-                <label htmlFor="" className="text-sm  w-[200px]">
-                  Km/saat
-                </label>
-                <Field as={TextInput} name="km" className="w-64" sizing="sm"/>
-                <span className="text-red-700 ml-4 text-lg">*</span>
-              </div>
-
-              <div className="flex  items-start mt-5">
-                <label htmlFor="" className="text-sm  w-[200px]">
-                  Maşın nömrəsi
-                </label>
-                <Field as={TextInput} name="vehicleNumber" className="w-64" sizing="sm"/>
-                <span className="text-red-700 ml-4 text-lg">*</span>
-              </div>
+              {!isStock && (
+                <div className="flex  items-start mt-5">
+                  <label htmlFor="" className="text-sm  w-[200px]">
+                    Maşın nömrəsi
+                  </label>
+                  <Field
+                    as={TextInput}
+                    name="vehicleNumber"
+                    className="w-64"
+                    sizing="sm"
+                  />
+                  <span className="text-red-700 ml-4 text-lg">*</span>
+                </div>
+              )}
 
               <div className="flex  items-center mt-5">
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Ödəniş üsulu
                 </label>
-                <Field as={Select} name="paymentType" className="w-32" sizing="sm">
+                <Field
+                  as={Select}
+                  name="paymentType"
+                  className="w-32"
+                  sizing="sm"
+                >
                   <option value={PayType.Transfer}>Köçürmə</option>
                   <option value={PayType.Cash}>Nağd</option>
                 </Field>
                 <span className="text-red-700 ml-4 text-lg">*</span>
               </div>
 
-              <div className="flex  items-center mt-5">
-                <label htmlFor="" className="text-sm  w-[200px]">
-                  Çatdırılma
-                </label>
-                <Field as={Select} name="delivering" sizing="sm">
-                  <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
-                  <option value={DeliverType.Normal_Fast}>
-                    Orta (15-30 gün)
-                  </option>
-                  <option value={DeliverType.Planned}>
-                    Planlaşdırılmış (40-60 gün)
-                  </option>
-                </Field>
-                <span className="text-red-700 ml-4 text-lg">*</span>
-              </div>
+              {(isForeignMarket ||
+                isStock) && (
+                  <>
+                    <div className="flex  items-center mt-5">
+                      <label htmlFor="" className="text-sm  w-[200px]">
+                        Çatdırılma
+                      </label>
+                      <Field as={Select} name="delivering" sizing="sm">
+                        <option value={DeliverType.Fast}>
+                          Təcili (7-15 gün)
+                        </option>
+                        <option value={DeliverType.Normal_Fast}>
+                          Orta (15-30 gün)
+                        </option>
+                        <option value={DeliverType.Planned}>
+                          Planlaşdırılmış (40-60 gün)
+                        </option>
+                      </Field>
+                      <span className="text-red-700 ml-4 text-lg">*</span>
+                    </div>
 
-              <div className="flex  items-center mt-5">
-                <label htmlFor="" className="text-sm  w-[200px]">
-                  Çatdırılma üsulu
-                </label>
-                <Field as={Select} name="deliveringType" sizing="sm">
-                  <option value="simplified">Sadələşmiş</option>
-                  <option value="standart">Standart</option>
-                </Field>
-                <span className="text-red-700 ml-4 text-lg">*</span>
-              </div>
+                    <div className="flex  items-center mt-5">
+                      <label htmlFor="" className="text-sm  w-[200px]">
+                        Çatdırılma üsulu
+                      </label>
+                      <Field as={Select} name="deliveringType" sizing="sm">
+                        <option value="simplified">Sadələşmiş</option>
+                        <option value="standart">Standart</option>
+                      </Field>
+                      <span className="text-red-700 ml-4 text-lg">*</span>
+                    </div>
+                  </>
+                )}
 
-              <div className="flex  items-center mt-5">
-                <label htmlFor="" className="text-sm  w-[200px]">
-                  İlkin ödəniş
-                </label>
-                <Field as={Select} name="initialPayment" sizing="sm">
-                  <option value="0">0%</option>
-                  <option value="65">65%</option>
-                </Field>
-                <span className="text-red-700 ml-4 text-lg">*</span>
-              </div>
+              {!isStock && (
+                <div className="flex  items-center mt-5">
+                  <label htmlFor="" className="text-sm  w-[200px]">
+                    İlkin ödəniş
+                  </label>
+                  <Field as={Select} name="initialPayment" sizing="sm">
+                    <option value="0">0%</option>
+                    <option value="65">65%</option>
+                  </Field>
+                  <span className="text-red-700 ml-4 text-lg">*</span>
+                </div>
+              )}
 
               <div className="flex  items-center mt-5">
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Şərh
                 </label>
-                <Field as={Textarea} rows={5} name="comment" className="w-96" sizing="sm"/>
+                <Field
+                  as={Textarea}
+                  rows={5}
+                  name="comment"
+                  className="w-96"
+                  sizing="sm"
+                />
               </div>
 
               <div className="flex  items-center mt-5">
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Yağ
                 </label>
-                <Field as={Checkbox} name="oil" sizing="sm"/>
+                <Field as={Checkbox} name="oil" sizing="sm" />
               </div>
 
               <div className="mt-10 ">
@@ -437,7 +517,13 @@ const CreateOrders = () => {
                         >
                           Əlavə et <span className="ml-2 ">+</span>
                         </Button>
-                        <Button color="blue" size="xs" className="mt-5" type="button" onClick={() =>checkInstock(values)}>
+                        <Button
+                          color="blue"
+                          size="xs"
+                          className="mt-5"
+                          type="button"
+                          onClick={() => checkInstock(values)}
+                        >
                           Anbarda yoxla
                         </Button>
                       </div>
@@ -472,13 +558,14 @@ const CreateOrders = () => {
                         <option value="">Çatdırıldı</option>
                       </Field>
                       <Field as={Select} className="flex-1" sizing="sm">
-                      {
-                        officeUsers.length>0&&officeUsers.map((officeUser:UserInterface,index:number)=>(
-                          <option value={officeUser.id} key={index}>{officeUser.firstName} {officeUser.lastName}</option>
-
-                        ))
-                      }
-                      
+                        {officeUsers.length > 0 &&
+                          officeUsers.map(
+                            (officeUser: UserInterface, index: number) => (
+                              <option value={officeUser.id} key={index}>
+                                {officeUser.firstName} {officeUser.lastName}
+                              </option>
+                            )
+                          )}
                       </Field>
                     </div>
                   </div>
@@ -492,7 +579,7 @@ const CreateOrders = () => {
                   </div>
                 </div>
               </div>
-             
+
               {!error && success && (
                 <p className="my-10 text-sm text-green-700">{success}</p>
               )}
@@ -503,7 +590,6 @@ const CreateOrders = () => {
           );
         }}
       </Formik>
-
     </div>
   );
 };

@@ -26,15 +26,14 @@ const ActionsOnOrder = ({
   const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
   const [error, setError] = useState<string>("");
-  const file=useRef("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
 
 
   const { currentUser } = useSelector((state: RootState) => state.auth);
 
-  const navigate = useNavigate();
 
   console.log(order, "order");
-  // console.log(supplierOrderHistory,"supplierOrderHistory");
 
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
   console.log(checkUser, "checkUser");
@@ -68,6 +67,13 @@ const ActionsOnOrder = ({
 
     getSuppliers();
   }, [order.id]);
+
+
+ const handleClickFileUpload=()=>{
+  if (fileInputRef.current) {
+    fileInputRef.current.click();
+  }
+ }
 
   const handleAddSelect = () => {
     setSelectedSuppliers([...selectedSuppliers, ""]); // Add an empty select option
@@ -534,10 +540,22 @@ const ActionsOnOrder = ({
                             <div className="flex gap-40 items-center">
                               <div className="flex gap-2 items-center">
                                 <Select sizing={"sm"} className="w-80">
-                                  <option value="">Fatih Bedir</option>
+                                  {
+                                    order.orderHistory[4]?.supplierOrderHistories
+                                    ?.length > 0 &&
+                                    order.orderHistory[4].supplierOrderHistories
+                                      .sort(
+                                        (a: any, b: any) =>
+                                          new Date(a.date).getTime() -
+                                          new Date(b.date).getTime()
+                                      )
+                                      .map((item:any,index:number)=>(
+                                        <option value={item.supplier.id} key={index}>{item.supplier.supplier}</option>
+                                      ))
+                                  }
                                 </Select>
-                                <TextInput type="file" sizing={"xs"}  className="hidden"/>
-                                <Button size={"xs"} className="flex  items-center bg-yellow-500 text-white rounded-md ">
+                                <TextInput type="file" sizing={"xs"}  className="hidden" ref={fileInputRef}/>
+                                <Button size={"xs"} className="flex  items-center bg-yellow-500 text-white rounded-md" onClick={handleClickFileUpload}>
                                 <span className="mt-1">Faylı yüklə</span>
                                 <FaCloudUploadAlt className="text-2xl ml-1"/>
                                   </Button>
