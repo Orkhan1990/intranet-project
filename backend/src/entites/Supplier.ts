@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToMany, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne } from 'typeorm';
 import { AllEntities } from './AllEntities';
 import { Invoice} from './Invoice';
 import { Order } from './Order';
+import { SupplierOrderHistory } from './SuppliersOrderHistory';
 
 
 @Entity({name:"suppliers"})
@@ -44,7 +45,10 @@ export class Supplier extends AllEntities{
     @OneToMany(() =>Invoice, (invoice) => invoice.supplier)
     invoices: Invoice[];
     
-    @ManyToMany(()=>Order,(order)=>order.suppliers)
-    orders:Order[]
+    // @ManyToMany(()=>Order,(order)=>order.suppliers)
+    // orders:Order[];
+
+     @OneToMany(()=>SupplierOrderHistory,(item)=>item.supplier)
+     supplierOrderHistories:SupplierOrderHistory[];
 
 }

@@ -1,9 +1,12 @@
-import { Button, Select, Textarea } from "flowbite-react";
-import React, { useEffect, useState } from "react";
+import { Button, Select, Textarea, TextInput } from "flowbite-react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux-toolkit/store/store";
 import { SupplierInterface } from "../types";
+import { Link } from "react-router-dom";
+import { FaCloudUploadAlt } from "react-icons/fa";
+
 
 interface ActionsOnOrderInterface {
   order: any;
@@ -20,26 +23,24 @@ const ActionsOnOrder = ({
   const [responsibleMessage, setResponsibleMessage] = useState<string>("");
   const [responsibleUser, setResponsibleUser] = useState<number>(0);
   const [selectedName, setSelectedName] = useState<string>("");
-  const [suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
+  const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
-  const[error,setError]=useState<string>("");
+  const [error, setError] = useState<string>("");
+  const file=useRef("");
+
 
   const { currentUser } = useSelector((state: RootState) => state.auth);
 
   const navigate = useNavigate();
 
   console.log(order, "order");
+  // console.log(supplierOrderHistory,"supplierOrderHistory");
 
-  // const fullName = order?.responsibleUser
-  //   ? `${order.responsibleUser?.firstName} ${order.responsibleUser?.lastName}`
-  //   : "";
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
   console.log(checkUser, "checkUser");
 
-
-  useEffect(()=>{
-    
-    const getSuppliers=async()=>{
+  useEffect(() => {
+    const getSuppliers = async () => {
       try {
         const res = await fetch(
           "http://localhost:3013/api/v1/supplier/getSuppliers",
@@ -52,32 +53,64 @@ const ActionsOnOrder = ({
           }
         );
         const data = await res.json();
-         if(!res.ok||data.success===false){
-           setError(data.message)
-         }
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+        }
 
         if (res.ok) {
-          setSuppliers(data)
+          setSuppliers(data);
         }
         console.log(data);
       } catch (error) {
         console.log(error);
       }
-    }
+    };
 
     getSuppliers();
-  },[order.id])
-
+  }, [order.id]);
 
   const handleAddSelect = () => {
     setSelectedSuppliers([...selectedSuppliers, ""]); // Add an empty select option
   };
 
-  const handleReduceSelect=()=>{
-    if(selectedSuppliers.length>1){
-      setSelectedSuppliers(selectedSuppliers.slice(0,-1))
+  const handleReduceSelect = () => {
+    if (selectedSuppliers.length > 1) {
+      setSelectedSuppliers(selectedSuppliers.slice(0, -1));
     }
-  }
+  };
+
+  const handleSelectSuppliers = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    index: number
+  ) => {
+    const updatedSuppliers = [...selectedSuppliers];
+    updatedSuppliers[index] = e.target.value; // Update the specific index
+    setSelectedSuppliers(updatedSuppliers);
+  };
+
+  const sendToSupplier = async (historyId: number) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3013/api/v1/order/sendToSupplier/${order.id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message, historyId, selectedSuppliers }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok || data.success === false) {
+        setError(data.message);
+      } else {
+        setRefreshData((prev: any) => !prev);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleChange = (e: any) => {
     const rejectMessage = e.target.value;
@@ -143,7 +176,6 @@ const ActionsOnOrder = ({
     return formattedDate;
   };
 
-
   const selectRepsonsibleUser = async (
     userId: number,
     id: number,
@@ -196,7 +228,7 @@ const ActionsOnOrder = ({
     }
   };
 
-  const startResponsibleUser = async (historyId:any) => {
+  const startResponsibleUser = async (historyId: any) => {
     try {
       const res = await fetch(
         `http://localhost:3013/api/v1/order/startResponsibleOrder/${order.id}`,
@@ -206,7 +238,7 @@ const ActionsOnOrder = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message,historyId }),
+          body: JSON.stringify({ message, historyId }),
         }
       );
       const data = await res.json();
@@ -226,206 +258,307 @@ const ActionsOnOrder = ({
       </h2>
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-            {order.orderHistory &&
-              order.orderHistory.map((item: any, index: number) => {
-                switch (item.step) {
-                  case "orderConfirm":
-                    return (
-                      <div className="flex text-sm">
-                        <div className="w-64 py-6 px-6 text-black">
-                          Müraciət tarixi
-                        </div>
-                        <div className="py-6 px-6  ">
-                          {changeFormatDate(order.createdAt)}
-                        </div>
-                      </div>
-                    );
+        {order.orderHistory &&
+          order.orderHistory.map((item: any, index: number) => {
+            switch (item.step) {
+              case "orderConfirm":
+                return (
+                  <div className="flex text-sm">
+                    <div className="w-64 py-6 px-6 text-black">
+                      Müraciət tarixi
+                    </div>
+                    <div className="py-6 px-6  ">
+                      {changeFormatDate(order.createdAt)}
+                    </div>
+                  </div>
+                );
 
-                  case "orderAccept":
-                    return (
-                      <div className="flex text-sm  odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                        <div className="w-64 px-6 py-4 text-black flex flex-col">
-                          <span>Bölmə rəhbərin təsdiqi</span>
-                          <span>logistika və xidmətin inkişafı</span>
-                        </div>
-                        {item.confirm ? (
-                          <>
-                            <div className="px-6 py-4">
-                              <div>
-                                <h2 className="text-black">Mesaj</h2>
-                                <Textarea
-                                  rows={5}
-                                  className="my-2"
-                                  name="acceptMessage"
-                                />
-                                <Button
-                                  type="button"
-                                  color={"blue"}
-                                  size={"xs"}
-                                  onClick={() => acceptOrder(item.id)}
-                                >
-                                  Təsdiqlə
-                                </Button>
-                              </div>
-                            </div>
-                            <div className="px-6 py-4">
-                              <div>
-                                <h2 className="text-black">İmtina səbəbi</h2>
-                                <Textarea
-                                  rows={5}
-                                  className="my-2"
-                                  name="rejectMessage"
-                                  onChange={handleChange}
-                                />
-                                <Button
-                                  type="button"
-                                  color={"blue"}
-                                  size={"xs"}
-                                  onClick={() => handleReject(item.id)}
-                                >
-                                  İmtina et
-                                </Button>
-                              </div>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="px-6 py-4">
-                              {changeFormatDate(item.date)}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    );
-
-                  case "responsibleFromOrder":
-                    return (
-                      <div className=" flex  text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 ">
-                        <div className="w-64 px-6 py-4 text-black flex flex-col">
-                          <span>Sifarişdən cavabdehdir</span>
-                        </div>
-                        {item.confirm ? (
-                          <div className="px-6 py-4">
-                            <div>
-                              <div>
-                                <h2 className="text-black">Mesaj</h2>
-                                <Textarea
-                                  rows={5}
-                                  className="my-2"
-                                  onChange={(e: any) =>
-                                    setResponsibleMessage(e.target.value)
-                                  }
-                                />
-                                <Select
-                                  sizing="sm"
-                                  onChange={(e: any) =>
-                                    handleSelectChange(e, item.id)
-                                  }
-                                >
-                                  {officeUsers.map((user: any) => (
-                                    <option key={user.id} value={user.id}>
-                                      {user.firstName} {user.lastName}
-                                    </option>
-                                  ))}
-                                </Select>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                          <div className="flex items-center">
-                            <div className="px-6 py-4">
-                              <div className="flex gap-2">
-                                <span>{changeFormatDate(item?.date)}</span>
-                              </div>
-                            </div>
-                            <div>
-                              <span>{`(${item?.user.firstName} ${item?.user.lastName})`}</span>
-                            </div>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    );
-
-                  case "responsibleUserBegin":
-                    return checkUser ? (
-                      item.confirm?(
-                        <div className="flex text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                        <div className="w-64 px-6 py-4 text-black ">
-                          Cavabdeh işə başladı
-                        </div>
+              case "orderAccept":
+                return (
+                  <div className="flex text-sm  odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                    <div className="w-64 px-6 py-4 text-black flex flex-col">
+                      <span>Bölmə rəhbərin təsdiqi</span>
+                      <span>logistika və xidmətin inkişafı</span>
+                    </div>
+                    {item.confirm ? (
+                      <>
                         <div className="px-6 py-4">
                           <div>
-                            <h2>Mesaj</h2>
-                            <Textarea rows={5} className="my-2" onChange={(e:React.ChangeEvent<HTMLTextAreaElement>)=>setMessage(e.target.value)}/>
-                            <Button color={"blue"} size={"xs"} onClick={()=>startResponsibleUser(item.id)}>
-                              Başla
+                            <h2 className="text-black">Mesaj</h2>
+                            <Textarea
+                              rows={5}
+                              className="my-2"
+                              name="acceptMessage"
+                            />
+                            <Button
+                              type="button"
+                              color={"blue"}
+                              size={"xs"}
+                              onClick={() => acceptOrder(item.id)}
+                            >
+                              Təsdiqlə
                             </Button>
                           </div>
                         </div>
-                      </div>
-                      ):(
-                        <div className="flex text-sm items-center odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                        <div className="w-64 px-6 py-4 text-black ">
-                          Cavabdeh işə başladı
-                        </div>
                         <div className="px-6 py-4">
-                        <div className="flex gap-2">
-                                <span>{changeFormatDate(item?.date)}</span>
-                              </div>
+                          <div>
+                            <h2 className="text-black">İmtina səbəbi</h2>
+                            <Textarea
+                              rows={5}
+                              className="my-2"
+                              name="rejectMessage"
+                              onChange={handleChange}
+                            />
+                            <Button
+                              type="button"
+                              color={"blue"}
+                              size={"xs"}
+                              onClick={() => handleReject(item.id)}
+                            >
+                              İmtina et
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                      )
-                      
+                      </>
                     ) : (
-                      <div className="text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                        <div className="w-64 px-6 py-4 text-black">
-                          Cavabdeh işə başladı
+                      <>
+                        <div className="px-6 py-4">
+                          {changeFormatDate(item.date)}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+
+              case "responsibleFromOrder":
+                return (
+                  <div className=" flex  text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 ">
+                    <div className="w-64 px-6 py-4 text-black flex flex-col">
+                      <span>Sifarişdən cavabdehdir</span>
+                    </div>
+                    {item.confirm ? (
+                      <div className="px-6 py-4">
+                        <div>
+                          <div>
+                            <h2 className="text-black">Mesaj</h2>
+                            <Textarea
+                              rows={5}
+                              className="my-2"
+                              onChange={(e: any) =>
+                                setResponsibleMessage(e.target.value)
+                              }
+                            />
+                            <Select
+                              sizing="sm"
+                              onChange={(e: any) =>
+                                handleSelectChange(e, item.id)
+                              }
+                            >
+                              {officeUsers.map((user: any) => (
+                                <option key={user.id} value={user.id}>
+                                  {user.firstName} {user.lastName}
+                                </option>
+                              ))}
+                            </Select>
+                          </div>
                         </div>
                       </div>
-                    );
+                    ) : (
+                      <>
+                        <div className="flex items-center">
+                          <div className="px-6 py-4">
+                            <div className="flex gap-2">
+                              <span>{changeFormatDate(item?.date)}</span>
+                            </div>
+                          </div>
+                          <div>
+                            <span>{`(${item?.user.firstName} ${item?.user.lastName})`}</span>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
 
-                    case "requestSupplier":
+              case "responsibleUserBegin":
+                return checkUser ? (
+                  item.confirm ? (
+                    <div className="flex text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                      <div className="w-64 px-6 py-4 text-black ">
+                        Cavabdeh işə başladı
+                      </div>
+                      <div className="px-6 py-4">
+                        <div>
+                          <h2>Mesaj</h2>
+                          <Textarea
+                            rows={5}
+                            className="my-2"
+                            onChange={(
+                              e: React.ChangeEvent<HTMLTextAreaElement>
+                            ) => setMessage(e.target.value)}
+                          />
+                          <Button
+                            color={"blue"}
+                            size={"xs"}
+                            onClick={() => startResponsibleUser(item.id)}
+                          >
+                            Başla
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex text-sm items-center odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                      <div className="w-64 px-6 py-4 text-black ">
+                        Cavabdeh işə başladı
+                      </div>
+                      <div className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <span>{changeFormatDate(item?.date)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                ) : (
+                  <div className="text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                    <div className="w-64 px-6 py-4 text-black">
+                      Cavabdeh işə başladı
+                    </div>
+                  </div>
+                );
 
-                    return checkUser&&(
+              case "requestSupplier":
+                return (
+                  checkUser && (
+                    <div>
                       <div className="flex text-sm">
                         <div className="w-64 px-6 py-4 text-black">
                           Təchizatçıya sorğu
                         </div>
                         <div className="px-6 py-4">
-                          <h2>Mesaj</h2>
-                          <Textarea rows={5} className="my-2 w-80"/>
-                          <div className="flex items-center gap-2">
-                            <div className="flex flex-col gap-2">
+                          {order.orderHistory[4]?.supplierOrderHistories
+                            ?.length > 0 &&
+                            order.orderHistory[4].supplierOrderHistories
+                              .sort(
+                                (a: any, b: any) =>
+                                  new Date(a.date).getTime() -
+                                  new Date(b.date).getTime()
+                              )
+                              .map((item: any, index: number) => (
+                                <div className="flex gap-2" key={index}>
+                                  <span>{changeFormatDate(item.date)}</span>
+                                  <div className="flex gap-2">
+                                    <span className="text-black font-semibold">
+                                      Təchizatçı:
+                                    </span>
+                                    <Link
+                                      to={`/updateSupplier/${item.supplier.id}`}
+                                      className="underline text-blue-500"
+                                    >
+                                      {item.supplier.supplier}
+                                    </Link>
+                                  </div>
+                                </div>
+                              ))}
+                          <div>
+                            <h2>Mesaj</h2>
+                            <Textarea
+                              rows={5}
+                              className="my-2 w-80"
+                              onChange={(e: any) => setMessage(e.target.value)}
+                            />
+                            <div className="flex items-center gap-2">
+                              <div className="flex flex-col gap-2">
+                                {selectedSuppliers.map((_, index: number) => (
+                                  <Select
+                                    className="w-[500px]"
+                                    sizing={"sm"}
+                                    key={index}
+                                    value={selectedSuppliers[index]}
+                                    onChange={(e) =>
+                                      handleSelectSuppliers(e, index)
+                                    }
+                                  >
+                                    <option value="">Təchizatçını seç</option>
+                                    {suppliers.length > 0 &&
+                                      suppliers.map((supplier) => (
+                                        <option
+                                          key={supplier.id}
+                                          value={supplier.id}
+                                        >
+                                          {supplier.supplier}
+                                        </option>
+                                      ))}
+                                  </Select>
+                                ))}
+                              </div>
 
-                            {
-                              selectedSuppliers.map((_,index:number)=>(
-                                <Select className="w-[500px]" sizing={"sm"} key={index}>
-                                <option value="" disabled>Təchizatçını seç</option>
-                                {
-                                  suppliers.length>0&&suppliers.map((supplier)=>(
-                                    <option key={supplier.id} value={supplier.id}>{supplier.supplier}</option>
-                                  ))
-                                }
-                                
-                              </Select>
-                              ))
-                            }
+                              <Button
+                                color={"white"}
+                                className="bg-yellow-400 outline-none rounded-full  text-white hover:bg-yellow-600 "
+                                size={"xs"}
+                                onClick={handleAddSelect}
+                              >
+                                +
+                              </Button>
+                              <Button
+                                color={"white"}
+                                className=" bg-red-400 outline-none rounded-full  text-white hover:bg-red-600 "
+                                size={"xs"}
+                                onClick={handleReduceSelect}
+                              >
+                                -
+                              </Button>
+                              <Button
+                                color={"blue"}
+                                type="button"
+                                size={"xs"}
+                                onClick={() => sendToSupplier(item.id)}
+                              >
+                                Göndər
+                              </Button>
                             </div>
-                            
-                            <Button color={"white"} className="bg-yellow-400 outline-none rounded-full  text-white hover:bg-yellow-600 " size={"xs"} onClick={handleAddSelect}>+</Button>
-                            <Button color={"white"} className=" bg-red-400 outline-none rounded-full  text-white hover:bg-red-600 " size={"xs"} onClick={handleReduceSelect}>-</Button>
-                            <Button color={"blue"} size={"xs"}>Göndər</Button>
                           </div>
                         </div>
                       </div>
-                    )
+                      {
+                        !item.confirm&&(
+                          <div className="flex text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                          <h2 className="w-64  px-6 py-4 text-black">
+                            Təchizatçıdan cavab
+                          </h2>
+  
+                          <div className="px-6 py-4 flex flex-col gap-3">
+                            <h2>Mesaj</h2>
+                            <Textarea rows={5} className="w-80" />
+                            <div className="flex gap-40 items-center">
+                              <div className="flex gap-2 items-center">
+                                <Select sizing={"sm"} className="w-80">
+                                  <option value="">Fatih Bedir</option>
+                                </Select>
+                                <TextInput type="file" sizing={"xs"}  className="hidden"/>
+                                <Button size={"xs"} className="flex  items-center bg-yellow-500 text-white rounded-md ">
+                                <span className="mt-1">Faylı yüklə</span>
+                                <FaCloudUploadAlt className="text-2xl ml-1"/>
+                                  </Button>
+                              </div>
+                              <Button color={"blue"} size={"xs"}>
+                                Yüklə
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                        )
+                      }
+                     
+                    </div>
+                  )
+                );
 
-                  default:
-                    break;
-                }
-              })}
+              default:
+                break;
+            }
+          })}
       </div>
     </div>
   );

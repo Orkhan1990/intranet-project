@@ -1,8 +1,9 @@
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { User } from "./User";
 import { Order } from "./Order";
 import { OrderStage, OrderStep } from "../enums/allEnums";
+import { SupplierOrderHistory } from "./SuppliersOrderHistory";
 
 
 
@@ -36,4 +37,8 @@ export class OrderHistory extends AllEntities{
 
     @ManyToOne(()=>Order,(order)=>order.orderHistory)
     order:Order
+
+    @OneToMany(()=>SupplierOrderHistory,(item)=>item.orderHistory)
+    supplierOrderHistories:SupplierOrderHistory[];
+
 }

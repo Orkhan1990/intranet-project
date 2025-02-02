@@ -150,8 +150,25 @@ export interface OrderHistoryInterface{
   reject:string,
   file:string,
   date:Date
-  user:ResponsibleUserInterface
+  user:ResponsibleUserInterface,
+  supplierOrderHistories:SupplierOrderHistoriesInterface[]
+
 }
+
+export interface SupplierOrderHistoriesInterface
+  {
+    id:number,
+    date:Date,
+    file:string,
+    supplier:{
+      id:number,
+      contactPerson:string,
+      country:string,
+      supplier:string,
+      email:string
+    }
+  }
+
 
 export interface EditOrderInterface{
   id:number,

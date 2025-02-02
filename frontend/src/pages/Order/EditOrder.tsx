@@ -103,7 +103,19 @@ const EditOrder = () => {
             email:"",
             lastName:"",
             firstName:""
-          }
+          },
+          supplierOrderHistories:[{
+            id:0,
+            date:new Date(),
+            file:"",
+            supplier:{
+              id:0,
+              contactPerson:"",
+              country:"",
+              supplier:"",
+              email:""
+            }
+          }]
         }
       ]
     });

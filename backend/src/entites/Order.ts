@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Client } from "./Client";
 import { OrderPart } from "./OrderPart";
@@ -118,7 +118,8 @@ export class Order extends AllEntities {
   secondMessageToSupplier:string
 
 
-  @ManyToMany(()=>Supplier,(supplier)=>supplier.orders)
+  @ManyToMany(()=>Supplier)
+  @JoinTable()
   suppliers:Supplier[];
 
   @ManyToOne(() => User, (user) => user.orders)
