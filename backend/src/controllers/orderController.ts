@@ -630,7 +630,8 @@ export const startResponsibleOrder = async (
     await orderHistoryRepository.save(orderHistory);
 
     const newHistory = new OrderHistory();
-    newHistory.confirm = true;
+    newHistory.confirm = false;
+    newHistory.showHide=true;
     newHistory.order = order;
     newHistory.user = user;
     newHistory.date = new Date();
@@ -680,7 +681,7 @@ export const sendToSupplier = async (
     }
     console.log(order);
 
-    orderHistory.confirm = false;
+    orderHistory.confirm = true;
     orderHistory.date = new Date();
     orderHistory.user = user;
     orderHistory.order = order;
@@ -722,3 +723,59 @@ export const sendToSupplier = async (
     next(errorHandler(401, error.message));
   }
 };
+
+
+export const calculationStepPass=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+  try {
+    
+
+    const userId=req.userId;
+    const{id}=req.params
+    const {historyId}=req.body;
+    console.log(req.params);
+    
+
+
+    const user = await userRepository.findOneBy({ id: userId });
+    if (!user) {
+      next(errorHandler(401, "Belə bir istifadəçi yoxdur!"));
+      return;
+    }
+    
+    const order=await orderRepository.findOneBy({id:Number(id)})
+    if (!order) {
+      next(errorHandler(401, "Belə bir sifariş yoxdur!"));
+      return;
+    }
+
+    const orderHistory=await orderHistoryRepository.findOneBy({id:historyId});
+    if (!orderHistory) {
+      next(errorHandler(401, "Belə bir sifariş tarixi yoxdur!"));
+      return;
+    }
+
+
+    orderHistory.confirm=false;
+    orderHistory.showHide=false;
+    orderHistory.date=new Date();
+    orderHistory.order=order;
+    orderHistory.user=user;
+    await orderHistoryRepository.save(orderHistory);
+
+
+    const newOrderHistory=new OrderHistory();
+    newOrderHistory.step=OrderStep.CalculationBegin;
+    newOrderHistory.date=new Date();
+    newOrderHistory.showHide=true;
+    newOrderHistory.order=order;
+    newOrderHistory.user=user;
+    await orderHistoryRepository.save(newOrderHistory);
+
+
+    res.status(201).json({message:"all good"});
+
+    
+  } catch (error) {
+    next(errorHandler(401, error.message));
+  }
+}

@@ -6,6 +6,8 @@ import { RootState } from "../redux-toolkit/store/store";
 import { SupplierInterface } from "../types";
 import { Link } from "react-router-dom";
 import { FaCloudUploadAlt } from "react-icons/fa";
+import { DeliverType } from "../enums/projectEnums";
+import { FaPlus } from "react-icons/fa6";
 
 
 interface ActionsOnOrderInterface {
@@ -21,17 +23,13 @@ const ActionsOnOrder = ({
 }: ActionsOnOrderInterface) => {
   const [message, setMessage] = useState<string>("");
   const [responsibleMessage, setResponsibleMessage] = useState<string>("");
-  const [responsibleUser, setResponsibleUser] = useState<number>(0);
-  const [selectedName, setSelectedName] = useState<string>("");
   const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
   const [error, setError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
 
-
   const { currentUser } = useSelector((state: RootState) => state.auth);
-
 
   console.log(order, "order");
 
@@ -68,12 +66,11 @@ const ActionsOnOrder = ({
     getSuppliers();
   }, [order.id]);
 
-
- const handleClickFileUpload=()=>{
-  if (fileInputRef.current) {
-    fileInputRef.current.click();
-  }
- }
+  const handleClickFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   const handleAddSelect = () => {
     setSelectedSuppliers([...selectedSuppliers, ""]); // Add an empty select option
@@ -215,9 +212,7 @@ const ActionsOnOrder = ({
     historyId: any
   ) => {
     const selectedValue = parseInt(e.target.value);
-    setResponsibleUser(selectedValue);
     const selectedName = e.target.selectedOptions[0].text;
-    setSelectedName(selectedName);
     if (selectedValue) {
       const confirm = window.confirm(`"${selectedName}" sifarişi davam etsin?`);
       console.log(confirm, "confirm");
@@ -252,6 +247,31 @@ const ActionsOnOrder = ({
         setRefreshData((prev: any) => !prev);
       }
       console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const continueNextStep = async (historyId: number) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3013/api/v1/order/calculationStepPass/${order.id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ historyId }),
+        }
+      );
+
+      const data=await res.json();
+      if(!res.ok||data.success===false){
+        setError(data.message)
+      }else{
+        setRefreshData((prev:any)=>!prev);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -466,82 +486,85 @@ const ActionsOnOrder = ({
                                   </div>
                                 </div>
                               ))}
-                          <div>
-                            <h2>Mesaj</h2>
-                            <Textarea
-                              rows={5}
-                              className="my-2 w-80"
-                              onChange={(e: any) => setMessage(e.target.value)}
-                            />
-                            <div className="flex items-center gap-2">
-                              <div className="flex flex-col gap-2">
-                                {selectedSuppliers.map((_, index: number) => (
-                                  <Select
-                                    className="w-[500px]"
-                                    sizing={"sm"}
-                                    key={index}
-                                    value={selectedSuppliers[index]}
-                                    onChange={(e) =>
-                                      handleSelectSuppliers(e, index)
-                                    }
-                                  >
-                                    <option value="">Təchizatçını seç</option>
-                                    {suppliers.length > 0 &&
-                                      suppliers.map((supplier) => (
-                                        <option
-                                          key={supplier.id}
-                                          value={supplier.id}
-                                        >
-                                          {supplier.supplier}
-                                        </option>
-                                      ))}
-                                  </Select>
-                                ))}
-                              </div>
 
-                              <Button
-                                color={"white"}
-                                className="bg-yellow-400 outline-none rounded-full  text-white hover:bg-yellow-600 "
-                                size={"xs"}
-                                onClick={handleAddSelect}
-                              >
-                                +
-                              </Button>
-                              <Button
-                                color={"white"}
-                                className=" bg-red-400 outline-none rounded-full  text-white hover:bg-red-600 "
-                                size={"xs"}
-                                onClick={handleReduceSelect}
-                              >
-                                -
-                              </Button>
-                              <Button
-                                color={"blue"}
-                                type="button"
-                                size={"xs"}
-                                onClick={() => sendToSupplier(item.id)}
-                              >
-                                Göndər
-                              </Button>
+                          {item.showHide && (
+                            <div>
+                              <h2>Mesaj</h2>
+                              <Textarea
+                                rows={5}
+                                className="my-2 w-80"
+                                onChange={(e: any) =>
+                                  setMessage(e.target.value)
+                                }
+                              />
+                              <div className="flex items-center gap-2">
+                                <div className="flex flex-col gap-2">
+                                  {selectedSuppliers.map((_, index: number) => (
+                                    <Select
+                                      className="w-[500px]"
+                                      sizing={"sm"}
+                                      key={index}
+                                      value={selectedSuppliers[index]}
+                                      onChange={(e) =>
+                                        handleSelectSuppliers(e, index)
+                                      }
+                                    >
+                                      <option value="">Təchizatçını seç</option>
+                                      {suppliers.length > 0 &&
+                                        suppliers.map((supplier) => (
+                                          <option
+                                            key={supplier.id}
+                                            value={supplier.id}
+                                          >
+                                            {supplier.supplier}
+                                          </option>
+                                        ))}
+                                    </Select>
+                                  ))}
+                                </div>
+
+                                <Button
+                                  color={"white"}
+                                  className="bg-yellow-400 outline-none rounded-full  text-white hover:bg-yellow-600 "
+                                  size={"xs"}
+                                  onClick={handleAddSelect}
+                                >
+                                  +
+                                </Button>
+                                <Button
+                                  color={"white"}
+                                  className=" bg-red-400 outline-none rounded-full  text-white hover:bg-red-600 "
+                                  size={"xs"}
+                                  onClick={handleReduceSelect}
+                                >
+                                  -
+                                </Button>
+                                <Button
+                                  color={"blue"}
+                                  type="button"
+                                  size={"xs"}
+                                  onClick={() => sendToSupplier(item.id)}
+                                >
+                                  Göndər
+                                </Button>
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       </div>
-                      {
-                        !item.confirm&&(
-                          <div className="flex text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                      {item.confirm && (
+                        <div className="flex text-sm odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                           <h2 className="w-64  px-6 py-4 text-black">
                             Təchizatçıdan cavab
                           </h2>
-  
+
                           <div className="px-6 py-4 flex flex-col gap-3">
                             <h2>Mesaj</h2>
                             <Textarea rows={5} className="w-80" />
                             <div className="flex gap-40 items-center">
                               <div className="flex gap-2 items-center">
                                 <Select sizing={"sm"} className="w-80">
-                                  {
-                                    order.orderHistory[4]?.supplierOrderHistories
+                                  {order.orderHistory[4]?.supplierOrderHistories
                                     ?.length > 0 &&
                                     order.orderHistory[4].supplierOrderHistories
                                       .sort(
@@ -549,29 +572,100 @@ const ActionsOnOrder = ({
                                           new Date(a.date).getTime() -
                                           new Date(b.date).getTime()
                                       )
-                                      .map((item:any,index:number)=>(
-                                        <option value={item.supplier.id} key={index}>{item.supplier.supplier}</option>
-                                      ))
-                                  }
+                                      .map((item: any, index: number) => (
+                                        <option
+                                          value={item.supplier.id}
+                                          key={index}
+                                        >
+                                          {item.supplier.supplier}
+                                        </option>
+                                      ))}
                                 </Select>
-                                <TextInput type="file" sizing={"xs"}  className="hidden" ref={fileInputRef}/>
-                                <Button size={"xs"} className="flex  items-center bg-yellow-500 text-white rounded-md" onClick={handleClickFileUpload}>
-                                <span className="mt-1">Faylı yüklə</span>
-                                <FaCloudUploadAlt className="text-2xl ml-1"/>
-                                  </Button>
+                                <TextInput
+                                  type="file"
+                                  sizing={"xs"}
+                                  className="hidden"
+                                  ref={fileInputRef}
+                                />
+                                <Button
+                                  size={"xs"}
+                                  className="flex  items-center bg-yellow-500 text-white rounded-md"
+                                  onClick={handleClickFileUpload}
+                                >
+                                  <span className="mt-1">Faylı yüklə</span>
+                                  <FaCloudUploadAlt className="text-2xl ml-1" />
+                                </Button>
                               </div>
                               <Button color={"blue"} size={"xs"}>
                                 Yüklə
                               </Button>
                             </div>
+                            <Button
+                              color={"blue"}
+                              size={"xs"}
+                              className="w-24"
+                              onClick={() => continueNextStep(item.id)}
+                            >
+                              Davam etmək
+                            </Button>
                           </div>
                         </div>
-                        )
-                      }
-                     
+                      )}
+
+                      {!item.confirm && !item.showHide && (
+                        <div className="flex text-sm  odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                          <div className="w-64 px-6 py-4 text-black flex flex-col">
+                            Təchizatçıdan cavab
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )
                 );
+
+                case "calculationBegin":
+                  return(
+                    checkUser&&(
+                      <div className="flex text-sm ">
+                           <div className="w-64 px-6 py-4 text-black flex flex-col">
+                                Hesablama
+                          </div>
+
+                          <div className="px-6 py-4 flex flex-col gap-3">
+                          
+                          <div className="flex gap-2 items-center">
+                            <Select className="w-72" sizing={"sm"}>
+                            {order.orderHistory[4]?.supplierOrderHistories
+                                    ?.length > 0 &&
+                                    order.orderHistory[4].supplierOrderHistories
+                                      .sort(
+                                        (a: any, b: any) =>
+                                          new Date(a.date).getTime() -
+                                          new Date(b.date).getTime()
+                                      )
+                                      .map((item: any, index: number) => (
+                                        <option
+                                          value={item.supplier.id}
+                                          key={index}
+                                        >
+                                          {item.supplier.supplier}
+                                        </option>
+                                      ))}
+                            </Select>
+                            <Select className="w-52" sizing={"sm"}>
+                              <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
+                              <option value={DeliverType.Normal_Fast}>Orta təcili (15-30 gün)</option>
+                              <option value={DeliverType.Planned}>Planlı (40-60 gün)</option>
+                            </Select>
+                            <Link to={""}><Button color={"blue"} size={"xs"}>Hesablama</Button></Link>
+                          </div>
+                          <Button  className="rounded-full bg-yellow-500 w-10"><FaPlus className="text-white"/></Button>
+                          </div>
+
+                      </div>
+                    )
+                  
+                  )
 
               default:
                 break;

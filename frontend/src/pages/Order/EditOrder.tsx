@@ -98,6 +98,7 @@ const EditOrder = () => {
           message: "",
           reject: "",
           file: "",
+          showHide:false,
           date: new Date(),
           user: {
             id: 0,

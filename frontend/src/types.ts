@@ -146,6 +146,7 @@ export interface OrderHistoryInterface{
   id:number,
   step:string,
   confirm:boolean,
+  showHide:boolean,
   message:string,
   reject:string,
   file:string,

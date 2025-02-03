@@ -26,7 +26,6 @@ export enum OrderStatus{
     ResposibleFromOrder="responsibleFromOrder",
     ResponsibleUserBegin="responsibleUserBegin",
     RequsetToSupplier="requestToSupplier",
-    DirectorAccept="directorAccept",
     CalculationBegin="calculationBegin",
     CalculationAccept="calculationAccept",
     CalculationEnd="calculationEnd",
@@ -34,5 +33,6 @@ export enum OrderStatus{
     ProcessingSupplier="processingSupplier",
     AccountantAccept="accountantAccept",  
     ClientConfirm="clientConfirm",
-    Reject="reject"
+    Reject="reject",
+    DirectorAccept="directorAccept"
   }
