@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux-toolkit/store/store";
 import { SupplierInterface } from "../types";
 import { Link } from "react-router-dom";
-import { FaCloudUploadAlt } from "react-icons/fa";
+import { FaCloudUploadAlt, FaMinus } from "react-icons/fa";
 import { DeliverType } from "../enums/projectEnums";
 import { FaPlus } from "react-icons/fa6";
 
@@ -25,6 +25,12 @@ const ActionsOnOrder = ({
   const [responsibleMessage, setResponsibleMessage] = useState<string>("");
   const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
+  const [selectSupplierForCalculation,setSelectSupplierForCalculation]=useState([
+    {
+      // id:0,
+      // deliverType:DeliverType.Fast
+    }
+  ]);
   const [error, setError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
@@ -276,6 +282,21 @@ const ActionsOnOrder = ({
       console.log(error);
     }
   };
+
+  const increaseCalculation=()=>{
+        if(selectSupplierForCalculation.length<order.orderHistory[4]?.supplierOrderHistories
+          ?.length){
+         setSelectSupplierForCalculation((prev)=>[...prev,{}])
+        }
+  }
+  const decreaseCalculation =()=>{
+      if(order?.orderHistory?.[4]?.supplierOrderHistories &&
+        order.orderHistory[4].supplierOrderHistories.length > 1){
+          setSelectSupplierForCalculation((prev) => 
+            Array.isArray(prev) && prev.length > 0 ? prev.slice(0,1) : prev
+          );
+        }
+  }
 
   return (
     <div className="mt-5">
@@ -632,34 +653,42 @@ const ActionsOnOrder = ({
                           </div>
 
                           <div className="px-6 py-4 flex flex-col gap-3">
+
+                            {
+                              selectSupplierForCalculation.map((_,index:number)=>(
+                                <div className="flex gap-2 items-center">
+                                <Select className="w-72" sizing={"sm"}>
+                                {order.orderHistory[4]?.supplierOrderHistories
+                                        ?.length > 0 &&
+                                        order.orderHistory[4].supplierOrderHistories
+                                          .sort(
+                                            (a: any, b: any) =>
+                                              new Date(a.date).getTime() -
+                                              new Date(b.date).getTime()
+                                          )
+                                          .map((item: any, index: number) => (
+                                            <option
+                                              value={item.supplier.id}
+                                              key={index}
+                                            >
+                                              {item.supplier.supplier}
+                                            </option>
+                                          ))}
+                                </Select>
+                                <Select className="w-52" sizing={"sm"}>
+                                  <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
+                                  <option value={DeliverType.Normal_Fast}>Orta təcili (15-30 gün)</option>
+                                  <option value={DeliverType.Planned}>Planlı (40-60 gün)</option>
+                                </Select>
+                                <Link to={""}><Button color={"blue"} size={"xs"}>Hesablama</Button></Link>
+                              </div>
+                              ))
+                            }
                           
-                          <div className="flex gap-2 items-center">
-                            <Select className="w-72" sizing={"sm"}>
-                            {order.orderHistory[4]?.supplierOrderHistories
-                                    ?.length > 0 &&
-                                    order.orderHistory[4].supplierOrderHistories
-                                      .sort(
-                                        (a: any, b: any) =>
-                                          new Date(a.date).getTime() -
-                                          new Date(b.date).getTime()
-                                      )
-                                      .map((item: any, index: number) => (
-                                        <option
-                                          value={item.supplier.id}
-                                          key={index}
-                                        >
-                                          {item.supplier.supplier}
-                                        </option>
-                                      ))}
-                            </Select>
-                            <Select className="w-52" sizing={"sm"}>
-                              <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
-                              <option value={DeliverType.Normal_Fast}>Orta təcili (15-30 gün)</option>
-                              <option value={DeliverType.Planned}>Planlı (40-60 gün)</option>
-                            </Select>
-                            <Link to={""}><Button color={"blue"} size={"xs"}>Hesablama</Button></Link>
-                          </div>
-                          <Button  className="rounded-full bg-yellow-500 w-10"><FaPlus className="text-white"/></Button>
+                           <div className="flex gap-2 items-center ">
+                          <Button  className="rounded-lg bg-yellow-500 w-6 h-6 outline-none flex items-center" onClick={increaseCalculation}><FaPlus className="text-white"/></Button>
+                          <Button  className="rounded-lg bg-yellow-500 w-6 h-6 outline-none flex items-center" onClick={decreaseCalculation}><FaMinus className="text-white"/></Button> 
+                           </div>
                           </div>
 
                       </div>
