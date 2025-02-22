@@ -17,6 +17,7 @@ import Warehouse from './pages/Warehouse/Warehouse';
 import CreateOrders from './pages/Order/CreateOrders';
 import Order from './pages/Order/Order';
 import EditOrder from './pages/Order/EditOrder';
+import Calculation from './pages/Calculation/Calculation';
 
 
 
@@ -37,12 +38,11 @@ function App() {
       <Route path="/newSuppliers" element={<Layout><AddSuppliers/></Layout>} /> 
       <Route path="/updateSupplier/:id" element={<Layout><UpdateSupplier/></Layout>} />
       <Route path="/orders" element={<Layout><Order/></Layout>} />  
-      <Route path="/editOrder/:id" element={<Layout><EditOrder/></Layout>} />       
+      <Route path="/editOrder/:id" element={<Layout><EditOrder/></Layout>} />   
+      <Route path="/calculation" element={<Calculation/>}/>       
+    
      
-       
       
-      
-   
        
       </Route>
       <Route path="*" element={<NoPage />} />

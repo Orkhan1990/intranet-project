@@ -1,6 +1,6 @@
 import { Button, Checkbox, Select, Textarea, TextInput } from "flowbite-react";
 import { Field, FieldArray, Form, Formik } from "formik";
-import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
+import { DeliverType, Liquidity, OrderType, PayType } from "../../enums/projectEnums";
 import {
   ClientInterface,
   EditOrderInterface,
@@ -25,8 +25,8 @@ const EditOrder = () => {
   const [fileError, setFileError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [stockInfos, setStockInfos] = useState<StockInfoInterface[]>([]);
-  // const [isStock,setIsStock]=useState<boolean>(false);
-  // const[isForeignMarket,setForeignMarket]=useState<boolean>(false);
+ 
+ 
   const [orderInitialValue, setOrdersInitialValue] =
     useState<EditOrderInterface>({
       id: 0,

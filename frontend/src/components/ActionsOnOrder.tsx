@@ -6,7 +6,7 @@ import { RootState } from "../redux-toolkit/store/store";
 import { SupplierInterface } from "../types";
 import { Link } from "react-router-dom";
 import { FaCloudUploadAlt, FaMinus } from "react-icons/fa";
-import { DeliverType } from "../enums/projectEnums";
+import { DeliverType, Liquidity } from "../enums/projectEnums";
 import { FaPlus } from "react-icons/fa6";
 
 
@@ -15,6 +15,11 @@ interface ActionsOnOrderInterface {
   setRefreshData: (item: any) => void;
   officeUsers: any;
 }
+
+// interface CalculationData{
+//   supplierId:number,
+//   liquidity:Liquidity
+// }
 
 const ActionsOnOrder = ({
   order,
@@ -32,15 +37,49 @@ const ActionsOnOrder = ({
     }
   ]);
   const [error, setError] = useState<string>("");
+  const [calculationData, setCalculationData] = useState({
+    supplierId:0,
+    liquidity:Liquidity.Fast
+  });
+
+
+  useEffect(()=>{
+
+    const supplierId=order.orderHistory[4]?.supplierOrderHistories
+    ?.length > 0 &&
+    order.orderHistory[4].supplierOrderHistories
+      .sort(
+        (a: any, b: any) =>
+          new Date(a.date).getTime() -
+          new Date(b.date).getTime()
+      )[0].supplier.id
+        setCalculationData((prevData) => ({
+          ...prevData,
+          supplierId,  // Update supplierId dynamically
+        }));
+      }
+    
+  ,[order])
+
+  console.log(calculationData,"calculationData");
+
+ 
+    
+
+  const handleChangeCalculation=(e:React.ChangeEvent<HTMLSelectElement>)=>{
+    setCalculationData((prev:any)=>({...prev,[e.target.name]:e.target.value}))
+  }
+
+  
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
 
   const { currentUser } = useSelector((state: RootState) => state.auth);
 
-  console.log(order, "order");
+  // console.log(order, "order");
 
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
-  console.log(checkUser, "checkUser");
+  // console.log(checkUser, "checkUser");
 
   useEffect(() => {
     const getSuppliers = async () => {
@@ -297,6 +336,28 @@ const ActionsOnOrder = ({
           );
         }
   }
+
+
+  const calculationOpenNewTab=()=>{
+      // Calculate 90% of the screen width and full screen height
+      const width = window.innerWidth * 0.9; // 90% of the screen width
+      const height = window.innerHeight/1.4;    // Full screen height
+  
+      // Set the position (optional) - center the window
+      const left = (window.innerWidth - width) / 2;  // Center horizontally
+      const top = (window.innerHeight - height) / 2; // Center vertically
+  
+      // Set window features
+      const windowFeatures = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
+  
+    window.open(`http://localhost:5173/calculation?orderId=${order.id}&supplierId=${calculationData.supplierId}&liquidity=${calculationData.liquidity}`,"_blank",windowFeatures)
+  }
+
+
+
+
+
+    
 
   return (
     <div className="mt-5">
@@ -657,7 +718,7 @@ const ActionsOnOrder = ({
                             {
                               selectSupplierForCalculation.map((_,index:number)=>(
                                 <div className="flex gap-2 items-center">
-                                <Select className="w-72" sizing={"sm"}>
+                                <Select className="w-72" sizing={"sm"} name="supplierId" onChange={handleChangeCalculation}>
                                 {order.orderHistory[4]?.supplierOrderHistories
                                         ?.length > 0 &&
                                         order.orderHistory[4].supplierOrderHistories
@@ -675,12 +736,12 @@ const ActionsOnOrder = ({
                                             </option>
                                           ))}
                                 </Select>
-                                <Select className="w-52" sizing={"sm"}>
+                                <Select className="w-52" sizing={"sm"} name="liquidity" onChange={handleChangeCalculation}>
                                   <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
                                   <option value={DeliverType.Normal_Fast}>Orta təcili (15-30 gün)</option>
                                   <option value={DeliverType.Planned}>Planlı (40-60 gün)</option>
                                 </Select>
-                                <Link to={""}><Button color={"blue"} size={"xs"}>Hesablama</Button></Link>
+                              <Button color={"blue"}  onClick={calculationOpenNewTab} size={"xs"} className="cursor-pointer">Hesablama</Button>
                               </div>
                               ))
                             }
