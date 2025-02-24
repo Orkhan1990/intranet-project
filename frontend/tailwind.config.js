@@ -10,7 +10,13 @@ export default {
      flowbite.content()
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors:{
+        'custom-gray': '#999',
+        'custom-yellow':'#ffff80',
+        'custom-red':'#ff9fff',
+      }
+    },
   },
   plugins: [
     require('flowbite/plugin'),
