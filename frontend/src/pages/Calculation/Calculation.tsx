@@ -1,20 +1,41 @@
 import { Button} from "flowbite-react";
 import { useEffect, useState } from "react";
-import { OrderPartsInterface } from "../../types";
+import { OrderInterface } from "../../types";
 import { useLocation } from "react-router-dom";
+import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
 
 const Calculation = () => {
   const[error,setError]=useState<string>("");
-  const [orderParts, setOrderParts] = useState<OrderPartsInterface[]>([
-    {
-      id: 0,
-      origCode: "",
-      count: 0,
-      checkOnWarehouse: false,
-      stockQuantity: 0,
-      partName: "",
-    },
-  ]);
+  const [order, setOrder] = useState<OrderInterface>({
+    id: 0,
+    project: "project1",
+    cardNumber: "1",
+    orderType: OrderType.Standart_Client,
+    clientId: 1,
+    manufacturer: "Man",
+    model: "",
+    chassisNumber: "",
+    engineNumber: "",
+    produceYear: "2024",
+    km: "",
+    vehicleNumber: "",
+    paymentType: PayType.Transfer,
+    delivering: DeliverType.Fast,
+    deliveringType: "simplified",
+    initialPayment: 0,
+    comment: "",
+    oil: false,
+    parts: [
+      {
+        id: 0,
+        origCode: "",
+        count: 1,
+        stockQuantity: 0,
+        checkOnWarehouse: false,
+        partName: "",
+      },
+    ],
+  });
 
 
   const location=useLocation();
@@ -23,20 +44,20 @@ const Calculation = () => {
   const supplierId=parseInt(params.get('supplierId')||'');
   const liquidity=(params.get('liquidity')||'');
   console.log(orderId,supplierId,liquidity);
-  console.log(orderParts);
+  // console.log(orderParts);
   
   
 
   useEffect(() => {
     const fetchOrderParts = async () => {
-      const res = await fetch(`http://localhost:3013/api/v1/orderPart/getOrderPartsByOrderId/${orderId}`);
+      const res = await fetch(`http://localhost:3013/api/v1/order/getOrder/${orderId}`);
       const data = await res.json();
 
       if(!res.ok||data.success===false){
         setError(data.message);
         return;
       }
-      setOrderParts(data);
+      setOrder(data);
     };
     fetchOrderParts();
   }, []);
@@ -150,7 +171,7 @@ const Calculation = () => {
           </tr>
 
           {
-            orderParts&&orderParts.map((orderPart:any,index:number)=>(
+            order&&order.parts.map((orderPart:any,index:number)=>(
                 
           <tr className="h-7" key={index}>
           <td className="px-1  text-xs w-[15px] font-[400] border border-dashed border-black p-2 ">{index+1}</td>
