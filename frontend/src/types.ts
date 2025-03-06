@@ -131,7 +131,7 @@ export interface OrderInterface {
   initialPayment: number;
   comment: string;
   oil: boolean;
-  parts:OrderPartsInterface[]
+  orderParts:OrderPartsInterface[]
 }
 
 export interface ResponsibleUserInterface {

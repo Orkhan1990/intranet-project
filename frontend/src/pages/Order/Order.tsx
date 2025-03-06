@@ -48,7 +48,7 @@ const Order = () => {
     comment: string;
     oil: boolean;
     user: UserInterface;
-    parts: OrderPartsInterface[];
+    orderParts: OrderPartsInterface[];
     createdAt: string;
   }
 
