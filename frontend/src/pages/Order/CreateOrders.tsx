@@ -30,7 +30,7 @@ const CreateOrders = () => {
     initialPayment: 0,
     comment: "",
     oil: false,
-    parts: [
+    orderParts: [
       {
         id: 0,
         origCode: "",
@@ -38,6 +38,7 @@ const CreateOrders = () => {
         stockQuantity: 0,
         checkOnWarehouse: false,
         partName: "",
+        price:0
       },
     ],
   });
@@ -211,7 +212,7 @@ const CreateOrders = () => {
           const deletePart = (index: number) => {
             setFieldValue(
               "parts",
-              values.parts.filter((_, i) => i !== index)
+              values.orderParts.filter((_, i) => i !== index)
             );
           };
 
@@ -489,13 +490,13 @@ const CreateOrders = () => {
                             </th>
                           </tr>
                         </thead>
-                        {values.parts.map((_, index) => (
+                        {values.orderParts.map((_, index) => (
                           <OrderPartsComponent
                             name={`parts[${index}]`}
                             key={index}
                             index={index}
                             deletePart={() => deletePart(index)}
-                            value={values.parts[index]}
+                            value={values.orderParts[index]}
                           />
                         ))}
                       </table>

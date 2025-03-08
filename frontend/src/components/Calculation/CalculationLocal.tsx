@@ -1,11 +1,93 @@
 import { Button } from "flowbite-react";
-import { OrderInterface } from "../../types";
+import { OrderInterface} from "../../types";
+import { useEffect, useState } from "react";
 
+
+
+interface Part {
+  id: number;
+  price: number;
+  quantity: number;
+  totalPrice: number;
+  profit: number;
+  sellPrice: number;
+  transport: number;
+  sipPrice: number;
+  percent: number;
+  unitSipPrice: number;
+  unitSellPrice: number;
+}
 interface CalculationLocalInterface {
   order: OrderInterface
 }
 
 const CalculationLocal = ({order}: CalculationLocalInterface) => {
+
+  const [parts, setParts] = useState<Part[]>([]);
+
+ 
+  useEffect(() => {
+    if (order && order.orderParts) {
+      // Map over the orderParts array and prepare your data for useState
+      const partsData:Part[] = order.orderParts.map((part) => ({
+        id: part.id,
+        price: part.price || 0, // Default to 0 if price is undefined
+        quantity: part.count || 1, // Default to 1 if count is undefined
+        totalPrice: (part.count || 1) * (part.price || 0), // Calculate initial totalPrice
+        profit: 0, // You can set the initial value as needed
+        sellPrice: 0, // Likewise for sellPrice
+        transport: 0, // And transport
+        sipPrice: 0, // And sipPrice
+        percent:0, // Example percent
+        unitSipPrice: 0, // Initial sip price per unit
+        unitSellPrice: 0, // Initial sell price per unit
+      }));
+      setParts(partsData); // Set the state with the mapped parts data
+
+      // Set the state with the mapped parts data
+    }
+  }, [order]);
+
+  console.log(parts,"parts");
+  
+
+  const handleChange = (e: any, id: number) => {
+    const {name,value} = e.target;
+    setParts((prev: Part[]) => {
+      return [...prev].map((part) =>
+        part.id === id ? { ...part, [name]: value } : part
+      );
+    });
+  }
+  const[transport,setTransport]=useState<number>(0);
+
+  const handleChangeTransport=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    setTransport(Number(e.target.value));
+  }
+
+  console.log(parts);
+  console.log(transport);
+
+  
+  const calculationLocal=()=>{
+  
+    // let totalPrice=(order.orderParts.reduce((acc,part)=>acc+part.count,0)*1);
+    // if(transport>0){
+    //   // setShowTransportValue(transport)
+    //   setSipPrice(totalPrice+Number(transport));
+    // }else{
+    //   // setShowTransportValue(transport)
+    //   setSipPrice(Number(transport)+totalPrice);
+    // }
+    // let profit=totalPrice*(percent/100);
+    // let sellPriceCalculation=totalPrice+profit; 
+    // setTotalPrice(totalPrice);
+    // setProfit(profit);
+    // setSellPrice(sellPriceCalculation);
+  }
+  // useEffect(() => {
+  //   calculationLocal();
+  // }, [sellPrice]);
   return (
     <div>
       <table className="table-auto w-full ">
@@ -87,7 +169,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" onChange={handleChangeTransport} />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -115,7 +197,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
           </tr>
 
-          {order &&
+          {order.orderParts.length>0 &&
             order.orderParts.map((orderPart: any, index: number) => (
               <tr className="h-7" key={index}>
                 <td className="px-1  text-xs w-[15px] font-[400] border border-dashed border-black p-2 ">
@@ -147,25 +229,25 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="price" onChange={(e) => handleChange(e,orderPart.id)}/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.totalPrice} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.transport} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.sipPrice} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -179,26 +261,28 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
                   <div className="flex gap-1 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={45}
+                      name="percent"
+                      value={orderPart.percent}
+                      onChange={(e) => handleChange(e, orderPart.id)}
                     />
                     <span className="text-black font-[400] text-sm">%</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.profit} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.sellPrice} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.unitSellPrice} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -225,7 +309,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
         </tbody>
       </table>
       <div className="flex gap-2 mt-1 ml-2">
-        <Button color={"blue"} size={"xs"}>
+        <Button color={"blue"} size={"xs"} onClick={calculationLocal}>
           Hesabla
         </Button>
         <Button color={"blue"} size={"xs"}>

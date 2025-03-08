@@ -88,6 +88,7 @@ const EditOrder = () => {
           stockQuantity: 0,
           checkOnWarehouse: false,
           partName: "",
+          price:0
         },
       ],
       orderHistory: [

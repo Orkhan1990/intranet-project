@@ -110,6 +110,7 @@ export interface OrderPartsInterface {
   checkOnWarehouse: boolean;
   stockQuantity: number;
   partName: string;
+  price:number
 }
 
 export interface OrderInterface {

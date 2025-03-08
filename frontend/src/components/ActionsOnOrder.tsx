@@ -6,7 +6,7 @@ import { RootState } from "../redux-toolkit/store/store";
 import { SupplierInterface } from "../types";
 import { Link } from "react-router-dom";
 import { FaCloudUploadAlt, FaMinus } from "react-icons/fa";
-import { DeliverType, Liquidity } from "../enums/projectEnums";
+import { DeliverType, Liquidity, OrderType } from "../enums/projectEnums";
 import { FaPlus } from "react-icons/fa6";
 
 
@@ -349,8 +349,9 @@ const ActionsOnOrder = ({
   
       // Set window features
       const windowFeatures = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
+      const isStandartClient=order.orderType===OrderType.Standart_Client;
   
-    window.open(`http://localhost:5173/calculation?orderId=${order.id}&supplierId=${calculationData.supplierId}&liquidity=${calculationData.liquidity}`,"_blank",windowFeatures)
+    window.open(`http://localhost:5173/calculation?orderId=${order.id}&supplierId=${calculationData.supplierId}&liquidity=${calculationData.liquidity}&isStandartClient=${isStandartClient}`,"_blank",windowFeatures)
   }
 
 

@@ -34,6 +34,7 @@ const Calculation = () => {
         stockQuantity: 0,
         checkOnWarehouse: false,
         partName: "",
+        price:0
       },
     ],
   });
@@ -43,6 +44,7 @@ const Calculation = () => {
   const params=new URLSearchParams(location.search);
   const orderId=parseInt(params.get('orderId') || '');
   const supplierId=parseInt(params.get('supplierId')||'');
+  const isStandartClient=params.get('isStandartClient')==='true';
   const liquidity=(params.get('liquidity')||'');
   console.log(orderId,supplierId,liquidity);
   console.log(order);
@@ -61,14 +63,17 @@ const Calculation = () => {
       setOrder(data);
     };
     fetchOrderParts();
-  }, []);
+
+  }, [orderId]);
 
 
-  const isStandartClient=order.orderType===OrderType.Standart_Client;
-  console.log(isStandartClient);
+
+  // const isStandartClient = order.orderType === OrderType.Standart_Client;
+
+  // console.log(isStandartClient);
   
   return (
-   isStandartClient?<CalculationStandart order={order}/>:<CalculationLocal order={order}/>
+    isStandartClient?<CalculationStandart order={order}/>:<CalculationLocal order={order}/>
   )
 };
 
