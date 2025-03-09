@@ -77,12 +77,12 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
     setTotalPriceSum(totalPriceSum);
   let result=parts.map((part)=>{
      const totalPriceResult=Number(part.price)*part.quantity;
-     const trasnportResult=totalPriceSum>0?(totalPriceResult*transport/totalPriceSum):0;
+     const trasnportResult=totalPriceSum>0?Math.ceil((totalPriceResult*transport/totalPriceSum)*100)/100:0;
      const sipPriceResult=totalPriceResult+trasnportResult;
      const profitResult=part.percent>0?sipPriceResult*(Number(part.percent)/100):0;
-     const unitSipPriceResult=sipPriceResult/part.quantity;
-     const sellPriceResult=sipPriceResult+profitResult;
-      const unitSellPriceResult=sellPriceResult/part.quantity;
+     const unitSipPriceResult=Math.ceil((sipPriceResult/part.quantity)*100)/100;
+     const sellPriceResult=Math.ceil((sipPriceResult+profitResult)*100)/100;
+      const unitSellPriceResult=Math.ceil((sellPriceResult/part.quantity)*100)/100;
     return{
        ...part,
       id:part.id,
