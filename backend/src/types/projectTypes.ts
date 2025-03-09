@@ -53,7 +53,7 @@ export interface OrderInterface {
   oil: boolean;
   clientId:number;
   userId:number,
-  parts: OrderPartInterface[];
+  orderParts: OrderPartInterface[];
 }
 
 

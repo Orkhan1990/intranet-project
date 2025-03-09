@@ -3,7 +3,6 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { Field } from "formik";
 import { OrderPartsInterface } from "../types";
 import { FaUnlock } from "react-icons/fa";
-import { FaLock } from "react-icons/fa";
 
 
 interface OrderPartsComponentInterface {

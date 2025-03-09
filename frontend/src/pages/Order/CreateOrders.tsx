@@ -117,7 +117,7 @@ const CreateOrders = () => {
 
   //SUMBIT FORM TO BACKEND
   const onsubmit = async (values: OrderInterface) => {
-    // console.log(values);
+    console.log(values,"frontvalue");
     try {
       const res = await fetch(
         "http://localhost:3013/api/v1/order/createOrder",
@@ -150,7 +150,7 @@ const CreateOrders = () => {
   const checkInstock = async (values: any) => {
     // console.log(values,"checkinStock");
 
-    const newPartsArray = values.parts;
+    const newPartsArray = values.orderParts;
 
     try {
       const res = await fetch(
@@ -193,7 +193,7 @@ const CreateOrders = () => {
           }
         );
 
-        setOrdersInitialValue({ ...values, parts: updatedPartsArray });
+        setOrdersInitialValue({ ...values, orderParts: updatedPartsArray });
       }
     } catch (error: any) {
       // setError(error);
@@ -211,7 +211,7 @@ const CreateOrders = () => {
         {({ values, setFieldValue }) => {
           const deletePart = (index: number) => {
             setFieldValue(
-              "parts",
+              "orderParts",
               values.orderParts.filter((_, i) => i !== index)
             );
           };
@@ -340,8 +340,8 @@ const CreateOrders = () => {
                       className="w-32"
                       sizing="sm"
                     >
-                      {produceDateData.map((item: string) => (
-                        <option value={item}>{item}</option>
+                      {produceDateData.map((item: string,index:number) => (
+                        <option value={item} key={index}>{item}</option>
                       ))}
                     </Field>
                     <span className="text-red-700 ml-4 text-lg">*</span>
@@ -464,7 +464,7 @@ const CreateOrders = () => {
               </div>
 
               <div className="mt-10 ">
-                <FieldArray name="parts">
+                <FieldArray name="orderParts">
                   {({ push }) => (
                     <div className="border text-sm  w-3/4 p-5 rounded-md ">
                       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -492,7 +492,7 @@ const CreateOrders = () => {
                         </thead>
                         {values.orderParts.map((_, index) => (
                           <OrderPartsComponent
-                            name={`parts[${index}]`}
+                            name={`orderParts[${index}]`}
                             key={index}
                             index={index}
                             deletePart={() => deletePart(index)}
@@ -535,9 +535,6 @@ const CreateOrders = () => {
                 <Button type="submit" size={"xs"} color={"blue"}>
                   Yadda Saxla
                 </Button>
-                {/* <Button size={"xs"} color={"blue"}>
-                  Təsdiqlə
-                </Button> */}
               </div>
               <div className="mt-10 flex justify-between mr-[190px] ">
                 <div></div>

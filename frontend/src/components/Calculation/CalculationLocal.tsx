@@ -24,6 +24,7 @@ interface CalculationLocalInterface {
 const CalculationLocal = ({order}: CalculationLocalInterface) => {
 
   const [parts, setParts] = useState<Part[]>([]);
+  const [handleTotalPriceSum,setTotalPriceSum]=useState<number>(0); 
 
  
   useEffect(() => {
@@ -31,9 +32,11 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
       // Map over the orderParts array and prepare your data for useState
       const partsData:Part[] = order.orderParts.map((part) => ({
         id: part.id,
+        partName:part.partName,
+        origCode:part.origCode,
         price: part.price || 0, // Default to 0 if price is undefined
         quantity: part.count || 1, // Default to 1 if count is undefined
-        totalPrice: (part.count || 1) * (part.price || 0), // Calculate initial totalPrice
+        totalPrice:0 , // Calculate initial totalPrice
         profit: 0, // You can set the initial value as needed
         sellPrice: 0, // Likewise for sellPrice
         transport: 0, // And transport
@@ -49,7 +52,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
   }, [order]);
 
   console.log(parts,"parts");
-  
+
 
   const handleChange = (e: any, id: number) => {
     const {name,value} = e.target;
@@ -70,24 +73,36 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
 
   
   const calculationLocal=()=>{
+    const totalPriceSum=parts.reduce((acc,part)=>acc+(Number(part.price)*part.quantity),0);
+    setTotalPriceSum(totalPriceSum);
+  let result=parts.map((part)=>{
+     const totalPriceResult=Number(part.price)*part.quantity;
+     const trasnportResult=totalPriceSum>0?(totalPriceResult*transport/totalPriceSum):0;
+     const sipPriceResult=totalPriceResult+trasnportResult;
+     const profitResult=part.percent>0?sipPriceResult*(Number(part.percent)/100):0;
+     const unitSipPriceResult=sipPriceResult/part.quantity;
+     const sellPriceResult=sipPriceResult+profitResult;
+      const unitSellPriceResult=sellPriceResult/part.quantity;
+    return{
+       ...part,
+      id:part.id,
+      price:part.price,
+      percent:Number(part.percent),
+      quantity:part.quantity,
+      totalPrice:totalPriceResult,
+      profit:profitResult,
+      transport:trasnportResult,
+      sipPrice:sipPriceResult,
+      unitSipPrice:unitSipPriceResult,
+      sellPrice:sellPriceResult,
+      unitSellPrice:unitSellPriceResult
+    }
+     
+  });
   
-    // let totalPrice=(order.orderParts.reduce((acc,part)=>acc+part.count,0)*1);
-    // if(transport>0){
-    //   // setShowTransportValue(transport)
-    //   setSipPrice(totalPrice+Number(transport));
-    // }else{
-    //   // setShowTransportValue(transport)
-    //   setSipPrice(Number(transport)+totalPrice);
-    // }
-    // let profit=totalPrice*(percent/100);
-    // let sellPriceCalculation=totalPrice+profit; 
-    // setTotalPrice(totalPrice);
-    // setProfit(profit);
-    // setSellPrice(sellPriceCalculation);
+   setParts(result);
   }
-  // useEffect(() => {
-  //   calculationLocal();
-  // }, [sellPrice]);
+ 
   return (
     <div>
       <table className="table-auto w-full ">
@@ -197,8 +212,8 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
           </tr>
 
-          {order.orderParts.length>0 &&
-            order.orderParts.map((orderPart: any, index: number) => (
+          {parts.length>0 &&
+            parts.map((orderPart: any, index: number) => (
               <tr className="h-7" key={index}>
                 <td className="px-1  text-xs w-[15px] font-[400] border border-dashed border-black p-2 ">
                   {index + 1}
@@ -225,7 +240,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
                   </select>
                 </td>
                 <td className="px-1  font-[400] text-xs border border-dashed border-black p-2">
-                  {orderPart.count}
+                  {orderPart.quantity}
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
@@ -253,7 +268,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.unitSipPrice} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -297,7 +312,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
-            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
+            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">{handleTotalPriceSum===0?"":handleTotalPriceSum}</td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>

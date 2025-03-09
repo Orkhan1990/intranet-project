@@ -49,9 +49,10 @@ export const createOrder = async (
       initialPayment,
       comment,
       oil,
-      parts,
+      orderParts,
     }: OrderInterface = req.body;
-
+    console.log(req.body);
+    
     const userId = req.userId;
 
     const getclient = await clientRepository.findOneBy({ id: clientId });
@@ -68,7 +69,7 @@ export const createOrder = async (
     }
 
     const newOrderArray = await Promise.all(
-      parts.map(async (part) => {
+      orderParts.map(async (part) => {
         const newOrderPart = new OrderPart();
         newOrderPart.partName = part.partName;
         newOrderPart.count = part.count;
@@ -113,7 +114,7 @@ export const createOrder = async (
 
     res.status(200).json({
       result: `${
-        parts.length > 1 ? "Sifarişlər əlavə olundu" : "Sifariş əlavə olundu!"
+        orderParts.length > 1 ? "Sifarişlər əlavə olundu" : "Sifariş əlavə olundu!"
       }`,
     });
   } catch (error) {
