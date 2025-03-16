@@ -304,11 +304,24 @@ export const updateOrderParts = async (
       return;
     }
 
+    await orderPartsRepository.delete({ order: existOrder });
+
     const newOrderPartsPromises = req.body.orderParts.map(async (item: any) => {
       const newOrderPart = new OrderPart();
       newOrderPart.origCode = String(item.origCode);
       newOrderPart.count = item.count;
       newOrderPart.partName = item.partName;
+      newOrderPart.price =item.price>0?item.price:0;
+      newOrderPart.totalPrice =item.totalPrice>0?item.totalPrice:0;
+      newOrderPart.sipPrice =item.sipPrice>0?item.sipPrice:0;
+      newOrderPart.percent =item.percent>0?item.percent:0;
+      newOrderPart.profit =item.profit>0?item.profit:0;
+      newOrderPart.sellPrice =item.sellPrice>0?item.sellPrice:0;
+      newOrderPart.stockQuantity=item.stockQuantity>0?item.stockQuantity:0;
+      newOrderPart.transport=item.transport>0?item.transport:0;
+      newOrderPart.unitSellPrice=item.unitSellPrice>0?item.unitSellPrice:0;
+      newOrderPart.unitSipPrice=item.unitSipPrice>0?item.unitSellPrice:0;
+      newOrderPart.orderType=req.body.orderType;
       newOrderPart.order = existOrder;
       return await orderPartsRepository.save(newOrderPart);
     });
@@ -377,12 +390,6 @@ export const rejectOrder = async (
     }
 
     await orderHistoryRepository.delete({ id: Number(id) });
-
-    // order.isExcellFile = true;
-    // order.confirm = false;
-    // order.confirmDate = null;
-    // order.rejectMessage = req.body.orderRejectMessage;
-    // order.stage = OrderStage.Created;
 
     await orderRepository.save(order);
     res.status(201).json(order);
@@ -462,14 +469,7 @@ export const checkInStock = async (
         }
       }
     );
-    // orderPartsRepository.save(result);
-    //   await orderPartsRepository.clear();
-    // result.forEach(async (item:any) => {
-    //   const newOrderPart = new OrderPart();
-    //   newOrderPart.stockQuantity = item.stockQuantity;
-    //   newOrderPart.checkInStock = item.inStock;
-    //   await orderPartsRepository.save(newOrderPart);
-    // });
+
     res.status(200).json(result);
   } catch (error) {
     next(errorHandler(401, error)); // Handle error appropriately
@@ -510,14 +510,6 @@ export const acceptOrder = async (
     orderHistory.user = user;
     await orderHistoryRepository.save(orderHistory);
 
-    // order.confirm = false;
-    // order.accept = true;
-    // order.acceptDate = new Date();
-    // order.isExcellFile = false;
-    // order.rejectMessage = null;
-    // order.isResponsible = true;
-    // order.stage = OrderStage.OrderResponsibility;
-    // order.user = user;
 
     const newOrderHistory = new OrderHistory();
     newOrderHistory.user = user;
@@ -688,14 +680,7 @@ export const sendToSupplier = async (
     orderHistory.order = order;
     await orderHistoryRepository.save(orderHistory);
 
-    // const newSupplierArray = await Promise.all(
-    //   selectedSuppliers.map(async (item: string) => {
-    //     const suppliers = await supplierRepository.findOneBy({
-    //       id: Number(item),
-    //     });
-    //     return suppliers;
-    //   })
-    // );
+   
 
     const suppliers = await supplierRepository.findBy({
       id: In(selectedSuppliers.map(Number)) // Use 'In' to query multiple ids at once

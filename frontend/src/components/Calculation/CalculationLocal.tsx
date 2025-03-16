@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 interface Part {
   id: number;
   price: number;
-  quantity: number;
+  count: number;
   totalPrice: number;
   profit: number;
   sellPrice: number;
@@ -25,6 +25,9 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
 
   const [parts, setParts] = useState<Part[]>([]);
   const [handleTotalPriceSum,setTotalPriceSum]=useState<number>(0); 
+  const [orderId, setOrderId] = useState<number>(0);
+  const [error, setError] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>("");
 
  
   useEffect(() => {
@@ -34,18 +37,20 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
         id: part.id,
         partName:part.partName,
         origCode:part.origCode,
-        price: part.price || 0, // Default to 0 if price is undefined
-        quantity: part.count || 1, // Default to 1 if count is undefined
-        totalPrice:0 , // Calculate initial totalPrice
-        profit: 0, // You can set the initial value as needed
-        sellPrice: 0, // Likewise for sellPrice
-        transport: 0, // And transport
-        sipPrice: 0, // And sipPrice
-        percent:0, // Example percent
-        unitSipPrice: 0, // Initial sip price per unit
-        unitSellPrice: 0, // Initial sell price per unit
+        price: part?.price || 0, // Default to 0 if price is undefined
+        count: part?.count || 1, // Default to 1 if count is undefined
+        totalPrice:part?.totalPrice||0, // Calculate initial totalPrice
+        profit:part?.profit||0, // You can set the initial value as needed
+        sellPrice:part?.sellPrice||0, // Likewise for sellPrice
+        transport:part?.transport||0, // And transport
+        sipPrice:part?.sipPrice||0, // And sipPrice
+        percent:part?.percent||0, // Example percent
+        unitSipPrice:part?.unitSipPrice||0, // Initial sip price per unit
+        unitSellPrice:part?.unitSellPrice||0, // Initial sell price per unit
       }));
       setParts(partsData); // Set the state with the mapped parts data
+      setOrderId(order.id);
+      setOrderType(order.orderType);
 
       // Set the state with the mapped parts data
     }
@@ -73,22 +78,22 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
 
   
   const calculationLocal=()=>{
-    const totalPriceSum=parts.reduce((acc,part)=>acc+(Number(part.price)*part.quantity),0);
+    const totalPriceSum=parts.reduce((acc,part)=>acc+(Number(part.price)*part.count),0);
     setTotalPriceSum(totalPriceSum);
   let result=parts.map((part)=>{
-     const totalPriceResult=Number(part.price)*part.quantity;
+     const totalPriceResult=Number(part.price)*part.count;
      const trasnportResult=totalPriceSum>0?Math.ceil((totalPriceResult*transport/totalPriceSum)*100)/100:0;
      const sipPriceResult=totalPriceResult+trasnportResult;
      const profitResult=part.percent>0?sipPriceResult*(Number(part.percent)/100):0;
-     const unitSipPriceResult=Math.ceil((sipPriceResult/part.quantity)*100)/100;
+     const unitSipPriceResult=Math.ceil((sipPriceResult/part.count)*100)/100;
      const sellPriceResult=Math.ceil((sipPriceResult+profitResult)*100)/100;
-      const unitSellPriceResult=Math.ceil((sellPriceResult/part.quantity)*100)/100;
+      const unitSellPriceResult=Math.ceil((sellPriceResult/part.count)*100)/100;
     return{
        ...part,
       id:part.id,
       price:part.price,
       percent:Number(part.percent),
-      quantity:part.quantity,
+      count:part.count,
       totalPrice:totalPriceResult,
       profit:profitResult,
       transport:trasnportResult,
@@ -101,6 +106,34 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
   });
   
    setParts(result);
+  }
+
+  const saveData=async()=>{
+    console.log(parts);
+    try {
+
+      const res = await fetch(
+        `http://localhost:3013/api/v1/order/updateOrderParts/${orderId}`,
+        {
+          method: "POST",
+          credentials: "include", // added this part
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderParts: parts,orderType:orderType }),
+        }
+      );
+
+      const data = await res.json();
+      if(!res.ok||data.success===false){
+        setError(data.message);
+        return;
+      }
+      console.log(data);      
+    } catch (error) {
+      console.log(error);
+      
+    }
   }
  
   return (
@@ -240,35 +273,35 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
                   </select>
                 </td>
                 <td className="px-1  font-[400] text-xs border border-dashed border-black p-2">
-                  {orderPart.quantity}
+                  {orderPart.count}
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="price" onChange={(e) => handleChange(e,orderPart.id)}/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="price" value={parseFloat(orderPart.price).toString()} onChange={(e) => handleChange(e,orderPart.id)}/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.totalPrice} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.totalPrice).toString()} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.transport} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.transport).toString()} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.sipPrice} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.sipPrice).toString()} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.unitSipPrice} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.unitSipPrice).toString()} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -277,7 +310,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                       name="percent"
-                      value={orderPart.percent}
+                      value={parseFloat(orderPart.percent).toString()}
                       onChange={(e) => handleChange(e, orderPart.id)}
                     />
                     <span className="text-black font-[400] text-sm">%</span>
@@ -285,19 +318,19 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.profit} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.profit).toString()} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.sellPrice} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.sellPrice).toString()} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.unitSellPrice} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.unitSellPrice).toString()} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -327,7 +360,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
         <Button color={"blue"} size={"xs"} onClick={calculationLocal}>
           Hesabla
         </Button>
-        <Button color={"blue"} size={"xs"}>
+        <Button color={"blue"} size={"xs"} onClick={saveData}>
           Yadda saxlamaq
         </Button>
       </div>

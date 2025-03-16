@@ -88,7 +88,16 @@ const EditOrder = () => {
           stockQuantity: 0,
           checkOnWarehouse: false,
           partName: "",
-          price:0
+          price:0,
+          totalPrice:0,
+          transport:0,
+          sipPrice:0,
+          unitSipPrice:0,
+          percent:0,
+          profit:0,
+          sellPrice:0,
+          unitSellPrice:0,
+          orderType: OrderType.Standart_Client
         },
       ],
       orderHistory: [
@@ -354,10 +363,10 @@ const EditOrder = () => {
 
   //CHECK IN STOCK
 
-  const checkInstock = async () => {
+  const checkInstock = async (values:any) => {
     // console.log(values,"checkinStock");
 
-    const newPartsArray = orderInitialValue.orderParts;
+    const newPartsArray = values.orderParts;
 
     try {
       const res = await fetch(
@@ -765,7 +774,7 @@ const EditOrder = () => {
                             size="xs"
                             className="mt-5"
                             type="button"
-                            onClick={() => checkInstock()}
+                            onClick={() => checkInstock(values)}
                           >
                             Anbarda yoxla
                           </Button>
