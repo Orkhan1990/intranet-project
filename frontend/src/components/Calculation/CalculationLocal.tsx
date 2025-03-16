@@ -27,7 +27,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
   const [handleTotalPriceSum,setTotalPriceSum]=useState<number>(0); 
   const [orderId, setOrderId] = useState<number>(0);
   const [error, setError] = useState<string>("");
-  const [orderType, setOrderType] = useState<string>("");
+  const [delivering, setDelivering] = useState<string>("");
 
  
   useEffect(() => {
@@ -50,7 +50,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
       }));
       setParts(partsData); // Set the state with the mapped parts data
       setOrderId(order.id);
-      setOrderType(order.orderType);
+      setDelivering(order.delivering);
 
       // Set the state with the mapped parts data
     }
@@ -120,7 +120,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ orderParts: parts,orderType:orderType }),
+          body: JSON.stringify({ orderParts: parts,delivering:delivering }),
         }
       );
 

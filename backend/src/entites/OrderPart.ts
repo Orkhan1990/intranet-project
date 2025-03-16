@@ -14,8 +14,8 @@ export class OrderPart extends AllEntities{
     @Column({nullable:true})
     count:number;
 
-    @Column({ name: "order_type",nullable:true })
-    orderType: string;
+    @Column({ name: "delivering",nullable:true })
+    delivering: string;
     
     @Column({name:"price",type:"decimal",precision:10,scale:2,nullable:true})
     price:string;

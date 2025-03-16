@@ -321,7 +321,7 @@ export const updateOrderParts = async (
       newOrderPart.transport=item?.transport||0;
       newOrderPart.unitSellPrice=item?.unitSellPrice||0;
       newOrderPart.unitSipPrice=item?.unitSellPrice||0;
-      newOrderPart.orderType=req.body?.orderType||"";
+      newOrderPart.delivering=req.body?.delivering||"";
       newOrderPart.order = existOrder;
       return await orderPartsRepository.save(newOrderPart);
     });

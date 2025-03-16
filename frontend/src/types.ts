@@ -119,7 +119,7 @@ export interface OrderPartsInterface {
   profit:number,
   sellPrice:number,
   unitSellPrice:number,
-  orderType: OrderType;
+  delivering:string;
 }
 
 export interface OrderInterface {
@@ -185,7 +185,7 @@ export interface EditOrderInterface{
   id:number,
   project:string,
   cardNumber:string,
-  orderType: OrderType,
+  orderType: string,
   client:ClientInterface,
   manufacturer:string,
   model:string,

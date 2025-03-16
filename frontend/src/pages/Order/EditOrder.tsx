@@ -25,8 +25,8 @@ const EditOrder = () => {
   const [fileError, setFileError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [stockInfos, setStockInfos] = useState<StockInfoInterface[]>([]);
- 
- 
+
+
   const [orderInitialValue, setOrdersInitialValue] =
     useState<EditOrderInterface>({
       id: 0,
@@ -88,16 +88,16 @@ const EditOrder = () => {
           stockQuantity: 0,
           checkOnWarehouse: false,
           partName: "",
-          price:0,
-          totalPrice:0,
-          transport:0,
-          sipPrice:0,
-          unitSipPrice:0,
-          percent:0,
-          profit:0,
-          sellPrice:0,
-          unitSellPrice:0,
-          orderType: OrderType.Standart_Client
+          price: 0,
+          totalPrice: 0,
+          transport: 0,
+          sipPrice: 0,
+          unitSipPrice: 0,
+          percent: 0,
+          profit: 0,
+          sellPrice: 0,
+          unitSellPrice: 0,
+          delivering: ""
         },
       ],
       orderHistory: [
@@ -108,7 +108,7 @@ const EditOrder = () => {
           message: "",
           reject: "",
           file: "",
-          showHide:false,
+          showHide: false,
           date: new Date(),
           user: {
             id: 0,
@@ -363,7 +363,7 @@ const EditOrder = () => {
 
   //CHECK IN STOCK
 
-  const checkInstock = async (values:any) => {
+  const checkInstock = async (values: any) => {
     // console.log(values,"checkinStock");
 
     const newPartsArray = values.orderParts;
@@ -443,6 +443,24 @@ const EditOrder = () => {
     }
   };
 
+
+  const defineDeliverType = (delivering: string) => {
+    switch (delivering) {
+      case "təcili":
+        return <span className="bg-red-700 text-white pb-5 px-[100px] pt-5 rounded-md">Təcili (15 gün)</span>;
+      case "normal":
+        return <span className="bg-green-700 text-white pb-5 px-[100px] pt-5 rounded-md">Orta (15-30 gün)</span>;
+      case "planlaşdırılmış":
+        return <span className="bg-green-700 text-white pb-5 px-[100px] pt-5 rounded-md">Planlaşdırılmış (40-60 gün)</span>;
+      default:
+        return false;
+
+    }
+  }
+
+
+
+
   return (
     <div>
       <div className="min-h-screen mt-[100px] mb-[100px] ml-[90px] ">
@@ -462,8 +480,8 @@ const EditOrder = () => {
               );
             };
 
-            let isForeignMarket=false;
-             isForeignMarket =
+            let isForeignMarket = false;
+            isForeignMarket =
               values.orderType === OrderType.Standart_Client;
             const isStock = values.orderType === OrderType.Stok;
 
@@ -651,37 +669,37 @@ const EditOrder = () => {
                   </Field>
                   <span className="text-red-700 ml-4 text-lg">*</span>
                 </div>
-                {(isForeignMarket||isStock) && (
-                    <>
-                      <div className="flex  items-center mt-5">
-                        <label htmlFor="" className="text-sm  w-[200px]">
-                          Çatdırılma
-                        </label>
-                        <Field as={Select} name="delivering" sizing="sm">
-                          <option value={DeliverType.Fast}>
-                            Təcili (7-15 gün)
-                          </option>
-                          <option value={DeliverType.Normal_Fast}>
-                            Orta (15-30 gün)
-                          </option>
-                          <option value={DeliverType.Planned}>
-                            Planlaşdırılmış (40-60 gün)
-                          </option>
-                        </Field>
-                        <span className="text-red-700 ml-4 text-lg">*</span>
-                      </div>
-                      <div className="flex  items-center mt-5">
-                        <label htmlFor="" className="text-sm  w-[200px]">
-                          Çatdırılma üsulu
-                        </label>
-                        <Field as={Select} name="deliveringType" sizing="sm">
-                          <option value="simplified">Sadələşmiş</option>
-                          <option value="standart">Standart</option>
-                        </Field>
-                        <span className="text-red-700 ml-4 text-lg">*</span>
-                      </div>
-                    </>
-                  )}
+                {(isForeignMarket || isStock) && (
+                  <>
+                    <div className="flex  items-center mt-5">
+                      <label htmlFor="" className="text-sm  w-[200px]">
+                        Çatdırılma
+                      </label>
+                      <Field as={Select} name="delivering" sizing="sm">
+                        <option value={DeliverType.Fast}>
+                          Təcili (7-15 gün)
+                        </option>
+                        <option value={DeliverType.Normal_Fast}>
+                          Orta (15-30 gün)
+                        </option>
+                        <option value={DeliverType.Planned}>
+                          Planlaşdırılmış (40-60 gün)
+                        </option>
+                      </Field>
+                      <span className="text-red-700 ml-4 text-lg">*</span>
+                    </div>
+                    <div className="flex  items-center mt-5">
+                      <label htmlFor="" className="text-sm  w-[200px]">
+                        Çatdırılma üsulu
+                      </label>
+                      <Field as={Select} name="deliveringType" sizing="sm">
+                        <option value="simplified">Sadələşmiş</option>
+                        <option value="standart">Standart</option>
+                      </Field>
+                      <span className="text-red-700 ml-4 text-lg">*</span>
+                    </div>
+                  </>
+                )}
                 {!isStock && (
                   <div className="flex  items-center mt-5">
                     <label htmlFor="" className="text-sm  w-[200px]">
@@ -719,7 +737,18 @@ const EditOrder = () => {
                   <FieldArray name="orderParts">
                     {({ push }) => (
                       <div className="border text-sm  w-3/4 p-5 rounded-md ">
+                        {
+                          defineDeliverType(orderInitialValue.orderParts[0].delivering) && (
+                            <div className="text-end mb-5">
+                              {
+                                defineDeliverType(orderInitialValue.orderParts[0].delivering)
+                              }
+                            </div>
+                          )
+                        }
                         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+
+
                           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                               <th scope="col" className="px-6 py-3">
