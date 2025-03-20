@@ -3,6 +3,7 @@ import { AllEntities } from './AllEntities';
 import { Invoice} from './Invoice';
 import { Order } from './Order';
 import { SupplierOrderHistory } from './SuppliersOrderHistory';
+import { SupplierOrderParts } from './SupplierOrderParts';
 
 
 @Entity({name:"suppliers"})
@@ -50,5 +51,8 @@ export class Supplier extends AllEntities{
 
      @OneToMany(()=>SupplierOrderHistory,(item)=>item.supplier)
      supplierOrderHistories:SupplierOrderHistory[];
+
+     @OneToMany(()=>SupplierOrderParts,(item)=>item.supplier)
+     supplierOrderPart:SupplierOrderParts[];
 
 }

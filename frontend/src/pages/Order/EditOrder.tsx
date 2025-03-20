@@ -1,6 +1,6 @@
 import { Button, Checkbox, Select, Textarea, TextInput } from "flowbite-react";
 import { Field, FieldArray, Form, Formik } from "formik";
-import { DeliverType, Liquidity, OrderType, PayType } from "../../enums/projectEnums";
+import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
 import {
   ClientInterface,
   EditOrderInterface,
@@ -737,7 +737,7 @@ const EditOrder = () => {
                   <FieldArray name="orderParts">
                     {({ push }) => (
                       <div className="border text-sm  w-3/4 p-5 rounded-md ">
-                        {
+                        {/* {
                           defineDeliverType(orderInitialValue.orderParts[0].delivering) && (
                             <div className="text-end mb-5">
                               {
@@ -745,7 +745,7 @@ const EditOrder = () => {
                               }
                             </div>
                           )
-                        }
+                        } */}
                         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
 
 
@@ -766,6 +766,13 @@ const EditOrder = () => {
                               <th scope="col" className="px-6 py-3">
                                 Detalın adı
                               </th>
+                              {
+                                orderInitialValue.orderParts[0].sellPrice && (
+                                  <th scope="col" className="px-6 py-3">
+                                    Qiymət
+                                  </th>
+                                )
+                              }
                               <th scope="col" className="px-6 py-3">
                                 #
                               </th>

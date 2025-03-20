@@ -747,10 +747,16 @@ const ActionsOnOrder = ({
                               ))
                             }
                           
-                           <div className="flex gap-2 items-center ">
-                          <Button  className="rounded-lg bg-yellow-500 w-6 h-6 outline-none flex items-center" onClick={increaseCalculation}><FaPlus className="text-white"/></Button>
-                          <Button  className="rounded-lg bg-yellow-500 w-6 h-6 outline-none flex items-center" onClick={decreaseCalculation}><FaMinus className="text-white"/></Button> 
-                           </div>
+                          {
+                            order.orderHistory[4]?.supplierOrderHistories
+                            ?.length > 1 && (
+                              <div className="flex gap-2 items-center ">
+                              <Button  className="rounded-lg bg-yellow-500 w-6 h-6 outline-none flex items-center" onClick={increaseCalculation}><FaPlus className="text-white"/></Button>
+                              <Button  className="rounded-lg bg-yellow-500 w-6 h-6 outline-none flex items-center" onClick={decreaseCalculation}><FaMinus className="text-white"/></Button> 
+                               </div>
+                            )
+                          }
+                           <Button color={"blue"} size={"xs"} className="w-20">Bitirmək</Button>
                           </div>
 
                       </div>

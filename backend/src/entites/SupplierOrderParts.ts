@@ -1,15 +1,23 @@
-import { Column, Decimal128, Entity, ManyToMany, ManyToOne, OneToMany} from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { AllEntities } from "./AllEntities";
-import { Order } from "./Order";
 import { Supplier } from "./Supplier";
-import { SupplierOrderParts } from "./SupplierOrderParts";
+import { OrderPart } from "./OrderPart";
 
 
 
+  @Entity({name:"supplier_orderParts"})
+export class SupplierOrderParts extends AllEntities{
 
-@Entity({name:"order_parts"})
-export class OrderPart extends AllEntities{
-
+    @ManyToOne(()=>Supplier,(supplier)=>supplier.supplierOrderPart)
+    @JoinColumn({name:"supplier_id"})
+    supplier:Supplier;
+    
+    @ManyToOne(()=>OrderPart,(orderPart)=>orderPart.supplierOrderPart)
+    @JoinColumn({name:"order_part_id"})
+    orderPart:OrderPart;
+    
+    @Column({nullable:true})
+    date:Date;
     @Column({name:"orig_code",nullable:true})
     origCode:string;
 
@@ -51,10 +59,4 @@ export class OrderPart extends AllEntities{
 
     @Column({name:"part_name",nullable:true})
     partName:string;
-    
-    @ManyToOne(()=>Order,(order)=>order.orderParts)
-    order:Order
-
-    @OneToMany(()=>SupplierOrderParts,(supplier)=>supplier.orderPart)
-    supplierOrderPart:SupplierOrderParts[]
 }

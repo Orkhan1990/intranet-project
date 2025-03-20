@@ -18,10 +18,11 @@ interface Part {
   unitSellPrice: number;
 }
 interface CalculationLocalInterface {
-  order: OrderInterface
+  order: OrderInterface;
+  supplierId?: number;
 }
 
-const CalculationLocal = ({order}: CalculationLocalInterface) => {
+const CalculationLocal = ({order,supplierId}: CalculationLocalInterface) => {
 
   const [parts, setParts] = useState<Part[]>([]);
   const [handleTotalPriceSum,setTotalPriceSum]=useState<number>(0); 
@@ -120,7 +121,7 @@ const CalculationLocal = ({order}: CalculationLocalInterface) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ orderParts: parts,delivering:delivering }),
+          body: JSON.stringify({ orderParts: parts,delivering:delivering,supplierId:supplierId }),
         }
       );
 

@@ -34,7 +34,16 @@ const Calculation = () => {
         stockQuantity: 0,
         checkOnWarehouse: false,
         partName: "",
-        price:0
+        price:0,
+        totalPrice:0,
+        transport:0,
+        sipPrice:0,
+        unitSipPrice:0,
+        percent:0,
+        profit:0,
+        sellPrice:0,
+        unitSellPrice:0,
+        delivering:""
       },
     ],
   });
@@ -73,7 +82,7 @@ const Calculation = () => {
   // console.log(isStandartClient);
   
   return (
-    isStandartClient?<CalculationStandart order={order}/>:<CalculationLocal order={order}/>
+    isStandartClient?<CalculationStandart order={order} supplierId={supplierId}/>:<CalculationLocal order={order} supplierId={supplierId}/>
   )
 };
 
