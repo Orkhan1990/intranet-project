@@ -14,6 +14,7 @@ import { log } from "console";
 import { SupplierOrderHistory } from "../entites/SuppliersOrderHistory";
 import { Supplier } from "../entites/Supplier";
 import { In } from "typeorm";
+import { SupplierOrderParts } from "../entites/SupplierOrderParts";
 
 const orderPartsRepository = AppDataSource.getRepository(OrderPart);
 const orderRepository = AppDataSource.getRepository(Order);
@@ -24,6 +25,7 @@ const sparePartsRepository = AppDataSource.getRepository(SparePart);
 const suppliersOrderHistoryReposiroty =
   AppDataSource.getRepository(SupplierOrderHistory);
 const supplierRepository = AppDataSource.getRepository(Supplier);
+const supplierOrderPartRepository=AppDataSource.getRepository(SupplierOrderParts);
 
 export const createOrder = async (
   req: CustomRequest,
@@ -229,7 +231,6 @@ export const updateOrder = async (
   try {
     const { id } = req.params;
     const userId = req.userId;
-    console.log(req.body);
 
     const user = await userRepository.findOneBy({ id: userId });
     if (!user) {
@@ -294,7 +295,7 @@ export const updateOrderParts = async (
   next: NextFunction
 ) => {
   const { id } = req.params;
-  console.log(req.body, id);
+  console.log(req.body);
 
   try {
     const existOrder = await orderRepository.findOneBy({ id: Number(id) });
@@ -304,34 +305,80 @@ export const updateOrderParts = async (
       return;
     }
 
+    const supplier=await supplierRepository.findOneBy({
+      id:Number(req.body.supplierId)});
+
+      console.log(supplier,"supplier");
+      
+
+      if (!supplier) {
+        next(errorHandler(401, "Təchizatçı mövcud deyil!"));
+        return;
+      }
+
     await orderPartsRepository.delete({ order: existOrder });
 
-    const newOrderPartsPromises = req.body.orderParts.map(async (item: any) => {
-      const newOrderPart = new OrderPart();
-      newOrderPart.origCode = String(item.origCode);
-      newOrderPart.count = item.count;
-      newOrderPart.partName = item.partName;
-      newOrderPart.price =item?.price||0;
-      newOrderPart.totalPrice =item?.totalPrice||0;
-      newOrderPart.sipPrice =item?.sipPrice||0;
-      newOrderPart.percent =item?.percent||0;
-      newOrderPart.profit =item?.profit||0;
-      newOrderPart.sellPrice =item?.sellPrice||0;
-      newOrderPart.stockQuantity=item?.stockQuantity||0;
-      newOrderPart.transport=item?.transport||0;
-      newOrderPart.unitSellPrice=item?.unitSellPrice||0;
-      newOrderPart.unitSipPrice=item?.unitSellPrice||0;
-      newOrderPart.delivering=req.body?.delivering||"";
-      newOrderPart.order = existOrder;
-      return await orderPartsRepository.save(newOrderPart);
-    });
 
-    const newOrderParts = await Promise.all(newOrderPartsPromises);
-    res
-      .status(200)
-      .json({ message: "Elave olundu", orderParts: newOrderParts });
+    const newOrderParts=req.body.orderParts.map(async (item:any)=>{
+      return console.log(item);
+      
+    })
 
-    res.status(200).json({ message: "Elave olundu" });
+    console.log(newOrderParts,"salam");
+    
+    // const newOrderPartsPromises = req.body.orderParts.map(async (item: any) => {
+        
+    //   const orderPart=await orderPartsRepository.findOneBy({
+    //     id:item.id});
+    //     console.log(orderPart,"orderPart");
+        
+
+    //   const newSupplierOrderPart=new SupplierOrderParts();
+    //   newSupplierOrderPart.origCode=String(item.origCode);
+    //   newSupplierOrderPart.count = item.count;
+    //   newSupplierOrderPart.partName = item.partName;
+    //   newSupplierOrderPart.price =item.price>0?item.price:0;
+    //   newSupplierOrderPart.totalPrice =item?.totalPrice||0;
+    //   newSupplierOrderPart.sipPrice =item?.sipPrice||0;
+    //   newSupplierOrderPart.percent =item?.percent||0;
+    //   newSupplierOrderPart.profit =item?.profit||0;
+    //   newSupplierOrderPart.sellPrice =item?.sellPrice||0;
+    //   newSupplierOrderPart.stockQuantity=item?.stockQuantity||0;
+    //   newSupplierOrderPart.transport=item?.transport||0;
+    //   newSupplierOrderPart.unitSellPrice=item?.unitSellPrice||0;
+    //   newSupplierOrderPart.unitSipPrice=item?.unitSellPrice||0;
+    //   newSupplierOrderPart.delivering=req.body?.delivering||"";
+    //   newSupplierOrderPart.supplier=supplier;
+    //   newSupplierOrderPart.orderPart=orderPart;
+    //   console.log(newSupplierOrderPart,"newSupplierOrderPart");
+      
+    //   await supplierOrderPartRepository.save(newSupplierOrderPart);
+
+    //   const newOrderPart = new OrderPart();
+    //   newOrderPart.origCode = String(item.origCode);
+    //   newOrderPart.count = item.count;
+    //   newOrderPart.partName = item.partName;
+    //   newOrderPart.price =item.price>0?item.price:0;
+    //   newOrderPart.totalPrice =item?.totalPrice||0;
+    //   newOrderPart.sipPrice =item?.sipPrice||0;
+    //   newOrderPart.percent =item?.percent||0;
+    //   newOrderPart.profit =item?.profit||0;
+    //   newOrderPart.sellPrice =item?.sellPrice||0;
+    //   newOrderPart.stockQuantity=item?.stockQuantity||0;
+    //   newOrderPart.transport=item?.transport||0;
+    //   newOrderPart.unitSellPrice=item?.unitSellPrice||0;
+    //   newOrderPart.unitSipPrice=item?.unitSellPrice||0;
+    //   newOrderPart.delivering=req.body?.delivering||"";
+    //   newOrderPart.order = existOrder;
+    //   return await orderPartsRepository.save(newOrderPart);
+    // });
+
+    // const newOrderParts = await Promise.all(newOrderPartsPromises);
+    // res
+    //   .status(200)
+    //   .json({ message: "Elave olundu", orderParts: newOrderParts });
+
+    // res.status(200).json({ message: "Elave olundu" });
   } catch (error) {
     next(errorHandler(401, error));
   }

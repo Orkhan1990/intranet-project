@@ -129,6 +129,8 @@ const CalculationLocal = ({order,supplierId}: CalculationLocalInterface) => {
       if(!res.ok||data.success===false){
         setError(data.message);
         return;
+      }else{
+        window.close();
       }
       console.log(data);      
     } catch (error) {

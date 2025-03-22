@@ -30,18 +30,26 @@ const ActionsOnOrder = ({
   const [responsibleMessage, setResponsibleMessage] = useState<string>("");
   const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
-  const [selectSupplierForCalculation,setSelectSupplierForCalculation]=useState([
-    {
-      // id:0,
-      // deliverType:DeliverType.Fast
-    }
-  ]);
+  // const [selectSupplierForCalculation,setSelectSupplierForCalculation]=useState([
+  //   {
+  //     // id:0,
+  //     // deliverType:DeliverType.Fast
+  //   }
+  // ]);
   const [error, setError] = useState<string>("");
-  const [calculationData, setCalculationData] = useState({
+  const [calculationData, setCalculationData] = useState([{
     supplierId:0,
     liquidity:Liquidity.Fast
-  });
+  }]);
 
+
+  // console.log(order.orderHistory[4].supplierOrderHistories
+  //   .sort(
+  //     (a: any, b: any) =>
+  //       new Date(a.date).getTime() -
+  //       new Date(b.date).getTime()
+  //   )[0],"supplierId");
+  
 
   useEffect(()=>{
 
@@ -53,21 +61,27 @@ const ActionsOnOrder = ({
           new Date(a.date).getTime() -
           new Date(b.date).getTime()
       )[0].supplier.id
-        setCalculationData((prevData) => ({
+
+      if (supplierId) {
+        setCalculationData((prevData) => [
           ...prevData,
-          supplierId,  // Update supplierId dynamically
-        }));
+          {
+            supplierId,
+            liquidity:Liquidity.Fast // Add the supplierId dynamically
+          },
+        ]);
       }
+  }
     
   ,[order])
 
-  console.log(calculationData,"calculationData");
+  console.log(order,"order");
 
  
     
 
   const handleChangeCalculation=(e:React.ChangeEvent<HTMLSelectElement>)=>{
-    setCalculationData((prev:any)=>({...prev,[e.target.name]:e.target.value}))
+    setCalculationData((prev:any)=>[{...prev,[e.target.name]:e.target.value}])
   }
 
   
@@ -79,7 +93,7 @@ const ActionsOnOrder = ({
   // console.log(order, "order");
 
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
-  // console.log(checkUser, "checkUser");
+  // console.log(selectSupplierForCalculation, "selectSupplierForCalculation");
 
   useEffect(() => {
     const getSuppliers = async () => {
@@ -323,22 +337,22 @@ const ActionsOnOrder = ({
   };
 
   const increaseCalculation=()=>{
-        if(selectSupplierForCalculation.length<order.orderHistory[4]?.supplierOrderHistories
-          ?.length){
-         setSelectSupplierForCalculation((prev)=>[...prev,{}])
-        }
+        // if(selectSupplierForCalculation.length<order.orderHistory[4]?.supplierOrderHistories
+        //   ?.length){
+        //  setSelectSupplierForCalculation((prev)=>[...prev,{}])
+        // }
   }
   const decreaseCalculation =()=>{
-      if(order?.orderHistory?.[4]?.supplierOrderHistories &&
-        order.orderHistory[4].supplierOrderHistories.length > 1){
-          setSelectSupplierForCalculation((prev) => 
-            Array.isArray(prev) && prev.length > 0 ? prev.slice(0,1) : prev
-          );
-        }
+      // if(order?.orderHistory?.[4]?.supplierOrderHistories &&
+      //   order.orderHistory[4].supplierOrderHistories.length > 1){
+      //     setSelectSupplierForCalculation((prev) => 
+      //       Array.isArray(prev) && prev.length > 0 ? prev.slice(0,1) : prev
+      //     );
+      //   }
   }
 
 
-  const calculationOpenNewTab=()=>{
+  const calculationOpenNewTab=(id:any)=>{
       // Calculate 90% of the screen width and full screen height
       const width = window.innerWidth * 0.9; // 90% of the screen width
       const height = window.innerHeight/1.4;    // Full screen height
@@ -351,7 +365,7 @@ const ActionsOnOrder = ({
       const windowFeatures = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
       const isStandartClient=order.orderType===OrderType.Standart_Client;
   
-    window.open(`http://localhost:5173/calculation?orderId=${order.id}&supplierId=${calculationData.supplierId}&liquidity=${calculationData.liquidity}&isStandartClient=${isStandartClient}`,"_blank",windowFeatures)
+    window.open(`http://localhost:5173/calculation?orderId=${order.id}&supplierId=${id}&liquidity=${calculationData[0].liquidity}&isStandartClient=${isStandartClient}`,"_blank",windowFeatures)
   }
 
 
@@ -717,37 +731,35 @@ const ActionsOnOrder = ({
                           <div className="px-6 py-4 flex flex-col gap-3">
 
                             {
-                              selectSupplierForCalculation.map((_,index:number)=>(
-                                <div className="flex gap-2 items-center">
+                              order.orderHistory[4]?.supplierOrderHistories
+                              ?.length > 0&&order.orderHistory[4].supplierOrderHistories
+                              .sort(
+                                (a: any, b: any) =>
+                                  new Date(a.date).getTime() -
+                                  new Date(b.date).getTime()
+                              )
+                              .map((item: any, index: number) => (
+                                <div className="flex gap-2 items-center" key={index}>
                                 <Select className="w-72" sizing={"sm"} name="supplierId" onChange={handleChangeCalculation}>
-                                {order.orderHistory[4]?.supplierOrderHistories
-                                        ?.length > 0 &&
-                                        order.orderHistory[4].supplierOrderHistories
-                                          .sort(
-                                            (a: any, b: any) =>
-                                              new Date(a.date).getTime() -
-                                              new Date(b.date).getTime()
-                                          )
-                                          .map((item: any, index: number) => (
+                            
                                             <option
                                               value={item.supplier.id}
                                               key={index}
                                             >
                                               {item.supplier.supplier}
                                             </option>
-                                          ))}
                                 </Select>
                                 <Select className="w-52" sizing={"sm"} name="liquidity" onChange={handleChangeCalculation}>
                                   <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
                                   <option value={DeliverType.Normal_Fast}>Orta təcili (15-30 gün)</option>
                                   <option value={DeliverType.Planned}>Planlı (40-60 gün)</option>
                                 </Select>
-                              <Button color={"blue"}  onClick={calculationOpenNewTab} size={"xs"} className="cursor-pointer">Hesablama</Button>
+                              <Button color={"blue"}  onClick={()=>calculationOpenNewTab(item.id)} size={"xs"} className="cursor-pointer">Hesablama</Button>
                               </div>
                               ))
                             }
-                          
-                          {
+                                                    
+                          {/* {
                             order.orderHistory[4]?.supplierOrderHistories
                             ?.length > 1 && (
                               <div className="flex gap-2 items-center ">
@@ -755,7 +767,7 @@ const ActionsOnOrder = ({
                               <Button  className="rounded-lg bg-yellow-500 w-6 h-6 outline-none flex items-center" onClick={decreaseCalculation}><FaMinus className="text-white"/></Button> 
                                </div>
                             )
-                          }
+                          } */}
                            <Button color={"blue"} size={"xs"} className="w-20">Bitirmək</Button>
                           </div>
 
