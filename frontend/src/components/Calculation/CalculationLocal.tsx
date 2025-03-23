@@ -20,44 +20,81 @@ interface Part {
 interface CalculationLocalInterface {
   order: OrderInterface;
   supplierId?: number;
+  delivering?: string;
 }
 
-const CalculationLocal = ({order,supplierId}: CalculationLocalInterface) => {
+const CalculationLocal = ({order,supplierId,delivering}: CalculationLocalInterface) => {
 
   const [parts, setParts] = useState<Part[]>([]);
   const [handleTotalPriceSum,setTotalPriceSum]=useState<number>(0); 
-  const [orderId, setOrderId] = useState<number>(0);
   const [error, setError] = useState<string>("");
-  const [delivering, setDelivering] = useState<string>("");
+  // const [delivering, setDelivering] = useState<string>("");
+  const [orderId, setOrderId] = useState<number>(0);
 
  
-  useEffect(() => {
-    if (order && order.orderParts) {
-      // Map over the orderParts array and prepare your data for useState
-      const partsData:Part[] = order.orderParts.map((part) => ({
-        id: part.id,
-        partName:part.partName,
-        origCode:part.origCode,
-        price: part?.price || 0, // Default to 0 if price is undefined
-        count: part?.count || 1, // Default to 1 if count is undefined
-        totalPrice:part?.totalPrice||0, // Calculate initial totalPrice
-        profit:part?.profit||0, // You can set the initial value as needed
-        sellPrice:part?.sellPrice||0, // Likewise for sellPrice
-        transport:part?.transport||0, // And transport
-        sipPrice:part?.sipPrice||0, // And sipPrice
-        percent:part?.percent||0, // Example percent
-        unitSipPrice:part?.unitSipPrice||0, // Initial sip price per unit
-        unitSellPrice:part?.unitSellPrice||0, // Initial sell price per unit
-      }));
-      setParts(partsData); // Set the state with the mapped parts data
-      setOrderId(order.id);
-      setDelivering(order.delivering);
+   console.log(order.id,"sifaris");
+   
 
-      // Set the state with the mapped parts data
+useEffect(() => {
+  setOrderId(order.id);
+
+    const getsupplierOrderParts = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3013/api/v1/order/getSupplierOrderParts/${supplierId}/${order.id}`,
+          {
+            method: "GET",
+            credentials: "include", // added this part
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+          return;
+        }else{
+          console.log(data);
+          setParts(data);
+        }
+    
+        // setDelivering(data.delivering);
+      } catch (error) {
+        console.log(error);
+      }
     }
-  }, [order]);
 
-  console.log(parts,"parts");
+    getsupplierOrderParts();
+
+}, [supplierId,order]);
+  // useEffect(() => {
+  //   // if (order && order.orderParts) {
+  //   //   // Map over the orderParts array and prepare your data for useState
+  //   //   const partsData:Part[] = order.orderParts.map((part) => ({
+  //   //     id: part.id,
+  //   //     partName:part.partName,
+  //   //     origCode:part.origCode,
+  //   //     price: part?.price || 0, // Default to 0 if price is undefined
+  //   //     count: part?.count || 1, // Default to 1 if count is undefined
+  //   //     totalPrice:part?.totalPrice||0, // Calculate initial totalPrice
+  //   //     profit:part?.profit||0, // You can set the initial value as needed
+  //   //     sellPrice:part?.sellPrice||0, // Likewise for sellPrice
+  //   //     transport:part?.transport||0, // And transport
+  //   //     sipPrice:part?.sipPrice||0, // And sipPrice
+  //   //     percent:part?.percent||0, // Example percent
+  //   //     unitSipPrice:part?.unitSipPrice||0, // Initial sip price per unit
+  //   //     unitSellPrice:part?.unitSellPrice||0, // Initial sell price per unit
+  //   //   }));
+  //   //   setParts(partsData); // Set the state with the mapped parts data
+  //   //   setOrderId(order.id);
+  //   //   setDelivering(order.delivering);
+
+  //     // Set the state with the mapped parts data
+  //   }
+  // }, [supplierId]);
+
+  // console.log(parts,"parts");
 
 
   const handleChange = (e: any, id: number) => {
@@ -74,8 +111,8 @@ const CalculationLocal = ({order,supplierId}: CalculationLocalInterface) => {
     setTransport(Number(e.target.value));
   }
 
-  console.log(parts);
-  console.log(transport);
+  // console.log(parts);
+  // console.log(transport);
 
   
   const calculationLocal=()=>{
@@ -114,7 +151,7 @@ const CalculationLocal = ({order,supplierId}: CalculationLocalInterface) => {
     try {
 
       const res = await fetch(
-        `http://localhost:3013/api/v1/order/updateOrderParts/${orderId}`,
+        `http://localhost:3013/api/v1/order/updateOrderParts/${order.id}`,
         {
           method: "POST",
           credentials: "include", // added this part

@@ -6,9 +6,10 @@ import { Link } from "react-router-dom";
 interface CalculationStandartInterface {
   order: OrderInterface;
   supplierId: number;
+  delivering: string;
 }
 
-const CalculationStandart = ({ order,supplierId }: CalculationStandartInterface) => {
+const CalculationStandart = ({ order,supplierId,delivering }: CalculationStandartInterface) => {
   return (
     <div>
       <table className="table-auto w-full ">

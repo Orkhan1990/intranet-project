@@ -5,9 +5,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux-toolkit/store/store";
 import { SupplierInterface } from "../types";
 import { Link } from "react-router-dom";
-import { FaCloudUploadAlt, FaMinus } from "react-icons/fa";
-import { DeliverType, Liquidity, OrderType } from "../enums/projectEnums";
-import { FaPlus } from "react-icons/fa6";
+import { FaCloudUploadAlt} from "react-icons/fa";
+import { DeliverType, OrderType } from "../enums/projectEnums";
 
 
 interface ActionsOnOrderInterface {
@@ -16,10 +15,7 @@ interface ActionsOnOrderInterface {
   officeUsers: any;
 }
 
-// interface CalculationData{
-//   supplierId:number,
-//   liquidity:Liquidity
-// }
+
 
 const ActionsOnOrder = ({
   order,
@@ -30,25 +26,14 @@ const ActionsOnOrder = ({
   const [responsibleMessage, setResponsibleMessage] = useState<string>("");
   const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
-  // const [selectSupplierForCalculation,setSelectSupplierForCalculation]=useState([
-  //   {
-  //     // id:0,
-  //     // deliverType:DeliverType.Fast
-  //   }
-  // ]);
   const [error, setError] = useState<string>("");
   const [calculationData, setCalculationData] = useState([{
     supplierId:0,
-    liquidity:Liquidity.Fast
+    delivering:DeliverType.Fast
   }]);
 
 
-  // console.log(order.orderHistory[4].supplierOrderHistories
-  //   .sort(
-  //     (a: any, b: any) =>
-  //       new Date(a.date).getTime() -
-  //       new Date(b.date).getTime()
-  //   )[0],"supplierId");
+
   
 
   useEffect(()=>{
@@ -67,11 +52,12 @@ const ActionsOnOrder = ({
           ...prevData,
           {
             supplierId,
-            liquidity:Liquidity.Fast // Add the supplierId dynamically
+            delivering:DeliverType.Fast // Add the supplierId dynamically
           },
         ]);
       }
   }
+
     
   ,[order])
 
@@ -336,20 +322,7 @@ const ActionsOnOrder = ({
     }
   };
 
-  const increaseCalculation=()=>{
-        // if(selectSupplierForCalculation.length<order.orderHistory[4]?.supplierOrderHistories
-        //   ?.length){
-        //  setSelectSupplierForCalculation((prev)=>[...prev,{}])
-        // }
-  }
-  const decreaseCalculation =()=>{
-      // if(order?.orderHistory?.[4]?.supplierOrderHistories &&
-      //   order.orderHistory[4].supplierOrderHistories.length > 1){
-      //     setSelectSupplierForCalculation((prev) => 
-      //       Array.isArray(prev) && prev.length > 0 ? prev.slice(0,1) : prev
-      //     );
-      //   }
-  }
+
 
 
   const calculationOpenNewTab=(id:any)=>{
@@ -365,7 +338,7 @@ const ActionsOnOrder = ({
       const windowFeatures = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
       const isStandartClient=order.orderType===OrderType.Standart_Client;
   
-    window.open(`http://localhost:5173/calculation?orderId=${order.id}&supplierId=${id}&liquidity=${calculationData[0].liquidity}&isStandartClient=${isStandartClient}`,"_blank",windowFeatures)
+    window.open(`http://localhost:5173/calculation?orderId=${order.id}&supplierId=${id}&delivering=${calculationData[0].delivering}&isStandartClient=${isStandartClient}`,"_blank",windowFeatures)
   }
 
 
@@ -749,25 +722,16 @@ const ActionsOnOrder = ({
                                               {item.supplier.supplier}
                                             </option>
                                 </Select>
-                                <Select className="w-52" sizing={"sm"} name="liquidity" onChange={handleChangeCalculation}>
+                                <Select className="w-52" sizing={"sm"} name="delivering" onChange={handleChangeCalculation}>
                                   <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
                                   <option value={DeliverType.Normal_Fast}>Orta təcili (15-30 gün)</option>
                                   <option value={DeliverType.Planned}>Planlı (40-60 gün)</option>
                                 </Select>
-                              <Button color={"blue"}  onClick={()=>calculationOpenNewTab(item.id)} size={"xs"} className="cursor-pointer">Hesablama</Button>
+                              <Button color={"blue"}  onClick={()=>calculationOpenNewTab(item.supplier.id)} size={"xs"} className="cursor-pointer">Hesablama</Button>
                               </div>
                               ))
                             }
                                                     
-                          {/* {
-                            order.orderHistory[4]?.supplierOrderHistories
-                            ?.length > 1 && (
-                              <div className="flex gap-2 items-center ">
-                              <Button  className="rounded-lg bg-yellow-500 w-6 h-6 outline-none flex items-center" onClick={increaseCalculation}><FaPlus className="text-white"/></Button>
-                              <Button  className="rounded-lg bg-yellow-500 w-6 h-6 outline-none flex items-center" onClick={decreaseCalculation}><FaMinus className="text-white"/></Button> 
-                               </div>
-                            )
-                          } */}
                            <Button color={"blue"} size={"xs"} className="w-20">Bitirmək</Button>
                           </div>
 

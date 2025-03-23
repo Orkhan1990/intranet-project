@@ -1,5 +1,5 @@
 import express from "express";
-import {acceptOrder, calculationStepPass, checkInStock,confirmOrder,createOrder, deleteOrderParts, getAllOrderParts, getAllOrders, getOrder, rejectOrder, responsibleOrder, sendToSupplier, startResponsibleOrder, updateOrder, updateOrderParts } from "../controllers/orderController";
+import {acceptOrder, calculationStepPass, checkInStock,confirmOrder,createOrder, deleteOrderParts, getAllOrderParts, getAllOrders, getOrder, getSupplierOrderParts, rejectOrder, responsibleOrder, sendToSupplier, startResponsibleOrder, updateOrder, updateOrderParts } from "../controllers/orderController";
 import verifyToken from "../middleware/verifyToken";
 
 
@@ -20,6 +20,7 @@ router.post("/responsibleOrder/:id",verifyToken,responsibleOrder);
 router.post("/startResponsibleOrder/:id",verifyToken,startResponsibleOrder);
 router.post("/sendToSupplier/:id",verifyToken,sendToSupplier);
 router.post("/calculationStepPass/:id",verifyToken,calculationStepPass);
+router.get("/getSupplierOrderParts/:id/:orderId",getSupplierOrderParts);
 
 
 

@@ -295,7 +295,7 @@ export const updateOrderParts = async (
   next: NextFunction
 ) => {
   const { id } = req.params;
-  console.log(req.body);
+  // console.log(req.body);
 
   try {
     const existOrder = await orderRepository.findOneBy({ id: Number(id) });
@@ -308,7 +308,7 @@ export const updateOrderParts = async (
     const supplier=await supplierRepository.findOneBy({
       id:Number(req.body.supplierId)});
 
-      console.log(supplier,"supplier");
+      // console.log(supplier,"supplier");
       
 
       if (!supplier) {
@@ -319,66 +319,58 @@ export const updateOrderParts = async (
     await orderPartsRepository.delete({ order: existOrder });
 
 
-    const newOrderParts=req.body.orderParts.map(async (item:any)=>{
-      return console.log(item);
-      
-    })
 
-    console.log(newOrderParts,"salam");
     
-    // const newOrderPartsPromises = req.body.orderParts.map(async (item: any) => {
+    const newOrderPartsPromises = req.body.orderParts.map(async (item: any) => {
         
-    //   const orderPart=await orderPartsRepository.findOneBy({
-    //     id:item.id});
-    //     console.log(orderPart,"orderPart");
+      const orderPart=await orderPartsRepository.findOneBy({
+        id:Number(item.id)});
+        console.log(orderPart,"orderPart");
         
 
-    //   const newSupplierOrderPart=new SupplierOrderParts();
-    //   newSupplierOrderPart.origCode=String(item.origCode);
-    //   newSupplierOrderPart.count = item.count;
-    //   newSupplierOrderPart.partName = item.partName;
-    //   newSupplierOrderPart.price =item.price>0?item.price:0;
-    //   newSupplierOrderPart.totalPrice =item?.totalPrice||0;
-    //   newSupplierOrderPart.sipPrice =item?.sipPrice||0;
-    //   newSupplierOrderPart.percent =item?.percent||0;
-    //   newSupplierOrderPart.profit =item?.profit||0;
-    //   newSupplierOrderPart.sellPrice =item?.sellPrice||0;
-    //   newSupplierOrderPart.stockQuantity=item?.stockQuantity||0;
-    //   newSupplierOrderPart.transport=item?.transport||0;
-    //   newSupplierOrderPart.unitSellPrice=item?.unitSellPrice||0;
-    //   newSupplierOrderPart.unitSipPrice=item?.unitSellPrice||0;
-    //   newSupplierOrderPart.delivering=req.body?.delivering||"";
-    //   newSupplierOrderPart.supplier=supplier;
-    //   newSupplierOrderPart.orderPart=orderPart;
-    //   console.log(newSupplierOrderPart,"newSupplierOrderPart");
+      const newSupplierOrderPart=new SupplierOrderParts();
+      newSupplierOrderPart.origCode=String(item.origCode);
+      newSupplierOrderPart.count = item.count;
+      newSupplierOrderPart.partName = item.partName;
+      newSupplierOrderPart.price =item.price>0?item.price:0;
+      newSupplierOrderPart.totalPrice =item?.totalPrice||0;
+      newSupplierOrderPart.sipPrice =item?.sipPrice||0;
+      newSupplierOrderPart.percent =item?.percent||0;
+      newSupplierOrderPart.profit =item?.profit||0;
+      newSupplierOrderPart.sellPrice =item?.sellPrice||0;
+      newSupplierOrderPart.stockQuantity=item?.stockQuantity||0;
+      newSupplierOrderPart.transport=item?.transport||0;
+      newSupplierOrderPart.unitSellPrice=item?.unitSellPrice||0;
+      newSupplierOrderPart.unitSipPrice=item?.unitSellPrice||0;
+      newSupplierOrderPart.delivering=req.body?.delivering||"";
+      newSupplierOrderPart.supplier=supplier;
+      newSupplierOrderPart.orderPart=orderPart;
+      console.log(newSupplierOrderPart,"newSupplierOrderPart");
       
-    //   await supplierOrderPartRepository.save(newSupplierOrderPart);
+      await supplierOrderPartRepository.save(newSupplierOrderPart);
 
-    //   const newOrderPart = new OrderPart();
-    //   newOrderPart.origCode = String(item.origCode);
-    //   newOrderPart.count = item.count;
-    //   newOrderPart.partName = item.partName;
-    //   newOrderPart.price =item.price>0?item.price:0;
-    //   newOrderPart.totalPrice =item?.totalPrice||0;
-    //   newOrderPart.sipPrice =item?.sipPrice||0;
-    //   newOrderPart.percent =item?.percent||0;
-    //   newOrderPart.profit =item?.profit||0;
-    //   newOrderPart.sellPrice =item?.sellPrice||0;
-    //   newOrderPart.stockQuantity=item?.stockQuantity||0;
-    //   newOrderPart.transport=item?.transport||0;
-    //   newOrderPart.unitSellPrice=item?.unitSellPrice||0;
-    //   newOrderPart.unitSipPrice=item?.unitSellPrice||0;
-    //   newOrderPart.delivering=req.body?.delivering||"";
-    //   newOrderPart.order = existOrder;
-    //   return await orderPartsRepository.save(newOrderPart);
-    // });
+      const newOrderPart = new OrderPart();
+      newOrderPart.origCode = String(item.origCode);
+      newOrderPart.count = item.count;
+      newOrderPart.partName = item.partName;
+      newOrderPart.price =item.price>0?item.price:0;
+      newOrderPart.totalPrice =item?.totalPrice||0;
+      newOrderPart.sipPrice =item?.sipPrice||0;
+      newOrderPart.percent =item?.percent||0;
+      newOrderPart.profit =item?.profit||0;
+      newOrderPart.sellPrice =item?.sellPrice||0;
+      newOrderPart.stockQuantity=item?.stockQuantity||0;
+      newOrderPart.transport=item?.transport||0;
+      newOrderPart.unitSellPrice=item?.unitSellPrice||0;
+      newOrderPart.unitSipPrice=item?.unitSellPrice||0;
+      newOrderPart.delivering=req.body?.delivering||"";
+      newOrderPart.order = existOrder;
+      return await orderPartsRepository.save(newOrderPart);
+    });
 
-    // const newOrderParts = await Promise.all(newOrderPartsPromises);
-    // res
-    //   .status(200)
-    //   .json({ message: "Elave olundu", orderParts: newOrderParts });
+    const newOrderParts = await Promise.all(newOrderPartsPromises);
 
-    // res.status(200).json({ message: "Elave olundu" });
+    res.status(200).json({ message: "Elave olundu" });
   } catch (error) {
     next(errorHandler(401, error));
   }
@@ -691,7 +683,7 @@ export const sendToSupplier = async (
 ) => {
   try {
     const { id } = req.params;
-    // console.log(orderId);
+    // console.log(id);
 
     const userId = req.userId;
     const { historyId, message, selectedSuppliers } = req.body;
@@ -712,14 +704,16 @@ export const sendToSupplier = async (
       return;
     }
     // console.log(user);
-
-    const order = await orderRepository.findOneBy({ id: Number(id) });
+    const order = await orderRepository.findOne({
+      where: { id: Number(id) },
+      relations: ["orderParts"],
+    });
+    console.log(order,"salam");
 
     if (!order) {
       next(errorHandler(401, "Belə bir sifariş yoxdur!"));
       return;
     }
-    console.log(order);
 
     orderHistory.confirm = true;
     orderHistory.date = new Date();
@@ -736,6 +730,20 @@ export const sendToSupplier = async (
 
     await Promise.all(
       suppliers.map(async (supplier: any) => {
+
+
+          for (const item of order.orderParts) {
+            const newSupplierOrderPart = new SupplierOrderParts();
+            newSupplierOrderPart.origCode = item.origCode;
+            newSupplierOrderPart.count = item.count;
+            newSupplierOrderPart.partName = item.partName;
+            newSupplierOrderPart.orderPart = item;
+            newSupplierOrderPart.supplier = supplier;
+            await supplierOrderPartRepository.save(newSupplierOrderPart);
+            
+          }
+
+
         const newSupplierHistory = new SupplierOrderHistory();
         newSupplierHistory.orderHistory = orderHistory;
         newSupplierHistory.supplier = supplier;
@@ -807,6 +815,69 @@ export const calculationStepPass=async(req:CustomRequest,res:Response,next:NextF
 
     res.status(201).json({message:"all good"});
 
+    
+  } catch (error) {
+    next(errorHandler(401, error.message));
+  }
+}
+
+
+
+export const getSupplierOrderParts=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+
+     const {id,orderId}=req.params;
+     console.log(id,orderId);
+
+     const order = await orderRepository.findOne({
+      where: { id: Number(orderId) },
+      relations: ["orderParts"], // Fetch related orderParts directly
+    });
+    
+    if (!order) {
+      return next(errorHandler(404, "Sifariş tapılmadı"));
+    }
+      // console.log(order,"order");
+
+      const orderParts = order.orderParts;
+      
+     const supplier=await supplierRepository.findOneBy({id:Number(id)});
+     if (!supplier) {
+    return next(errorHandler(404,"Təchizatçı tapılmadı")); 
+     }
+
+    //  console.log(supplier,"supplier");
+     
+
+   
+
+    console.log(orderParts);
+    
+
+     if (orderParts.length===0) {
+      return next(errorHandler(404,"Sifariş hissələri tapılmadı"));
+     }
+    
+     const supplierOrderParts = (
+      await Promise.all(
+        orderParts.map(async (item) => {
+          return supplierOrderPartRepository.find({
+            where: {
+              orderPart: { id: item.id }, // Fix: Corrected query structure
+              supplier: { id: supplier.id }, // Fix: Use supplier.id
+            },
+          });
+        })
+      )
+    ).flat(); // Fix: Flatten the array
+
+      console.log(supplierOrderParts);
+      
+      if (supplierOrderParts.length===0) {
+        next(errorHandler(401, "Təchizatçıya aid sifariş hissələri mövcud deyil!"));
+        return;
+      }
+     res.status(200).json(supplierOrderParts);
     
   } catch (error) {
     next(errorHandler(401, error.message));

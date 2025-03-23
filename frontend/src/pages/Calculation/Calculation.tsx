@@ -54,8 +54,8 @@ const Calculation = () => {
   const orderId=parseInt(params.get('orderId') || '');
   const supplierId=parseInt(params.get('supplierId')||'');
   const isStandartClient=params.get('isStandartClient')==='true';
-  const liquidity=(params.get('liquidity')||'');
-  console.log(orderId,supplierId,liquidity);
+  const delivering=(params.get('delivering')||'');
+  // console.log(orderId,supplierId,liquidity);
   console.log(order);
   
   
@@ -82,7 +82,7 @@ const Calculation = () => {
   // console.log(isStandartClient);
   
   return (
-    isStandartClient?<CalculationStandart order={order} supplierId={supplierId}/>:<CalculationLocal order={order} supplierId={supplierId}/>
+    isStandartClient?<CalculationStandart order={order} supplierId={supplierId} delivering={delivering}/>:<CalculationLocal order={order} supplierId={supplierId} delivering={delivering}/>
   )
 };
 
