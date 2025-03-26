@@ -8,11 +8,11 @@ import { OrderPart } from "./OrderPart";
   @Entity({name:"supplier_orderParts"})
 export class SupplierOrderParts extends AllEntities{
 
-    @ManyToOne(()=>Supplier,(supplier)=>supplier.supplierOrderPart)
+    @ManyToOne(()=>Supplier,(supplier)=>supplier.supplierOrderPart,{ onDelete:"CASCADE",onUpdate:"CASCADE"})
     @JoinColumn({name:"supplier_id"})
     supplier:Supplier;
     
-    @ManyToOne(()=>OrderPart,(orderPart)=>orderPart.supplierOrderPart)
+    @ManyToOne(()=>OrderPart,(orderPart)=>orderPart.supplierOrderPart,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     @JoinColumn({name:"order_part_id"})
     orderPart:OrderPart;
     

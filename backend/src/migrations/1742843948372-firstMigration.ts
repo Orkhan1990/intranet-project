@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class FirstMigration1742548941688 implements MigrationInterface {
-    name = 'FirstMigration1742548941688'
+export class FirstMigration1742843948372 implements MigrationInterface {
+    name = 'FirstMigration1742843948372'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`card_problems\` (\`id\` int NOT NULL AUTO_INCREMENT, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`description\` varchar(255) NOT NULL, \`cardId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -33,8 +33,8 @@ export class FirstMigration1742548941688 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`order_history\` ADD CONSTRAINT \`FK_e15b4a73a3e53311433968993cc\` FOREIGN KEY (\`orderId\`) REFERENCES \`orders\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`supplier_order_history\` ADD CONSTRAINT \`FK_f91defbc1d544c92cd8418d015a\` FOREIGN KEY (\`supplier_id\`) REFERENCES \`suppliers\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`supplier_order_history\` ADD CONSTRAINT \`FK_2537b53b94c87e67c31194ba7a9\` FOREIGN KEY (\`order_history_id\`) REFERENCES \`order_history\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`supplier_orderParts\` ADD CONSTRAINT \`FK_f44a198d276aedb8c83750b52d6\` FOREIGN KEY (\`supplier_id\`) REFERENCES \`suppliers\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`supplier_orderParts\` ADD CONSTRAINT \`FK_3e439c36a1470027bbee51d8802\` FOREIGN KEY (\`order_part_id\`) REFERENCES \`order_parts\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`supplier_orderParts\` ADD CONSTRAINT \`FK_f44a198d276aedb8c83750b52d6\` FOREIGN KEY (\`supplier_id\`) REFERENCES \`suppliers\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
+        await queryRunner.query(`ALTER TABLE \`supplier_orderParts\` ADD CONSTRAINT \`FK_3e439c36a1470027bbee51d8802\` FOREIGN KEY (\`order_part_id\`) REFERENCES \`order_parts\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE \`order_parts\` ADD CONSTRAINT \`FK_790f388a94f5ffc752754e3d0f8\` FOREIGN KEY (\`orderId\`) REFERENCES \`orders\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`orders\` ADD CONSTRAINT \`FK_151b79a83ba240b0cb31b2302d1\` FOREIGN KEY (\`userId\`) REFERENCES \`users\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`orders\` ADD CONSTRAINT \`FK_1457f286d91f271313fded23e53\` FOREIGN KEY (\`clientId\`) REFERENCES \`clients\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);

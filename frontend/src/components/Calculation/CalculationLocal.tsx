@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 interface Part {
   id: number;
   price: number;
+  partName: string;
+  origCode: string;
   count: number;
   totalPrice: number;
   profit: number;
@@ -28,15 +30,16 @@ const CalculationLocal = ({order,supplierId,delivering}: CalculationLocalInterfa
   const [parts, setParts] = useState<Part[]>([]);
   const [handleTotalPriceSum,setTotalPriceSum]=useState<number>(0); 
   const [error, setError] = useState<string>("");
-  // const [delivering, setDelivering] = useState<string>("");
-  const [orderId, setOrderId] = useState<number>(0);
+  const [orderId,setOrderId]=useState<number>(0);
+  const [orderPartsIdArray,setOrderPartsIdArray]=useState<number[]>([]);
 
  
-   console.log(order.id,"sifaris");
+   console.log(orderPartsIdArray,"orderIdArray");
+
+
    
 
 useEffect(() => {
-  setOrderId(order.id);
 
     const getsupplierOrderParts = async () => {
       try {
@@ -55,8 +58,28 @@ useEffect(() => {
           setError(data.message);
           return;
         }else{
-          console.log(data);
-          setParts(data);
+          // console.log(data);
+          // setParts(data);
+
+          if (data.length>0) {
+
+            const partsData:Part[] = data.map((part:any) => ({
+              id: part.id,
+              partName:part.partName,
+              origCode:part.origCode,
+              price: part?.price || 0, // Default to 0 if price is undefined
+              count: part?.count || 1, // Default to 1 if count is undefined
+              totalPrice:part?.totalPrice||0, // Calculate initial totalPrice
+              profit:part?.profit||0, // You can set the initial value as needed
+              sellPrice:part?.sellPrice||0, // Likewise for sellPrice
+              transport:part?.transport||0, // And transport
+              sipPrice:part?.sipPrice||0, // And sipPrice
+              percent:part?.percent||0, // Example percent
+              unitSipPrice:part?.unitSipPrice||0, // Initial sip price per unit
+              unitSellPrice:part?.unitSellPrice||0, // Initial sell price per unit
+            }));
+              setParts(partsData);
+          }
         }
     
         // setDelivering(data.delivering);
@@ -66,35 +89,11 @@ useEffect(() => {
     }
 
     getsupplierOrderParts();
+    setOrderId(order.id);
+    const orderIdArray=order.orderParts.map((part)=>part.id);
+    setOrderPartsIdArray(orderIdArray);
 
 }, [supplierId,order]);
-  // useEffect(() => {
-  //   // if (order && order.orderParts) {
-  //   //   // Map over the orderParts array and prepare your data for useState
-  //   //   const partsData:Part[] = order.orderParts.map((part) => ({
-  //   //     id: part.id,
-  //   //     partName:part.partName,
-  //   //     origCode:part.origCode,
-  //   //     price: part?.price || 0, // Default to 0 if price is undefined
-  //   //     count: part?.count || 1, // Default to 1 if count is undefined
-  //   //     totalPrice:part?.totalPrice||0, // Calculate initial totalPrice
-  //   //     profit:part?.profit||0, // You can set the initial value as needed
-  //   //     sellPrice:part?.sellPrice||0, // Likewise for sellPrice
-  //   //     transport:part?.transport||0, // And transport
-  //   //     sipPrice:part?.sipPrice||0, // And sipPrice
-  //   //     percent:part?.percent||0, // Example percent
-  //   //     unitSipPrice:part?.unitSipPrice||0, // Initial sip price per unit
-  //   //     unitSellPrice:part?.unitSellPrice||0, // Initial sell price per unit
-  //   //   }));
-  //   //   setParts(partsData); // Set the state with the mapped parts data
-  //   //   setOrderId(order.id);
-  //   //   setDelivering(order.delivering);
-
-  //     // Set the state with the mapped parts data
-  //   }
-  // }, [supplierId]);
-
-  // console.log(parts,"parts");
 
 
   const handleChange = (e: any, id: number) => {
@@ -122,7 +121,7 @@ useEffect(() => {
      const totalPriceResult=Number(part.price)*part.count;
      const trasnportResult=totalPriceSum>0?Math.ceil((totalPriceResult*transport/totalPriceSum)*100)/100:0;
      const sipPriceResult=totalPriceResult+trasnportResult;
-     const profitResult=part.percent>0?sipPriceResult*(Number(part.percent)/100):0;
+     const profitResult=part.percent>0?Math.ceil(sipPriceResult*(Number(part.percent)/100)*100)/100:0;
      const unitSipPriceResult=Math.ceil((sipPriceResult/part.count)*100)/100;
      const sellPriceResult=Math.ceil((sipPriceResult+profitResult)*100)/100;
       const unitSellPriceResult=Math.ceil((sellPriceResult/part.count)*100)/100;
@@ -147,18 +146,16 @@ useEffect(() => {
   }
 
   const saveData=async()=>{
-    console.log(parts);
     try {
-
       const res = await fetch(
-        `http://localhost:3013/api/v1/order/updateOrderParts/${order.id}`,
+        `http://localhost:3013/api/v1/order/updateOrderParts/${orderId}`,
         {
           method: "POST",
           credentials: "include", // added this part
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ orderParts: parts,delivering:delivering,supplierId:supplierId }),
+          body: JSON.stringify({ orderParts: parts,delivering:delivering,supplierId:supplierId,orderPartsIdArray:orderPartsIdArray }),
         }
       );
 
@@ -167,6 +164,7 @@ useEffect(() => {
         setError(data.message);
         return;
       }else{
+        setParts(data)
         window.close();
       }
       console.log(data);      
@@ -317,7 +315,7 @@ useEffect(() => {
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="price" value={parseFloat(orderPart.price).toString()} onChange={(e) => handleChange(e,orderPart.id)}/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="price" value={orderPart.price} onChange={(e) => handleChange(e,orderPart.id)}/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -350,7 +348,7 @@ useEffect(() => {
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                       name="percent"
-                      value={parseFloat(orderPart.percent).toString()}
+                      value={orderPart.percent}
                       onChange={(e) => handleChange(e, orderPart.id)}
                     />
                     <span className="text-black font-[400] text-sm">%</span>

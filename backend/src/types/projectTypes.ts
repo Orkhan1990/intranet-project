@@ -57,4 +57,22 @@ export interface OrderInterface {
 }
 
 
+export interface SupplierOrderPartInterface {
+  origCode: string;
+  count: number;
+  partName:string;
+  price: number;
+  totalPrice:number;
+  sipPrice: number;
+  percent:number;
+  profit:number;
+  sellPrice:number;
+  stockQuantity:number;
+  transport:number;
+  unitSellPrice:number;
+  unitSipPrice:number;
+  delivering: string;
+  date: string;
+}
+
 
