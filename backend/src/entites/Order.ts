@@ -117,6 +117,8 @@ export class Order extends AllEntities {
   @Column({name:"second_message_to_supplier",nullable:true})
   secondMessageToSupplier:string
 
+  @Column({name:"is_finish_calculation",default:false})
+  isFinishCalculation:boolean
 
   @ManyToMany(()=>Supplier)
   @JoinTable()

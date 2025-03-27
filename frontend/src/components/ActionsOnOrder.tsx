@@ -31,13 +31,36 @@ const ActionsOnOrder = ({
     supplierId:0,
     delivering:DeliverType.Fast
   }]);
+const[supplierOrderPartsData,setSupplierOrderPartsData]=useState<any>([])
+const [orderPartArrayId,setOrderPartArrayId]=useState<number[]>([])
 
+
+console.log(supplierOrderPartsData,"supplierOrderPartsData");
+
+
+
+
+          
 
 
   
+  const handleChangeCalculation=(e:React.ChangeEvent<HTMLSelectElement>)=>{
+    setCalculationData((prev:any)=>[{...prev,[e.target.name]:e.target.value}])
+  }
 
-  useEffect(()=>{
+  
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
 
+  const { currentUser } = useSelector((state: RootState) => state.auth);
+
+  // console.log(order, "order");
+
+  const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
+  // console.log(selectSupplierForCalculation, "selectSupplierForCalculation");
+
+  useEffect(() => {
+     
     const supplierId=order.orderHistory[4]?.supplierOrderHistories
     ?.length > 0 &&
     order.orderHistory[4].supplierOrderHistories
@@ -56,32 +79,7 @@ const ActionsOnOrder = ({
           },
         ]);
       }
-  }
 
-    
-  ,[order])
-
-  console.log(order,"order");
-
- 
-    
-
-  const handleChangeCalculation=(e:React.ChangeEvent<HTMLSelectElement>)=>{
-    setCalculationData((prev:any)=>[{...prev,[e.target.name]:e.target.value}])
-  }
-
-  
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const navigate = useNavigate();
-
-  const { currentUser } = useSelector((state: RootState) => state.auth);
-
-  // console.log(order, "order");
-
-  const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
-  // console.log(selectSupplierForCalculation, "selectSupplierForCalculation");
-
-  useEffect(() => {
     const getSuppliers = async () => {
       try {
         const res = await fetch(
@@ -108,8 +106,47 @@ const ActionsOnOrder = ({
       }
     };
 
+
+    const getSupplierOrderParts=async()=>{
+      try {
+
+         const queryParams = new URLSearchParams({
+          orderPartIds:orderPartArrayId.join(","),
+        });
+
+
+        const res = await fetch(
+          `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData?${queryParams}`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+        }
+
+        if (res.ok) {
+          
+          setSupplierOrderPartsData(data);
+        }
+      } catch (error) {
+        console.log(error);
+        
+      }
+    }
+    getSupplierOrderParts();
     getSuppliers();
-  }, [order.id]);
+    const orderPartIdArray=order.orderParts.map((item:any)=>item.id)
+    setOrderPartArrayId(orderPartIdArray);
+  }, [order]);
+
+
+ 
 
   const handleClickFileUpload = () => {
     if (fileInputRef.current) {
@@ -323,7 +360,7 @@ const ActionsOnOrder = ({
   };
 
 
-
+ 
 
   const calculationOpenNewTab=(id:any)=>{
       // Calculate 90% of the screen width and full screen height
@@ -342,6 +379,29 @@ const ActionsOnOrder = ({
   }
 
 
+  const finishCalculation=async(id:any)=>{
+          try {
+            const res=await fetch(
+              `http://localhost:3013/api/v1/order/finishCalculation/${id}`,{
+                method:"POST",
+                credentials:"include",
+                headers:{
+                  "Content-Type":"application/json"
+                },
+                body:JSON.stringify({orderId:order.id})
+              })
+
+            const data=await res.json();
+            if(!res.ok||data.success===false){
+              setError(data.message)
+            }else{
+              setRefreshData((prev:any)=>!prev);
+            }
+            
+          } catch (error) {
+            
+          }
+  }
 
 
 
@@ -702,7 +762,11 @@ const ActionsOnOrder = ({
                           </div>
 
                           <div className="px-6 py-4 flex flex-col gap-3">
-
+                            <div className="font-semibold">
+                              {
+                               item.showHide &&supplierOrderPartsData[0]?.date &&changeFormatDate(supplierOrderPartsData[0].date)
+                              }
+                            </div>
                             {
                               order.orderHistory[4]?.supplierOrderHistories
                               ?.length > 0&&order.orderHistory[4].supplierOrderHistories
@@ -711,15 +775,16 @@ const ActionsOnOrder = ({
                                   new Date(a.date).getTime() -
                                   new Date(b.date).getTime()
                               )
-                              .map((item: any, index: number) => (
+                              .map((itemobj: any, index: number) => (
                                 <div className="flex gap-2 items-center" key={index}>
+                                  <div>{item.showHide&&supplierOrderPartsData[index]?.date&&changeFormatDate(supplierOrderPartsData[index]?.date)}</div>
                                 <Select className="w-72" sizing={"sm"} name="supplierId" onChange={handleChangeCalculation}>
                             
                                             <option
-                                              value={item.supplier.id}
+                                              value={itemobj.supplier.id}
                                               key={index}
                                             >
-                                              {item.supplier.supplier}
+                                              {itemobj.supplier.supplier}
                                             </option>
                                 </Select>
                                 <Select className="w-52" sizing={"sm"} name="delivering" onChange={handleChangeCalculation}>
@@ -727,12 +792,14 @@ const ActionsOnOrder = ({
                                   <option value={DeliverType.Normal_Fast}>Orta təcili (15-30 gün)</option>
                                   <option value={DeliverType.Planned}>Planlı (40-60 gün)</option>
                                 </Select>
-                              <Button color={"blue"}  onClick={()=>calculationOpenNewTab(item.supplier.id)} size={"xs"} className="cursor-pointer">Hesablama</Button>
+                              <Button color={"blue"}  onClick={()=>calculationOpenNewTab(itemobj.supplier.id)} size={"xs"} className="cursor-pointer">Hesablama</Button>
                               </div>
                               ))
                             }
-                                                    
-                           <Button color={"blue"} size={"xs"} className="w-20">Bitirmək</Button>
+                            {
+
+                               !item.showHide&&(<Button color={"blue"} size={"xs"} className="w-20" onClick={()=>finishCalculation(item.id)}>Bitirmək</Button>)
+                            }                        
                           </div>
 
                       </div>

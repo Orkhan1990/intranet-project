@@ -32,6 +32,7 @@ const CalculationLocal = ({order,supplierId,delivering}: CalculationLocalInterfa
   const [error, setError] = useState<string>("");
   const [orderId,setOrderId]=useState<number>(0);
   const [orderPartsIdArray,setOrderPartsIdArray]=useState<number[]>([]);
+  const [result,setResult]=useState<number>(0);
 
  
    console.log(orderPartsIdArray,"orderIdArray");
@@ -79,6 +80,8 @@ useEffect(() => {
               unitSellPrice:part?.unitSellPrice||0, // Initial sell price per unit
             }));
               setParts(partsData);
+              const result=partsData.reduce((acc,part)=>acc+(Number(part.price)*part.count),0);
+              setResult(result)
           }
         }
     
@@ -92,7 +95,7 @@ useEffect(() => {
     setOrderId(order.id);
     const orderIdArray=order.orderParts.map((part)=>part.id);
     setOrderPartsIdArray(orderIdArray);
-
+    
 }, [supplierId,order]);
 
 
@@ -113,7 +116,7 @@ useEffect(() => {
   // console.log(parts);
   // console.log(transport);
 
-  
+
   const calculationLocal=()=>{
     const totalPriceSum=parts.reduce((acc,part)=>acc+(Number(part.price)*part.count),0);
     setTotalPriceSum(totalPriceSum);
@@ -315,7 +318,7 @@ useEffect(() => {
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="price" value={orderPart.price} onChange={(e) => handleChange(e,orderPart.id)}/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="price" value={parseFloat(orderPart.price).toString()} onChange={(e) => handleChange(e,orderPart.id)}/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -383,7 +386,7 @@ useEffect(() => {
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
-            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">{handleTotalPriceSum===0?"":handleTotalPriceSum}</td>
+            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">{handleTotalPriceSum===0?(result===0?"":result):handleTotalPriceSum}</td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>

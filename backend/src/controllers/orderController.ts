@@ -333,6 +333,7 @@ export const updateOrderParts = async (
           unitSellPrice: matchingOrderPart?.unitSellPrice || 0,
           unitSipPrice: matchingOrderPart?.unitSellPrice || 0,
           delivering: req.body?.delivering || "",
+          date:new Date()
         });
       }
     });
@@ -711,6 +712,7 @@ export const sendToSupplier = async (
             newSupplierOrderPart.partName = item.partName;
             newSupplierOrderPart.orderPart = item;
             newSupplierOrderPart.supplier = supplier;
+            newSupplierOrderPart.date = new Date();
             await supplierOrderPartRepository.save(newSupplierOrderPart);
             
           }
@@ -779,7 +781,7 @@ export const calculationStepPass=async(req:CustomRequest,res:Response,next:NextF
     const newOrderHistory=new OrderHistory();
     newOrderHistory.step=OrderStep.CalculationBegin;
     newOrderHistory.date=new Date();
-    newOrderHistory.showHide=true;
+    newOrderHistory.showHide=false;
     newOrderHistory.order=order;
     newOrderHistory.user=user;
     await orderHistoryRepository.save(newOrderHistory);
@@ -818,14 +820,7 @@ export const getSupplierOrderParts=async(req:Request,res:Response,next:NextFunct
     return next(errorHandler(404,"Təchizatçı tapılmadı")); 
      }
 
-    //  console.log(supplier,"supplier");
-     
-
-   
-
-    // console.log(orderParts);
     
-
      if (orderParts.length===0) {
       return next(errorHandler(404,"Sifariş hissələri tapılmadı"));
      }
@@ -853,5 +848,44 @@ export const getSupplierOrderParts=async(req:Request,res:Response,next:NextFunct
     
   } catch (error) {
     next(errorHandler(401, error.message));
+  }
+}
+
+
+
+export const finisCalculation=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+  try {
+
+    const userId=req.userId;
+    const {id}=req.params;
+    const {orderId} = req.body;
+
+
+    const user=await userRepository.findOneBy({id:userId});
+    if (!user) {
+      next(errorHandler(401, "Belə bir istifadəçi yoxdur!"));
+      return;
+    }
+    const order=await orderRepository.findOneBy({id:Number(orderId)});
+    order.isFinishCalculation=true;
+    await orderRepository.save(order);
+    if (!order) {
+      next(errorHandler(401, "Belə bir sifariş yoxdur!"));
+      return;
+    }
+    const orderHistory=await orderHistoryRepository.findOneBy({id:Number(id)}); 
+    if (!orderHistory) {
+      next(errorHandler(401, "Belə bir sifariş tarixi yoxdur!"));
+      return;
+    }
+
+    orderHistory.showHide=true;
+    await orderHistoryRepository.save(orderHistory);
+
+    res.status(201).json({message:"Uğurla tamamlandı!"});
+    
+  } catch (error) {
+    next(errorHandler(401, error.message));
+    
   }
 }

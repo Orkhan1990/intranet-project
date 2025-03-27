@@ -820,10 +820,12 @@ const EditOrder = () => {
                   </FieldArray>
                 </div>
                 <div className="flex gap-2 mt-10">
-                  <Button type="submit" size={"xs"} color={"blue"}>
+                  
+                  {values.isExcellFile && (
+                    <>
+                    <Button type="submit" size={"xs"} color={"blue"}>
                     Yadda Saxla
                   </Button>
-                  {values.isExcellFile && (
                     <Button
                       size={"xs"}
                       color={"blue"}
@@ -831,6 +833,7 @@ const EditOrder = () => {
                     >
                       Təsdiqlə
                     </Button>
+                    </>
                   )}
                 </div>
                 {values.isExcellFile && (
