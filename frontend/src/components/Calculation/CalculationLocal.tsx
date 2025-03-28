@@ -36,6 +36,8 @@ const CalculationLocal = ({order,supplierId,delivering}: CalculationLocalInterfa
 
  
    console.log(orderPartsIdArray,"orderIdArray");
+   console.log(error);
+   
 
 
    
@@ -120,7 +122,7 @@ useEffect(() => {
   const calculationLocal=()=>{
     const totalPriceSum=parts.reduce((acc,part)=>acc+(Number(part.price)*part.count),0);
     setTotalPriceSum(totalPriceSum);
-  let result=parts.map((part)=>{
+  const result=parts.map((part)=>{
      const totalPriceResult=Number(part.price)*part.count;
      const trasnportResult=totalPriceSum>0?Math.ceil((totalPriceResult*transport/totalPriceSum)*100)/100:0;
      const sipPriceResult=totalPriceResult+trasnportResult;

@@ -202,6 +202,7 @@ export interface EditOrderInterface{
   paymentType: PayType,
   isExcellFile:boolean,
   isResponsible:boolean,
+  isFinishCalculation:boolean,
   responsibleDate:Date,
   delivering: DeliverType,
   deliveringType:string,

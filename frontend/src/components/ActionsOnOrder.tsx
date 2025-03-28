@@ -35,7 +35,7 @@ const[supplierOrderPartsData,setSupplierOrderPartsData]=useState<any>([])
 const [orderPartArrayId,setOrderPartArrayId]=useState<number[]>([])
 
 
-console.log(supplierOrderPartsData,"supplierOrderPartsData");
+console.log(supplierOrderPartsData,error,"supplierOrderPartsData");
 
 
 
@@ -250,14 +250,14 @@ console.log(supplierOrderPartsData,"supplierOrderPartsData");
 
   const changeFormatDate = (resultDate: Date) => {
     const date = new Date(resultDate);
-    let hours = date.getHours().toString().padStart(2, "0");
-    let minutes = date.getMinutes().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
 
-    let day = date.getDate().toString().padStart(2, "0");
-    let month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-based month
-    let year = date.getFullYear();
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-based month
+    const year = date.getFullYear();
 
-    let formattedDate = `${hours}:${minutes} ${day}-${month}-${year}`;
+    const formattedDate = `${hours}:${minutes} ${day}-${month}-${year}`;
     return formattedDate;
   };
 
@@ -283,6 +283,8 @@ console.log(supplierOrderPartsData,"supplierOrderPartsData");
       if (res.ok) {
         setRefreshData((prev: any) => !prev);
         navigate(`/editOrder/${order.id}`);
+        console.log(data);
+        
       }
     } catch (error) {
       console.log(error);
@@ -399,7 +401,8 @@ console.log(supplierOrderPartsData,"supplierOrderPartsData");
             }
             
           } catch (error) {
-            
+              console.log(error);
+              
           }
   }
 
@@ -415,7 +418,7 @@ console.log(supplierOrderPartsData,"supplierOrderPartsData");
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {order.orderHistory &&
-          order.orderHistory.map((item: any, index: number) => {
+          order.orderHistory.map((item: any) => {
             switch (item.step) {
               case "orderConfirm":
                 return (
@@ -756,6 +759,7 @@ console.log(supplierOrderPartsData,"supplierOrderPartsData");
                 case "calculationBegin":
                   return(
                     checkUser&&(
+                      <div>
                       <div className="flex text-sm ">
                            <div className="w-64 px-6 py-4 text-black flex flex-col">
                                 Hesablama
@@ -802,6 +806,53 @@ console.log(supplierOrderPartsData,"supplierOrderPartsData");
                             }                        
                           </div>
 
+                      </div>
+                      {
+                        item.showHide&&(
+                          <div className="flex text-sm">
+                         <div className="w-64 px-6 py-4 text-black flex flex-col">
+                                Hesablamanin Təsdiqi
+                          </div>
+                          <div className="px-6 py-4">
+                            <div>
+                              <h2 className="text-black">Mesaj</h2>
+                              <Textarea
+                                rows={5}
+                                className="my-2"
+                                name="acceptMessage"
+                              />
+                              <Button
+                                type="button"
+                                color={"blue"}
+                                size={"xs"}
+                                // onClick={() => acceptOrder(item.id)}
+                              >
+                                Təsdiqlə
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="px-6 py-4">
+                            <div>
+                              <h2 className="text-black">İmtina səbəbi</h2>
+                              <Textarea
+                                rows={5}
+                                className="my-2"
+                                name="rejectMessage"
+                                onChange={handleChange}
+                              />
+                              <Button
+                                type="button"
+                                color={"blue"}
+                                size={"xs"}
+                                // onClick={() => handleReject(item.id)}
+                              >
+                                İmtina et
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                        )
+                      }
                       </div>
                     )
                   

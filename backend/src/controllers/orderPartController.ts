@@ -40,7 +40,7 @@ export const getSupplierOrderPartsData = async (req: Request, res: Response,next
 
         
         const supplierOrderPartsDatas= await supplierOrderPartsRepository.find({
-            relations: ["orderPart"]  
+            relations: ["orderPart","supplier"]  
             });
         if(supplierOrderPartsDatas.length===0){
             return next(errorHandler(404,"Tədarikçi sifariş hissələri tapılmadı"));

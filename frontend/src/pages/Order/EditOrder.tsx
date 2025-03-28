@@ -1,18 +1,18 @@
 import { Button, Checkbox, Select, Textarea, TextInput } from "flowbite-react";
-import { Field, FieldArray, Form, Formik } from "formik";
+import { Field, Form, Formik } from "formik";
 import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
 import {
   ClientInterface,
   EditOrderInterface,
-  StockInfoInterface,
   UserInterface,
 } from "../../types";
-import OrderPartsComponent from "../../components/OrderPartsComponent";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ActionsOnOrder from "../../components/ActionsOnOrder";
 import { FiUpload } from "react-icons/fi";
 import * as XLSX from "xlsx"; // Import the library
+import { BeforeCalculationOrderPartsComponent } from "../../components/BeforeCalculationOrderPartsComponent";
+import { AfterCalculationOrderPartsComponent } from "../../components/AfterCalculationOrderPartsComponent";
 
 const EditOrder = () => {
   const [clients, setClients] = useState([]);
@@ -24,7 +24,6 @@ const EditOrder = () => {
   const [orderParts, setOrderParts] = useState<any[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [stockInfos, setStockInfos] = useState<StockInfoInterface[]>([]);
 
 
   const [orderInitialValue, setOrdersInitialValue] =
@@ -70,6 +69,7 @@ const EditOrder = () => {
       isExcellFile: false,
       isResponsible: false,
       responsibleDate: new Date(),
+      isFinishCalculation:false,
       responsibleUser: {
         id: 0,
         userName: "",
@@ -213,8 +213,10 @@ const EditOrder = () => {
       if (res.ok) {
         setRefreshData(true);
         setFileName("");
+        console.log(data);
       }
     } catch (error: any) {
+      
       setFileError(error.message);
     }
   };
@@ -415,11 +417,12 @@ const EditOrder = () => {
         });
       }
     } catch (error: any) {
-      // setError(error);
+      console.log(error);
+      
     }
   };
 
-  console.log(stockInfos, "stockInfo");
+  // console.log(stockInfos, "stockInfo");
   console.log(orderParts, "orderParts");
 
   const handleSubmitButton = async (id: any) => {
@@ -444,19 +447,7 @@ const EditOrder = () => {
   };
 
 
-  const defineDeliverType = (delivering: string) => {
-    switch (delivering) {
-      case "təcili":
-        return <span className="bg-red-700 text-white pb-5 px-[100px] pt-5 rounded-md">Təcili (15 gün)</span>;
-      case "normal":
-        return <span className="bg-green-700 text-white pb-5 px-[100px] pt-5 rounded-md">Orta (15-30 gün)</span>;
-      case "planlaşdırılmış":
-        return <span className="bg-green-700 text-white pb-5 px-[100px] pt-5 rounded-md">Planlaşdırılmış (40-60 gün)</span>;
-      default:
-        return false;
 
-    }
-  }
 
 
 
@@ -734,18 +725,17 @@ const EditOrder = () => {
                 </div>
 
                 <div className="mt-10 ">
-                  <FieldArray name="orderParts">
+
+
+                  {
+                      !orderInitialValue.isFinishCalculation?(<BeforeCalculationOrderPartsComponent deletePart={deletePart} orderInitialValue={orderInitialValue} checkInstock={checkInstock} values={values}/>):(<AfterCalculationOrderPartsComponent orderInitialValue={orderInitialValue}/>)
+                  }
+               
+{/* 
+               <FieldArray name="orderParts">
                     {({ push }) => (
                       <div className="border text-sm  w-3/4 p-5 rounded-md ">
-                        {/* {
-                          defineDeliverType(orderInitialValue.orderParts[0].delivering) && (
-                            <div className="text-end mb-5">
-                              {
-                                defineDeliverType(orderInitialValue.orderParts[0].delivering)
-                              }
-                            </div>
-                          )
-                        } */}
+                        
                         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
 
 
@@ -818,6 +808,7 @@ const EditOrder = () => {
                       </div>
                     )}
                   </FieldArray>
+                  */}
                 </div>
                 <div className="flex gap-2 mt-10">
                   
