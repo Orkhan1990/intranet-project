@@ -26,7 +26,7 @@ export const AfterCalculationOrderPartsComponent = ({
   );
 
   const groupedSupplierOrderParts = supplierOrderParts.sort(
-    (a: any, b: any) => b.supplier.id - a.supplier.id
+    (a: any, b: any) => a.supplier.id - b.supplier.id
   );
 
   const forHeader = groupedSupplierOrderParts.reduce(
@@ -40,8 +40,8 @@ export const AfterCalculationOrderPartsComponent = ({
   );
 
   const newArrayGroupedSupplierOrderParts = [
-    groupedSupplierOrderParts.slice(0, 2),
-    groupedSupplierOrderParts.slice(2, 4),
+    groupedSupplierOrderParts.slice(0, ((groupedSupplierOrderParts.length)/2)),
+    groupedSupplierOrderParts.slice(((groupedSupplierOrderParts.length)/2), (((groupedSupplierOrderParts.length)/2)*2))
   ];
   console.log(groupedSupplierOrderParts, "groupedSupplierOrderParts");
   console.log(forHeader, "forHeader");
@@ -50,14 +50,7 @@ export const AfterCalculationOrderPartsComponent = ({
     "newArrayGroupedSupplierOrderParts"
   );
 
-  for (const item of newArrayGroupedSupplierOrderParts) {
-    for (let index = 0; index < item.length; index++) {
-      if (index === 2) {
-        console.log(item[index], "salam");
-        break;
-      }
-    }
-  }
+
 
   useEffect(() => {
     if (orderInitialValue.orderParts) {
@@ -221,7 +214,7 @@ export const AfterCalculationOrderPartsComponent = ({
                             type="text"
                             sizing="sm"
                             className="w-20"
-                            value={parseFloat(item[index].price).toString()}
+                            value={parseFloat(item[index]?.price).toString()}
                             readOnly
                           />
                         </td>
@@ -231,7 +224,7 @@ export const AfterCalculationOrderPartsComponent = ({
                             sizing="sm"
                             className="w-20"
                             value={parseFloat(
-                              item[index].unitSellPrice
+                              item[index]?.unitSellPrice
                             ).toString()}
                             readOnly
                           />
@@ -241,7 +234,7 @@ export const AfterCalculationOrderPartsComponent = ({
                             type="text"
                             sizing="sm"
                             className="w-20"
-                            value={parseFloat(item[index].sellPrice).toString()}
+                            value={parseFloat(item[index]?.sellPrice).toString()}
                             readOnly
                           />
                         </td>
@@ -263,11 +256,12 @@ export const AfterCalculationOrderPartsComponent = ({
                 <React.Fragment key={supplierIndex}>
                   <td className="px-6 py-4"></td>
                   <td className="px-9 py-4 text-black text-xs">
-                    {item.reduce(
+                    {(item.reduce(
                       (total: number, obj: any) =>
-                        total + Number(obj.unitSellPrice),
+                        total + Number(obj?.sellPrice),
                       0
-                    )}
+                    )).toFixed(2)
+                    }
                   </td>
                   <td className="px-6 py-4"></td>
                 </React.Fragment>

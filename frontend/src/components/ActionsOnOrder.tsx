@@ -35,7 +35,7 @@ const[supplierOrderPartsData,setSupplierOrderPartsData]=useState<any>([])
 const [orderPartArrayId,setOrderPartArrayId]=useState<number[]>([])
 
 
-console.log(supplierOrderPartsData,error,"supplierOrderPartsData");
+console.log(selectedSuppliers,error,"selectedSuppliers");
 
 
 
@@ -808,7 +808,7 @@ console.log(supplierOrderPartsData,error,"supplierOrderPartsData");
 
                       </div>
                       {
-                        item.showHide&&(
+                        item.confirm&&(
                           <div className="flex text-sm">
                          <div className="w-64 px-6 py-4 text-black flex flex-col">
                                 Hesablamanin Təsdiqi
