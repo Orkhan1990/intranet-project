@@ -24,6 +24,9 @@ export class SupplierOrderParts extends AllEntities{
     @Column({nullable:true})
     count:number;
 
+    @Column({name:"is_the_best_supplier",default:false})
+    isTheBestSupplier:boolean;
+
     @Column({ name: "delivering",nullable:true })
     delivering: string;
     

@@ -655,89 +655,58 @@ export const sendToSupplier = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    // console.log(id);
+  const { id } = req.params;
+  const userId = req.userId;
+  const { historyId, selectedSuppliers } = req.body;
 
-    const userId = req.userId;
-    const { historyId, message, selectedSuppliers } = req.body;
+  const orderHistory = await orderHistoryRepository.findOneBy({ id: historyId });
+  if (!orderHistory) return next(errorHandler(404, "Belə bir sifariş tarixçəsi yoxdur!"));
 
-    const orderHistory = await orderHistoryRepository.findOneBy({
-      id: historyId,
-    });
-    // console.log(orderHistory);
+  const user = await userRepository.findOneBy({ id: userId });
+  if (!user) return next(errorHandler(404, "İstifadəçi mövcud deyil!"));
 
-    if (!orderHistory) {
-      next(errorHandler(401, "Belə bir sifariş tarixi yoxdur!"));
-      return;
-    }
+  const order = await orderRepository.findOne({
+    where: { id: Number(id) },
+    relations: ["orderParts"],
+  });
+  if (!order) return next(errorHandler(404, "Sifariş mövcud deyil!"));
 
-    const user = await userRepository.findOneBy({ id: userId });
-    if (!user) {
-      next(errorHandler(401, "Belə bir istifadəçi yoxdur!"));
-      return;
-    }
-    // console.log(user);
-    const order = await orderRepository.findOne({
-      where: { id: Number(id) },
-      relations: ["orderParts"],
-    });
-    // console.log(order,"salam");
+  // Updating OrderHistory details
+  // Object.assign(orderHistory, { confirm: true, date: new Date(), user, order });
+  // await orderHistoryRepository.save(orderHistory);
 
-    if (!order) {
-      next(errorHandler(401, "Belə bir sifariş yoxdur!"));
-      return;
-    }
+  const existingSupplierOrders = await suppliersOrderHistoryReposiroty.find({
+    where: { orderHistory },
+    relations: ["supplier"],
+  });
 
-    orderHistory.confirm = true;
-    orderHistory.date = new Date();
-    orderHistory.user = user;
-    orderHistory.order = order;
-    await orderHistoryRepository.save(orderHistory);
+  const existingSupplierIds = new Set(existingSupplierOrders.map(item => item.supplier.id));
+  const newSupplierIds = selectedSuppliers.filter((id: any) => !existingSupplierIds.has(Number(id)));
 
-   
-
-    const suppliers = await supplierRepository.findBy({
-      id: In(selectedSuppliers.map(Number)) // Use 'In' to query multiple ids at once
-    });
-
-
+  if (newSupplierIds.length > 0) {
     await Promise.all(
-      suppliers.map(async (supplier: any) => {
-
-
-          for (const item of order.orderParts) {
-            const newSupplierOrderPart = new SupplierOrderParts();
-            newSupplierOrderPart.origCode = item.origCode;
-            newSupplierOrderPart.count = item.count;
-            newSupplierOrderPart.partName = item.partName;
-            newSupplierOrderPart.orderPart = item;
-            newSupplierOrderPart.supplier = supplier;
-            newSupplierOrderPart.date = new Date();
-            await supplierOrderPartRepository.save(newSupplierOrderPart);
-            
-          }
-
-
-        const newSupplierHistory = new SupplierOrderHistory();
-        newSupplierHistory.orderHistory = orderHistory;
-        newSupplierHistory.supplier = supplier;
-        newSupplierHistory.date = new Date();
-
-        await suppliersOrderHistoryReposiroty.save(newSupplierHistory);
+      newSupplierIds.map(async (supplierId: any) => {
+        const supplier = await supplierRepository.findOneBy({ id: supplierId });
+        if (supplier) {
+          const newSupplierOrderHistory = new SupplierOrderHistory();
+          Object.assign(newSupplierOrderHistory, { date: new Date(), supplier, orderHistory });
+          await suppliersOrderHistoryReposiroty.save(newSupplierOrderHistory);
+        }
       })
     );
-      
-     const data=await suppliersOrderHistoryReposiroty.find({
-      where:{orderHistory:{id:historyId}},
-      relations:["supplier"]
-     })
-    //  console.log(data);
-     
-    res.status(201).json({data});
+  }
+
+  const updatedData = await suppliersOrderHistoryReposiroty.find({
+    where: { orderHistory: { id: historyId } },
+    relations: ["supplier"],
+  });
+
+  res.status(201).json({ data: updatedData });
+
   } catch (error) {
     next(errorHandler(401, error.message));
-  }
-};
+  }}
+
 
 
 export const calculationStepPass=async(req:CustomRequest,res:Response,next:NextFunction)=>{
@@ -853,7 +822,7 @@ export const getSupplierOrderParts=async(req:Request,res:Response,next:NextFunct
 
 
 
-export const finisCalculation=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+export const acceptCalculation=async(req:CustomRequest,res:Response,next:NextFunction)=>{
   try {
 
     const userId=req.userId;
@@ -867,12 +836,14 @@ export const finisCalculation=async(req:CustomRequest,res:Response,next:NextFunc
       return;
     }
     const order=await orderRepository.findOneBy({id:Number(orderId)});
-    order.isFinishCalculation=true;
-    await orderRepository.save(order);
     if (!order) {
       next(errorHandler(401, "Belə bir sifariş yoxdur!"));
       return;
     }
+    order.isFinishCalculation=true;
+    await orderRepository.save(order);
+
+
     const orderHistory=await orderHistoryRepository.findOneBy({id:Number(id)}); 
     if (!orderHistory) {
       next(errorHandler(401, "Belə bir sifariş tarixi yoxdur!"));
@@ -882,10 +853,71 @@ export const finisCalculation=async(req:CustomRequest,res:Response,next:NextFunc
     orderHistory.showHide=true;
     await orderHistoryRepository.save(orderHistory);
 
+    const newOrderHistory=new OrderHistory();
+    newOrderHistory.step=OrderStep.CalculationAccept;
+    newOrderHistory.date=new Date();
+    newOrderHistory.showHide=false;
+    newOrderHistory.order=order;
+    newOrderHistory.user=user;
+    await orderHistoryRepository.save(newOrderHistory);
+
+
+
+
     res.status(201).json({message:"Uğurla tamamlandı!"});
     
   } catch (error) {
     next(errorHandler(401, error.message));
     
+  }
+}
+
+
+
+export const confirmCalculationPassNextStep=async(req:CustomRequest,res:Response,next:NextFunction)=>{
+  try {
+
+    const userId=req.userId;
+    const {id}=req.params;
+    const {orderId}=req.body;
+
+    const user=await userRepository.findOneBy({id:userId});
+    if (!user) {
+      next(errorHandler(401, "Belə bir istifadəçi yoxdur!"));
+      return;
+    }
+
+
+    const order=await orderRepository.findOneBy({id:Number(orderId)});
+    if (!order) {
+      next(errorHandler(401, "Belə bir sifariş yoxdur!"));
+      return;
+    }
+
+    const orderHistory=await orderHistoryRepository.findOneBy({id:Number(id)}); 
+    if (!orderHistory) {
+      next(errorHandler(401, "Belə bir sifariş tarixi yoxdur!"));
+      return;
+    }
+
+    orderHistory.date=new Date();
+    orderHistory.showHide=true;
+    orderHistory.user=user;
+    orderHistory.order=order;
+
+    await orderHistoryRepository.save(orderHistory);
+
+    const newOrderHistory=new OrderHistory();
+    newOrderHistory.step=OrderStep.ChoosingBestSupplier;
+    newOrderHistory.date=new Date();
+    newOrderHistory.showHide=false;
+    newOrderHistory.order=order;
+    newOrderHistory.user=user;
+    await orderHistoryRepository.save(newOrderHistory);
+
+    res.status(201).json({message:"Məlumat yeniləndi!"})
+    
+  } catch (error) {
+    next(errorHandler(401,error))
   }
 }

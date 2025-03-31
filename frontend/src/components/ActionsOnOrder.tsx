@@ -5,15 +5,16 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux-toolkit/store/store";
 import { SupplierInterface } from "../types";
 import { Link } from "react-router-dom";
-import { FaCloudUploadAlt} from "react-icons/fa";
+import { FaCloudUploadAlt } from "react-icons/fa";
 import { DeliverType, OrderType } from "../enums/projectEnums";
-
 
 interface ActionsOnOrderInterface {
   order: any;
   setRefreshData: (item: any) => void;
   officeUsers: any;
 }
+
+
 
 
 
@@ -27,58 +28,50 @@ const ActionsOnOrder = ({
   const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
   const [error, setError] = useState<string>("");
-  const [calculationData, setCalculationData] = useState([{
-    supplierId:0,
-    delivering:DeliverType.Fast
-  }]);
-const[supplierOrderPartsData,setSupplierOrderPartsData]=useState<any>([])
-const [orderPartArrayId,setOrderPartArrayId]=useState<number[]>([])
+  const [calculationData, setCalculationData] = useState([
+    {
+      supplierId: 0,
+      delivering: DeliverType.Fast,
+    },
+  ]);
+  const [supplierOrderPartsData, setSupplierOrderPartsData] = useState<any>([]);
+  const [orderPartArrayId, setOrderPartArrayId] = useState<number[]>([]);
 
+  console.log(selectedSuppliers, error, "selectedSuppliers");
 
-console.log(selectedSuppliers,error,"selectedSuppliers");
+  const handleChangeCalculation = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCalculationData((prev: any) => [
+      { ...prev, [e.target.name]: e.target.value },
+    ]);
+  };
 
-
-
-
-          
-
-
-  
-  const handleChangeCalculation=(e:React.ChangeEvent<HTMLSelectElement>)=>{
-    setCalculationData((prev:any)=>[{...prev,[e.target.name]:e.target.value}])
-  }
-
-  
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
 
   const { currentUser } = useSelector((state: RootState) => state.auth);
 
-  // console.log(order, "order");
+  console.log(order, "order");
 
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
   // console.log(selectSupplierForCalculation, "selectSupplierForCalculation");
 
   useEffect(() => {
-     
-    const supplierId=order.orderHistory[4]?.supplierOrderHistories
-    ?.length > 0 &&
-    order.orderHistory[4].supplierOrderHistories
-      .sort(
+    const supplierId =
+      order.orderHistory[4]?.supplierOrderHistories?.length > 0 &&
+      order.orderHistory[4].supplierOrderHistories.sort(
         (a: any, b: any) =>
-          new Date(a.date).getTime() -
-          new Date(b.date).getTime()
-      )[0].supplier.id
+          new Date(a.date).getTime() - new Date(b.date).getTime()
+      )[0].supplier.id;
 
-      if (supplierId) {
-        setCalculationData((prevData) => [
-          ...prevData,
-          {
-            supplierId,
-            delivering:DeliverType.Fast // Add the supplierId dynamically
-          },
-        ]);
-      }
+    if (supplierId) {
+      setCalculationData((prevData) => [
+        ...prevData,
+        {
+          supplierId,
+          delivering: DeliverType.Fast, // Add the supplierId dynamically
+        },
+      ]);
+    }
 
     const getSuppliers = async () => {
       try {
@@ -106,14 +99,11 @@ console.log(selectedSuppliers,error,"selectedSuppliers");
       }
     };
 
-
-    const getSupplierOrderParts=async()=>{
+    const getSupplierOrderParts = async () => {
       try {
-
-         const queryParams = new URLSearchParams({
-          orderPartIds:orderPartArrayId.join(","),
+        const queryParams = new URLSearchParams({
+          orderPartIds: orderPartArrayId.join(","),
         });
-
 
         const res = await fetch(
           `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData?${queryParams}`,
@@ -131,22 +121,17 @@ console.log(selectedSuppliers,error,"selectedSuppliers");
         }
 
         if (res.ok) {
-          
           setSupplierOrderPartsData(data);
         }
       } catch (error) {
         console.log(error);
-        
       }
-    }
+    };
     getSupplierOrderParts();
     getSuppliers();
-    const orderPartIdArray=order.orderParts.map((item:any)=>item.id)
+    const orderPartIdArray = order.orderParts.map((item: any) => item.id);
     setOrderPartArrayId(orderPartIdArray);
   }, [order]);
-
-
- 
 
   const handleClickFileUpload = () => {
     if (fileInputRef.current) {
@@ -284,7 +269,6 @@ console.log(selectedSuppliers,error,"selectedSuppliers");
         setRefreshData((prev: any) => !prev);
         navigate(`/editOrder/${order.id}`);
         console.log(data);
-        
       }
     } catch (error) {
       console.log(error);
@@ -350,65 +334,86 @@ console.log(selectedSuppliers,error,"selectedSuppliers");
         }
       );
 
-      const data=await res.json();
-      if(!res.ok||data.success===false){
-        setError(data.message)
-      }else{
-        setRefreshData((prev:any)=>!prev);
+      const data = await res.json();
+      if (!res.ok || data.success === false) {
+        setError(data.message);
+      } else {
+        setRefreshData((prev: any) => !prev);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const calculationOpenNewTab = (id: any) => {
+    // Calculate 90% of the screen width and full screen height
+    const width = window.innerWidth * 0.9; // 90% of the screen width
+    const height = window.innerHeight / 1.4; // Full screen height
 
- 
+    // Set the position (optional) - center the window
+    const left = (window.innerWidth - width) / 2; // Center horizontally
+    const top = (window.innerHeight - height) / 2; // Center vertically
 
-  const calculationOpenNewTab=(id:any)=>{
-      // Calculate 90% of the screen width and full screen height
-      const width = window.innerWidth * 0.9; // 90% of the screen width
-      const height = window.innerHeight/1.4;    // Full screen height
-  
-      // Set the position (optional) - center the window
-      const left = (window.innerWidth - width) / 2;  // Center horizontally
-      const top = (window.innerHeight - height) / 2; // Center vertically
-  
-      // Set window features
-      const windowFeatures = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
-      const isStandartClient=order.orderType===OrderType.Standart_Client;
-  
-    window.open(`http://localhost:5173/calculation?orderId=${order.id}&supplierId=${id}&delivering=${calculationData[0].delivering}&isStandartClient=${isStandartClient}`,"_blank",windowFeatures)
-  }
+    // Set window features
+    const windowFeatures = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
+    const isStandartClient = order.orderType === OrderType.Standart_Client;
 
+    window.open(
+      `http://localhost:5173/calculation?orderId=${order.id}&supplierId=${id}&delivering=${calculationData[0].delivering}&isStandartClient=${isStandartClient}`,
+      "_blank",
+      windowFeatures
+    );
+  };
 
-  const finishCalculation=async(id:any)=>{
-          try {
-            const res=await fetch(
-              `http://localhost:3013/api/v1/order/finishCalculation/${id}`,{
-                method:"POST",
-                credentials:"include",
-                headers:{
-                  "Content-Type":"application/json"
-                },
-                body:JSON.stringify({orderId:order.id})
-              })
+  const acceptCalculation = async (id: any) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3013/api/v1/order/acceptCalculation/${id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderId: order.id }),
+        }
+      );
 
-            const data=await res.json();
-            if(!res.ok||data.success===false){
-              setError(data.message)
-            }else{
-              setRefreshData((prev:any)=>!prev);
-            }
-            
-          } catch (error) {
-              console.log(error);
-              
-          }
-  }
+      const data = await res.json();
+      if (!res.ok || data.success === false) {
+        setError(data.message);
+      } else {
+        setRefreshData((prev: any) => !prev);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const confirmCalculationPassNextStep = async (id: number) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3013/api/v1/order/confirmCalculationPassNextStep/${id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderId: order.id }),
+        }
+      );
 
-
-    
+      const data = await res.json();
+      if (!res.ok || data.success === false) {
+        setError(data.message);
+      } else {
+        setRefreshData((prev: any) => !prev);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="mt-5">
@@ -756,107 +761,226 @@ console.log(selectedSuppliers,error,"selectedSuppliers");
                   )
                 );
 
-                case "calculationBegin":
-                  return(
-                    checkUser&&(
-                      <div>
+              case "calculationBegin":
+                return (
+                  checkUser && (
+                    <div>
                       <div className="flex text-sm ">
-                           <div className="w-64 px-6 py-4 text-black flex flex-col">
-                                Hesablama
-                          </div>
+                        <div className="w-64 px-6 py-4 text-black flex flex-col">
+                          Hesablama
+                        </div>
 
-                          <div className="px-6 py-4 flex flex-col gap-3">
-                            <div className="font-semibold">
-                              {
-                               item.showHide &&supplierOrderPartsData[0]?.date &&changeFormatDate(supplierOrderPartsData[0].date)
-                              }
-                            </div>
-                            {
-                              order.orderHistory[4]?.supplierOrderHistories
-                              ?.length > 0&&order.orderHistory[4].supplierOrderHistories
+                        <div className="px-6 py-4 flex flex-col gap-3">
+                          <div className="font-semibold">
+                            {item.showHide &&
+                              supplierOrderPartsData[0]?.date &&
+                              changeFormatDate(supplierOrderPartsData[0].date)}
+                          </div>
+                          {order.orderHistory[4]?.supplierOrderHistories
+                            ?.length > 0 &&
+                            order.orderHistory[4].supplierOrderHistories
                               .sort(
                                 (a: any, b: any) =>
                                   new Date(a.date).getTime() -
                                   new Date(b.date).getTime()
                               )
                               .map((itemobj: any, index: number) => (
-                                <div className="flex gap-2 items-center" key={index}>
-                                  <div>{item.showHide&&supplierOrderPartsData[index]?.date&&changeFormatDate(supplierOrderPartsData[index]?.date)}</div>
-                                <Select className="w-72" sizing={"sm"} name="supplierId" onChange={handleChangeCalculation}>
-                            
-                                            <option
-                                              value={itemobj.supplier.id}
-                                              key={index}
-                                            >
-                                              {itemobj.supplier.supplier}
-                                            </option>
-                                </Select>
-                                <Select className="w-52" sizing={"sm"} name="delivering" onChange={handleChangeCalculation}>
-                                  <option value={DeliverType.Fast}>Təcili (7-15 gün)</option>
-                                  <option value={DeliverType.Normal_Fast}>Orta təcili (15-30 gün)</option>
-                                  <option value={DeliverType.Planned}>Planlı (40-60 gün)</option>
-                                </Select>
-                              <Button color={"blue"}  onClick={()=>calculationOpenNewTab(itemobj.supplier.id)} size={"xs"} className="cursor-pointer">Hesablama</Button>
-                              </div>
-                              ))
-                            }
-                            {
-
-                               !item.showHide&&(<Button color={"blue"} size={"xs"} className="w-20" onClick={()=>finishCalculation(item.id)}>Bitirmək</Button>)
-                            }                        
-                          </div>
-
-                      </div>
-                      {
-                        item.confirm&&(
-                          <div className="flex text-sm">
-                         <div className="w-64 px-6 py-4 text-black flex flex-col">
-                                Hesablamanin Təsdiqi
-                          </div>
-                          <div className="px-6 py-4">
-                            <div>
-                              <h2 className="text-black">Mesaj</h2>
-                              <Textarea
-                                rows={5}
-                                className="my-2"
-                                name="acceptMessage"
-                              />
-                              <Button
-                                type="button"
-                                color={"blue"}
-                                size={"xs"}
-                                // onClick={() => acceptOrder(item.id)}
-                              >
-                                Təsdiqlə
-                              </Button>
-                            </div>
-                          </div>
-                          <div className="px-6 py-4">
-                            <div>
-                              <h2 className="text-black">İmtina səbəbi</h2>
-                              <Textarea
-                                rows={5}
-                                className="my-2"
-                                name="rejectMessage"
-                                onChange={handleChange}
-                              />
-                              <Button
-                                type="button"
-                                color={"blue"}
-                                size={"xs"}
-                                // onClick={() => handleReject(item.id)}
-                              >
-                                İmtina et
-                              </Button>
-                            </div>
-                          </div>
+                                <div
+                                  className="flex gap-2 items-center"
+                                  key={index}
+                                >
+                                  <div>
+                                    {item.showHide &&
+                                      supplierOrderPartsData[index]?.date &&
+                                      changeFormatDate(
+                                        supplierOrderPartsData[index]?.date
+                                      )}
+                                  </div>
+                                  <Select
+                                    className="w-72"
+                                    sizing={"sm"}
+                                    name="supplierId"
+                                    onChange={handleChangeCalculation}
+                                  >
+                                    <option
+                                      value={itemobj.supplier.id}
+                                      key={index}
+                                    >
+                                      {itemobj.supplier.supplier}
+                                    </option>
+                                  </Select>
+                                  <Select
+                                    className="w-52"
+                                    sizing={"sm"}
+                                    name="delivering"
+                                    onChange={handleChangeCalculation}
+                                  >
+                                    <option value={DeliverType.Fast}>
+                                      Təcili (7-15 gün)
+                                    </option>
+                                    <option value={DeliverType.Normal_Fast}>
+                                      Orta təcili (15-30 gün)
+                                    </option>
+                                    <option value={DeliverType.Planned}>
+                                      Planlı (40-60 gün)
+                                    </option>
+                                  </Select>
+                                  <Button
+                                    color={"blue"}
+                                    onClick={() =>
+                                      calculationOpenNewTab(itemobj.supplier.id)
+                                    }
+                                    size={"xs"}
+                                    className="cursor-pointer"
+                                  >
+                                    Hesablama
+                                  </Button>
+                                </div>
+                              ))}
+                          {!item.showHide && (
+                            <Button
+                              color={"blue"}
+                              size={"xs"}
+                              className="w-20"
+                              onClick={() => acceptCalculation(item.id)}
+                            >
+                              Bitirmək
+                            </Button>
+                          )}
                         </div>
-                        )
-                      }
                       </div>
-                    )
-                  
+                    </div>
                   )
+                );
+
+              case "calculationAccept":
+                return (
+                  <>
+                    {checkUser && (
+                      <div>
+                        <div className="flex text-sm odd:bg-gray-100 odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                          <div className="w-64 px-6 py-4 text-black ">
+                            Hesablamanın təsdiqi
+                          </div>
+
+                          {!item.showHide ? (
+                            <>
+                              <div className="px-6 py-4">
+                                <div>
+                                  <h2 className="text-black">Mesaj</h2>
+                                  <Textarea
+                                    rows={5}
+                                    className="my-2"
+                                    name="acceptMessage"
+                                  />
+                                  <Button
+                                    type="button"
+                                    color={"blue"}
+                                    size={"xs"}
+                                    onClick={() =>
+                                      confirmCalculationPassNextStep(item.id)
+                                    }
+                                  >
+                                    Təsdiqlə
+                                  </Button>
+                                </div>
+                              </div>
+                              <div className="px-6 py-4">
+                                <div>
+                                  <h2 className="text-black">İmtina səbəbi</h2>
+                                  <Textarea
+                                    rows={5}
+                                    className="my-2"
+                                    name="rejectMessage"
+                                    onChange={handleChange}
+                                  />
+                                  <Button
+                                    type="button"
+                                    color={"blue"}
+                                    size={"xs"}
+                                    // onClick={() => handleReject(item.id)}
+                                  >
+                                    İmtina et
+                                  </Button>
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="px-6 py-4">
+                              {changeFormatDate(item.date)}
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          {item.showHide && (
+                            <div className="flex text-sm ">
+                              <div className="w-64 px-6 py-4 text-black ">
+                                Menecerə təsdiq üçün göndərildi
+                              </div>
+                              <div className="px-6 py-4">
+                                {changeFormatDate(item.date)}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
+
+              case "choosingBestSupplier":
+                return (
+                  <>
+                    {checkUser && (
+                      <div>
+                        <div className="flex text-sm odd:bg-gray-100 odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                          <div className="w-64 px-6 py-4 text-black ">
+                            Menecerin təsdiqi
+                          </div>
+                              <div className="px-6 py-4">
+                                <div>
+                                  <h2 className="text-black">Mesaj</h2>
+                                  <Textarea
+                                    rows={5}
+                                    className="my-2"
+                                    name="acceptMessage"
+                                  />
+                                  <Button
+                                    type="button"
+                                    color={"blue"}
+                                    size={"xs"}
+                                    onClick={() =>
+                                      confirmCalculationPassNextStep(item.id)
+                                    }
+                                  >
+                                    Təsdiqlə
+                                  </Button>
+                                </div>
+                              </div>
+                              <div className="px-6 py-4">
+                                <div>
+                                  <h2 className="text-black">İmtina səbəbi</h2>
+                                  <Textarea
+                                    rows={5}
+                                    className="my-2"
+                                    name="rejectMessage"
+                                    onChange={handleChange}
+                                  />
+                                  <Button
+                                    type="button"
+                                    color={"blue"}
+                                    size={"xs"}
+                                    // onClick={() => handleReject(item.id)}
+                                  >
+                                    İmtina et
+                                  </Button>
+                                </div>
+                              </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
 
               default:
                 break;

@@ -28,7 +28,7 @@ export enum OrderStatus{
     RequsetToSupplier="requestToSupplier",
     CalculationBegin="calculationBegin",
     CalculationAccept="calculationAccept",
-    CalculationEnd="calculationEnd",
+    ChoosingBestSupplier="choosingBestSupplier",
     RequestSupplier="requestSupplier",
     ProcessingSupplier="processingSupplier",
     AccountantAccept="accountantAccept",  

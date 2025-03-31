@@ -1,5 +1,5 @@
 import express from "express";
-import {acceptOrder, calculationStepPass, checkInStock,confirmOrder,createOrder, deleteOrderParts, finisCalculation, getAllOrderParts, getAllOrders, getOrder, getSupplierOrderParts, rejectOrder, responsibleOrder, sendToSupplier, startResponsibleOrder, updateOrder, updateOrderParts } from "../controllers/orderController";
+import {acceptCalculation, acceptOrder, calculationStepPass, checkInStock,confirmCalculationPassNextStep,confirmOrder,createOrder, deleteOrderParts, getAllOrderParts, getAllOrders, getOrder, getSupplierOrderParts, rejectOrder, responsibleOrder, sendToSupplier, startResponsibleOrder, updateOrder, updateOrderParts } from "../controllers/orderController";
 import verifyToken from "../middleware/verifyToken";
 
 
@@ -21,7 +21,8 @@ router.post("/startResponsibleOrder/:id",verifyToken,startResponsibleOrder);
 router.post("/sendToSupplier/:id",verifyToken,sendToSupplier);
 router.post("/calculationStepPass/:id",verifyToken,calculationStepPass);
 router.get("/getSupplierOrderParts/:id/:orderId",getSupplierOrderParts);
-router.post("/finishCalculation/:id",verifyToken,finisCalculation);
+router.post("/acceptCalculation/:id",verifyToken,acceptCalculation);
+router.post("/confirmCalculationPassNextStep/:id",verifyToken,confirmCalculationPassNextStep)
 
 
 
