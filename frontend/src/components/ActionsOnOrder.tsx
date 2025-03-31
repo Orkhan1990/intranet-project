@@ -14,10 +14,6 @@ interface ActionsOnOrderInterface {
   officeUsers: any;
 }
 
-
-
-
-
 const ActionsOnOrder = ({
   order,
   setRefreshData,
@@ -28,22 +24,27 @@ const ActionsOnOrder = ({
   const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
   const [error, setError] = useState<string>("");
-  const [calculationData, setCalculationData] = useState([
-    {
-      supplierId: 0,
-      delivering: DeliverType.Fast,
-    },
-  ]);
+  const [delivering,setDelivering]=useState<DeliverType>(DeliverType.Fast);
+  // const [calculationData, setCalculationData] = useState([
+  //   {
+  //     supplierId: 0,
+  //     delivering: DeliverType.Fast,
+  //   },
+  // ]);
   const [supplierOrderPartsData, setSupplierOrderPartsData] = useState<any>([]);
   const [orderPartArrayId, setOrderPartArrayId] = useState<number[]>([]);
 
-  console.log(selectedSuppliers, error, "selectedSuppliers");
+  console.log(selectedSuppliers, "selectedSuppliers");
+  console.log(delivering,error,"delivering");
+  
 
-  const handleChangeCalculation = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCalculationData((prev: any) => [
-      { ...prev, [e.target.name]: e.target.value },
-    ]);
-  };
+  // const handleChangeCalculation = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setCalculationData((prev: any) => [
+  //     { ...prev, [e.target.name]: e.target.value },
+  //   ]);
+  // };
+
+  // console.log(calculationData, "calculationData");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
@@ -56,22 +57,22 @@ const ActionsOnOrder = ({
   // console.log(selectSupplierForCalculation, "selectSupplierForCalculation");
 
   useEffect(() => {
-    const supplierId =
-      order.orderHistory[4]?.supplierOrderHistories?.length > 0 &&
-      order.orderHistory[4].supplierOrderHistories.sort(
-        (a: any, b: any) =>
-          new Date(a.date).getTime() - new Date(b.date).getTime()
-      )[0].supplier.id;
+    // const supplierId =
+    //   order.orderHistory[4]?.supplierOrderHistories?.length > 0 &&
+    //   order.orderHistory[4].supplierOrderHistories.sort(
+    //     (a: any, b: any) =>
+    //       new Date(a.date).getTime() - new Date(b.date).getTime()
+    //   )[0].supplier.id;
 
-    if (supplierId) {
-      setCalculationData((prevData) => [
-        ...prevData,
-        {
-          supplierId,
-          delivering: DeliverType.Fast, // Add the supplierId dynamically
-        },
-      ]);
-    }
+    // if (supplierId) {
+    //   setCalculationData((prevData) => [
+    //     ...prevData,
+    //     {
+    //       supplierId,
+    //       delivering: DeliverType.Fast, // Add the supplierId dynamically
+    //     },
+    //   ]);
+    // }
 
     const getSuppliers = async () => {
       try {
@@ -359,7 +360,7 @@ const ActionsOnOrder = ({
     const isStandartClient = order.orderType === OrderType.Standart_Client;
 
     window.open(
-      `http://localhost:5173/calculation?orderId=${order.id}&supplierId=${id}&delivering=${calculationData[0].delivering}&isStandartClient=${isStandartClient}`,
+      `http://localhost:5173/calculation?orderId=${order.id}&supplierId=${id}&delivering=${delivering}&isStandartClient=${isStandartClient}`,
       "_blank",
       windowFeatures
     );
@@ -412,6 +413,19 @@ const ActionsOnOrder = ({
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const defineDeliverType = (delivering: string) => {
+    switch (delivering) {
+      case "təcili":
+        return <span>Təcili (15 gün)</span>;
+      case "normal":
+        return <span>Orta (15-30 gün)</span>;
+      case "planlaşdırılmış":
+        return <span>Planlaşdırılmış (40-60 gün)</span>;
+      default:
+        return false;
     }
   };
 
@@ -603,11 +617,11 @@ const ActionsOnOrder = ({
                           {order.orderHistory[4]?.supplierOrderHistories
                             ?.length > 0 &&
                             order.orderHistory[4].supplierOrderHistories
-                              .sort(
-                                (a: any, b: any) =>
-                                  new Date(a.date).getTime() -
-                                  new Date(b.date).getTime()
-                              )
+                              // .sort(
+                              //   (a: any, b: any) =>
+                              //     new Date(a.date).getTime() -
+                              //     new Date(b.date).getTime()
+                              // )
                               .map((item: any, index: number) => (
                                 <div className="flex gap-2" key={index}>
                                   <span>{changeFormatDate(item.date)}</span>
@@ -637,12 +651,12 @@ const ActionsOnOrder = ({
                               />
                               <div className="flex items-center gap-2">
                                 <div className="flex flex-col gap-2">
-                                  {selectedSuppliers.map((_, index: number) => (
+                                  {selectedSuppliers.map((item, index: number) => (
                                     <Select
                                       className="w-[500px]"
                                       sizing={"sm"}
                                       key={index}
-                                      value={selectedSuppliers[index]}
+                                      value={item}
                                       onChange={(e) =>
                                         handleSelectSuppliers(e, index)
                                       }
@@ -705,11 +719,11 @@ const ActionsOnOrder = ({
                                   {order.orderHistory[4]?.supplierOrderHistories
                                     ?.length > 0 &&
                                     order.orderHistory[4].supplierOrderHistories
-                                      .sort(
-                                        (a: any, b: any) =>
-                                          new Date(a.date).getTime() -
-                                          new Date(b.date).getTime()
-                                      )
+                                      // .sort(
+                                      //   (a: any, b: any) =>
+                                      //     new Date(a.date).getTime() -
+                                      //     new Date(b.date).getTime()
+                                      // )
                                       .map((item: any, index: number) => (
                                         <option
                                           value={item.supplier.id}
@@ -776,44 +790,37 @@ const ActionsOnOrder = ({
                               supplierOrderPartsData[0]?.date &&
                               changeFormatDate(supplierOrderPartsData[0].date)}
                           </div>
-                          {order.orderHistory[4]?.supplierOrderHistories
-                            ?.length > 0 &&
-                            order.orderHistory[4].supplierOrderHistories
-                              .sort(
-                                (a: any, b: any) =>
-                                  new Date(a.date).getTime() -
-                                  new Date(b.date).getTime()
-                              )
-                              .map((itemobj: any, index: number) => (
+                          {supplierOrderPartsData &&
+                            supplierOrderPartsData.map(
+                              (itemobj: any, index: number) => (
                                 <div
                                   className="flex gap-2 items-center"
                                   key={index}
                                 >
                                   <div>
                                     {item.showHide &&
-                                      supplierOrderPartsData[index]?.date &&
-                                      changeFormatDate(
-                                        supplierOrderPartsData[index]?.date
-                                      )}
+                                      itemobj.date &&
+                                      changeFormatDate(itemobj.date)}
                                   </div>
                                   <Select
                                     className="w-72"
                                     sizing={"sm"}
-                                    name="supplierId"
-                                    onChange={handleChangeCalculation}
+                                    // name="supplierId"
+                                    // onChange={handleChangeCalculation}
                                   >
                                     <option
-                                      value={itemobj.supplier.id}
+                                      value={itemobj?.supplier.id}
                                       key={index}
                                     >
-                                      {itemobj.supplier.supplier}
+                                      {itemobj?.supplier?.supplier}
                                     </option>
                                   </Select>
                                   <Select
                                     className="w-52"
                                     sizing={"sm"}
                                     name="delivering"
-                                    onChange={handleChangeCalculation}
+                                    onChange={(e:any)=>setDelivering(e.target.value)}
+                                    value={itemobj?.delivering}
                                   >
                                     <option value={DeliverType.Fast}>
                                       Təcili (7-15 gün)
@@ -836,7 +843,8 @@ const ActionsOnOrder = ({
                                     Hesablama
                                   </Button>
                                 </div>
-                              ))}
+                              )
+                            )}
                           {!item.showHide && (
                             <Button
                               color={"blue"}
@@ -915,7 +923,7 @@ const ActionsOnOrder = ({
                           {item.showHide && (
                             <div className="flex text-sm ">
                               <div className="w-64 px-6 py-4 text-black ">
-                                Menecerə təsdiq üçün göndərildi
+                                Məsul şəxsə təsdiq üçün göndərildi
                               </div>
                               <div className="px-6 py-4">
                                 {changeFormatDate(item.date)}
@@ -935,47 +943,61 @@ const ActionsOnOrder = ({
                       <div>
                         <div className="flex text-sm odd:bg-gray-100 odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                           <div className="w-64 px-6 py-4 text-black ">
-                            Menecerin təsdiqi
+                            Məsul şəxsin təsdiqi
                           </div>
-                              <div className="px-6 py-4">
-                                <div>
-                                  <h2 className="text-black">Mesaj</h2>
-                                  <Textarea
-                                    rows={5}
-                                    className="my-2"
-                                    name="acceptMessage"
-                                  />
-                                  <Button
-                                    type="button"
-                                    color={"blue"}
-                                    size={"xs"}
-                                    onClick={() =>
-                                      confirmCalculationPassNextStep(item.id)
-                                    }
-                                  >
-                                    Təsdiqlə
-                                  </Button>
-                                </div>
+                          <div className="px-6 py-4">
+                            <div>
+                              <h2 className="text-black">Mesaj</h2>
+                              <Textarea
+                                rows={5}
+                                className="my-2 w-72"
+                                name="acceptMessage"
+                              />
+                              <Select sizing={"sm"}>
+                                {supplierOrderPartsData &&
+                                  supplierOrderPartsData.map(
+                                    (item: any, index: number) => (
+                                      <option value={item.supplier.id} key={index}>
+                                        {item.supplier.supplier} (
+                                        {defineDeliverType(item.delivering)})
+                                      </option>
+                                    )
+                                  )}
+                              </Select>
+                              <Button
+                                color={"blue"}
+                                size={"xs"}
+                                className="mt-5"
+                              >
+                                Seç
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="px-6 py-4">
+                            <div>
+                              <h2 className="text-black">İmtina səbəbi</h2>
+                              <Textarea
+                                rows={5}
+                                className="my-2 w-60"
+                                name="rejectMessage"
+                                onChange={handleChange}
+                              />
+                              <div>
+                                <Select sizing={"sm"} className="my-2">
+                                  <option value="">Təchizatçıya sorğu</option>
+                                  <option value="">Sifarişi bağlamaq</option>
+                                </Select>
+                                <Button
+                                  type="button"
+                                  color={"blue"}
+                                  size={"xs"}
+                                  // onClick={() => handleReject(item.id)}
+                                >
+                                  İmtina et
+                                </Button>
                               </div>
-                              <div className="px-6 py-4">
-                                <div>
-                                  <h2 className="text-black">İmtina səbəbi</h2>
-                                  <Textarea
-                                    rows={5}
-                                    className="my-2"
-                                    name="rejectMessage"
-                                    onChange={handleChange}
-                                  />
-                                  <Button
-                                    type="button"
-                                    color={"blue"}
-                                    size={"xs"}
-                                    // onClick={() => handleReject(item.id)}
-                                  >
-                                    İmtina et
-                                  </Button>
-                                </div>
-                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}

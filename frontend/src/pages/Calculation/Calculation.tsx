@@ -56,7 +56,7 @@ const Calculation = () => {
   const isStandartClient=params.get('isStandartClient')==='true';
   const delivering=(params.get('delivering')||'');
   // console.log(orderId,supplierId,liquidity);
-  console.log(order);
+  console.log(order,error);
   
   
 

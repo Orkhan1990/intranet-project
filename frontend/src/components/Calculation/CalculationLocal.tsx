@@ -37,6 +37,7 @@ const CalculationLocal = ({order,supplierId,delivering}: CalculationLocalInterfa
  
    console.log(orderPartsIdArray,"orderIdArray");
    console.log(error);
+   console.log(delivering);
    
 
 
@@ -70,16 +71,16 @@ useEffect(() => {
               id: part.id,
               partName:part.partName,
               origCode:part.origCode,
-              price: part?.price || 0, // Default to 0 if price is undefined
+              price: parseFloat(part?.price) || 0, // Default to 0 if price is undefined
               count: part?.count || 1, // Default to 1 if count is undefined
-              totalPrice:part?.totalPrice||0, // Calculate initial totalPrice
-              profit:part?.profit||0, // You can set the initial value as needed
-              sellPrice:part?.sellPrice||0, // Likewise for sellPrice
-              transport:part?.transport||0, // And transport
-              sipPrice:part?.sipPrice||0, // And sipPrice
-              percent:part?.percent||0, // Example percent
-              unitSipPrice:part?.unitSipPrice||0, // Initial sip price per unit
-              unitSellPrice:part?.unitSellPrice||0, // Initial sell price per unit
+              totalPrice:parseFloat(part?.totalPrice)||0, // Calculate initial totalPrice
+              profit:parseFloat(part?.profit)||0, // You can set the initial value as needed
+              sellPrice:parseFloat(part?.sellPrice)||0, // Likewise for sellPrice
+              transport:parseFloat(part?.transport)||0, // And transport
+              sipPrice:parseFloat(part?.sipPrice)||0, // And sipPrice
+              percent:parseFloat(part?.percent)||0, // Example percent
+              unitSipPrice:parseFloat(part?.unitSipPrice)||0, // Initial sip price per unit
+              unitSellPrice:parseFloat(part?.unitSellPrice)||0, // Initial sell price per unit
             }));
               setParts(partsData);
               const result=partsData.reduce((acc,part)=>acc+(Number(part.price)*part.count),0);
@@ -92,7 +93,7 @@ useEffect(() => {
         console.log(error);
       }
     }
-
+    
     getsupplierOrderParts();
     setOrderId(order.id);
     const orderIdArray=order.orderParts.map((part)=>part.id);
@@ -123,22 +124,22 @@ useEffect(() => {
     const totalPriceSum=parts.reduce((acc,part)=>acc+(Number(part.price)*part.count),0);
     setTotalPriceSum(totalPriceSum);
   const result=parts.map((part)=>{
-     const totalPriceResult=Number(part.price)*part.count;
-     const trasnportResult=totalPriceSum>0?Math.ceil((totalPriceResult*transport/totalPriceSum)*100)/100:0;
-     const sipPriceResult=totalPriceResult+trasnportResult;
-     const profitResult=part.percent>0?Math.ceil(sipPriceResult*(Number(part.percent)/100)*100)/100:0;
-     const unitSipPriceResult=Math.ceil((sipPriceResult/part.count)*100)/100;
-     const sellPriceResult=Math.ceil((sipPriceResult+profitResult)*100)/100;
-      const unitSellPriceResult=Math.ceil((sellPriceResult/part.count)*100)/100;
+    const totalPriceResult = Number(part.price) * part.count;
+    const transportResult = totalPriceSum > 0 ? Number(((totalPriceResult * transport) / totalPriceSum).toFixed(2)) : 0;
+    const sipPriceResult = totalPriceResult + transportResult;
+    const profitResult = part.percent > 0 ? Number((sipPriceResult * (Number(part.percent) / 100)).toFixed(2)) : 0;
+    const unitSipPriceResult = Number((sipPriceResult / part.count).toFixed(2));
+    const sellPriceResult = Number((sipPriceResult + profitResult).toFixed(2));
+    const unitSellPriceResult = Number((sellPriceResult / part.count).toFixed(2));
     return{
        ...part,
       id:part.id,
-      price:part.price,
+      price:Number(part.price),
       percent:Number(part.percent),
       count:part.count,
       totalPrice:totalPriceResult,
       profit:profitResult,
-      transport:trasnportResult,
+      transport:transportResult,
       sipPrice:sipPriceResult,
       unitSipPrice:unitSipPriceResult,
       sellPrice:sellPriceResult,
@@ -320,31 +321,31 @@ useEffect(() => {
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="price" value={parseFloat(orderPart.price).toString()} onChange={(e) => handleChange(e,orderPart.id)}/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="price" value={orderPart.price} onChange={(e) => handleChange(e,orderPart.id)}/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.totalPrice).toString()} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.totalPrice} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.transport).toString()} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.transport} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.sipPrice).toString()} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.sipPrice} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.unitSipPrice).toString()} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.unitSipPrice} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -361,19 +362,19 @@ useEffect(() => {
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.profit).toString()} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.profit} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.sellPrice).toString()} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.sellPrice} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.unitSellPrice).toString()} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.unitSellPrice} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>

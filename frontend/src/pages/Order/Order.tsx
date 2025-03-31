@@ -11,7 +11,7 @@ import { Button } from "flowbite-react";
 const Order = () => {
   const [orders, setOrders] = useState<AllOrdersInterface[]>([]);
   const [error, setError] = useState("");
-  console.log(orders,"salaaaa");
+  console.log(orders,error,"salaaaa");
   
 
   console.log(orders);
@@ -206,7 +206,7 @@ const Order = () => {
                     key={index}
                   >
                     <td className="px-6 py-4"></td>
-                     <td className="px-6 py-4"><Link to={`/editOrder/${order.id}`} >{order.id}</Link></td>
+                     <td className="px-6 py-4"><Link to={`/editOrder/${order.id}`} >{index+1}</Link></td>
                     <td className="px-6 py-4"><Link to={`/editOrder/${order.id}`} >{order.client.companyName}</Link></td>
                     <td className="px-6 py-4">{order.manufacturer}</td>
                     <td className="px-6 py-4"></td>
