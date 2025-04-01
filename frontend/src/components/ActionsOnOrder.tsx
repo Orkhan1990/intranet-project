@@ -36,6 +36,9 @@ const ActionsOnOrder = ({
 
   console.log(selectedSuppliers, "selectedSuppliers");
   console.log(delivering,error,"delivering");
+  console.log(supplierOrderPartsData,"supplierOrderPartsData");
+  console.log(orderPartArrayId,"supplierOrderPartsData");
+
   
 
   // const handleChangeCalculation = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -617,11 +620,11 @@ const ActionsOnOrder = ({
                           {order.orderHistory[4]?.supplierOrderHistories
                             ?.length > 0 &&
                             order.orderHistory[4].supplierOrderHistories
-                              // .sort(
-                              //   (a: any, b: any) =>
-                              //     new Date(a.date).getTime() -
-                              //     new Date(b.date).getTime()
-                              // )
+                              .sort(
+                                (a: any, b: any) =>
+                                  new Date(a.createdAt).getTime() -
+                                  new Date(b.createdAt).getTime()
+                              )
                               .map((item: any, index: number) => (
                                 <div className="flex gap-2" key={index}>
                                   <span>{changeFormatDate(item.date)}</span>
@@ -719,11 +722,11 @@ const ActionsOnOrder = ({
                                   {order.orderHistory[4]?.supplierOrderHistories
                                     ?.length > 0 &&
                                     order.orderHistory[4].supplierOrderHistories
-                                      // .sort(
-                                      //   (a: any, b: any) =>
-                                      //     new Date(a.date).getTime() -
-                                      //     new Date(b.date).getTime()
-                                      // )
+                                      .sort(
+                                        (a: any, b: any) =>
+                                          new Date(a.createdAt).getTime() -
+                                          new Date(b.createdAt).getTime()
+                                      )
                                       .map((item: any, index: number) => (
                                         <option
                                           value={item.supplier.id}

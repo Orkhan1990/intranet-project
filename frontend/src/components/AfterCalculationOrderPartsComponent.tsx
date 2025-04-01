@@ -40,7 +40,7 @@ export const AfterCalculationOrderPartsComponent = ({
   );
 
   const newArrayGroupedSupplierOrderParts = [
-    groupedSupplierOrderParts.slice(0, ((groupedSupplierOrderParts.length)/2)),
+    groupedSupplierOrderParts.slice(0, 2),
     groupedSupplierOrderParts.slice(((groupedSupplierOrderParts.length)/2), (((groupedSupplierOrderParts.length)/2)*2))
   ];
   console.log(groupedSupplierOrderParts, "groupedSupplierOrderParts");

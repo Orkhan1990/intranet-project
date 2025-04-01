@@ -302,7 +302,7 @@ export const updateOrderParts = async (
 ) => {
   const { id } = req.params;
   // console.log(req.body.orderPartsIdArray);
-  console.log(req.body.delivering);
+  // console.log(req.body.delivering);
 
   try {
     const supplierOrderParts = (
@@ -449,7 +449,7 @@ export const checkInStock = async (
       })
     );
 
-    log(newOrderPartsArray);
+    // log(newOrderPartsArray);
 
     const sparePartsList = await sparePartsRepository.find();
     const newSparePartsList = sparePartsList.map((item) => ({
@@ -460,7 +460,7 @@ export const checkInStock = async (
 
     const result = newOrderPartsArray.map(
       (item: { code: string; requiredCount: number; partName: string }) => {
-        log(item);
+        // log(item);
 
         const matching = newSparePartsList.find(
           (orderPart: any) => orderPart.code === item.code
@@ -549,7 +549,7 @@ export const responsibleOrder = async (
     const { id } = req.params;
     const mainUserId = req.userId;
     const { userId, messageValue, historyId } = req.body;
-    log(userId, messageValue, id);
+    // log(userId, messageValue, id);
 
     const order = await orderRepository.findOneBy({ id: Number(id) });
     if (!order) {
@@ -822,17 +822,17 @@ export const getSupplierOrderParts = async (
     const supplierOrderParts = (
       await Promise.all(
         orderParts.map(async (item) => {
-          return supplierOrderPartRepository.find({
-            where: {
+          return supplierOrderPartRepository.findOneBy({
+           
               orderPart: { id: item.id }, // Fix: Corrected query structure
               supplier: { id: supplier.id }, // Fix: Use supplier.id
-            },
+            
           });
         })
       )
-    ).flat(); // Fix: Flatten the array
+    ); // Fix: Flatten the array
 
-    // console.log(supplierOrderParts);
+    console.log(supplierOrderParts);
 
     if (supplierOrderParts.length === 0) {
       next(

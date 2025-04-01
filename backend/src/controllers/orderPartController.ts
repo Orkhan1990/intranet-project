@@ -37,7 +37,8 @@ export const getSupplierOrderPartsData = async (req: Request, res: Response,next
         const{orderPartIds} = req.query;
         const orderPartIdArray = (orderPartIds as string).split(",").map(Number);
 
-
+        console.log(orderPartIds,"orderPartIds");
+        
         
         const supplierOrderPartsDatas= await supplierOrderPartsRepository.find({
             relations: ["orderPart","supplier"]  
@@ -47,12 +48,15 @@ export const getSupplierOrderPartsData = async (req: Request, res: Response,next
         }
 
 
+        // console.log(supplierOrderPartsDatas);
+        
+
 
         const filteredData = supplierOrderPartsDatas.filter((item: any) =>
             orderPartIdArray.includes(item?.orderPart?.id)
           );
 
-        // console.log(supplierOrderPartsDatas,"salam");
+        console.log(filteredData,"filteredData");
         
        
         res.status(200).json(filteredData);

@@ -99,7 +99,7 @@ useEffect(() => {
     const orderIdArray=order.orderParts.map((part)=>part.id);
     setOrderPartsIdArray(orderIdArray);
     
-}, [supplierId,order]);
+}, [supplierId,order,delivering]);
 
 
   const handleChange = (e: any, id: number) => {
@@ -327,25 +327,25 @@ useEffect(() => {
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.totalPrice} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat((orderPart.totalPrice).toFixed(2))} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.transport} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat((orderPart.transport).toFixed(2))} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.sipPrice} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat((orderPart.sipPrice).toFixed(2))} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.unitSipPrice} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat((orderPart.unitSipPrice).toFixed(2))} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -362,19 +362,19 @@ useEffect(() => {
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.profit} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat((orderPart.profit).toFixed(2))} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.sellPrice} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat((orderPart.sellPrice).toFixed(2))} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.unitSellPrice} readOnly/>
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat((orderPart.unitSellPrice).toFixed(2))} readOnly/>
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -389,7 +389,7 @@ useEffect(() => {
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
-            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">{handleTotalPriceSum===0?(result===0?"":result):handleTotalPriceSum}</td>
+            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">{handleTotalPriceSum===0?(result===0?"":parseFloat((result).toFixed(2))):parseFloat((handleTotalPriceSum).toFixed(2))}</td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
