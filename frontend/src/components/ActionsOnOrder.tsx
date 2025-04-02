@@ -37,17 +37,9 @@ const ActionsOnOrder = ({
   console.log(selectedSuppliers, "selectedSuppliers");
   console.log(delivering,error,"delivering");
   console.log(supplierOrderPartsData,"supplierOrderPartsData");
-  console.log(orderPartArrayId,"supplierOrderPartsData");
+  console.log(orderPartArrayId,"qaqaduzdu???");
 
   
-
-  // const handleChangeCalculation = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  //   setCalculationData((prev: any) => [
-  //     { ...prev, [e.target.name]: e.target.value },
-  //   ]);
-  // };
-
-  // console.log(calculationData, "calculationData");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
@@ -60,22 +52,6 @@ const ActionsOnOrder = ({
   // console.log(selectSupplierForCalculation, "selectSupplierForCalculation");
 
   useEffect(() => {
-    // const supplierId =
-    //   order.orderHistory[4]?.supplierOrderHistories?.length > 0 &&
-    //   order.orderHistory[4].supplierOrderHistories.sort(
-    //     (a: any, b: any) =>
-    //       new Date(a.date).getTime() - new Date(b.date).getTime()
-    //   )[0].supplier.id;
-
-    // if (supplierId) {
-    //   setCalculationData((prevData) => [
-    //     ...prevData,
-    //     {
-    //       supplierId,
-    //       delivering: DeliverType.Fast, // Add the supplierId dynamically
-    //     },
-    //   ]);
-    // }
 
     const getSuppliers = async () => {
       try {
@@ -163,6 +139,7 @@ const ActionsOnOrder = ({
   };
 
   const sendToSupplier = async (historyId: number) => {
+    
     try {
       const res = await fetch(
         `http://localhost:3013/api/v1/order/sendToSupplier/${order.id}`,
@@ -172,7 +149,7 @@ const ActionsOnOrder = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message, historyId, selectedSuppliers }),
+          body: JSON.stringify({ message, historyId, selectedSuppliers,orderPartArrayId}),
         }
       );
       const data = await res.json();

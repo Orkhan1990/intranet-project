@@ -660,9 +660,15 @@ export const sendToSupplier = async (
   try {
     const { id } = req.params;
     const userId = req.userId;
-    const { historyId, selectedSuppliers } = req.body;
+    const { historyId, selectedSuppliers,orderPartArrayId} = req.body;
 
-    console.log(selectedSuppliers);
+    console.log(orderPartArrayId,"orderPartArrayId");
+
+
+    const uniqueArr = [...new Set(selectedSuppliers)];
+
+    // console.log(uniqueArr,"uniqueArr");
+    
 
     const user = await userRepository.findOneBy({ id: userId });
     if (!user) return next(errorHandler(404, "İstifadəçi mövcud deyil!"));
@@ -696,35 +702,55 @@ export const sendToSupplier = async (
     const existingSupplierIds = new Set(
       existingSupplierOrders.map((item) => item.supplier.id)
     );
-    const newSupplierIds = selectedSuppliers.filter(
+    const newSupplierIds = uniqueArr.filter(
       (id: any) => !existingSupplierIds.has(Number(id))
     );
-    console.log(newSupplierIds);
+    console.log(newSupplierIds,"newSupplierIds");
 
-    if (newSupplierIds.length > 0) {
-      for (const supplierId of newSupplierIds) {
-        const supplier = await supplierRepository.findOneBy({ id: supplierId });
-        console.log(supplier, "supplier");
 
-        if (supplier) {
-          const newSupplierOrderHistory = new SupplierOrderHistory();
-          newSupplierOrderHistory.supplier = supplier;
-          newSupplierOrderHistory.date = new Date();
-          newSupplierOrderHistory.orderHistory = orderHistory;
-          await suppliersOrderHistoryReposiroty.save(newSupplierOrderHistory);
-          for (const item of order.orderParts) {
-            const newSupplierOrderPart = new SupplierOrderParts();
-            newSupplierOrderPart.origCode = item.origCode;
-            newSupplierOrderPart.count = item.count;
-            newSupplierOrderPart.partName = item.partName;
-            newSupplierOrderPart.orderPart = item;
-            newSupplierOrderPart.supplier = supplier;
-            newSupplierOrderPart.date = new Date();
-            await supplierOrderPartRepository.save(newSupplierOrderPart);
+    for (const supplierId of newSupplierIds) {
+      for (const partId of orderPartArrayId) {
+        // Check if the entry already exists
+        const existingRecord = await supplierOrderPartRepository.findOne({
+          where: {
+            supplier: { id: Number(supplierId) },
+            orderPart: { id: partId },
+          },
+        });
+
+        if (!existingRecord) {
+          
+          if (newSupplierIds.length > 0) {
+            for (const supplierId of newSupplierIds) {
+              const supplier = await supplierRepository.findOneBy({ id: Number(supplierId)});
+              // console.log(supplier, "supplier");
+      
+              if (supplier) {
+                const newSupplierOrderHistory = new SupplierOrderHistory();
+                newSupplierOrderHistory.supplier = supplier;
+                newSupplierOrderHistory.date = new Date();
+                newSupplierOrderHistory.orderHistory = orderHistory;
+                await suppliersOrderHistoryReposiroty.save(newSupplierOrderHistory);            
+      
+                for (const item of order.orderParts) {
+                  const newSupplierOrderPart = new SupplierOrderParts();
+                  newSupplierOrderPart.origCode = item.origCode;
+                  newSupplierOrderPart.count = item.count;
+                  newSupplierOrderPart.partName = item.partName;
+                  newSupplierOrderPart.orderPart = item;
+                  newSupplierOrderPart.supplier = supplier;
+                  newSupplierOrderPart.date = new Date();
+                  await supplierOrderPartRepository.save(newSupplierOrderPart);
+                }
+              }
+            }
           }
+
+        }else{
+          next(errorHandler(401,"Bazada mövcuddur"));
+          return;
         }
-      }
-    }
+   }}
 
     const updatedData = await suppliersOrderHistoryReposiroty.find({
       where: { orderHistory: { id: historyId } },
