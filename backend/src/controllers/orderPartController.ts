@@ -54,12 +54,25 @@ export const getSupplierOrderPartsData = async (req: Request, res: Response,next
 
         const filteredData = supplierOrderPartsDatas.filter((item: any) =>
             orderPartIdArray.includes(item?.orderPart?.id)
-          );
+        );
 
-        // console.log(filteredData,"filteredData");
+        // Extract the unique supplier data by filtering duplicate suppliers
+        const uniqueSuppliers = new Map();
+
+        filteredData.forEach((item: any) => {
+            const supplier = item?.supplier;
+            if (supplier && !uniqueSuppliers.has(supplier.id)) {
+                uniqueSuppliers.set(supplier.id, supplier);
+            }
+        });
+
+        // Convert the map back to an array
+        const uniqueSupplierList = Array.from(uniqueSuppliers.values());
+        
+        console.log(uniqueSupplierList);
         
        
-        res.status(200).json(filteredData);
+        res.status(200).json(uniqueSupplierList);
     } catch (error) {
         next(errorHandler(401,error))
     }

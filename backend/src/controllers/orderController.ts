@@ -745,9 +745,10 @@ export const sendToSupplier = async (
               }
             }
           }
+          res.status(201).json({message:"Uğurlu oldu" });
 
         }else{
-          next(errorHandler(401,"Bazada mövcuddur"));
+          next(errorHandler(401,"Təchizatçıya göndərilib!"));
           return;
         }
    }}

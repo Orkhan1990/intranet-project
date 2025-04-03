@@ -24,22 +24,14 @@ const ActionsOnOrder = ({
   const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
   const [error, setError] = useState<string>("");
-  const [delivering,setDelivering]=useState<DeliverType>(DeliverType.Fast);
-  // const [calculationData, setCalculationData] = useState([
-  //   {
-  //     supplierId: 0,
-  //     delivering: DeliverType.Fast,
-  //   },
-  // ]);
+  const [delivering, setDelivering] = useState<string>("təcili");
   const [supplierOrderPartsData, setSupplierOrderPartsData] = useState<any>([]);
   const [orderPartArrayId, setOrderPartArrayId] = useState<number[]>([]);
 
   console.log(selectedSuppliers, "selectedSuppliers");
-  console.log(delivering,error,"delivering");
-  console.log(supplierOrderPartsData,"supplierOrderPartsData");
-  console.log(orderPartArrayId,"qaqaduzdu???");
-
-  
+  console.log(delivering, error, "delivering");
+  console.log(supplierOrderPartsData, "supplierOrderPartsDatasssss");
+  console.log(orderPartArrayId, "qaqaduzdu???");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
@@ -48,11 +40,14 @@ const ActionsOnOrder = ({
 
   console.log(order, "order");
 
+  const handleDelivering=(e:React.ChangeEvent<HTMLSelectElement>)=>{
+      setDelivering(e.target.value)
+  }
+
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
-  // console.log(selectSupplierForCalculation, "selectSupplierForCalculation");
+  // console.log(delivering, "deliveringgg");
 
   useEffect(() => {
-
     const getSuppliers = async () => {
       try {
         const res = await fetch(
@@ -99,7 +94,7 @@ const ActionsOnOrder = ({
         if (!res.ok || data.success === false) {
           setError(data.message);
         }
-
+        
         if (res.ok) {
           setSupplierOrderPartsData(data);
         }
@@ -139,7 +134,6 @@ const ActionsOnOrder = ({
   };
 
   const sendToSupplier = async (historyId: number) => {
-    
     try {
       const res = await fetch(
         `http://localhost:3013/api/v1/order/sendToSupplier/${order.id}`,
@@ -149,7 +143,12 @@ const ActionsOnOrder = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message, historyId, selectedSuppliers,orderPartArrayId}),
+          body: JSON.stringify({
+            message,
+            historyId,
+            selectedSuppliers,
+            orderPartArrayId,
+          }),
         }
       );
       const data = await res.json();
@@ -338,11 +337,12 @@ const ActionsOnOrder = ({
     // Set window features
     const windowFeatures = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
     const isStandartClient = order.orderType === OrderType.Standart_Client;
-
+    setRefreshData(true);
     window.open(
-      `http://localhost:5173/calculation?orderId=${order.id}&supplierId=${id}&delivering=${delivering}&isStandartClient=${isStandartClient}`,
-      "_blank",
-      windowFeatures
+      
+        `http://localhost:5173/calculation?orderId=${order.id}&supplierId=${id}&delivering=${delivering}&isStandartClient=${isStandartClient}`,
+        "_blank",
+        windowFeatures
     );
   };
 
@@ -631,28 +631,32 @@ const ActionsOnOrder = ({
                               />
                               <div className="flex items-center gap-2">
                                 <div className="flex flex-col gap-2">
-                                  {selectedSuppliers.map((item, index: number) => (
-                                    <Select
-                                      className="w-[500px]"
-                                      sizing={"sm"}
-                                      key={index}
-                                      value={item}
-                                      onChange={(e) =>
-                                        handleSelectSuppliers(e, index)
-                                      }
-                                    >
-                                      <option value="">Təchizatçını seç</option>
-                                      {suppliers.length > 0 &&
-                                        suppliers.map((supplier) => (
-                                          <option
-                                            key={supplier.id}
-                                            value={supplier.id}
-                                          >
-                                            {supplier.supplier}
-                                          </option>
-                                        ))}
-                                    </Select>
-                                  ))}
+                                  {selectedSuppliers.map(
+                                    (item, index: number) => (
+                                      <Select
+                                        className="w-[500px]"
+                                        sizing={"sm"}
+                                        key={index}
+                                        value={item}
+                                        onChange={(e) =>
+                                          handleSelectSuppliers(e, index)
+                                        }
+                                      >
+                                        <option value="">
+                                          Təchizatçını seç
+                                        </option>
+                                        {suppliers.length > 0 &&
+                                          suppliers.map((supplier) => (
+                                            <option
+                                              key={supplier.id}
+                                              value={supplier.id}
+                                            >
+                                              {supplier.supplier}
+                                            </option>
+                                          ))}
+                                      </Select>
+                                    )
+                                  )}
                                 </div>
 
                                 <Button
@@ -680,6 +684,7 @@ const ActionsOnOrder = ({
                                   Göndər
                                 </Button>
                               </div>
+                              {<p className="text-red-700 mt-2">{error}</p>}
                             </div>
                           )}
                         </div>
@@ -789,17 +794,17 @@ const ActionsOnOrder = ({
                                     // onChange={handleChangeCalculation}
                                   >
                                     <option
-                                      value={itemobj?.supplier.id}
+                                      value={itemobj?.id}
                                       key={index}
                                     >
-                                      {itemobj?.supplier?.supplier}
+                                      {itemobj?.supplier}
                                     </option>
                                   </Select>
                                   <Select
                                     className="w-52"
                                     sizing={"sm"}
                                     name="delivering"
-                                    onChange={(e:any)=>setDelivering(e.target.value)}
+                                    onChange={handleDelivering}
                                     value={itemobj?.delivering}
                                   >
                                     <option value={DeliverType.Fast}>
@@ -815,7 +820,7 @@ const ActionsOnOrder = ({
                                   <Button
                                     color={"blue"}
                                     onClick={() =>
-                                      calculationOpenNewTab(itemobj.supplier.id)
+                                      calculationOpenNewTab(itemobj?.id)
                                     }
                                     size={"xs"}
                                     className="cursor-pointer"
@@ -830,7 +835,7 @@ const ActionsOnOrder = ({
                               color={"blue"}
                               size={"xs"}
                               className="w-20"
-                              onClick={() => acceptCalculation(item.id)}
+                              onClick={() => acceptCalculation(item?.id)}
                             >
                               Bitirmək
                             </Button>
@@ -937,7 +942,10 @@ const ActionsOnOrder = ({
                                 {supplierOrderPartsData &&
                                   supplierOrderPartsData.map(
                                     (item: any, index: number) => (
-                                      <option value={item.supplier.id} key={index}>
+                                      <option
+                                        value={item.supplier.id}
+                                        key={index}
+                                      >
                                         {item.supplier.supplier} (
                                         {defineDeliverType(item.delivering)})
                                       </option>
