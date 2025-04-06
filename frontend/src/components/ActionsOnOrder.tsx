@@ -31,7 +31,7 @@ const ActionsOnOrder = ({
   console.log(selectedSuppliers, "selectedSuppliers");
   // console.log(delivering, error, "delivering");
   console.log(supplierOrderPartsData, "supplierOrderPartsDatasssss");
-  console.log(orderPartArrayId, "qaqaduzdu???");
+  console.log(orderPartArrayId, "orderPartArrayId");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
@@ -49,16 +49,6 @@ const ActionsOnOrder = ({
 
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
   // console.log(delivering, "deliveringgg");
-
-  useEffect(() => {
-    if (supplierOrderPartsData) {
-      const initial = supplierOrderPartsData.reduce((acc:any, item:any) => {
-        acc[item.id] = item.delivering || DeliverType.Fast;
-        return acc;
-      }, {} as { [key: string]: DeliverType });
-      setDeliveryTypes(initial);
-    }
-  }, [supplierOrderPartsData]);
 
 
   useEffect(() => {
@@ -91,9 +81,11 @@ const ActionsOnOrder = ({
     const getSupplierOrderParts = async () => {
       try {
         const queryParams = new URLSearchParams({
-          orderPartIds: orderPartArrayId.join(","),
+          orderPartIds: orderPartArrayId.join(","), // <- use this key name!
         });
 
+        // console.log(queryParams, "queryParams");
+        
         const res = await fetch(
           `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData?${queryParams}`,
           {
@@ -121,6 +113,20 @@ const ActionsOnOrder = ({
     const orderPartIdArray = order.orderParts.map((item: any) => item.id);
     setOrderPartArrayId(orderPartIdArray);
   }, [order]);
+
+
+  useEffect(() => {
+    if (supplierOrderPartsData) {
+      const initial = supplierOrderPartsData.reduce((acc:any, item:any) => {
+        acc[item.id] = item.delivering || DeliverType.Fast;
+        return acc;
+      }, {} as { [key: string]: DeliverType });
+      setDeliveryTypes(initial);
+    }
+  }, [supplierOrderPartsData]);
+
+
+
 
   const handleClickFileUpload = () => {
     if (fileInputRef.current) {
@@ -817,7 +823,7 @@ const ActionsOnOrder = ({
                                       value={itemobj?.id}
                                       key={index}
                                     >
-                                      {itemobj?.supplier}
+                                      {itemobj?.supplier.supplier}
                                     </option>
                                   </Select>
                                   <Select
@@ -825,7 +831,7 @@ const ActionsOnOrder = ({
                                     sizing={"sm"}
                                     name="delivering"
                                     onChange={(e) => handleDeliveringChange(itemobj.id, e.target.value as DeliverType)}
-                                    value={deliveryTypes[itemobj.id] || DeliverType.Fast}
+                                    value={itemobj.delivering}
                                     >
                                     <option value={DeliverType.Fast}>
                                       Təcili (7-15 gün)
