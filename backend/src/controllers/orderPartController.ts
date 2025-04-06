@@ -14,12 +14,12 @@ export const getOrderPartsByOrderId = async (req: Request, res: Response,next:Ne
     try {
 
         const{id} = req.params;
-        console.log(id);      
+        // console.log(id);      
         
         const orderParts = await orderPartRepository.find({
             where: { order: { id: parseInt(id) } }, // Filter by orderId
         });
-        console.log(orderParts);
+        // console.log(orderParts);
         if(orderParts.length===0){
             return next(errorHandler(404,"Ehtiyyat hissələri tapılmadı"));
         }
@@ -43,9 +43,9 @@ export const getSupplierOrderPartsData = async (req: Request, res: Response,next
         const supplierOrderPartsDatas= await supplierOrderPartsRepository.find({
             relations: ["orderPart","supplier"]  
             });
-        if(supplierOrderPartsDatas.length===0){
-            return next(errorHandler(404,"Tədarikçi sifariş hissələri tapılmadı"));
-        }
+        // if(supplierOrderPartsDatas.length===0){
+        //     return next(errorHandler(404,"Tədarikçi sifariş hissələri tapılmadı"));
+        // }
 
 
         // console.log(supplierOrderPartsDatas);
@@ -69,7 +69,7 @@ export const getSupplierOrderPartsData = async (req: Request, res: Response,next
         // Convert the map back to an array
         const uniqueSupplierList = Array.from(uniqueSuppliers.values());
         
-        console.log(uniqueSupplierList);
+        // console.log(uniqueSupplierList);
         
        
         res.status(200).json(uniqueSupplierList);

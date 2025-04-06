@@ -24,12 +24,12 @@ const ActionsOnOrder = ({
   const [suppliers, setSuppliers] = useState<SupplierInterface[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState([""]);
   const [error, setError] = useState<string>("");
-  const [delivering, setDelivering] = useState<string>("təcili");
+  const [deliveryTypes, setDeliveryTypes] = useState<{ [key: string]: DeliverType }>({});
   const [supplierOrderPartsData, setSupplierOrderPartsData] = useState<any>([]);
   const [orderPartArrayId, setOrderPartArrayId] = useState<number[]>([]);
 
   console.log(selectedSuppliers, "selectedSuppliers");
-  console.log(delivering, error, "delivering");
+  // console.log(delivering, error, "delivering");
   console.log(supplierOrderPartsData, "supplierOrderPartsDatasssss");
   console.log(orderPartArrayId, "qaqaduzdu???");
 
@@ -40,12 +40,26 @@ const ActionsOnOrder = ({
 
   console.log(order, "order");
 
-  const handleDelivering=(e:React.ChangeEvent<HTMLSelectElement>)=>{
-      setDelivering(e.target.value)
-  }
+  const handleDeliveringChange = (id: number, value: DeliverType) => {
+    setDeliveryTypes(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
 
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
   // console.log(delivering, "deliveringgg");
+
+  useEffect(() => {
+    if (supplierOrderPartsData) {
+      const initial = supplierOrderPartsData.reduce((acc:any, item:any) => {
+        acc[item.id] = item.delivering || DeliverType.Fast;
+        return acc;
+      }, {} as { [key: string]: DeliverType });
+      setDeliveryTypes(initial);
+    }
+  }, [supplierOrderPartsData]);
+
 
   useEffect(() => {
     const getSuppliers = async () => {
@@ -154,6 +168,9 @@ const ActionsOnOrder = ({
       const data = await res.json();
       if (!res.ok || data.success === false) {
         setError(data.message);
+        setInterval(() => {
+          setError("")
+        }, 7000);
       } else {
         setRefreshData((prev: any) => !prev);
       }
@@ -325,7 +342,7 @@ const ActionsOnOrder = ({
     }
   };
 
-  const calculationOpenNewTab = (id: any) => {
+  const calculationOpenNewTab = (id: any,delivering:string) => {
     // Calculate 90% of the screen width and full screen height
     const width = window.innerWidth * 0.9; // 90% of the screen width
     const height = window.innerHeight / 1.4; // Full screen height
@@ -347,6 +364,9 @@ const ActionsOnOrder = ({
   };
 
   const acceptCalculation = async (id: any) => {
+
+    console.log(id,"qaqaqaqaqaqaIDDDDDDDDDDDDDD");
+    
     try {
       const res = await fetch(
         `http://localhost:3013/api/v1/order/acceptCalculation/${id}`,
@@ -804,9 +824,9 @@ const ActionsOnOrder = ({
                                     className="w-52"
                                     sizing={"sm"}
                                     name="delivering"
-                                    onChange={handleDelivering}
-                                    value={itemobj?.delivering}
-                                  >
+                                    onChange={(e) => handleDeliveringChange(itemobj.id, e.target.value as DeliverType)}
+                                    value={deliveryTypes[itemobj.id] || DeliverType.Fast}
+                                    >
                                     <option value={DeliverType.Fast}>
                                       Təcili (7-15 gün)
                                     </option>
@@ -819,9 +839,7 @@ const ActionsOnOrder = ({
                                   </Select>
                                   <Button
                                     color={"blue"}
-                                    onClick={() =>
-                                      calculationOpenNewTab(itemobj?.id)
-                                    }
+                                    onClick={() => calculationOpenNewTab(itemobj.id, deliveryTypes[itemobj.id])}
                                     size={"xs"}
                                     className="cursor-pointer"
                                   >
@@ -835,7 +853,7 @@ const ActionsOnOrder = ({
                               color={"blue"}
                               size={"xs"}
                               className="w-20"
-                              onClick={() => acceptCalculation(item?.id)}
+                              onClick={() => acceptCalculation(item.id)}
                             >
                               Bitirmək
                             </Button>

@@ -652,6 +652,8 @@ export const startResponsibleOrder = async (
   }
 };
 
+
+
 export const sendToSupplier = async (
   req: CustomRequest,
   res: Response,
@@ -708,50 +710,65 @@ export const sendToSupplier = async (
     console.log(newSupplierIds,"newSupplierIds");
 
 
-    for (const supplierId of newSupplierIds) {
-      for (const partId of orderPartArrayId) {
-        // Check if the entry already exists
-        const existingRecord = await supplierOrderPartRepository.findOne({
-          where: {
-            supplier: { id: Number(supplierId) },
-            orderPart: { id: partId },
-          },
-        });
+    const combinations = [];
+for (const supplierId of uniqueArr) {
+  for (const partId of orderPartArrayId) {
+    combinations.push({
+      supplier: { id: Number(supplierId) },
+      orderPart: { id: Number(partId) },
+    });
+  }
+}
 
-        if (!existingRecord) {
-          
-          if (newSupplierIds.length > 0) {
-            for (const supplierId of newSupplierIds) {
-              const supplier = await supplierRepository.findOneBy({ id: Number(supplierId)});
-              // console.log(supplier, "supplier");
-      
-              if (supplier) {
-                const newSupplierOrderHistory = new SupplierOrderHistory();
-                newSupplierOrderHistory.supplier = supplier;
-                newSupplierOrderHistory.date = new Date();
-                newSupplierOrderHistory.orderHistory = orderHistory;
-                await suppliersOrderHistoryReposiroty.save(newSupplierOrderHistory);            
-      
-                for (const item of order.orderParts) {
-                  const newSupplierOrderPart = new SupplierOrderParts();
-                  newSupplierOrderPart.origCode = item.origCode;
-                  newSupplierOrderPart.count = item.count;
-                  newSupplierOrderPart.partName = item.partName;
-                  newSupplierOrderPart.orderPart = item;
-                  newSupplierOrderPart.supplier = supplier;
-                  newSupplierOrderPart.date = new Date();
-                  await supplierOrderPartRepository.save(newSupplierOrderPart);
-                }
-              }
-            }
-          }
-          res.status(201).json({message:"Uğurlu oldu" });
+// Step 2: Fetch all existing supplierOrderPart records for those combinations
+const existingRecords = await supplierOrderPartRepository.find({
+  where: combinations,
+  relations: ["supplier", "orderPart"],
+});
 
-        }else{
-          next(errorHandler(401,"Təchizatçıya göndərilib!"));
-          return;
-        }
-   }}
+// Step 3: Build a Set of existing combinations
+const existingSet = new Set(
+  existingRecords.map(record => `${record.supplier.id}-${record.orderPart.id}`)
+);
+
+// Step 4: Loop through each supplier and process only if not all combinations exist
+for (const supplierId of uniqueArr) {
+  const supplier = await supplierRepository.findOneBy({ id: Number(supplierId) });
+  if (!supplier) continue;
+
+  // Filter only the order parts that do NOT exist yet for this supplier
+  const missingParts = order.orderParts.filter(part => {
+    const key = `${supplierId}-${part.id}`;
+    return !existingSet.has(key);
+  });
+
+  if (missingParts.length === 0) {
+    console.log(`Supplier ${supplierId} already has all parts. Skipping.`);
+    continue; // skip this supplier
+  }
+
+  // Step 5: Create SupplierOrderHistory once per supplier
+  const newSupplierOrderHistory = new SupplierOrderHistory();
+  newSupplierOrderHistory.supplier = supplier;
+  newSupplierOrderHistory.date = new Date();
+  newSupplierOrderHistory.orderHistory = orderHistory;
+  await suppliersOrderHistoryReposiroty.save(newSupplierOrderHistory);
+
+  // Step 6: Create missing SupplierOrderParts
+  const newSupplierOrderParts = missingParts.map(part => {
+    const newPart = new SupplierOrderParts();
+    newPart.origCode = part.origCode;
+    newPart.count = part.count;
+    newPart.partName = part.partName;
+    newPart.orderPart = part;
+    newPart.supplier = supplier;
+    newPart.date = new Date();
+    return newPart;
+  });
+
+  await supplierOrderPartRepository.save(newSupplierOrderParts);
+}
+
 
     const updatedData = await suppliersOrderHistoryReposiroty.find({
       where: { orderHistory: { id: historyId } },
@@ -763,6 +780,7 @@ export const sendToSupplier = async (
     next(errorHandler(401, error.message));
   }
 };
+
 
 export const calculationStepPass = async (
   req: CustomRequest,
@@ -859,7 +877,7 @@ export const getSupplierOrderParts = async (
       )
     ); // Fix: Flatten the array
 
-    console.log(supplierOrderParts);
+    // console.log(supplierOrderParts);
 
     if (supplierOrderParts.length === 0) {
       next(
