@@ -12,7 +12,7 @@ export const AfterCalculationOrderPartsComponent = ({
   const [orderPartsIds, setOrderPartsId] = useState<any>([]);
   const [supplierOrderParts, setSupplierOrderParts] = useState<any>([]);
   const [error, setError] = useState("");
-  console.log(orderPartsIds, error, "orderPartsIds");
+  console.log(orderPartsIds, error, "orderPartsIds123456");
   console.log(supplierOrderParts, "supplierOrderParts");
 
   const uniqueSupplierOrderParts = supplierOrderParts.reduce(
@@ -44,12 +44,14 @@ export const AfterCalculationOrderPartsComponent = ({
     groupedSupplierOrderParts.slice(((groupedSupplierOrderParts.length)/2), (((groupedSupplierOrderParts.length)/2)*2))
   ];
   console.log(groupedSupplierOrderParts, "groupedSupplierOrderParts");
-  console.log(forHeader, "forHeader");
-  console.log(
-    newArrayGroupedSupplierOrderParts,
-    "newArrayGroupedSupplierOrderParts"
-  );
+  // console.log(forHeader, "forHeader");
+  // console.log(
+  //   newArrayGroupedSupplierOrderParts,
+  //   "newArrayGroupedSupplierOrderParts"
+  // );
 
+  console.log(supplierOrderParts, "supplierOrderParts");
+  
 
 
   useEffect(() => {

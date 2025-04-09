@@ -80,14 +80,14 @@ const ActionsOnOrder = ({
 
     const getSupplierOrderParts = async () => {
       try {
-        const queryParams = new URLSearchParams({
-          orderPartIds: orderPartArrayId.join(","), // <- use this key name!
-        });
+        // const queryParams = new URLSearchParams({
+        //   orderPartIds: orderPartArrayId.join(","), // <- use this key name!
+        // });
 
         // console.log(queryParams, "queryParams");
         
         const res = await fetch(
-          `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData?${queryParams}`,
+          `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData/${order.id}`,
           {
             method: "GET",
             credentials: "include",

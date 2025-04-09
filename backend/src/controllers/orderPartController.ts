@@ -41,6 +41,11 @@ export const getSupplierOrderPartsData = async (
   ) => {
     try {
       console.log(req.query);
+
+
+      const{id} = req.params;
+      console.log(id);
+      
   
       const { orderPartIds } = req.query;
   
@@ -62,11 +67,12 @@ export const getSupplierOrderPartsData = async (
         relations: ["orderPart", "supplier"],
       });
   
-      if (supplierOrderPartsDatas.length === 0) {
-        return next(errorHandler(404, "Tədarikçi sifariş hissələri tapılmadı"));
-      }
-  
-      res.status(200).json(supplierOrderPartsDatas);
+      const uniqueSupplierOrderParts = Array.from(
+        new Map(supplierOrderPartsDatas.map(item => [item.supplier.id, item])).values()
+      );
+          
+
+      res.status(200).json(uniqueSupplierOrderParts);
     } catch (error) {
       next(errorHandler(401, error));
     }

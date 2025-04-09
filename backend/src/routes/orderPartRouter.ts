@@ -5,7 +5,7 @@ import { getOrderPartsByOrderId, getSupplierOrderPartsData } from "../controller
 
 const router=express.Router();
 router.get("/getOrderPartsByOrderId/:id",getOrderPartsByOrderId);
-router.get("/getSupplierOrderPartsData",getSupplierOrderPartsData);
+router.get("/getSupplierOrderPartsData/:id",getSupplierOrderPartsData);
 
 
 
