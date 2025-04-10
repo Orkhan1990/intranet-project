@@ -15,6 +15,7 @@ export const AfterCalculationOrderPartsComponent = ({
   console.log(orderPartsIds, error, "orderPartsIds123456");
   console.log(supplierOrderParts, "supplierOrderParts");
 
+
   const uniqueSupplierOrderParts = supplierOrderParts.reduce(
     (acc: any[], item: any) => {
       if (!acc.some((el) => el.orderPart.id === item.orderPart.id)) {
@@ -85,6 +86,10 @@ export const AfterCalculationOrderPartsComponent = ({
             setError(data.message || "Error fetching supplier order parts");
             return;
           }
+
+
+          console.log(data,"gelendataaaa");
+          
 
           setSupplierOrderParts(data);
         } catch (error: any) {

@@ -52,6 +52,10 @@ const ActionsOnOrder = ({
 
 
   useEffect(() => {
+    if (!order || !order.orderParts || order.orderParts.length === 0) return;
+    const orderPartIdArray = order.orderParts.map((item: any) => item.id);
+    setOrderPartArrayId(orderPartIdArray);
+
     const getSuppliers = async () => {
       try {
         const res = await fetch(
@@ -80,14 +84,14 @@ const ActionsOnOrder = ({
 
     const getSupplierOrderParts = async () => {
       try {
-        // const queryParams = new URLSearchParams({
-        //   orderPartIds: orderPartArrayId.join(","), // <- use this key name!
-        // });
+        const queryParams = new URLSearchParams({
+          orderPartIds: orderPartArrayId.join(","), // <- use this key name!
+        });
 
-        // console.log(queryParams, "queryParams");
+        console.log(queryParams, "queryParams");
         
         const res = await fetch(
-          `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData/${order.id}`,
+          `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData?${queryParams}`,
           {
             method: "GET",
             credentials: "include",
@@ -110,8 +114,6 @@ const ActionsOnOrder = ({
     };
     getSupplierOrderParts();
     getSuppliers();
-    const orderPartIdArray = order.orderParts.map((item: any) => item.id);
-    setOrderPartArrayId(orderPartIdArray);
   }, [order]);
 
 
@@ -845,7 +847,7 @@ const ActionsOnOrder = ({
                                   </Select>
                                   <Button
                                     color={"blue"}
-                                    onClick={() => calculationOpenNewTab(itemobj.id, deliveryTypes[itemobj.id])}
+                                    onClick={() => calculationOpenNewTab(itemobj.supplier.id, deliveryTypes[itemobj.id])}
                                     size={"xs"}
                                     className="cursor-pointer"
                                   >

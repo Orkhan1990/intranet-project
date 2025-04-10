@@ -841,7 +841,7 @@ export const getSupplierOrderParts = async (
 ) => {
   try {
     const { id, orderId } = req.params;
-    //  console.log(id,orderId);
+     console.log(id,orderId);
 
     const order = await orderRepository.findOne({
       where: { id: Number(orderId) },

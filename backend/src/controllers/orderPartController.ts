@@ -35,45 +35,48 @@ export const getOrderPartsByOrderId = async (req: Request, res: Response,next:Ne
 
 
 export const getSupplierOrderPartsData = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      console.log(req.query);
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    console.log(req.query);
 
 
-      const{id} = req.params;
-      console.log(id);
-      
-  
-      const { orderPartIds } = req.query;
-  
-      const orderPartIdArray = orderPartIds
-        ? (orderPartIds as string)
-            .split(",")
-            .map((id) => parseInt(id))
-            .filter((id) => !isNaN(id))
-        : [];
-  
-      console.log(orderPartIdArray, "Parsed orderPartIdArray");
-  
-      const supplierOrderPartsDatas = await supplierOrderPartsRepository.find({
-        where: {
-          orderPart: {
-            id: In(orderPartIdArray),
-          },
+    // const{id} = req.params;
+    // console.log(id);
+    
+
+    const { orderPartIds } = req.query;
+
+    const orderPartIdArray = orderPartIds
+      ? (orderPartIds as string)
+          .split(",")
+          .map((id) => parseInt(id))
+          .filter((id) => !isNaN(id))
+      : [];
+
+    console.log(orderPartIdArray, "Parsed orderPartIdArray");
+
+    const supplierOrderPartsDatas = await supplierOrderPartsRepository.find({
+      where: {
+        orderPart: {
+          id: In(orderPartIdArray),
         },
-        relations: ["orderPart", "supplier"],
-      });
-  
-      const uniqueSupplierOrderParts = Array.from(
-        new Map(supplierOrderPartsDatas.map(item => [item.supplier.id, item])).values()
-      );
-          
+      },
+      relations: ["orderPart", "supplier"],
+    });
 
-      res.status(200).json(uniqueSupplierOrderParts);
-    } catch (error) {
-      next(errorHandler(401, error));
-    }
-  };
+    const uniqueSupplierOrderParts = Array.from(
+      new Map(supplierOrderPartsDatas.map(item => [item.supplier.id, item])).values()
+    );
+        
+
+    console.log(uniqueSupplierOrderParts, "Unique Supplier Order Parts");
+    
+
+    res.status(200).json(uniqueSupplierOrderParts);
+  } catch (error) {
+    next(errorHandler(401, error));
+  }
+};

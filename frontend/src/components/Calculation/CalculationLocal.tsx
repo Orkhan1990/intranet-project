@@ -38,6 +38,10 @@ const CalculationLocal = ({order,supplierId,delivering}: CalculationLocalInterfa
    console.log(orderPartsIdArray,"orderIdArray");
    console.log(error);
    console.log(delivering);
+   console.log(supplierId,"supplierId");
+   console.log(orderId,"orderId");
+   
+   
    
 
 
@@ -64,7 +68,8 @@ useEffect(() => {
         }else{
           // console.log(data);
           // setParts(data);
-
+           console.log(data,"gelendataaaavarmiiiii");
+           
           if (data.length>0) {
 
             const partsData:Part[] = data.map((part:any) => ({
