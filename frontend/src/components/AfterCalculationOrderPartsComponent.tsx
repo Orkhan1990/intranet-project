@@ -9,65 +9,28 @@ interface AfterCalculationOrderPartsInterface {
 export const AfterCalculationOrderPartsComponent = ({
   orderInitialValue,
 }: AfterCalculationOrderPartsInterface) => {
-  const [orderPartsIds, setOrderPartsId] = useState<any>([]);
-  const [supplierOrderParts, setSupplierOrderParts] = useState<any>([]);
+  const [orderPartsIds, setOrderPartsIds] = useState<any[]>([]);
+  const [supplierOrderParts, setSupplierOrderParts] = useState<any[]>([]);
   const [error, setError] = useState("");
-  console.log(orderPartsIds, error, "orderPartsIds123456");
-  console.log(supplierOrderParts, "supplierOrderParts");
 
-
-  const uniqueSupplierOrderParts = supplierOrderParts.reduce(
-    (acc: any[], item: any) => {
-      if (!acc.some((el) => el.orderPart.id === item.orderPart.id)) {
-        acc.push(item);
-      }
-      return acc;
-    },
-    []
-  );
-
-  const groupedSupplierOrderParts = supplierOrderParts.sort(
-    (a: any, b: any) => a.supplier.id - b.supplier.id
-  );
-
-  const forHeader = groupedSupplierOrderParts.reduce(
-    (acc: any[], item: any) => {
-      if (!acc.some((el) => el.supplier.id === item.supplier.id)) {
-        acc.push(item);
-      }
-      return acc;
-    },
-    []
-  );
-
-  const newArrayGroupedSupplierOrderParts = [
-    groupedSupplierOrderParts.slice(0, 2),
-    groupedSupplierOrderParts.slice(((groupedSupplierOrderParts.length)/2), (((groupedSupplierOrderParts.length)/2)*2))
-  ];
-  console.log(groupedSupplierOrderParts, "groupedSupplierOrderParts");
-  // console.log(forHeader, "forHeader");
-  // console.log(
-  //   newArrayGroupedSupplierOrderParts,
-  //   "newArrayGroupedSupplierOrderParts"
-  // );
-
-  console.log(supplierOrderParts, "supplierOrderParts");
+  // console.clear();
   
-
+  // console.log({supplierOrderParts});
+  
 
   useEffect(() => {
     if (orderInitialValue.orderParts) {
-      const orderPartIds = orderInitialValue.orderParts.map((item) => item.id);
-      setOrderPartsId(orderPartIds);
+      const ids = orderInitialValue.orderParts.map((item) => item.id);
+      setOrderPartsIds(ids);
     }
   }, [orderInitialValue]);
 
   useEffect(() => {
     if (orderPartsIds.length > 0) {
-      const getSupplierOrderParts = async () => {
+      const fetchSupplierOrderParts = async () => {
         try {
           const queryParams = new URLSearchParams({
-            orderPartIds: orderPartsIds.join(","), // Correctly sending orderPartsIds
+            orderPartIds: orderPartsIds.join(","),
           });
 
           const res = await fetch(
@@ -80,200 +43,163 @@ export const AfterCalculationOrderPartsComponent = ({
               },
             }
           );
-
           const data = await res.json();
+          console.clear();
+          console.log({data});
+          
           if (!res.ok || data.success === false) {
             setError(data.message || "Error fetching supplier order parts");
             return;
           }
-
-
-          console.log(data,"gelendataaaa");
-          
-
           setSupplierOrderParts(data);
-        } catch (error: any) {
-          setError(error.message || "Network error");
+        } catch (err: any) {
+          setError(err.message || "Network error");
         }
       };
 
-      getSupplierOrderParts();
+      fetchSupplierOrderParts();
     }
   }, [orderPartsIds]);
 
   const defineDeliverType = (delivering: string) => {
     switch (delivering) {
       case "təcili":
-        return <span>Təcili (15 gün)</span>;
+        return <span> (15 gün)</span>;
       case "normal":
-        return <span>Orta (15-30 gün)</span>;
+        return <span> (15-30 gün)</span>;
       case "planlaşdırılmış":
-        return <span>Planlaşdırılmış (40-60 gün)</span>;
+        return <span> (40-60 gün)</span>;
       default:
-        return false;
+        return null;
     }
   };
 
+  // Group supplierOrderParts by supplier
+  const supplierGroups = supplierOrderParts.reduce((acc: any, part: any) => {
+    const supplierId = part.supplier.id;
+    if (!acc[supplierId]) {
+      acc[supplierId] = {
+        supplier: part.supplier,
+        delivering: part.delivering,
+        parts: [],
+      };
+    }
+    acc[supplierId].parts.push(part);
+    return acc;
+  }, {});
+
+  // Get unique parts (by orderPart)
+  const uniqueParts = orderInitialValue.orderParts.map((part) => ({
+    id: part.id,
+    origCode: part.origCode,
+    count: part.count,
+    partName: part.partName,
+  }));
+
   return (
-    <table className="w-24 border p-2 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+    <table className="w-full border p-2 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+      {/* Headers */}
       <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
-          <th scope="col" className="px-6 py-3"></th>
-          <th scope="col" className="px-6 py-3"></th>
-          <th scope="col" className="px-6 py-3"></th>
-          <th scope="col" className="px-6 py-3"></th>
-          <th scope="col" className="px-6 py-3"></th>
-          {forHeader &&
-            forHeader.map((item: any, index: number) => (
-              <th
-                scope="col"
-                key={index}
-                colSpan={3}
-                className="w-full  py-6 border border-black text-white text-center bg-red-700"
-              >
-                <div className="">
-                  <span className="px-1 py-3">{item.supplier.supplier}</span>
-                  {defineDeliverType(item.delivering)}
-                </div>
-              </th>
-            ))}
+          <th className="px-6 py-3">№</th>
+          <th className="px-6 py-3">DETALIN NÖMRƏSİ</th>
+          <th className="px-6 py-3">SAYI</th>
+          <th className="px-6 py-3">ANBARDA VARMI</th>
+          <th className="px-6 py-3">DETALIN ADI</th>
+          {Object.values(supplierGroups).map((group: any, index: number) => (
+            <th key={index} colSpan={3} className="text-center bg-red-700 text-white border border-black py-6">
+              <div>
+                {group.supplier.supplier}
+                {defineDeliverType(group.delivering)}
+              </div>
+            </th>
+          ))}
         </tr>
-      </thead>
-      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
-          <th scope="col" className="px-6 py-3">
-            №
-          </th>
-          <th scope="col" className="px-6 py-3">
-            Detalın nömrəsi
-          </th>
-          <th scope="col" className="px-6 py-3">
-            Sayı
-          </th>
-          <th scope="col" className="px-6 py-3">
-            Anbarda varmı
-          </th>
-          <th scope="col" className="px-6 py-3">
-            Detalın adı
-          </th>
-
-          {newArrayGroupedSupplierOrderParts &&
-            newArrayGroupedSupplierOrderParts.map((index: number) => (
-              <>
-                <th scope="col" className="px-6 py-3 border-l border-black" key={index}>
-                  Maya dəyəri
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Satış dəyəri
-                </th>
-                <th scope="col" className="px-6 py-3 border-r-2 border-black">
-                  Ümumi satış dəyəri
-                </th>
-              </>
-            ))}
-        </tr>
-      </thead>
-      <tbody>
-        {uniqueSupplierOrderParts &&
-          uniqueSupplierOrderParts.map((item: any, index: number) => (
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          {Object.values(supplierGroups).map((_, index: number) => (
             <React.Fragment key={index}>
-              <tr>
-                <td scope="col" className="px-6 py-3 ">
-                  {index + 1}
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex gap-2 items-center">
-                    <TextInput
-                      type="text"
-                      sizing="sm"
-                      className="w-40"
-                      value={item.origCode}
-                      readOnly
-                    />
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <TextInput
-                    type="text"
-                    sizing="sm"
-                    className="w-20"
-                    value={item.count}
-                    readOnly
-                  />
-                </td>
-                <td scope="col" className="px-6 py-3"></td>
-                <td className="px-6 py-4">
-                  <TextInput
-                    type="text"
-                    sizing="sm"
-                    className="w-40"
-                    value={item.partName}
-                    readOnly
-                  />
-                </td>
-
-                {newArrayGroupedSupplierOrderParts &&
-                  newArrayGroupedSupplierOrderParts.map(
-                    (item: any, supplierIndex: number) => (
-                      <React.Fragment key={supplierIndex}>
-                        <td className="px-6 py-4">
-                          <TextInput
-                            type="text"
-                            sizing="sm"
-                            className="w-20"
-                            value={parseFloat(item[index]?.price).toString()}
-                            readOnly
-                          />
-                        </td>
-                        <td className="px-6 py-4">
-                          <TextInput
-                            type="text"
-                            sizing="sm"
-                            className="w-20"
-                            value={parseFloat(
-                              item[index]?.unitSellPrice
-                            ).toString()}
-                            readOnly
-                          />
-                        </td>
-                        <td className="px-6 py-4">
-                          <TextInput
-                            type="text"
-                            sizing="sm"
-                            className="w-20"
-                            value={parseFloat(item[index]?.sellPrice).toString()}
-                            readOnly
-                          />
-                        </td>
-                      </React.Fragment>
-                    )
-                  )}
-              </tr>
+              <th className="border-l border-black px-6 py-3">MAYA DƏYƏRİ</th>
+              <th className="px-6 py-3">SATIŞ DƏYƏRİ</th>
+              <th className="border-r-2 border-black px-6 py-3">ÜMUMİ SATIŞ DƏYƏRİ</th>
             </React.Fragment>
           ))}
-        <tr>
-          <td scope="col" className="px-6 py-3 "></td>
-          <td scope="col" className="px-6 py-3 "></td>
-          <td scope="col" className="px-6 py-3 "></td>
-          <td scope="col" className="px-6 py-3 "></td>
-          <td scope="col" className="px-6 py-3 "></td>
-          {newArrayGroupedSupplierOrderParts &&
-            newArrayGroupedSupplierOrderParts.map(
-              (item: any, supplierIndex: number) => (
-                <React.Fragment key={supplierIndex}>
-                  <td className="px-6 py-4"></td>
-                  <td className="px-9 py-4 text-black text-xs">
-                    {(item.reduce(
-                      (total: number, obj: any) =>
-                        total + Number(obj?.sellPrice),
-                      0
-                    )).toFixed(2)
-                    }
+        </tr>
+      </thead>
+
+      {/* Body */}
+      <tbody>
+        {uniqueParts.map((part, rowIndex) => (
+          <tr key={rowIndex}>
+            <td className="px-6 py-3">{rowIndex + 1}</td>
+            <td className="px-6 py-3">
+              <TextInput value={part.origCode} readOnly sizing="sm" className="w-32" />
+            </td>
+            <td className="px-6 py-3">
+              <TextInput value={part.count} readOnly sizing="sm" className="w-20" />
+            </td>
+            <td className="px-6 py-3"></td>
+            <td className="px-6 py-3">
+              <TextInput value={part.partName} readOnly sizing="sm" className="w-32" />
+            </td>
+
+            {Object.values(supplierGroups).map((group: any, index: number) => {
+              const supplierPart = group.parts.find(
+                (p: any) => p.orderPart.id === part.id
+              );
+
+              return (
+                <React.Fragment key={index}>
+                  <td className="px-6 py-3">
+                    <TextInput
+                      value={supplierPart ? supplierPart.price : ""}
+                      readOnly
+                      sizing="sm"
+                      className="w-20"
+                    />
                   </td>
-                  <td className="px-6 py-4"></td>
+                  <td className="px-6 py-3">
+                    <TextInput
+                      value={supplierPart ? supplierPart.unitSellPrice : ""}
+                      readOnly
+                      sizing="sm"
+                      className="w-20"
+                    />
+                  </td>
+                  <td className="px-6 py-3">
+                    <TextInput
+                      value={supplierPart ? supplierPart.sellPrice : ""}
+                      readOnly
+                      sizing="sm"
+                      className="w-20"
+                    />
+                  </td>
                 </React.Fragment>
-              )
-            )}
+              );
+            })}
+          </tr>
+        ))}
+
+        {/* Footer sums */}
+        <tr>
+          <td colSpan={5}></td>
+          {Object.values(supplierGroups).map((group: any, index: number) => {
+            const total = group.parts.reduce(
+              (sum: number, part: any) => sum + (Number(part.sellPrice) || 0),
+              0
+            );
+            return (
+              <React.Fragment key={index}>
+                <td></td>
+                <td className="px-6 py-3 font-bold text-black">{total.toFixed(2)}</td>
+                <td></td>
+              </React.Fragment>
+            );
+          })}
         </tr>
       </tbody>
     </table>
