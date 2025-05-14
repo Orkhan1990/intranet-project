@@ -4,8 +4,7 @@ import { AppDataSource } from "../database";
 import { SupplierOrderParts } from "../entites/SupplierOrderParts";
 import { Order } from "../entites/Order";
 import { OrderPart } from "../entites/OrderPart";
-import { log } from "console";
-import { In } from "typeorm";
+
 
 
 const orderPartRepository=AppDataSource.getRepository(OrderPart);
@@ -51,49 +50,17 @@ export const getSupplierOrderPartsData = async (
           .filter((id) => !isNaN(id))
       : [];
 
-    // console.log({orderPartIdArray});
-
-    // const supplierOrderPartsDatas = await supplierOrderPartsRepository.find({
-    //   where: {
-    //     orderPart: {
-    //       id: In(orderPartIdArray),
-    //     },
-    //   },
-    //   relations: ["orderPart", "supplier"],
-    // });
      
-    const subQuery = AppDataSource.getRepository(SupplierOrderParts)
-    .createQueryBuilder("sub_sop")
-    .select("sub_sop.supplier_id", "supplier_id")
-    .addSelect("MIN(CAST(sub_sop.unit_sell_price AS DECIMAL(10,2)))", "min_unit_sell_price")
-    .where("sub_sop.order_part_id IN (:...ids)", { ids: orderPartIdArray })
-    .groupBy("sub_sop.supplier_id");
+ 
   
   const supplierOrderParts = await AppDataSource.getRepository(SupplierOrderParts)
     .createQueryBuilder("sop")
     .innerJoinAndSelect("sop.supplier", "suppliers")
     .innerJoinAndSelect("sop.orderPart", "orderPart")
-    // .innerJoin(
-    //   `(${subQuery.getQuery()})`,
-    //   "min_prices",
-    //   `sop.supplier_id = min_prices.supplier_id AND 
-    //    CAST(sop.unit_sell_price AS DECIMAL(10,2)) = min_prices.min_unit_sell_price`
-    // )
     .where("sop.order_part_id IN (:...ids)", { ids: orderPartIdArray })
-    // .setParameters(subQuery.getParameters())
     .getMany();
 
     console.log(supplierOrderParts);
-
-    // const uniqueSupplierOrderParts = Array.from(
-    //   new Map(supplierOrderPartsDatas.map(item => [item.supplier.id, item])).values()
-    // );
-        
-   
-    
-    // console.log(uniqueSupplierOrderParts, "Unique Supplier Order Parts");
-    
-
     res.status(200).json(supplierOrderParts);
   } catch (error) {
     next(errorHandler(401, error));

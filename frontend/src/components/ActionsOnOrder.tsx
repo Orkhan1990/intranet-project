@@ -27,11 +27,23 @@ const ActionsOnOrder = ({
   const [deliveryTypes, setDeliveryTypes] = useState<{ [key: string]: DeliverType }>({});
   const [supplierOrderPartsData, setSupplierOrderPartsData] = useState<any>([]);
   const [orderPartArrayId, setOrderPartArrayId] = useState<number[]>([]);
+  const [supplierId,setSupplierId]=useState<number>(0)
 
   console.log(selectedSuppliers, "selectedSuppliers");
   // console.log(delivering, error, "delivering");
   console.log(supplierOrderPartsData, "supplierOrderPartsDatasssss");
   console.log(orderPartArrayId, "orderPartArrayId");
+
+
+  console.clear();
+  console.log({supplierOrderPartsData})
+
+
+
+  const uniqueSupplierOrderPartsData = Array.from(
+    new Map(supplierOrderPartsData.map((item:any) => [item.supplier.id, item])).values()
+  );
+
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
@@ -437,6 +449,25 @@ const ActionsOnOrder = ({
     }
   };
 
+
+  const handleSupplierId=(e:any)=>{
+    setSupplierId(e.target.value);
+  }
+
+  console.clear();
+  console.log({supplierId});
+  
+
+  const choosingBestSupplier = async () => {
+    try {
+      
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
+  
+
   return (
     <div className="mt-5">
       <h2 className=" bg-orange-300 py-5 px-5 rounded-sm font-semibold">
@@ -803,8 +834,8 @@ const ActionsOnOrder = ({
                               supplierOrderPartsData[0]?.date &&
                               changeFormatDate(supplierOrderPartsData[0].date)}
                           </div>
-                          {supplierOrderPartsData &&
-                            supplierOrderPartsData.map(
+                          {uniqueSupplierOrderPartsData &&
+                            uniqueSupplierOrderPartsData.map(
                               (itemobj: any, index: number) => (
                                 <div
                                   className="flex gap-2 items-center"
@@ -964,9 +995,9 @@ const ActionsOnOrder = ({
                                 className="my-2 w-72"
                                 name="acceptMessage"
                               />
-                              <Select sizing={"sm"}>
-                                {supplierOrderPartsData &&
-                                  supplierOrderPartsData.map(
+                              <Select sizing={"sm"} onChange={(e:any)=>handleSupplierId(e)}>
+                                {uniqueSupplierOrderPartsData &&
+                                  uniqueSupplierOrderPartsData.map(
                                     (item: any, index: number) => (
                                       <option
                                         value={item.supplier.id}
@@ -982,6 +1013,7 @@ const ActionsOnOrder = ({
                                 color={"blue"}
                                 size={"xs"}
                                 className="mt-5"
+                                onClick={choosingBestSupplier}
                               >
                                 Seç
                               </Button>
