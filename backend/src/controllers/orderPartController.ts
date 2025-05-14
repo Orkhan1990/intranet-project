@@ -42,16 +42,12 @@ export const getSupplierOrderPartsData = async (
     
     const { orderPartIds } = req.query;
 
-
     const orderPartIdArray = orderPartIds
       ? (orderPartIds as string)
           .split(",")
           .map((id) => parseInt(id))
           .filter((id) => !isNaN(id))
       : [];
-
-     
- 
   
   const supplierOrderParts = await AppDataSource.getRepository(SupplierOrderParts)
     .createQueryBuilder("sop")
@@ -66,3 +62,16 @@ export const getSupplierOrderPartsData = async (
     next(errorHandler(401, error));
   }
 };
+
+
+export const choosingBestSupplier = async ( req: Request,
+  res: Response,
+  next: NextFunction)=>{
+  try {
+
+    const{supplierId}=req.params;
+    
+  } catch (error) {
+    next(errorHandler(401, error));
+  }
+}
