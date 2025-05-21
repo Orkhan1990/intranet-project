@@ -1,11 +1,12 @@
 import express from "express";
-import { getOrderPartsByOrderId, getSupplierOrderPartsData } from "../controllers/orderPartController";
+import { choosingBestSupplier, getOrderPartsByOrderId, getSupplierOrderPartsData } from "../controllers/orderPartController";
 
 
 
 const router=express.Router();
 router.get("/getOrderPartsByOrderId/:id",getOrderPartsByOrderId);
 router.get("/getSupplierOrderPartsData",getSupplierOrderPartsData);
+router.post("/choosingBestSupplier/:id",choosingBestSupplier);
 
 
 

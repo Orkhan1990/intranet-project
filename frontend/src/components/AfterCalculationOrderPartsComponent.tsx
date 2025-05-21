@@ -81,6 +81,7 @@ export const AfterCalculationOrderPartsComponent = ({
       acc[supplierId] = {
         supplier: part.supplier,
         delivering: part.delivering,
+        isTheBestSupplier: part.isTheBestSupplier,
         parts: [],
       };
     }
@@ -107,10 +108,12 @@ export const AfterCalculationOrderPartsComponent = ({
           <th className="px-6 py-3">ANBARDA VARMI</th>
           <th className="px-6 py-3">DETALIN ADI</th>
           {Object.values(supplierGroups).map((group: any, index: number) => (
-            <th key={index} colSpan={3} className="text-center bg-red-700 text-white border border-black py-6">
+            <th key={index} colSpan={3} className="  text-white border border-black ">
               <div>
-                {group.supplier.supplier}
+                <div className={`${group.isTheBestSupplier?"bg-green-700":"bg-red-700"} h-14 text-center flex items-center justify-center`}>{group.supplier.supplier}
                 {defineDeliverType(group.delivering)}
+                </div>
+                
               </div>
             </th>
           ))}

@@ -4,12 +4,14 @@ import { AppDataSource } from "../database";
 import { SupplierOrderParts } from "../entites/SupplierOrderParts";
 import { Order } from "../entites/Order";
 import { OrderPart } from "../entites/OrderPart";
+import { Supplier } from "../entites/Supplier";
 
 
 
 const orderPartRepository=AppDataSource.getRepository(OrderPart);
 const orderRepository=AppDataSource.getRepository(Order);
 const supplierOrderPartsRepository=AppDataSource.getRepository(SupplierOrderParts);
+const supplierRepository=AppDataSource.getRepository(Supplier);
 
 export const getOrderPartsByOrderId = async (req: Request, res: Response,next:NextFunction) => {
     try {
@@ -69,8 +71,29 @@ export const choosingBestSupplier = async ( req: Request,
   next: NextFunction)=>{
   try {
 
-    const{supplierId}=req.params;
-    
+    const{id}=req.params;
+    const{orderPartArrayId}=req.body
+     console.log(orderPartArrayId)
+
+
+     const results = await supplierOrderPartsRepository
+     .createQueryBuilder("sop")
+     .leftJoinAndSelect("sop.supplier", "supplier") // include full supplier data
+     .leftJoinAndSelect("sop.orderPart", "orderPart") // include full orderPart data
+     .where("supplier.id = :supplierId", { supplierId: id })
+     .andWhere("orderPart.id IN (:...ids)", { ids: orderPartArrayId })
+     .getMany();
+
+
+     const updatedSupplierOrderParts = results.map((sop) => {
+      sop.isTheBestSupplier = true;
+      return sop;
+    });
+      await supplierOrderPartsRepository.save(updatedSupplierOrderParts);
+   
+    res.status(200).json({
+      message: "Supplier updated successfully"})
+   
   } catch (error) {
     next(errorHandler(401, error));
   }

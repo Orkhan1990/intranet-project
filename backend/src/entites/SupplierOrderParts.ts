@@ -18,6 +18,7 @@ export class SupplierOrderParts extends AllEntities{
     
     @Column({nullable:true})
     date:Date;
+    
     @Column({name:"orig_code",nullable:true})
     origCode:string;
 

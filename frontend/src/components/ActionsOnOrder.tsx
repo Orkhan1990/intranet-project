@@ -454,12 +454,33 @@ const ActionsOnOrder = ({
     setSupplierId(e.target.value);
   }
 
-  console.clear();
-  console.log({supplierId});
+ 
   
 
   const choosingBestSupplier = async () => {
+
+    console.clear();
+    console.log({supplierId});
     try {
+
+      const res = await fetch(
+        `http://localhost:3013/api/v1/orderPart/choosingBestSupplier/${supplierId}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderPartArrayId}),
+        }
+      );
+      const data = await res.json();
+       if (!res.ok || data.success === false) {
+        setError(data.message)
+        ;}else{
+          setRefreshData(true);
+        }
+
       
     } catch (error) {
       console.log(error);
@@ -841,7 +862,10 @@ const ActionsOnOrder = ({
                                   className="flex gap-2 items-center"
                                   key={index}
                                 >
-                                  <div>
+                                  {
+                                    itemobj.isTheBestSupplier &&(
+                                     <>
+                                      <div>
                                     {item.showHide &&
                                       itemobj.date &&
                                       changeFormatDate(itemobj.date)}
@@ -884,6 +908,10 @@ const ActionsOnOrder = ({
                                   >
                                     Hesablama
                                   </Button>
+                                     </>
+                                    )
+                                  }
+                                 
                                 </div>
                               )
                             )}
@@ -1014,6 +1042,7 @@ const ActionsOnOrder = ({
                                 size={"xs"}
                                 className="mt-5"
                                 onClick={choosingBestSupplier}
+                                // disabled={item.isTheBestSupplier}
                               >
                                 Seç
                               </Button>
