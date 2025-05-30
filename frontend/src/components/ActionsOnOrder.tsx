@@ -457,7 +457,7 @@ const ActionsOnOrder = ({
  
   
 
-  const choosingBestSupplier = async () => {
+  const choosingBestSupplier = async (orderhistoryId:any) => {
 
     console.clear();
     console.log({supplierId});
@@ -471,14 +471,14 @@ const ActionsOnOrder = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ orderPartArrayId}),
+          body: JSON.stringify({ orderPartArrayId,orderhistoryId}),
         }
       );
       const data = await res.json();
        if (!res.ok || data.success === false) {
         setError(data.message)
-        ;}else{
-          setRefreshData(true);
+        }else{
+          setRefreshData((prev:any)=> !prev);
         }
 
       
@@ -863,7 +863,7 @@ const ActionsOnOrder = ({
                                   key={index}
                                 >
                                   {
-                                    itemobj.isTheBestSupplier &&(
+                                    !itemobj.isTheBestSupplier &&(
                                      <>
                                       <div>
                                     {item.showHide &&
@@ -921,6 +921,7 @@ const ActionsOnOrder = ({
                               size={"xs"}
                               className="w-20"
                               onClick={() => acceptCalculation(item.id)}
+                              disabled={item.isFinished}
                             >
                               Bitirmək
                             </Button>
@@ -1015,7 +1016,11 @@ const ActionsOnOrder = ({
                           <div className="w-64 px-6 py-4 text-black ">
                             Məsul şəxsin təsdiqi
                           </div>
-                          <div className="px-6 py-4">
+
+                          {
+                          !item.showHide ? (
+                              <>
+                                  <div className="px-6 py-4">
                             <div>
                               <h2 className="text-black">Mesaj</h2>
                               <Textarea
@@ -1041,8 +1046,7 @@ const ActionsOnOrder = ({
                                 color={"blue"}
                                 size={"xs"}
                                 className="mt-5"
-                                onClick={choosingBestSupplier}
-                                // disabled={item.isTheBestSupplier}
+                                onClick={()=>choosingBestSupplier(item.id)}
                               >
                                 Seç
                               </Button>
@@ -1073,6 +1077,12 @@ const ActionsOnOrder = ({
                               </div>
                             </div>
                           </div>
+                              </>
+                            ):(  <div className="px-6 py-4">
+                              {changeFormatDate(item.date)}
+                            </div>)
+                          }
+                      
                         </div>
                       </div>
                     )}

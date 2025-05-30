@@ -5,6 +5,7 @@ import { SupplierOrderParts } from "../entites/SupplierOrderParts";
 import { Order } from "../entites/Order";
 import { OrderPart } from "../entites/OrderPart";
 import { Supplier } from "../entites/Supplier";
+import { OrderHistory } from "../entites/OrderHistory";
 
 
 
@@ -12,6 +13,7 @@ const orderPartRepository=AppDataSource.getRepository(OrderPart);
 const orderRepository=AppDataSource.getRepository(Order);
 const supplierOrderPartsRepository=AppDataSource.getRepository(SupplierOrderParts);
 const supplierRepository=AppDataSource.getRepository(Supplier);
+const orderHistoryRepository=AppDataSource.getRepository(OrderHistory);
 
 export const getOrderPartsByOrderId = async (req: Request, res: Response,next:NextFunction) => {
     try {
@@ -50,6 +52,10 @@ export const getSupplierOrderPartsData = async (
           .map((id) => parseInt(id))
           .filter((id) => !isNaN(id))
       : [];
+
+      if( orderPartIdArray.length === 0) {
+        return next(errorHandler(404, "Order part IDs are required"));
+      }
   
   const supplierOrderParts = await AppDataSource.getRepository(SupplierOrderParts)
     .createQueryBuilder("sop")
@@ -72,8 +78,26 @@ export const choosingBestSupplier = async ( req: Request,
   try {
 
     const{id}=req.params;
-    const{orderPartArrayId}=req.body
+    const{orderPartArrayId,orderhistoryId}=req.body
      console.log(orderPartArrayId)
+
+     if(!id || !orderPartArrayId || orderPartArrayId.length === 0) {
+      return next(errorHandler(400, "Supplier ID and order part IDs are required"));
+    }
+
+
+    const orderHistory = await orderHistoryRepository.findOneBy({
+      id: parseInt(orderhistoryId)
+    });
+
+    if (!orderHistory) {
+      return next(errorHandler(404, "Order history not found"));
+    }
+
+
+    orderHistory.showHide = true;
+    orderHistory.date = new Date();
+    await orderHistoryRepository.save(orderHistory);
 
 
      const results = await supplierOrderPartsRepository
