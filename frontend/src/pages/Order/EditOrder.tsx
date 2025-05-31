@@ -109,6 +109,7 @@ const EditOrder = () => {
           reject: "",
           file: "",
           showHide: false,
+          showResult:false,
           date: new Date(),
           user: {
             id: 0,

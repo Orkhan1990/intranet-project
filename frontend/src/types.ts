@@ -157,6 +157,7 @@ export interface OrderHistoryInterface{
   step:string,
   confirm:boolean,
   showHide:boolean,
+  showResult:boolean,
   message:string,
   reject:string,
   file:string,

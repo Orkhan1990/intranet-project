@@ -586,6 +586,7 @@ export const responsibleOrder = async (
 
     const newOrderHistory = new OrderHistory();
     newOrderHistory.confirm = true;
+    // newOrderHistory.showResult=true;
     newOrderHistory.date = new Date();
     newOrderHistory.user = responsibleUser;
     newOrderHistory.step = OrderStep.ResponsibleUserBegin;
@@ -633,12 +634,13 @@ export const startResponsibleOrder = async (
     orderHistory.confirm = false;
     orderHistory.date = new Date();
     orderHistory.message = message;
+    orderHistory.showResult=true;
     orderHistory.user = user;
 
     await orderHistoryRepository.save(orderHistory);
 
     const newHistory = new OrderHistory();
-    newHistory.confirm = false;
+    newHistory.confirm = true;
     newHistory.showHide = true;
     newHistory.order = order;
     newHistory.user = user;
@@ -686,15 +688,22 @@ export const sendToSupplier = async (
     });
     if (!orderHistory)
       return next(errorHandler(404, "Belə bir sifariş tarixçəsi yoxdur!"));
-    orderHistory.confirm = true;
+    orderHistory.confirm = false;
+    orderHistory.showResult=true;
     orderHistory.date = new Date();
     orderHistory.user = user;
     orderHistory.order = order;
     await orderHistoryRepository.save(orderHistory);
 
-    // Updating OrderHistory details
-    // Object.assign(orderHistory, { confirm: true, date: new Date(), user, order });
-    // await orderHistoryRepository.save(orderHistory);
+        const newOrderHistory = new OrderHistory(); 
+        newOrderHistory.confirm=true;
+        newOrderHistory.date=new Date();
+        newOrderHistory.step=OrderStep.ResponseFromSupplier;
+        newOrderHistory.order=order;
+        newOrderHistory.user=user;
+        newOrderHistory.showHide = true;
+        await orderHistoryRepository.save(newOrderHistory);
+
 
     const existingSupplierOrders = await suppliersOrderHistoryReposiroty.find({
       where: { orderHistory },

@@ -21,6 +21,10 @@ export class OrderHistory extends AllEntities{
   
     @Column({default:false,name:"show_hide"})
     showHide:boolean;
+
+      
+    @Column({default:false,name:"show_result"})
+    showResult:boolean;
     
     @Column({nullable:true})
     message:string;

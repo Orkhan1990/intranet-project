@@ -26,6 +26,7 @@ export enum OrderStatus{
     ResposibleFromOrder="responsibleFromOrder",
     ResponsibleUserBegin="responsibleUserBegin",
     RequsetToSupplier="requestToSupplier",
+    ResponseFromSupplier="responseFromSupplier",
     CalculationBegin="calculationBegin",
     CalculationAccept="calculationAccept",
     ChoosingBestSupplier="choosingBestSupplier",
