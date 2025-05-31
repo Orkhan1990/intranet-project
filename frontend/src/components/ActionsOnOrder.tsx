@@ -95,6 +95,7 @@ const ActionsOnOrder = ({
     };
 
     const getSupplierOrderParts = async () => {
+    if (orderPartArrayId.length === 0) return; // Check if orderPartArrayId is empty
       try {
         const queryParams = new URLSearchParams({
           orderPartIds: orderPartArrayId.join(","), // <- use this key name!
@@ -461,6 +462,11 @@ const ActionsOnOrder = ({
 
     console.clear();
     console.log({supplierId});
+      if(orderhistoryId.length === 0 || supplierId === 0){
+        setError("Təchizatçı seçilməyib və ya sifariş tarixçəsi boşdur.");
+        return; 
+      }
+
     try {
 
       const res = await fetch(
