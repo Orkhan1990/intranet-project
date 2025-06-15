@@ -702,6 +702,7 @@ export const sendToSupplier = async (
         newOrderHistory.order=order;
         newOrderHistory.user=user;
         newOrderHistory.showHide = true;
+        newOrderHistory.showResult = true; // Assuming you want to show the result
         await orderHistoryRepository.save(newOrderHistory);
 
 
@@ -834,6 +835,7 @@ export const calculationStepPass = async (
     newOrderHistory.date = new Date();
     newOrderHistory.showHide = false;
     newOrderHistory.order = order;
+    newOrderHistory.showResult = true; // Assuming you want to show the result
     newOrderHistory.user = user;
     await orderHistoryRepository.save(newOrderHistory);
 
