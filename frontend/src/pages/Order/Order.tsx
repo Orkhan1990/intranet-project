@@ -7,22 +7,24 @@ import {
 } from "../../types";
 import { Link } from "react-router-dom";
 import { Button } from "flowbite-react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux-toolkit/store/store";
 
 const Order = () => {
   const [orders, setOrders] = useState<AllOrdersInterface[]>([]);
   const [error, setError] = useState("");
-  console.log(orders,error,"salaaaa");
-  
 
-  console.log(orders);
+  console.log(error);
 
-  interface OrderHistory{
-    stage:string,
-    confirm:boolean,
-    confirmDate:string,
-    accept:boolean,
-    acceptDate:string,
-    acceptMessage:string
+  const { currentUser } = useSelector((state: RootState) => state.auth);
+
+  interface OrderHistory {
+    stage: string;
+    confirm: boolean;
+    confirmDate: string;
+    accept: boolean;
+    acceptDate: string;
+    acceptMessage: string;
   }
 
   interface AllOrdersInterface {
@@ -44,33 +46,35 @@ const Order = () => {
     delivering: DeliverType;
     deliveringType: string;
     initialPayment: number;
-    orderHistory:OrderHistory[],
+    orderHistory: OrderHistory[];
     comment: string;
     oil: boolean;
     user: UserInterface;
     orderParts: OrderPartsInterface[];
     createdAt: string;
+    confirmWarehouseDate: string | null;
+    responsibleStartDate: string | null;
+    requestToSupplierDate: string | null;
+    respoenseFromSupplierDate: string | null; //EDIT THIS WORD IN BACKEND
   }
 
-  
-
-  const getStageResult = (result:any) => {
+  const getStageResult = (result: any) => {
     // const currentStep=result.orderHistory[result.orderHistory.length-1]?.step
     switch (result) {
       case "created":
         return "Sifariş yaradıldı";
       case "warehouseConfirm":
-      return "Anbardar təsdiqi";
-      case "orderresposibility":
-      return "Sifariş üçün cavabdehdir";
+        return "Anbardar təsdiqi";
       case "responsibleUser":
         return "Məsul şəxs işə başladı";
-      case "invastigation":
-        return "Bazar araşdırması aparılır";
+      case "requestToSupplier":
+        return "Təchizatçıya müraciət";
+      case "responseFromSupplier":
+        return "Təchizatçıdan cavab gəldi";
       case "calculation":
         return "Hesablama aparılır";
-        case "finish":
-          return "Sifariş tamamlandı"
+      case "finish":
+        return "Sifariş tamamlandı";
       default:
         return "";
     }
@@ -102,7 +106,6 @@ const Order = () => {
 
     getAllOrders();
   }, []);
-
 
   //Change TIME FORMAT
 
@@ -200,45 +203,112 @@ const Order = () => {
             </thead>
             <tbody>
               {orders.length > 0 &&
-                orders.map((order: AllOrdersInterface, index: number) => (
-                  <tr
-                    className=" text-black odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
-                    key={index}
-                  >
-                    <td className="px-6 py-4"></td>
-                     <td className="px-6 py-4"><Link to={`/editOrder/${order.id}`} >{index+1}</Link></td>
-                    <td className="px-6 py-4"><Link to={`/editOrder/${order.id}`} >{order.client.companyName}</Link></td>
-                    <td className="px-6 py-4">{order.manufacturer}</td>
-                    <td className="px-6 py-4"></td>
-                    <td className="px-6 py-4">
-                      <input
-                        type="text"
-                        className="text-xs w-20 py-1 rounded-sm outline-none "
-                      />
-                    </td>
-                    <td className="px-6 py-4">{order.paymentType}</td>
-                    <td className="px-6 py-4">{order.delivering}</td>
-                    <td className="px-3 py-4 text-xs">
-                      {order.user.firstName} {order.user.lastName}
-                    </td>
-                    <td className=" px-6 py-4 text-xs">
-                      {order.initialPayment} %
-                    </td>
-                    <td className=" px-6 py-4 text-xs">0</td>
-                    <td className=" px-6 py-4 text-xs"></td>
-                    <td className=" px-6 py-4 text-xs">
-                      {getStageResult(order.stage)}
-                    </td>
-                    <td className="flex flex-col px-4 py-4 text-xs">
-                      <span>{getHour(order.createdAt)}</span>
-                      <span>{getFullDate(order.createdAt)}</span>
-                    </td>
-                  </tr>
-                ))}
+                orders.map((order: AllOrdersInterface, index: number) => {
+
+                    const checkUser = currentUser?.id === order.user.id;
+                  return (
+                    <tr
+                      className={`${checkUser?"text-black bg-red-700":"text-black odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"}`}
+                      key={index}
+                    >
+                      <td className="px-6 py-4"></td>
+                      <td className="px-6 py-4">
+                        <Link to={`/editOrder/${order.id}`}>{index + 1}</Link>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Link to={`/editOrder/${order.id}`}>
+                          {order.client.companyName}
+                        </Link>
+                      </td>
+                      <td className="px-6 py-4">{order.manufacturer}</td>
+                      <td className="px-6 py-4"></td>
+                      <td className="px-6 py-4">
+                        <input
+                          type="text"
+                          className="text-xs w-20 py-1 rounded-sm outline-none "
+                        />
+                      </td>
+                      <td className="px-6 py-4">{order.paymentType}</td>
+                      <td className="px-6 py-4">{order.delivering}</td>
+                      <td className="px-3 py-4 text-xs">
+                        {order.user.firstName} {order.user.lastName}
+                      </td>
+                      <td className=" px-6 py-4 text-xs">
+                        {order.initialPayment} %
+                      </td>
+                      <td className=" px-6 py-4 text-xs">0</td>
+                      <td className=" px-6 py-4 text-xs"></td>
+                      <td className=" px-6 py-4 text-xs">
+                        {getStageResult(order.stage)}
+                      </td>
+                      <td className="flex flex-col px-4 py-4 text-xs text-center">
+                        <span>{getHour(order.createdAt)}</span>
+                        <span>{getFullDate(order.createdAt)}</span>
+                      </td>
+
+                      <td className=" px-1 py-1 text-xs text-center">
+                        {order.confirmWarehouseDate ? (
+                          <div className="flex flex-col ">
+                            <span>{getHour(order.confirmWarehouseDate)}</span>
+                            <span>
+                              {getFullDate(order.confirmWarehouseDate)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span></span>
+                        )}
+                      </td>
+
+                      <td className=" px-1 py-1 text-xs text-center">
+                        {order.responsibleStartDate ? (
+                          <div className="flex flex-col ">
+                            <span>{getHour(order.responsibleStartDate)}</span>
+                            <span>
+                              {getFullDate(order.responsibleStartDate)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span></span>
+                        )}
+                      </td>
+
+                      <td className=" px-1 py-1 text-xs text-center">
+                        {order.requestToSupplierDate ? (
+                          <div className="flex flex-col ">
+                            <span>{getHour(order.requestToSupplierDate)}</span>
+                            <span>
+                              {getFullDate(order.requestToSupplierDate)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span></span>
+                        )}
+                      </td>
+
+                      <td className=" px-1 py-1 text-xs text-center">
+                        {order.respoenseFromSupplierDate ? (
+                          <div className="flex flex-col ">
+                            <span>
+                              {getHour(order.respoenseFromSupplierDate)}
+                            </span>
+                            <span>
+                              {getFullDate(order.respoenseFromSupplierDate)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span></span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
-          <Link to="/createOrder" ><Button color={"blue"} className="mx-16 my-5" size={"xs"}>Əlavə et +</Button></Link>
-
+          <Link to="/createOrder">
+            <Button color={"blue"} className="mx-16 my-5" size={"xs"}>
+              Əlavə et +
+            </Button>
+          </Link>
         </div>
       ) : (
         <div className="ml-20">

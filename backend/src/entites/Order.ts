@@ -80,8 +80,37 @@ export class Order extends AllEntities {
   @Column({ default: false })
   confirm: boolean;
 
-  @Column({ name: "confirm_date", nullable: true })
-  confirmDate: Date;
+   
+  
+      @Column({ name: "confirm_date", nullable: true })
+    confirmDate: Date;
+
+  @Column({ name: "confirm_warehouse_date", nullable: true })
+  confirmWarehouseDate: Date;
+
+   @Column({ name: "responsible_start_date", nullable: true })
+  responsibleStartDate: Date;
+
+  @Column({ name: "request_to_supplier_date", nullable: true })
+  requestToSupplierDate: Date;
+
+  @Column({ name: "response_from_supplier_date", nullable: true })
+  respoenseFromSupplierDate: Date;
+
+  @Column({ name: "give_order_date", nullable: true })
+  giveOrderDate: Date;
+
+
+   @Column({ name: "accounting_approval_date", nullable: true })
+   accountingApproval: Date;
+
+   @Column({ name: "payment_date", nullable: true })
+   paymentDate: Date;
+
+
+    @Column({ name: "send_date", nullable: true })
+    sendDate: Date;
+
 
   @Column({default:false})
   accept:boolean;

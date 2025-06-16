@@ -12,10 +12,12 @@ export enum OrderStatus{
   export enum OrderStage{
     Created="created",
     WarehouseConfirm="warehouseConfirm",
-    OrderResponsibility="orderresposibility",
     ResponsibleUser="responsibleUser",
-    Investigation="investigation",
-    Calculation="calculation",
+    RequestToSupplier="requestToSupplier",
+    ResponseFromSupplier="responseFromSupplier",
+    GiveTheOrder="giveTheOrder",
+    AccountingApproval="accounting_Approval",
+    Payment="payment",
     Finish="finish"
   }
 

@@ -16,7 +16,7 @@ import { SparePart } from "../entites/SparePart";
 import { log } from "console";
 import { SupplierOrderHistory } from "../entites/SuppliersOrderHistory";
 import { Supplier } from "../entites/Supplier";
-import { In } from "typeorm";
+import { In, Or } from "typeorm";
 import { SupplierOrderParts } from "../entites/SupplierOrderParts";
 
 const orderPartsRepository = AppDataSource.getRepository(OrderPart);
@@ -210,6 +210,7 @@ export const confirmOrder = async (
     order.isExcellFile = false;
     order.rejectMessage = null;
     order.stage = OrderStage.WarehouseConfirm;
+    order.confirmWarehouseDate = new Date();
     order.user = user;
 
     await orderRepository.save(order);
@@ -617,6 +618,10 @@ export const startResponsibleOrder = async (
 
     const order = await orderRepository.findOneBy({ id: Number(id) });
 
+    order.stage=OrderStage.ResponsibleUser;
+    order.responsibleStartDate = new Date();
+    await orderRepository.save(order);
+
     if (!order) {
       next(errorHandler(401, "Belə bir sifariş yoxdur!"));
       return;
@@ -683,6 +688,10 @@ export const sendToSupplier = async (
     });
     if (!order) return next(errorHandler(404, "Sifariş mövcud deyil!"));
 
+    order.stage=OrderStage.RequestToSupplier;
+    order.requestToSupplierDate = new Date();
+    await orderRepository.save(order);
+
     const orderHistory = await orderHistoryRepository.findOneBy({
       id: historyId,
     });
@@ -702,7 +711,6 @@ export const sendToSupplier = async (
         newOrderHistory.order=order;
         newOrderHistory.user=user;
         newOrderHistory.showHide = true;
-        newOrderHistory.showResult = true; // Assuming you want to show the result
         await orderHistoryRepository.save(newOrderHistory);
 
 
@@ -815,6 +823,12 @@ export const calculationStepPass = async (
       return;
     }
 
+
+    order.stage=OrderStage.ResponseFromSupplier
+   order.respoenseFromSupplierDate = new Date();
+    await orderRepository.save(order);
+
+
     const orderHistory = await orderHistoryRepository.findOneBy({
       id: historyId,
     });
@@ -825,6 +839,7 @@ export const calculationStepPass = async (
 
     orderHistory.confirm = false;
     orderHistory.showHide = false;
+     orderHistory.showResult = true;
     orderHistory.date = new Date();
     orderHistory.order = order;
     orderHistory.user = user;
@@ -835,7 +850,7 @@ export const calculationStepPass = async (
     newOrderHistory.date = new Date();
     newOrderHistory.showHide = false;
     newOrderHistory.order = order;
-    newOrderHistory.showResult = true; // Assuming you want to show the result
+    // Assuming you want to show the result
     newOrderHistory.user = user;
     await orderHistoryRepository.save(newOrderHistory);
 
