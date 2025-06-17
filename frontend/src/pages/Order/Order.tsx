@@ -55,7 +55,8 @@ const Order = () => {
     confirmWarehouseDate: string | null;
     responsibleStartDate: string | null;
     requestToSupplierDate: string | null;
-    respoenseFromSupplierDate: string | null; //EDIT THIS WORD IN BACKEND
+    respoenseFromSupplierDate: string | null;
+    giveOrderDate:string|null //EDIT THIS WORD IN BACKEND
   }
 
   const getStageResult = (result: any) => {
@@ -71,8 +72,8 @@ const Order = () => {
         return "Təchizatçıya müraciət";
       case "responseFromSupplier":
         return "Təchizatçıdan cavab gəldi";
-      case "calculation":
-        return "Hesablama aparılır";
+      case "giveTheOrder":
+        return "Sifariş verildi";
       case "finish":
         return "Sifariş tamamlandı";
       default:
@@ -208,7 +209,7 @@ const Order = () => {
                     const checkUser = currentUser?.id === order.user.id;
                   return (
                     <tr
-                      className={`${checkUser?"text-black bg-red-700":"text-black odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"}`}
+                      className={`${checkUser?"text-black bg-red-500":"text-black odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"}`}
                       key={index}
                     >
                       <td className="px-6 py-4"></td>
@@ -299,6 +300,22 @@ const Order = () => {
                           <span></span>
                         )}
                       </td>
+
+                        <td className=" px-1 py-1 text-xs text-center">
+                        {order.giveOrderDate ? (
+                          <div className="flex flex-col ">
+                            <span>
+                              {getHour(order.giveOrderDate)}
+                            </span>
+                            <span>
+                              {getFullDate(order.giveOrderDate)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span></span>
+                        )}
+                      </td>
+
                     </tr>
                   );
                 })}

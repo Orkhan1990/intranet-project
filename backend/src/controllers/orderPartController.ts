@@ -6,6 +6,7 @@ import { Order } from "../entites/Order";
 import { OrderPart } from "../entites/OrderPart";
 import { Supplier } from "../entites/Supplier";
 import { OrderHistory } from "../entites/OrderHistory";
+import { OrderStage } from "../enums/allEnums";
 
 
 
@@ -78,12 +79,25 @@ export const choosingBestSupplier = async ( req: Request,
   try {
 
     const{id}=req.params;
-    const{orderPartArrayId,orderhistoryId}=req.body
+    const{orderPartArrayId,orderhistoryId,orderId}=req.body
      console.log(orderPartArrayId)
 
      if(!id || !orderPartArrayId || orderPartArrayId.length === 0) {
       return next(errorHandler(400, "Supplier ID and order part IDs are required"));
     }
+
+
+    const order=await orderRepository.findOneBy({
+      id: parseInt(orderId)})
+
+      if(!order){
+        return next(errorHandler(404, "Order not found"));
+      }
+
+
+      order.stage=OrderStage.GiveTheOrder;
+      order.giveOrderDate = new Date();
+      await orderRepository.save(order);
 
 
     const orderHistory = await orderHistoryRepository.findOneBy({

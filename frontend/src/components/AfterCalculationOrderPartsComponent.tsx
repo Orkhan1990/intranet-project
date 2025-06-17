@@ -64,7 +64,7 @@ export const AfterCalculationOrderPartsComponent = ({
   const defineDeliverType = (delivering: string) => {
     switch (delivering) {
       case "təcili":
-        return <span> (15 gün)</span>;
+        return <span> (7-15 gün)</span>;
       case "normal":
         return <span> (15-30 gün)</span>;
       case "planlaşdırılmış":

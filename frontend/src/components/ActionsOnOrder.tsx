@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux-toolkit/store/store";
-import { SupplierInterface } from "../types";
+import { SupplierInterface, SupplierOrderPartsInterface } from "../types";
 import { Link } from "react-router-dom";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { DeliverType, OrderType } from "../enums/projectEnums";
@@ -27,7 +27,7 @@ const ActionsOnOrder = ({
   const [deliveryTypes, setDeliveryTypes] = useState<{
     [key: string]: DeliverType;
   }>({});
-  const [supplierOrderPartsData, setSupplierOrderPartsData] = useState<any>([]);
+  const [supplierOrderPartsData, setSupplierOrderPartsData] = useState<SupplierOrderPartsInterface[]>([]);
   const [orderPartArrayId, setOrderPartArrayId] = useState<number[]>([]);
   const [supplierId, setSupplierId] = useState<number>(0);
 
@@ -44,6 +44,15 @@ const ActionsOnOrder = ({
       supplierOrderPartsData.map((item: any) => [item.supplier.id, item])
     ).values()
   );
+
+  useEffect(() => {
+  if (
+    uniqueSupplierOrderPartsData.length > 0 &&
+    supplierId === 0 // only set once
+  ) {
+    setSupplierId(uniqueSupplierOrderPartsData[0].supplier.id);
+  }
+}, [uniqueSupplierOrderPartsData]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
@@ -62,71 +71,76 @@ const ActionsOnOrder = ({
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
   // console.log(delivering, "deliveringgg");
 
+
   useEffect(() => {
-    if (!order || !order.orderParts || order.orderParts.length === 0) return;
-    const orderPartIdArray = order.orderParts.map((item: any) => item.id);
-    setOrderPartArrayId(orderPartIdArray);
+  if (order?.orderParts?.length > 0) {
+    const orderPartIds = order.orderParts.map((item: any) => item.id);
+    setOrderPartArrayId(orderPartIds);
+  }
+}, [order]);
 
-    const getSuppliers = async () => {
-      try {
-        const res = await fetch(
-          "http://localhost:3013/api/v1/supplier/getSuppliers",
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await res.json();
-        if (!res.ok || data.success === false) {
-          setError(data.message);
-        }
+useEffect(() => {
+  const getSupplierOrderParts = async () => {
+    if (orderPartArrayId.length === 0) return;
 
-        if (res.ok) {
-          setSuppliers(data);
+    try {
+      const queryParams = new URLSearchParams({
+        orderPartIds: orderPartArrayId.join(","),
+      });
+
+      const res = await fetch(
+        `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData?${queryParams}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-        console.log(data);
-      } catch (error) {
-        console.log(error);
+      );
+
+      const data = await res.json();
+      if (!res.ok || data.success === false) {
+        setError(data.message);
+      } else {
+        setSupplierOrderPartsData(data);
       }
-    };
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    const getSupplierOrderParts = async () => {
-      if (orderPartArrayId.length === 0) return; // Check if orderPartArrayId is empty
-      try {
-        const queryParams = new URLSearchParams({
-          orderPartIds: orderPartArrayId.join(","), // <- use this key name!
-        });
-
-        console.log(queryParams, "queryParams");
-
-        const res = await fetch(
-          `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData?${queryParams}`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await res.json();
-        if (!res.ok || data.success === false) {
-          setError(data.message);
-        }
-
-        if (res.ok) {
-          setSupplierOrderPartsData(data);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  if (orderPartArrayId.length > 0) {
     getSupplierOrderParts();
-    getSuppliers();
-  }, [order]);
+  }
+}, [orderPartArrayId]);
+
+useEffect(() => {
+  const getSuppliers = async () => {
+    try {
+      const res = await fetch("http://localhost:3013/api/v1/supplier/getSuppliers", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.success === false) {
+        setError(data.message);
+      } else {
+        setSuppliers(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getSuppliers();
+}, []);
+
+
 
   useEffect(() => {
     if (supplierOrderPartsData) {
@@ -436,7 +450,7 @@ const ActionsOnOrder = ({
   const defineDeliverType = (delivering: string) => {
     switch (delivering) {
       case "təcili":
-        return <span>Təcili (15 gün)</span>;
+        return <span>Təcili (7-15 gün)</span>;
       case "normal":
         return <span>Orta (15-30 gün)</span>;
       case "planlaşdırılmış":
@@ -467,7 +481,7 @@ const ActionsOnOrder = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ orderPartArrayId, orderhistoryId }),
+          body: JSON.stringify({ orderPartArrayId, orderhistoryId,orderId: order.id }),
         }
       );
       const data = await res.json();

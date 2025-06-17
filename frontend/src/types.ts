@@ -255,3 +255,30 @@ export interface MergDataInterface{
   count:number,
   isStockAvailable:boolean
 }
+
+
+export interface SupplierOrderPartsInterface {
+
+    supplier:{
+      id:number;
+      supplier:string;
+      country:string;
+    };
+    orderPart:OrderPartsInterface;
+    date:Date;
+    origCode:string;
+    count:number;
+    isTheBestSupplier:boolean;
+    delivering: string;
+    price:string;
+    totalPrice:string;
+    transport:string;
+    sipPrice:string;
+    unitSipPrice:string;
+    percent:string;
+    profit:string;
+    sellPrice:string;
+    unitSellPrice:string;
+    stockQuantity:string;
+    partName:string;
+}
