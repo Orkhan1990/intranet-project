@@ -884,9 +884,168 @@ useEffect(() => {
 
               case "calculationBegin":
                 return (
-                  checkUser && (
-                    <div>
+                <> 
+
+                {
+                 checkUser && (
+                  <>
+                  {
+                     item.showHide&&(
+                         <div>
                       <div className="flex text-sm ">
+                        <div className="w-64 px-6 py-4 text-black flex flex-col">
+                          Hesablama
+                        </div>
+
+                        <div className="px-6 py-4 flex flex-col gap-3">
+                          {/* <div className="font-semibold">
+                            {item.showHide &&
+                              supplierOrderPartsData[0]?.date &&
+                              changeFormatDate(supplierOrderPartsData[0].date)}
+                          </div> */}
+                          {uniqueSupplierOrderPartsData &&
+                            uniqueSupplierOrderPartsData.map(
+                              (itemobj: any, index: number) => (
+                                <div
+                                  className="flex gap-2 items-center"
+                                  key={index}
+                                >
+                                  {item.confirm && (
+                                    <>
+                                      <div>
+                                        {item.showHide &&
+                                          itemobj.date &&
+                                          changeFormatDate(itemobj.date)}
+                                      </div>
+                                      <Select
+                                        className="w-72"
+                                        sizing={"sm"}
+                                        // name="supplierId"
+                                        // onChange={handleChangeCalculation}
+                                      >
+                                        <option value={itemobj?.id} key={index}>
+                                          {itemobj?.supplier.supplier}
+                                        </option>
+                                      </Select>
+                                      <Select
+                                        className="w-52"
+                                        sizing={"sm"}
+                                        name="delivering"
+                                        onChange={(e) =>
+                                          handleDeliveringChange(
+                                            itemobj.id,
+                                            e.target.value as DeliverType
+                                          )
+                                        }
+                                        value={itemobj.delivering}
+                                      >
+                                        <option value={DeliverType.Fast}>
+                                          Təcili (7-15 gün)
+                                        </option>
+                                        <option value={DeliverType.Normal_Fast}>
+                                          Orta təcili (15-30 gün)
+                                        </option>
+                                        <option value={DeliverType.Planned}>
+                                          Planlı (40-60 gün)
+                                        </option>
+                                      </Select>
+                                      <Button
+                                        color={"blue"}
+                                        onClick={() =>
+                                          calculationOpenNewTab(
+                                            itemobj.supplier.id,
+                                            deliveryTypes[itemobj.id]
+                                          )
+                                        }
+                                        size={"xs"}
+                                        className="cursor-pointer"
+                                      >
+                                        Hesablama
+                                      </Button>
+                                    </>
+                                  )}
+{/* 
+                                    {itemobj.isTheBestSupplier && (
+                                    <>
+                                      <div>
+                                        {item.showHide &&
+                                          itemobj.date &&
+                                          changeFormatDate(itemobj.date)}
+                                      </div>
+                                      <Select
+                                        className="w-72"
+                                        sizing={"sm"}
+                                        // name="supplierId"
+                                        // onChange={handleChangeCalculation}
+                                      >
+                                        <option value={itemobj?.id} key={index}>
+                                          {itemobj?.supplier.supplier}
+                                        </option>
+                                      </Select>
+                                      <Select
+                                        className="w-52"
+                                        sizing={"sm"}
+                                        name="delivering"
+                                        onChange={(e) =>
+                                          handleDeliveringChange(
+                                            itemobj.id,
+                                            e.target.value as DeliverType
+                                          )
+                                        }
+                                        value={itemobj.delivering}
+                                      >
+                                        <option value={DeliverType.Fast}>
+                                          Təcili (7-15 gün)
+                                        </option>
+                                        <option value={DeliverType.Normal_Fast}>
+                                          Orta təcili (15-30 gün)
+                                        </option>
+                                        <option value={DeliverType.Planned}>
+                                          Planlı (40-60 gün)
+                                        </option>
+                                      </Select>
+                                      <Button
+                                        color={"blue"}
+                                        onClick={() =>
+                                          calculationOpenNewTab(
+                                            itemobj.supplier.id,
+                                            deliveryTypes[itemobj.id]
+                                          )
+                                        }
+                                        size={"xs"}
+                                        className="cursor-pointer"
+                                      >
+                                        Hesablama
+                                      </Button>
+                                    </>
+                                  )} */}
+                                </div>
+                              )
+                            )}
+                          {!item.showHide && (
+                            <Button
+                              color={"blue"}
+                              size={"xs"}
+                              className="w-20"
+                              onClick={() => acceptCalculation(item.id)}
+                              disabled={item.isFinished}
+                            >
+                              Bitirmək
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                     )
+                  }
+                  </>
+                 
+                  )
+                }
+                
+                  {
+                    !item.showResult&&(
+                       <div className="flex text-sm ">
                         <div className="w-64 px-6 py-4 text-black flex flex-col">
                           Hesablama
                         </div>
@@ -897,6 +1056,7 @@ useEffect(() => {
                               supplierOrderPartsData[0]?.date &&
                               changeFormatDate(supplierOrderPartsData[0].date)}
                           </div>
+                        </div>
                           {uniqueSupplierOrderPartsData &&
                             uniqueSupplierOrderPartsData.map(
                               (itemobj: any, index: number) => (
@@ -904,7 +1064,62 @@ useEffect(() => {
                                   className="flex gap-2 items-center"
                                   key={index}
                                 >
-                                  {!itemobj.isTheBestSupplier && (
+                                  {item.confirm && (
+                                    <>
+                                      <div>
+                                        {item.showHide &&
+                                          itemobj.date &&
+                                          changeFormatDate(itemobj.date)}
+                                      </div>
+                                      <Select
+                                        className="w-72"
+                                        sizing={"sm"}
+                                        // name="supplierId"
+                                        // onChange={handleChangeCalculation}
+                                      >
+                                        <option value={itemobj?.id} key={index}>
+                                          {itemobj?.supplier.supplier}
+                                        </option>
+                                      </Select>
+                                      <Select
+                                        className="w-52"
+                                        sizing={"sm"}
+                                        name="delivering"
+                                        onChange={(e) =>
+                                          handleDeliveringChange(
+                                            itemobj.id,
+                                            e.target.value as DeliverType
+                                          )
+                                        }
+                                        value={itemobj.delivering}
+                                      >
+                                        <option value={DeliverType.Fast}>
+                                          Təcili (7-15 gün)
+                                        </option>
+                                        <option value={DeliverType.Normal_Fast}>
+                                          Orta təcili (15-30 gün)
+                                        </option>
+                                        <option value={DeliverType.Planned}>
+                                          Planlı (40-60 gün)
+                                        </option>
+                                      </Select>
+                                      <Button
+                                        color={"blue"}
+                                        onClick={() =>
+                                          calculationOpenNewTab(
+                                            itemobj.supplier.id,
+                                            deliveryTypes[itemobj.id]
+                                          )
+                                        }
+                                        size={"xs"}
+                                        className="cursor-pointer"
+                                      >
+                                        Hesablama
+                                      </Button>
+                                    </>
+                                  )}
+
+                                    {itemobj.isTheBestSupplier && (
                                     <>
                                       <div>
                                         {item.showHide &&
@@ -961,21 +1176,13 @@ useEffect(() => {
                                 </div>
                               )
                             )}
-                          {!item.showHide && (
-                            <Button
-                              color={"blue"}
-                              size={"xs"}
-                              className="w-20"
-                              onClick={() => acceptCalculation(item.id)}
-                              disabled={item.isFinished}
-                            >
-                              Bitirmək
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )
+                        
+                   </div>
+                    )
+                    
+                  }
+                </>
+                 
                 );
 
               case "calculationAccept":

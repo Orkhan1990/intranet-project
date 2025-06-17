@@ -849,6 +849,7 @@ export const calculationStepPass = async (
     newOrderHistory.step = OrderStep.CalculationBegin;
     newOrderHistory.date = new Date();
     newOrderHistory.showHide = false;
+    newOrderHistory.confirm = true;
     newOrderHistory.order = order;
     // Assuming you want to show the result
     newOrderHistory.user = user;
@@ -949,6 +950,7 @@ export const acceptCalculation = async (
     }
 
     orderHistory.showHide = true;
+    orderHistory.confirm=false;
     await orderHistoryRepository.save(orderHistory);
 
     const newOrderHistory = new OrderHistory();
@@ -956,6 +958,7 @@ export const acceptCalculation = async (
     newOrderHistory.date = new Date();
     newOrderHistory.showHide = false;
     newOrderHistory.order = order;
+    // newOrderHistory.confirm = false;
     newOrderHistory.user = user;
     await orderHistoryRepository.save(newOrderHistory);
 
