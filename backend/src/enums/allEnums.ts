@@ -39,3 +39,13 @@ export enum OrderStatus{
     Reject="reject",
     DirectorAccept="directorAccept"
   }
+
+  export enum Type{
+    Sachs1="sachs1",
+    Sachs2="sachs2",
+    Lemfer="lemfer",
+    Knor="knor",
+    Dt="dt",
+    Hengs="hengs",
+    Man="man"
+  }
