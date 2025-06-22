@@ -110,6 +110,7 @@ export const choosingBestSupplier = async ( req: Request,
 
 
     orderHistory.showHide = true;
+    orderHistory.showResult=true;
     orderHistory.date = new Date();
     await orderHistoryRepository.save(orderHistory);
 

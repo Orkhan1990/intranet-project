@@ -825,7 +825,7 @@ export const calculationStepPass = async (
 
 
     order.stage=OrderStage.ResponseFromSupplier
-   order.respoenseFromSupplierDate = new Date();
+    order.respoenseFromSupplierDate = new Date();
     await orderRepository.save(order);
 
 
@@ -848,7 +848,7 @@ export const calculationStepPass = async (
     const newOrderHistory = new OrderHistory();
     newOrderHistory.step = OrderStep.CalculationBegin;
     newOrderHistory.date = new Date();
-    newOrderHistory.showHide = false;
+    newOrderHistory.showHide = true;
     newOrderHistory.confirm = true;
     newOrderHistory.order = order;
     // Assuming you want to show the result
@@ -949,8 +949,9 @@ export const acceptCalculation = async (
       return;
     }
 
-    orderHistory.showHide = true;
+    orderHistory.showHide = false;
     orderHistory.confirm=false;
+    orderHistory.showResult=true;
     await orderHistoryRepository.save(orderHistory);
 
     const newOrderHistory = new OrderHistory();
@@ -1002,6 +1003,7 @@ export const confirmCalculationPassNextStep = async (
     orderHistory.showHide = true;
     orderHistory.user = user;
     orderHistory.order = order;
+    orderHistory.showResult = true;
 
     await orderHistoryRepository.save(orderHistory);
 

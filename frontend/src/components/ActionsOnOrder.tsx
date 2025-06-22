@@ -27,7 +27,9 @@ const ActionsOnOrder = ({
   const [deliveryTypes, setDeliveryTypes] = useState<{
     [key: string]: DeliverType;
   }>({});
-  const [supplierOrderPartsData, setSupplierOrderPartsData] = useState<SupplierOrderPartsInterface[]>([]);
+  const [supplierOrderPartsData, setSupplierOrderPartsData] = useState<
+    SupplierOrderPartsInterface[]
+  >([]);
   const [orderPartArrayId, setOrderPartArrayId] = useState<number[]>([]);
   const [supplierId, setSupplierId] = useState<number>(0);
 
@@ -46,13 +48,13 @@ const ActionsOnOrder = ({
   );
 
   useEffect(() => {
-  if (
-    uniqueSupplierOrderPartsData.length > 0 &&
-    supplierId === 0 // only set once
-  ) {
-    setSupplierId(uniqueSupplierOrderPartsData[0].supplier.id);
-  }
-}, [uniqueSupplierOrderPartsData]);
+    if (
+      uniqueSupplierOrderPartsData.length > 0 &&
+      supplierId === 0 // only set once
+    ) {
+      setSupplierId(uniqueSupplierOrderPartsData[0].supplier.id);
+    }
+  }, [uniqueSupplierOrderPartsData]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
@@ -71,76 +73,76 @@ const ActionsOnOrder = ({
   const checkUser = currentUser?.id === order.orderHistory[2]?.user.id;
   // console.log(delivering, "deliveringgg");
 
+  useEffect(() => {
+    if (order?.orderParts?.length > 0) {
+      const orderPartIds = order.orderParts.map((item: any) => item.id);
+      setOrderPartArrayId(orderPartIds);
+    }
+  }, [order]);
 
   useEffect(() => {
-  if (order?.orderParts?.length > 0) {
-    const orderPartIds = order.orderParts.map((item: any) => item.id);
-    setOrderPartArrayId(orderPartIds);
-  }
-}, [order]);
+    const getSupplierOrderParts = async () => {
+      if (orderPartArrayId.length === 0) return;
 
-useEffect(() => {
-  const getSupplierOrderParts = async () => {
-    if (orderPartArrayId.length === 0) return;
+      try {
+        const queryParams = new URLSearchParams({
+          orderPartIds: orderPartArrayId.join(","),
+        });
 
-    try {
-      const queryParams = new URLSearchParams({
-        orderPartIds: orderPartArrayId.join(","),
-      });
+        const res = await fetch(
+          `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData?${queryParams}`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      const res = await fetch(
-        `http://localhost:3013/api/v1/orderPart/getSupplierOrderPartsData?${queryParams}`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
+        const data = await res.json();
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+        } else {
+          setSupplierOrderPartsData(data);
         }
-      );
-
-      const data = await res.json();
-      if (!res.ok || data.success === false) {
-        setError(data.message);
-      } else {
-        setSupplierOrderPartsData(data);
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
+    };
+
+    if (orderPartArrayId.length > 0) {
+      getSupplierOrderParts();
     }
-  };
+  }, [orderPartArrayId]);
 
-  if (orderPartArrayId.length > 0) {
-    getSupplierOrderParts();
-  }
-}, [orderPartArrayId]);
+  useEffect(() => {
+    const getSuppliers = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:3013/api/v1/supplier/getSuppliers",
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-useEffect(() => {
-  const getSuppliers = async () => {
-    try {
-      const res = await fetch("http://localhost:3013/api/v1/supplier/getSuppliers", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await res.json();
-      if (!res.ok || data.success === false) {
-        setError(data.message);
-      } else {
-        setSuppliers(data);
+        const data = await res.json();
+        if (!res.ok || data.success === false) {
+          setError(data.message);
+        } else {
+          setSuppliers(data);
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    };
 
-  getSuppliers();
-}, []);
-
-
+    getSuppliers();
+  }, []);
 
   useEffect(() => {
     if (supplierOrderPartsData) {
@@ -481,7 +483,11 @@ useEffect(() => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ orderPartArrayId, orderhistoryId,orderId: order.id }),
+          body: JSON.stringify({
+            orderPartArrayId,
+            orderhistoryId,
+            orderId: order.id,
+          }),
         }
       );
       const data = await res.json();
@@ -884,305 +890,191 @@ useEffect(() => {
 
               case "calculationBegin":
                 return (
-                <> 
-
-                {
-                 checkUser && (
                   <>
-                  {
-                     item.showHide&&(
-                         <div>
-                      <div className="flex text-sm ">
-                        <div className="w-64 px-6 py-4 text-black flex flex-col">
-                          Hesablama
-                        </div>
+                    {checkUser && (
+                      <>
+                        {item.showHide && (
+                          <div>
+                            <div className="flex text-sm ">
+                              <div className="w-64 px-6 py-4 text-black flex flex-col">
+                                Hesablama
+                              </div>
 
-                        <div className="px-6 py-4 flex flex-col gap-3">
-                          {/* <div className="font-semibold">
+                              <div className="px-6 py-4 flex flex-col gap-3">
+                                {/* <div className="font-semibold">
                             {item.showHide &&
                               supplierOrderPartsData[0]?.date &&
                               changeFormatDate(supplierOrderPartsData[0].date)}
                           </div> */}
-                          {uniqueSupplierOrderPartsData &&
-                            uniqueSupplierOrderPartsData.map(
-                              (itemobj: any, index: number) => (
-                                <div
-                                  className="flex gap-2 items-center"
-                                  key={index}
-                                >
-                                  {item.confirm && (
-                                    <>
-                                      <div>
-                                        {item.showHide &&
-                                          itemobj.date &&
-                                          changeFormatDate(itemobj.date)}
+                                {uniqueSupplierOrderPartsData &&
+                                  uniqueSupplierOrderPartsData.map(
+                                    (itemobj: any, index: number) => (
+                                      <div
+                                        className="flex gap-2 items-center"
+                                        key={index}
+                                      >
+                                        {item.showHide && (
+                                          <>
+                                            <div>
+                                              {item.showHide &&
+                                                itemobj.date &&
+                                                changeFormatDate(itemobj.date)}
+                                            </div>
+                                            <Select
+                                              className="w-72"
+                                              sizing={"sm"}
+                                            >
+                                              <option
+                                                value={itemobj?.id}
+                                                key={index}
+                                              >
+                                                {itemobj?.supplier.supplier}
+                                              </option>
+                                            </Select>
+                                            <Select
+                                              className="w-52"
+                                              sizing={"sm"}
+                                              name="delivering"
+                                              onChange={(e) =>
+                                                handleDeliveringChange(
+                                                  itemobj.id,
+                                                  e.target.value as DeliverType
+                                                )
+                                              }
+                                              value={itemobj.delivering}
+                                            >
+                                              <option value={DeliverType.Fast}>
+                                                Təcili (7-15 gün)
+                                              </option>
+                                              <option
+                                                value={DeliverType.Normal_Fast}
+                                              >
+                                                Orta təcili (15-30 gün)
+                                              </option>
+                                              <option
+                                                value={DeliverType.Planned}
+                                              >
+                                                Planlı (40-60 gün)
+                                              </option>
+                                            </Select>
+                                            <Button
+                                              color={"blue"}
+                                              onClick={() =>
+                                                calculationOpenNewTab(
+                                                  itemobj.supplier.id,
+                                                  deliveryTypes[itemobj.id]
+                                                )
+                                              }
+                                              size={"xs"}
+                                              className="cursor-pointer"
+                                            >
+                                              Hesablama
+                                            </Button>
+                                          </>
+                                        )}
                                       </div>
-                                      <Select
-                                        className="w-72"
-                                        sizing={"sm"}
-                                        // name="supplierId"
-                                        // onChange={handleChangeCalculation}
-                                      >
-                                        <option value={itemobj?.id} key={index}>
-                                          {itemobj?.supplier.supplier}
-                                        </option>
-                                      </Select>
-                                      <Select
-                                        className="w-52"
-                                        sizing={"sm"}
-                                        name="delivering"
-                                        onChange={(e) =>
-                                          handleDeliveringChange(
-                                            itemobj.id,
-                                            e.target.value as DeliverType
-                                          )
-                                        }
-                                        value={itemobj.delivering}
-                                      >
-                                        <option value={DeliverType.Fast}>
-                                          Təcili (7-15 gün)
-                                        </option>
-                                        <option value={DeliverType.Normal_Fast}>
-                                          Orta təcili (15-30 gün)
-                                        </option>
-                                        <option value={DeliverType.Planned}>
-                                          Planlı (40-60 gün)
-                                        </option>
-                                      </Select>
-                                      <Button
-                                        color={"blue"}
-                                        onClick={() =>
-                                          calculationOpenNewTab(
-                                            itemobj.supplier.id,
-                                            deliveryTypes[itemobj.id]
-                                          )
-                                        }
-                                        size={"xs"}
-                                        className="cursor-pointer"
-                                      >
-                                        Hesablama
-                                      </Button>
-                                    </>
+                                    )
                                   )}
-{/* 
-                                    {itemobj.isTheBestSupplier && (
-                                    <>
-                                      <div>
-                                        {item.showHide &&
-                                          itemobj.date &&
-                                          changeFormatDate(itemobj.date)}
-                                      </div>
-                                      <Select
-                                        className="w-72"
-                                        sizing={"sm"}
-                                        // name="supplierId"
-                                        // onChange={handleChangeCalculation}
-                                      >
-                                        <option value={itemobj?.id} key={index}>
-                                          {itemobj?.supplier.supplier}
-                                        </option>
-                                      </Select>
-                                      <Select
-                                        className="w-52"
-                                        sizing={"sm"}
-                                        name="delivering"
-                                        onChange={(e) =>
-                                          handleDeliveringChange(
-                                            itemobj.id,
-                                            e.target.value as DeliverType
-                                          )
-                                        }
-                                        value={itemobj.delivering}
-                                      >
-                                        <option value={DeliverType.Fast}>
-                                          Təcili (7-15 gün)
-                                        </option>
-                                        <option value={DeliverType.Normal_Fast}>
-                                          Orta təcili (15-30 gün)
-                                        </option>
-                                        <option value={DeliverType.Planned}>
-                                          Planlı (40-60 gün)
-                                        </option>
-                                      </Select>
-                                      <Button
-                                        color={"blue"}
-                                        onClick={() =>
-                                          calculationOpenNewTab(
-                                            itemobj.supplier.id,
-                                            deliveryTypes[itemobj.id]
-                                          )
-                                        }
-                                        size={"xs"}
-                                        className="cursor-pointer"
-                                      >
-                                        Hesablama
-                                      </Button>
-                                    </>
-                                  )} */}
-                                </div>
-                              )
-                            )}
-                          {!item.showHide && (
-                            <Button
-                              color={"blue"}
-                              size={"xs"}
-                              className="w-20"
-                              onClick={() => acceptCalculation(item.id)}
-                              disabled={item.isFinished}
-                            >
-                              Bitirmək
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                     )
-                  }
-                  </>
-                 
-                  )
-                }
-                
-                  {
-                    !item.showResult&&(
-                       <div className="flex text-sm ">
+                                {item.showHide && (
+                                  <Button
+                                    color={"blue"}
+                                    size={"xs"}
+                                    className="w-20"
+                                    onClick={() => acceptCalculation(item.id)}
+                                    disabled={item.isFinished}
+                                  >
+                                    Bitirmək
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {item.showResult && (
+                      <div className="flex  text-sm ">
                         <div className="w-64 px-6 py-4 text-black flex flex-col">
                           Hesablama
                         </div>
 
                         <div className="px-6 py-4 flex flex-col gap-3">
                           <div className="font-semibold">
-                            {item.showHide &&
+                            {item.showResult &&
                               supplierOrderPartsData[0]?.date &&
                               changeFormatDate(supplierOrderPartsData[0].date)}
                           </div>
                         </div>
+
+                        <div className="px-6 py-4 flex flex-col gap-3">
                           {uniqueSupplierOrderPartsData &&
                             uniqueSupplierOrderPartsData.map(
                               (itemobj: any, index: number) => (
                                 <div
-                                  className="flex gap-2 items-center"
+                                  className="flex   gap-2 items-center"
                                   key={index}
                                 >
-                                  {item.confirm && (
+                                  {item.showResult && (
                                     <>
                                       <div>
                                         {item.showHide &&
                                           itemobj.date &&
                                           changeFormatDate(itemobj.date)}
                                       </div>
-                                      <Select
-                                        className="w-72"
-                                        sizing={"sm"}
-                                        // name="supplierId"
-                                        // onChange={handleChangeCalculation}
-                                      >
-                                        <option value={itemobj?.id} key={index}>
-                                          {itemobj?.supplier.supplier}
-                                        </option>
-                                      </Select>
-                                      <Select
-                                        className="w-52"
-                                        sizing={"sm"}
-                                        name="delivering"
-                                        onChange={(e) =>
-                                          handleDeliveringChange(
-                                            itemobj.id,
-                                            e.target.value as DeliverType
-                                          )
-                                        }
-                                        value={itemobj.delivering}
-                                      >
-                                        <option value={DeliverType.Fast}>
-                                          Təcili (7-15 gün)
-                                        </option>
-                                        <option value={DeliverType.Normal_Fast}>
-                                          Orta təcili (15-30 gün)
-                                        </option>
-                                        <option value={DeliverType.Planned}>
-                                          Planlı (40-60 gün)
-                                        </option>
-                                      </Select>
-                                      <Button
-                                        color={"blue"}
-                                        onClick={() =>
-                                          calculationOpenNewTab(
-                                            itemobj.supplier.id,
-                                            deliveryTypes[itemobj.id]
-                                          )
-                                        }
-                                        size={"xs"}
-                                        className="cursor-pointer"
-                                      >
-                                        Hesablama
-                                      </Button>
                                     </>
                                   )}
 
-                                    {itemobj.isTheBestSupplier && (
-                                    <>
+                                  {itemobj.isTheBestSupplier && (
+                                    <div className="flex flex-col">
                                       <div>
                                         {item.showHide &&
                                           itemobj.date &&
                                           changeFormatDate(itemobj.date)}
                                       </div>
-                                      <Select
-                                        className="w-72"
-                                        sizing={"sm"}
-                                        // name="supplierId"
-                                        // onChange={handleChangeCalculation}
-                                      >
-                                        <option value={itemobj?.id} key={index}>
-                                          {itemobj?.supplier.supplier}
-                                        </option>
-                                      </Select>
-                                      <Select
-                                        className="w-52"
-                                        sizing={"sm"}
-                                        name="delivering"
-                                        onChange={(e) =>
-                                          handleDeliveringChange(
-                                            itemobj.id,
-                                            e.target.value as DeliverType
-                                          )
-                                        }
-                                        value={itemobj.delivering}
-                                      >
-                                        <option value={DeliverType.Fast}>
-                                          Təcili (7-15 gün)
-                                        </option>
-                                        <option value={DeliverType.Normal_Fast}>
-                                          Orta təcili (15-30 gün)
-                                        </option>
-                                        <option value={DeliverType.Planned}>
-                                          Planlı (40-60 gün)
-                                        </option>
-                                      </Select>
-                                      <Button
-                                        color={"blue"}
-                                        onClick={() =>
-                                          calculationOpenNewTab(
-                                            itemobj.supplier.id,
-                                            deliveryTypes[itemobj.id]
-                                          )
-                                        }
-                                        size={"xs"}
-                                        className="cursor-pointer"
-                                      >
-                                        Hesablama
-                                      </Button>
-                                    </>
+                                      <div className="flex gap-2">
+                                        <Select className="w-72" sizing={"sm"}>
+                                          <option
+                                            value={itemobj?.id}
+                                            key={index}
+                                          >
+                                            {itemobj?.supplier.supplier}
+                                          </option>
+                                        </Select>
+                                        <Select
+                                          className="w-52"
+                                          sizing={"sm"}
+                                          name="delivering"
+                                          onChange={(e) =>
+                                            handleDeliveringChange(
+                                              itemobj.id,
+                                              e.target.value as DeliverType
+                                            )
+                                          }
+                                          value={itemobj.delivering}
+                                        >
+                                          <option value={DeliverType.Fast}>
+                                            Təcili (7-15 gün)
+                                          </option>
+                                          <option
+                                            value={DeliverType.Normal_Fast}
+                                          >
+                                            Orta təcili (15-30 gün)
+                                          </option>
+                                          <option value={DeliverType.Planned}>
+                                            Planlı (40-60 gün)
+                                          </option>
+                                        </Select>
+                                      </div>
+                                    </div>
                                   )}
                                 </div>
                               )
                             )}
-                        
-                   </div>
-                    )
-                    
-                  }
-                </>
-                 
+                        </div>
+                      </div>
+                    )}
+                  </>
                 );
 
               case "calculationAccept":
@@ -1243,7 +1135,12 @@ useEffect(() => {
                             </div>
                           )}
                         </div>
-                        <div>
+                      
+                      </div>
+                    )}
+                    {
+                    item.showResult&&(
+                      <div>
                           {item.showHide && (
                             <div className="flex text-sm ">
                               <div className="w-64 px-6 py-4 text-black ">
@@ -1255,8 +1152,8 @@ useEffect(() => {
                             </div>
                           )}
                         </div>
-                      </div>
-                    )}
+                    )
+                    }
                   </>
                 );
 
@@ -1265,14 +1162,13 @@ useEffect(() => {
                   <>
                     {checkUser && (
                       <div>
-                        <div className="flex text-sm odd:bg-gray-100 odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                          <div className="w-64 px-6 py-4 text-black ">
-                            Məsul şəxsin təsdiqi
-                          </div>
+                       
 
                           {!item.showHide ? (
-                            <>
-                              <div className="px-6 py-4">
+ <div className="flex text-sm odd:bg-gray-100 odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+ <div className="w-64 px-6 py-4 text-black ">
+   Məsul şəxsin təsdiqi
+ </div>                              <div className="px-6 py-4">
                                 <div>
                                   <h2 className="text-black">Mesaj</h2>
                                   <Textarea
@@ -1339,15 +1235,28 @@ useEffect(() => {
                                   </div>
                                 </div>
                               </div>
-                            </>
-                          ) : (
-                            <div className="px-6 py-4">
-                              {changeFormatDate(item.date)}
                             </div>
+                          ) : (
+                            // <div className="px-6 py-4">
+                            //   {changeFormatDate(item.date)}
+                            // </div>
+                            <>{""}</>
                           )}
-                        </div>
+                        {/* </div> */}
                       </div>
                     )}
+                    {
+                      item.showResult && (
+                        <div className="flex text-sm odd:bg-gray-100 odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                          <div className="w-64 px-6 py-4 text-black ">
+                            Məsul şəxsə təsdiqi
+                          </div>
+                          <div className="px-6 py-4">
+                            {changeFormatDate(item.date)}
+                          </div>
+                        </div>
+                      )
+                    }
                   </>
                 );
 
