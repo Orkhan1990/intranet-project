@@ -4,6 +4,7 @@ import {
   Market,
   OrderType,
   PayType,
+  Type,
 } from "./enums/projectEnums";
 
 export interface UserInterface {
@@ -281,4 +282,20 @@ export interface SupplierOrderPartsInterface {
     unitSellPrice:string;
     stockQuantity:string;
     partName:string;
+}
+
+
+
+export interface PriceListHistInterface{
+  name: string;
+  nameDe: string;
+  price: number;
+  quantity: number;
+  year:string;
+  month: string;
+  kvartal:number;
+  kod: string;
+  origKod: string;
+  type: Type;
+  rabatgrup: number;
 }
