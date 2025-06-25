@@ -293,7 +293,6 @@ export interface PriceListHistInterface{
   quantity: number;
   year:string;
   month: string;
-  kvartal:number;
   kod: string;
   origKod: string;
   type: Type;

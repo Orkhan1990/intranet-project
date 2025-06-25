@@ -4,33 +4,31 @@ import { useRef, useState } from "react";
 import { FaUpload } from "react-icons/fa";
 import { PriceListHistInterface } from "../../types";
 import { Type } from "../../enums/projectEnums";
-import * as XLSX from  "xlsx";
-
-
-
+import * as XLSX from "xlsx";
 
 const PriceList = () => {
   const fileUpload = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const[ initialValues, setInitialValues] = useState<PriceListHistInterface[]>([{
-    name: "",
-    nameDe: "",
-    price: 0,
-    quantity: 0,
-    year: "2025",
-    kvartal: 0,
-    kod: "",
-    origKod: "",
-    type:Type.Man,
-    rabatgrup: 0,
-    month: "1"
-  }]);
-  
+  const[year, setYear] = useState("2025");
+  const [month, setMonth] = useState("1");
+  const [type, setType] = useState<Type>(Type.Man);
+  const [initialValues, setInitialValues] = useState<PriceListHistInterface[]>([
+    {
+      name: "",
+      nameDe: "",
+      price: 0,
+      quantity: 0,
+      year: "2025",
+      kod: "",
+      origKod: "",
+      type: Type.Man,
+      rabatgrup: 0,
+      month: "1",
+    },
+  ]);
 
- 
-
- 
+  console.log(initialValues);
 
   const onSubmit = (values: typeof initialValues) => {
     console.log(values);
@@ -47,39 +45,46 @@ const PriceList = () => {
       setFileName(e.target.files[0].name);
     }
 
-    const file=e.target.files ? e.target.files[0] : null;
-    if (!file||file==null) { 
-       return;
+    const file = e.target.files ? e.target.files[0] : null;
+    if (!file || file == null) {
+      return;
     }
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const data= event.target?.result;
+      const data = event.target?.result;
       const workbook = XLSX.read(data, { type: "binary" });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const jsonData:any[]=XLSX.utils.sheet_to_json(worksheet);
+      const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
 
-      const mappedData:PriceListHistInterface[]=jsonData.map((item:any) => ({
-         ...item,
-         name:item.name||"",
-         nameDe:item.nameDe||"",
-          price:parseFloat(item.price)||0,
-          quantity:parseFloat(item.quantity)||0,
-          rabatgrup:parseFloat(item.rabatgrup)||0,
-          kod:item.kod||"",
-          origKod:item.origKod||"",
-      }))
-      setInitialValues(mappedData);
-    }
-     reader.readAsArrayBuffer(file);  
+     const mappedData: PriceListHistInterface[] = jsonData
+  .map((item: any) => {
+    if (!Array.isArray(item)) return null;
+
+    return {
+      name: String(item[0] ?? ""),        // Column A
+      nameDe: String(item[1] ?? ""),      // Column B
+      price: parseFloat(item[2]) || 0,    // Column C
+      quantity: parseFloat(item[3]) || 0, // Column D
+      kod: String(item[4] ?? ""),         // Column E
+      origKod: String(item[5] ?? ""),     // Column F
+      rabatgrup: parseFloat(item[6]) || 0, // Column G
+      year,
+      type,
+      month
     };
+  })
+  .filter((row) => row !== null); // remove null rows
+      setInitialValues(mappedData);
+    };
+    reader.readAsArrayBuffer(file);
+  };
   return (
     <div className="min-h-screen">
-      <Formik initialValues={initialValues} onSubmit={onSubmit}  enableReinitialize>
-        <Form className="flex items-center gap-5">
-          <div className="flex  gap-5 items-center p-4">
-            <Select sizing={"sm"} className="w-32" name="year">
+        <form className="flex items-center gap-5"  onSubmit={()=>onSubmit}>
+            <div className="flex  gap-5 items-center p-4">
+            <Select sizing={"sm"} className="w-32" name="year" onChange={(e) => setYear(e.target.value)}>
               <option value="2025">2025</option>
               <option value="2024">2024</option>
               <option value="2023">2023</option>
@@ -88,7 +93,7 @@ const PriceList = () => {
             </Select>
             <div className="flex items-center  gap-2">
               <span className="text-md">Month</span>
-              <Select sizing={"sm"} className="w-32" name="month">
+              <Select sizing={"sm"} className="w-32" name="month"  onChange={(e) => setMonth(e.target.value)}>
                 <option value="1">January</option>
                 <option value="2">February</option>
                 <option value="3">March</option>
@@ -104,7 +109,7 @@ const PriceList = () => {
               </Select>
             </div>
 
-            <Select sizing={"sm"} className="w-32" name="type">
+            <Select sizing={"sm"} className="w-32" name="type"  onChange={(e) => setType(e.target.value as Type)}>
               <option value="man">Man</option>
               <option value="sachs1">Sachs1</option>
               <option value="sachs2">Sachs2</option>
@@ -136,8 +141,7 @@ const PriceList = () => {
               Yüklə
             </Button>
           </div>
-        </Form>
-      </Formik>
+        </form>
     </div>
   );
 };
