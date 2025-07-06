@@ -36,5 +36,5 @@ export class PriceListHist extends AllEntities {
   year: number;
 
   @Column({ type: "int", nullable: true })
-  kvartal: number;
+  month: number;
 }

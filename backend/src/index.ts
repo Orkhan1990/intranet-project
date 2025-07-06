@@ -7,6 +7,7 @@ import supplierRouter from "./routes/supplierRouter";
 import brandRouter from "./routes/brandRouter";
 import invoiceRouter from "./routes/invoiceRouter";
 import sparePartRouter from "./routes/sparePartRouter";
+import priceListRouter from "./routes/priceListRouter";
 import orderRouter from "./routes/orderRouter";
 import orderPartRouter from "./routes/orderPartRouter";
 import bodyParser from "body-parser";
@@ -39,6 +40,7 @@ app.use("/api/v1/invoice",invoiceRouter);
 app.use("/api/v1/sparePart",sparePartRouter);
 app.use("/api/v1/order",orderRouter);
 app.use("/api/v1/orderPart",orderPartRouter);
+app.use("/api/v1/priceList",priceListRouter);
 
 
 

@@ -1,5 +1,4 @@
 import { Button, Select, TextInput } from "flowbite-react";
-import { Form, Formik } from "formik";
 import { useRef, useState } from "react";
 import { FaUpload } from "react-icons/fa";
 import { PriceListHistInterface } from "../../types";
@@ -9,6 +8,7 @@ import * as XLSX from "xlsx";
 const PriceList = () => {
   const fileUpload = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const[year, setYear] = useState("2025");
   const [month, setMonth] = useState("1");
@@ -30,8 +30,32 @@ const PriceList = () => {
 
   console.log(initialValues);
 
-  const onSubmit = (values: typeof initialValues) => {
-    console.log(values);
+  const onSubmit =async (e:any) => {
+
+    e.preventDefault();
+
+    try {
+
+     const res = await fetch(
+        "http://localhost:3013/api/v1/priceList/createPriceList",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ initialValues }),
+        }
+      );
+    const data = await res.json();
+    if(!res.ok||data.success===false){
+      setError(data.message || "An error occurred while submitting the form.");
+    }
+      
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      
+    }
   };
 
   const handleFileUploadClick = () => {
@@ -56,19 +80,20 @@ const PriceList = () => {
       const workbook = XLSX.read(data, { type: "binary" });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
+     const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+   
+      
 
      const mappedData: PriceListHistInterface[] = jsonData
   .map((item: any) => {
-    if (!Array.isArray(item)) return null;
 
     return {
-      name: String(item[0] ?? ""),        // Column A
-      nameDe: String(item[1] ?? ""),      // Column B
+      name: String(item[0] || ""),        // Column A
+      nameDe: String(item[1] || ""),      // Column B
       price: parseFloat(item[2]) || 0,    // Column C
       quantity: parseFloat(item[3]) || 0, // Column D
-      kod: String(item[4] ?? ""),         // Column E
-      origKod: String(item[5] ?? ""),     // Column F
+      kod: String(item[4] || ""),         // Column E
+      origKod: String(item[5] || ""),     // Column F
       rabatgrup: parseFloat(item[6]) || 0, // Column G
       year,
       type,

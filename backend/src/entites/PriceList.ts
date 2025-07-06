@@ -28,6 +28,7 @@ export class PriceList extends AllEntities {
   @Column({
     name: "quantity",
     nullable: true,
+    default: "1",
   })
   quantity: string;
 

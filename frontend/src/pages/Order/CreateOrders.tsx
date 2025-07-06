@@ -34,11 +34,20 @@ const CreateOrders = () => {
       {
         id: 0,
         origCode: "",
-        count: 1,
-        stockQuantity: 0,
+        count: 0,
         checkOnWarehouse: false,
+        stockQuantity: 0,
         partName: "",
-        price:0
+        price: 0,
+        totalPrice: 0,
+        transport: 0,
+        sipPrice: 0,
+        unitSipPrice: 0,
+        percent: 0,
+        profit: 0,
+        sellPrice: 0,
+        unitSellPrice: 0,
+        delivering: "",
       },
     ],
   });
@@ -117,7 +126,7 @@ const CreateOrders = () => {
 
   //SUMBIT FORM TO BACKEND
   const onsubmit = async (values: OrderInterface) => {
-    console.log(values,"frontvalue");
+    console.log(values, "frontvalue");
     try {
       const res = await fetch(
         "http://localhost:3013/api/v1/order/createOrder",
@@ -196,7 +205,7 @@ const CreateOrders = () => {
         setOrdersInitialValue({ ...values, orderParts: updatedPartsArray });
       }
     } catch (error: any) {
-      // setError(error);
+      setError(error);
     }
   };
 
@@ -216,8 +225,8 @@ const CreateOrders = () => {
             );
           };
 
-          let isForeignMarket=false;
-          isForeignMarket =values.orderType === OrderType.Standart_Client;
+          let isForeignMarket = false;
+          isForeignMarket = values.orderType === OrderType.Standart_Client;
           const isStock = values.orderType === OrderType.Stok;
           return (
             <Form>
@@ -340,8 +349,10 @@ const CreateOrders = () => {
                       className="w-32"
                       sizing="sm"
                     >
-                      {produceDateData.map((item: string,index:number) => (
-                        <option value={item} key={index}>{item}</option>
+                      {produceDateData.map((item: string, index: number) => (
+                        <option value={item} key={index}>
+                          {item}
+                        </option>
                       ))}
                     </Field>
                     <span className="text-red-700 ml-4 text-lg">*</span>

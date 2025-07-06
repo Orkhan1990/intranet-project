@@ -13,10 +13,8 @@ import { CustomRequest } from "../middleware/verifyToken";
 import { OrderHistory } from "../entites/OrderHistory";
 import { OrderStage, OrderStep } from "../enums/allEnums";
 import { SparePart } from "../entites/SparePart";
-import { log } from "console";
 import { SupplierOrderHistory } from "../entites/SuppliersOrderHistory";
 import { Supplier } from "../entites/Supplier";
-import { In, Or } from "typeorm";
 import { SupplierOrderParts } from "../entites/SupplierOrderParts";
 
 const orderPartsRepository = AppDataSource.getRepository(OrderPart);
