@@ -16,7 +16,10 @@ export const createPriceList = async (
   next: NextFunction
 ) => {
   try {
-    console.log(req.body);
+
+      const file = req.file;         // The uploaded file
+      const { year, month, type } = req.body;  // Other form data
+    console.log(file, year, month, type);
     const initialValues = req.body; // FIXED: don't destructure
 
     if (!Array.isArray(initialValues) || initialValues.length === 0) {

@@ -3,13 +3,14 @@ import { useRef, useState } from "react";
 import { FaUpload } from "react-icons/fa";
 import { PriceListHistInterface } from "../../types";
 import { Type } from "../../enums/projectEnums";
-import * as XLSX from "xlsx";
+// import * as XLSX from "xlsx";
 
 const PriceList = () => {
   const fileUpload = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [upload,setUpload] = useState(false);
   const[year, setYear] = useState("2025");
   const [month, setMonth] = useState("1");
   const [type, setType] = useState<Type>(Type.Man);
@@ -30,18 +31,28 @@ const PriceList = () => {
 
   console.log(initialValues);
 
-  const onSubmit =async (e:any) => {
+  const onSubmit =async () => {
 
+        if (!file) return alert('.csv file seçin');
+        // setFileName(file.name);
 
+       const formData = new FormData();
+       formData.append("file", file);
+       formData.append("year", year);
+        formData.append("month", month);
+        formData.append("type", type);
+        console.log(formData);
+        
+       setUpload(true);
     try {
 
    const res = await fetch("http://localhost:3013/api/v1/priceList/createPriceList", {
         method: "POST",
         credentials: 'include',
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(initialValues),
+        // headers: {
+        //   "Content-Type": "application/json",
+        // },
+        body: formData
       });
     const data = await res.json();
     if(!res.ok||data.success===false){
@@ -60,7 +71,14 @@ const PriceList = () => {
     }
   };
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = (e:any) => {
+
+    // console.log("File selected:", e.target.files[0].name);
+    
+
+    // setFileName(e.target.files[0].name);
+    // setFile(e.target.files[0]);
+    
     if (e.target.files && e.target.files.length > 0) {
       setFileName(e.target.files[0].name);
     }
@@ -69,37 +87,7 @@ const PriceList = () => {
     if (!file || file == null) {
       return;
     }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const data = event.target?.result;
-      const workbook = XLSX.read(data, { type: "binary" });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-     const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-   
-      
-
-     const mappedData: PriceListHistInterface[] = jsonData
-  .map((item: any) => {
-
-    return {
-      name: String(item[0] || ""),        // Column A
-      nameDe: String(item[1] || ""),      // Column B
-      price: parseFloat(item[2]) || 0,    // Column C
-      quantity: parseFloat(item[3]) || 0, // Column D
-      kod: String(item[4] || ""),         // Column E
-      origKod: String(item[5] || ""),     // Column F
-      rabatgrup: parseFloat(item[6]) || 0, // Column G
-      year,
-      type,
-      month
-    };
-  })
-  .filter((row) => row !== null); // remove null rows
-      setInitialValues(mappedData);
-    };
-    reader.readAsArrayBuffer(file);
+    setFile(file)
   };
   return (
     <div className="min-h-screen">
@@ -146,7 +134,7 @@ const PriceList = () => {
                 sizing={"xs"}
                 className="text-sm hidden"
                 ref={fileUpload}
-                onChange={handleFile}
+                onChange={(event)=>handleFile(event)}
                 accept=".xlsx, .xls,.csv"
               />
               <FaUpload
