@@ -32,21 +32,17 @@ const PriceList = () => {
 
   const onSubmit =async (e:any) => {
 
-    e.preventDefault();
 
     try {
 
-     const res = await fetch(
-        "http://localhost:3013/api/v1/priceList/createPriceList",
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ initialValues }),
-        }
-      );
+   const res = await fetch("http://localhost:3013/api/v1/priceList/createPriceList", {
+        method: "POST",
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(initialValues),
+      });
     const data = await res.json();
     if(!res.ok||data.success===false){
       setError(data.message || "An error occurred while submitting the form.");
@@ -107,7 +103,7 @@ const PriceList = () => {
   };
   return (
     <div className="min-h-screen">
-        <form className="flex items-center gap-5"  onSubmit={()=>onSubmit}>
+        <form className="flex items-center gap-5"  onSubmit={onSubmit}>
             <div className="flex  gap-5 items-center p-4">
             <Select sizing={"sm"} className="w-32" name="year" onChange={(e) => setYear(e.target.value)}>
               <option value="2025">2025</option>

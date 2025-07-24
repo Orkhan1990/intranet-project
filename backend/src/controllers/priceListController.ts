@@ -17,62 +17,54 @@ export const createPriceList = async (
 ) => {
   try {
     console.log(req.body);
-    const {initialValues} = req.body;
-    
+    const initialValues = req.body; // FIXED: don't destructure
 
     if (!Array.isArray(initialValues) || initialValues.length === 0) {
-      next(
+      return next(
         errorHandler(
-          401,
+          400,
           "Qiymət siyahısı məlumatı boşdur və ya düzgün formatda deyil."
         )
       );
-      return;
     }
 
-    const newPriceListHistArray = await Promise.all(
-      initialValues.map(async (data) => {
-        const newPriceListHist = new PriceListHist();
-        newPriceListHist.origKod = data.origKod;
-        newPriceListHist.kod = data.kod;
-        newPriceListHist.name = data.name;
-        newPriceListHist.namede = data.nameDe;
-        newPriceListHist.price = data.price;
-        newPriceListHist.quantity = data.quantity;
-        newPriceListHist.type = data.type;
-        newPriceListHist.rabatgrup = data.rabatgrup;
-        newPriceListHist.year = data.year;
-        newPriceListHist.month = data.month || null; // Handle month as optional
+    const newPriceListHistArray = initialValues.map((data) => {
+      const item = new PriceListHist();
+      item.origKod = data.origKod;
+      item.kod = data.kod;
+      item.name = data.name;
+      item.namede = data.nameDe;
+      item.price = parseFloat(data.price);
+      item.quantity = parseFloat(data.quantity);
+      item.type = data.type || "";
+      item.rabatgrup = parseFloat(data.rabatgrup) || 0;
+      item.year = data.year;
+      item.month = data.month || "";
 
-        return newPriceListHist;
-      })
-    );
+      return item;
+    });
+
+    const newPriceListArray = initialValues.map((data) => {
+      const item = new PriceList();
+      item.origkod = data.origKod;
+      item.kod = data.kod;
+      item.name = data.name;
+      item.nameDe = data.nameDe;
+      item.price = data.price;
+      item.quantity = data.quantity;
+      item.type = data.type || "";
+      item.rabatgrup = parseFloat(data.rabatgrup) || 0;
+
+      return item;
+    });
 
     await priceListHistRepository.save(newPriceListHistArray);
-
-    const newPriceListArray = await Promise.all(
-      initialValues.map(async (data) => {
-        const newPriceList = new PriceList();
-        newPriceList.origkod = data.origKod;
-        newPriceList.kod = data.kod;
-        newPriceList.name = data.name;
-        newPriceList.nameDe = data.nameDe;
-        newPriceList.price = data.price;
-        newPriceList.quantity = data.quantity;
-        newPriceList.type = data.type;
-        newPriceList.rabatgrup = data.rabatgrup;
-
-        return newPriceList;
-      })
-    );
-
     await priceListRepository.save(newPriceListArray);
 
-
-    return res
-      .status(200)
-      .json({ success: true, message: "Price list created successfully." });
-
+    return res.status(200).json({
+      success: true,
+      message: "Price list created successfully.",
+    });
   } catch (error) {
     console.error("Error creating price list:", error);
     return res
