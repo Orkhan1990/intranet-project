@@ -1,17 +1,18 @@
 import express from "express";
 import { createPriceList } from "../controllers/priceListController";
-import multer from 'multer';
-
-
-
+import multer from "multer";
+import path from "path";
+import fileUpload from "express-fileupload";
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' }); // or configure storage
 
+const uploadOptsions = {
+  useTempFiles: true,
+  tempFileDir: "./tmp/", // `__dirname` is `src/`
+  createParentPath: true,
+    limits: { fileSize: 200 * 1024 * 1024 }, // 200MB limit
+  abortOnLimit: true};
 
-router.post("/createPriceList",upload.single('file'),createPriceList);
-
-
-
+router.post("/createPriceList", fileUpload(uploadOptsions), createPriceList);
 
 export default router;
