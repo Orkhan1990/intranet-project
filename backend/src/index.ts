@@ -17,9 +17,10 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use("/api/v1", [
+  bodyParser.json(),
+  bodyParser.urlencoded({ extended: true }),
+]);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -43,8 +44,8 @@ app.use("/api/v1/priceList", priceListRouter);
 app.use(
   (error: CustomError, req: Request, res: Response, next: NextFunction) => {
     const success = false;
-    const statusCode = error.statusCode;
-    const message = error.message;
+    const statusCode = typeof error.statusCode === "number" ? error.statusCode : 500; // default 500
+    const message = error.message || "Internal Server Error";
     res.status(statusCode).json({
       success,
       message,

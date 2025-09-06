@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../config";
+import { VITE_API_BASE_URL } from "../config";
 
 export const uploadExcell = async (
   formData: any,
@@ -8,15 +8,12 @@ export const uploadExcell = async (
 ) => {
   setUpload(true);
 
-  console.log("Uploading file...", API_BASE_URL);
+  console.log("Uploading file...", VITE_API_BASE_URL);
 
   try {
     const response = await axios.post(
-      `${API_BASE_URL}priceList/createPriceList`,
-      formData,
-      {
-        withCredentials: true,
-      }
+      `${VITE_API_BASE_URL}priceList/createPriceList`,
+      formData
     );
 
     console.log("Upload successful:", response.data);

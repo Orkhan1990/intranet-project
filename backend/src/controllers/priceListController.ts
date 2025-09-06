@@ -1,19 +1,14 @@
 import { UploadedFile } from "express-fileupload";
-import {Request,Response } from "express";
+import { Request, Response } from "express";
+import { log } from "console";
 
-export const createPriceList = async (
-  req: Request,
-  res: Response,
-) => {
+export const createPriceList = async (req: Request, res: Response) => {
   try {
-    if (!req.files || !req.files.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded." });
-    }
+       log(req.file); // Multer adds the file to req.file
 
-    const file = req.files.file as UploadedFile;
-    console.log("File received:", file.name, file.mimetype, file.size);
-
-    res.status(201).json({ success: true, message: "Price list created successfully." });
+    res
+      .status(201)
+      .json({ success: true, message: "Price list created successfully." });
   } catch (error) {
     console.error("Error creating price list:", error);
     return res

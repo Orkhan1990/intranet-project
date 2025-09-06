@@ -1,9 +1,8 @@
 import { Button, Select, TextInput } from "flowbite-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FaUpload } from "react-icons/fa";
-import { PriceListHistInterface } from "../../types";
+// import { PriceListHistInterface } from "../../types";
 import { Type } from "../../enums/projectEnums";
-import axios from "axios";
 import { uploadExcell } from "../../api/uploadExcel";
 // import * as XLSX from "xlsx";
 
@@ -16,37 +15,39 @@ const PriceList = () => {
   const [year, setYear] = useState("2025");
   const [month, setMonth] = useState("1");
   const [type, setType] = useState<Type>(Type.Man);
-  const [initialValues, setInitialValues] = useState<PriceListHistInterface[]>([
-    {
-      name: "",
-      nameDe: "",
-      price: 0,
-      quantity: 0,
-      year: "2025",
-      kod: "",
-      origKod: "",
-      type: Type.Man,
-      rabatgrup: 0,
-      month: "1",
-    },
-  ]);
+  // const [initialValues, setInitialValues] = useState<PriceListHistInterface[]>([
+  //   {
+  //     name: "",
+  //     nameDe: "",
+  //     price: 0,
+  //     quantity: 0,
+  //     year: "2025",
+  //     kod: "",
+  //     origKod: "",
+  //     type: Type.Man,
+  //     rabatgrup: 0,
+  //     month: "1",
+  //   },
+  // ]);
 
-  
-
-  const onSubmit = async (e:any) => {
+  const onSubmit = async (e: any) => {
     e.preventDefault();
     if (!file) console.error("No file selected");
 
     const formData = new FormData();
     formData.append("file", file!);
     formData.append("year", year);
-    formData.append("month", "1");
-    formData.append("type", "man");
+    formData.append("month", month);
+    formData.append("type", type);
 
-   await  uploadExcell(formData, setUpload,setError);
+    await uploadExcell(formData, setUpload, setError);
+    setFileName("");
 
-   setFile(null)
-
+    // ✅ Reset file input so same file can be selected again
+    if (fileUpload.current) {
+      fileUpload.current.value = "";
+    }
+    setFile(null);
   };
 
   const handleFileUploadClick = () => {
@@ -56,11 +57,6 @@ const PriceList = () => {
   };
 
   const handleFile = (e: any) => {
-    // console.log("File selected:", e.target.files[0].name);
-
-    // setFileName(e.target.files[0].name);
-    // setFile(e.target.files[0]);
-
     if (e.target.files && e.target.files.length > 0) {
       setFileName(e.target.files[0].name);
     }
