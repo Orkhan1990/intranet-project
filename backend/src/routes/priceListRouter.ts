@@ -1,7 +1,5 @@
 import express from "express";
 import { createPriceList } from "../controllers/priceListController";
-import multer from "multer";
-import path from "path";
 import { upload } from "../middleware/multerConfig";
 
 const router = express.Router();

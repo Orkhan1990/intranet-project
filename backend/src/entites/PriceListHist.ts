@@ -19,6 +19,9 @@ export class PriceListHist extends AllEntities {
   @Column({ type: "double" })
   price: number;
 
+    @Column({ type: "int" })
+  weight: number;
+
   @Column({ type: "int" })
   quantity: number;
 
