@@ -10,7 +10,7 @@ export class PriceListHist extends AllEntities {
   @Column({ type: "varchar", length: 50 })
   namede: string;
 
-  @Column({ type: "varchar", length: 50 })
+  @Column({ type: "varchar", length: 50,nullable: true, default: null })
   kod: string;
 
   @Column({ type: "varchar", length: 50 })
@@ -22,7 +22,7 @@ export class PriceListHist extends AllEntities {
     @Column({ type: "int" })
   weight: number;
 
-  @Column({ type: "int" })
+  @Column({ type: "int",nullable: true, default: null })
   quantity: number;
 
   @Column({
