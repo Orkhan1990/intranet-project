@@ -1,5 +1,5 @@
 import { Button, Select, TextInput } from "flowbite-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaUpload } from "react-icons/fa";
 // import { PriceListHistInterface } from "../../types";
 import { Type } from "../../enums/projectEnums";
@@ -17,12 +17,25 @@ const PriceList = () => {
   const [type, setType] = useState<Type>(Type.Man);
   const [result, setResult] = useState<boolean>(false);
   const [spinner, setSpinner] = useState(false);
+  console.log(upload);
+  
 
   // Define the expected response type from uploadExcell
   interface UploadExcelResponse {
     success: boolean;
     [key: string]: any;
   }
+
+  useEffect(() => {
+  if (error || result) {
+    const timer = setTimeout(() => {
+      setError(false);
+      setResult(false);
+    }, 8000);
+
+    return () => clearTimeout(timer); // cleanup on unmount
+  }
+}, [error, result]);
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
