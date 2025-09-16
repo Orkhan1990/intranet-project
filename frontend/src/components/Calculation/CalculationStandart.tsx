@@ -9,7 +9,52 @@ interface CalculationStandartInterface {
   delivering: string;
 }
 
-const CalculationStandart = ({ order,supplierId,delivering }: CalculationStandartInterface) => {
+interface Part {
+  id: number;
+  price: number;
+  partName: string;
+  origCode: string;
+  count: number;
+  totalPrice: number;
+  profit: number;
+  sellPrice: number;
+  transport: number;
+  sipPrice: number;
+  percent: number;
+  unitSipPrice: number;
+  unitSellPrice: number;
+  qtyInStock: number;
+  qtyForStock: number;
+  priceListExw: number;
+  priceExw: string;
+  priceExwNoDiscount: string;
+  priceWithoutPacking: string;
+  packing: string;
+  totalPriceStandart: string;
+  totalPriceMan: string;
+  nettoByUnit: string;
+  totalNetto: string;
+  transportMan: string;
+  cipPrice: string;
+  tax: string;
+  accessoryCost: string;
+  declaration: string;
+  ddpPrice: string;
+  unitDdpPrice: string;
+  percentage: string;
+  sellPriceClientStock: string;
+  totalSellPriceClientOrdered: string;
+  sellPriceUnitWhichInStock: string;
+  reserved: string;
+  totalSellPriceWhichInStock: string;
+  totalSellPriceOrderedWhichInStock: string;
+}
+
+const CalculationStandart = ({
+  order,
+  supplierId,
+  delivering,
+}: CalculationStandartInterface) => {
   return (
     <div>
       <table className="table-auto w-full ">
@@ -469,14 +514,14 @@ const CalculationStandart = ({ order,supplierId,delivering }: CalculationStandar
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">
               <div className="flex gap-1 items-end w-24">
-                   <div className="flex gap-1 items-center font-[400]">
-                    <input type="radio" className="w-3 h-3"/>
-                    <span>Man</span>
-                   </div>
-                   <div className="flex gap-1 items-center font-[400]">
-                    <input type="radio" className="w-3 h-3"/>
-                    <span>Min</span>
-                   </div>
+                <div className="flex gap-1 items-center font-[400]">
+                  <input type="radio" className="w-3 h-3" />
+                  <span>Man</span>
+                </div>
+                <div className="flex gap-1 items-center font-[400]">
+                  <input type="radio" className="w-3 h-3" />
+                  <span>Min</span>
+                </div>
               </div>
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
@@ -512,9 +557,11 @@ const CalculationStandart = ({ order,supplierId,delivering }: CalculationStandar
           Price ExW əldə etmək
         </Button>
         <Button color={"blue"} size={"xs"}>
-        Hesabla
+          Hesabla
         </Button>
-        <Link to={"#"} className="underline text-blue-800">Excel-ə çıxart</Link>
+        <Link to={"#"} className="underline text-blue-800">
+          Excel-ə çıxart
+        </Link>
       </div>
     </div>
   );
