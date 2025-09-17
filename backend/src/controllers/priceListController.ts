@@ -4,6 +4,8 @@ import { parse } from "@fast-csv/parse";
 import { AppDataSource } from "../database";
 import { PriceListHist } from "../entites/PriceListHist";
 import { Type } from "../enums/allEnums";
+import errorHandler from "../middleware/errorHandler";
+import { log } from "console";
 
 const priceListHistRepo = AppDataSource.getRepository(PriceListHist);
 
@@ -17,15 +19,21 @@ export const createPriceList = async (
     const filePath = req.file?.path;
 
     if (!filePath) {
-      return res.status(400).json({ success: false, message: "CSV file is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "CSV file is required" });
     }
 
     if (!year || !month || !type) {
-      return res.status(400).json({ success: false, message: "Missing year, month, or type" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing year, month, or type" });
     }
 
     if (!Object.values(Type).includes(type)) {
-      return res.status(400).json({ success: false, message: "Invalid type value" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid type value" });
     }
 
     await priceListHistRepo.clear(); // Clear existing data
@@ -39,7 +47,9 @@ export const createPriceList = async (
     csvStream
       .on("error", (error) => {
         console.error("❌ CSV Parsing Error:", error);
-        return res.status(500).json({ success: false, message: "CSV parsing error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "CSV parsing error" });
       })
       .on("data", (row) => {
         const rabatgrup = parseInt(row[0], 10);
@@ -52,7 +62,7 @@ export const createPriceList = async (
         const hist = new PriceListHist();
         hist.rabatgrup = isNaN(rabatgrup) ? 0 : rabatgrup;
         hist.weight = isNaN(weight) ? 0 : weight;
-        hist.price = isNaN(price) ? 0 : price;
+        hist.price = isNaN(price / 100) ? 0 : price / 100;
         hist.name = name || "";
         hist.namede = nameDe || "";
         hist.origKod = origKod || "";
@@ -64,7 +74,9 @@ export const createPriceList = async (
       })
       .on("end", async () => {
         try {
-          console.log(`✅ Parsed ${records.length} rows. Saving to DB in batches...`);
+          console.log(
+            `✅ Parsed ${records.length} rows. Saving to DB in batches...`
+          );
 
           for (let i = 0; i < records.length; i += BATCH_SIZE) {
             const batch = records.slice(i, i + BATCH_SIZE);
@@ -91,6 +103,37 @@ export const createPriceList = async (
     stream.pipe(csvStream);
   } catch (err) {
     console.error("❌ Import Error:", err);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const checkPriceList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { origKods } = req.body;
+
+
+
+
+    if (!origKods || !Array.isArray(origKods) || origKods.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "origKods array is required" });
+    }
+
+
+    const foundParts = await priceListHistRepo
+      .createQueryBuilder("priceListHist")
+      .where("priceListHist.origKod IN (:...origKods)", { origKods })
+      .getMany();
+     log(foundParts);
+    return res.status(200).json({ success: true, data: foundParts });
+  } catch (error) {
+    next(errorHandler(401,error.message))
   }
 };

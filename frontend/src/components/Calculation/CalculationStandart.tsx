@@ -2,6 +2,8 @@ import { Button } from "flowbite-react";
 import { OrderInterface } from "../../types";
 import { LuEuro } from "react-icons/lu";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { findOrigKodFromPriceList } from "../../api/uploadExcel";
 
 interface CalculationStandartInterface {
   order: OrderInterface;
@@ -55,6 +57,28 @@ const CalculationStandart = ({
   supplierId,
   delivering,
 }: CalculationStandartInterface) => {
+  const [partsOrigKods, setPartsOrigKod] = useState<number[]>([]);
+  const[error,setError]=useState<string|null>(null);
+
+  useEffect(() => {
+    const getOrigKods = () => {
+      const origKods = order?.orderParts.map((part: any) => part.origCode);
+      setPartsOrigKod(origKods);
+    };
+    getOrigKods();
+  }, [order]);
+
+
+  const countViaPriceList= async (partsOrigKods:any)=>{
+    try {
+      const data=await findOrigKodFromPriceList(partsOrigKods,setError);
+      console.log(data);
+    } catch (error:any) {
+      setError(error)
+    }
+  }
+
+
   return (
     <div>
       <table className="table-auto w-full ">
@@ -553,7 +577,7 @@ const CalculationStandart = ({
         </tbody>
       </table>
       <div className="flex gap-2 mt-1 ml-2 items-end">
-        <Button color={"blue"} size={"xs"}>
+        <Button color={"blue"} size={"xs"} onClick={() => countViaPriceList(partsOrigKods)}>
           Price ExW əldə etmək
         </Button>
         <Button color={"blue"} size={"xs"}>

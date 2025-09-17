@@ -34,7 +34,7 @@ const CreateOrders = () => {
       {
         id: 0,
         origCode: "",
-        count: 0,
+        count: 1,
         checkOnWarehouse: false,
         stockQuantity: 0,
         partName: "",

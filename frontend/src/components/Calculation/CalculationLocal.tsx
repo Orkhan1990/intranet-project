@@ -19,6 +19,7 @@ interface Part {
   unitSipPrice: number;
   unitSellPrice: number;
 }
+
 interface CalculationLocalInterface {
   order: OrderInterface;
   supplierId?: number;

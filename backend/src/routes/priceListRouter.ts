@@ -1,5 +1,5 @@
 import express from "express";
-import { createPriceList } from "../controllers/priceListController";
+import { checkPriceList, createPriceList } from "../controllers/priceListController";
 import { upload } from "../middleware/multerConfig";
 
 const router = express.Router();
@@ -7,5 +7,6 @@ const router = express.Router();
 
 
 router.post("/createPriceList", upload.single("file"), createPriceList);
+router.post("/checkPriceList", checkPriceList);
 
 export default router;

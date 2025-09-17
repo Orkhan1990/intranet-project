@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class FirstMigration1758049982126 implements MigrationInterface {
-    name = 'FirstMigration1758049982126'
+export class FistMigration1758100093278 implements MigrationInterface {
+    name = 'FistMigration1758100093278'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`card_problems\` (\`id\` int NOT NULL AUTO_INCREMENT, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`description\` varchar(255) NOT NULL, \`cardId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -21,6 +21,7 @@ export class FirstMigration1758049982126 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE \`users\` (\`id\` int NOT NULL AUTO_INCREMENT, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`userName\` varchar(255) NOT NULL, \`first_name\` varchar(255) NULL, \`last_name\` varchar(255) NULL, \`email\` varchar(255) NOT NULL, \`user_role\` varchar(255) NOT NULL DEFAULT 'ServiceUser', \`password\` varchar(255) NOT NULL, \`cardWorkerJobId\` int NULL, UNIQUE INDEX \`IDX_226bb9aa7aa8a69991209d58f5\` (\`userName\`), UNIQUE INDEX \`IDX_97672ac88f789774dd47f7c8be\` (\`email\`), UNIQUE INDEX \`REL_0c3f075afca9bec9e0d7250eed\` (\`cardWorkerJobId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`price_lists\` (\`id\` int NOT NULL AUTO_INCREMENT, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`name\` varchar(255) NOT NULL, \`nameDe\` varchar(255) NOT NULL, \`kod\` varchar(255) NOT NULL, \`origkod\` varchar(255) NOT NULL, \`price\` decimal(10,2) NULL, \`quantity\` varchar(255) NULL DEFAULT '1', \`weight\` decimal(10,2) NULL, \`rabatgrup\` int NOT NULL, \`type\` enum ('sachs1', 'sachs2', 'lemfer', 'knor', 'dt', 'hengs', 'man') NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`price_list_hist\` (\`id\` int NOT NULL AUTO_INCREMENT, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`name\` varchar(50) NOT NULL, \`namede\` varchar(50) NOT NULL, \`kod\` varchar(50) NULL, \`origKod\` varchar(50) NOT NULL, \`price\` double NOT NULL, \`weight\` int NOT NULL, \`quantity\` int NULL, \`type\` enum ('sachs1', 'sachs2', 'lemfer', 'knor', 'dt', 'hengs', 'man') NOT NULL, \`rabatgrup\` int NOT NULL, \`year\` int NULL, \`month\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`rabatgrup\` (\`id\` int NOT NULL AUTO_INCREMENT, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`rabatgrup_ind\` int NULL, \`discount\` decimal(10,2) NULL, \`notation\` decimal(10,2) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`card_problems_service_workers_users\` (\`cardProblemsId\` int NOT NULL, \`usersId\` int NOT NULL, INDEX \`IDX_6f4898d8b20cb35d8cb3ed6f53\` (\`cardProblemsId\`), INDEX \`IDX_8c18d1f1bc831b1ef5289a5e20\` (\`usersId\`), PRIMARY KEY (\`cardProblemsId\`, \`usersId\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`orders_suppliers_suppliers\` (\`ordersId\` int NOT NULL, \`suppliersId\` int NOT NULL, INDEX \`IDX_c3ca6f0311ccf0f40169f85fe3\` (\`ordersId\`), INDEX \`IDX_a325796b3a7c1b470659b94c93\` (\`suppliersId\`), PRIMARY KEY (\`ordersId\`, \`suppliersId\`)) ENGINE=InnoDB`);
         await queryRunner.query(`ALTER TABLE \`card_problems\` ADD CONSTRAINT \`FK_ec13c3b3e2a76c49c6c6d73c758\` FOREIGN KEY (\`cardId\`) REFERENCES \`cards\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -80,6 +81,7 @@ export class FirstMigration1758049982126 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX \`IDX_8c18d1f1bc831b1ef5289a5e20\` ON \`card_problems_service_workers_users\``);
         await queryRunner.query(`DROP INDEX \`IDX_6f4898d8b20cb35d8cb3ed6f53\` ON \`card_problems_service_workers_users\``);
         await queryRunner.query(`DROP TABLE \`card_problems_service_workers_users\``);
+        await queryRunner.query(`DROP TABLE \`rabatgrup\``);
         await queryRunner.query(`DROP TABLE \`price_list_hist\``);
         await queryRunner.query(`DROP TABLE \`price_lists\``);
         await queryRunner.query(`DROP INDEX \`REL_0c3f075afca9bec9e0d7250eed\` ON \`users\``);

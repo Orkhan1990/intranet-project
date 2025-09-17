@@ -18,6 +18,7 @@ import { SupplierOrderHistory } from "./entites/SuppliersOrderHistory";
 import { SupplierOrderParts } from "./entites/SupplierOrderParts";
 import { PriceList } from "./entites/PriceList";
 import { PriceListHist } from "./entites/PriceListHist";
+import { Rabatgrup } from "./entites/Rabatgrup";
 dotenv.config();
 
 
@@ -29,7 +30,7 @@ export const AppDataSource = new DataSource({
     username:DATABASE_USERNAME,
     password:DATABASE_PASSWORD,
     database:DATABASE,
-    entities: [User,Client,Card,CardProblem,CardJob,CardWorkerJob,Supplier,Brand,Invoice,SparePart,Order,OrderPart,OrderHistory,SupplierOrderHistory,SupplierOrderParts,PriceList,PriceListHist],
+    entities: [User,Client,Card,CardProblem,CardJob,CardWorkerJob,Supplier,Brand,Invoice,SparePart,Order,OrderPart,OrderHistory,SupplierOrderHistory,SupplierOrderParts,PriceList,PriceListHist,Rabatgrup],
     synchronize: false,
     migrations: ["./src/migrations/**/*.ts"],
 

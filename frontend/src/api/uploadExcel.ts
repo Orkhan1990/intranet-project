@@ -25,3 +25,14 @@ export const uploadExcell = async (
     setError(error.response?.data || error.message);
   }
 };
+
+
+export const findOrigKodFromPriceList=async(origKods:any,setError:any)=>{
+  try {
+    const response=await axios.post(`${VITE_API_BASE_URL}priceList/checkPriceList`,{origKods});
+    return response.data;
+  } catch (error:any) {
+    console.log(error);
+    setError(error.response?.data || error.message);
+  }
+}
