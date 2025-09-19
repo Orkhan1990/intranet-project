@@ -118,7 +118,6 @@ export class OrderPart extends AllEntities {
   @Column({ nullable: true, default: 0 })
   priceListExw: number;
 
-  
   @Column({
     name: "price_exw",
     type: "decimal",
@@ -128,7 +127,7 @@ export class OrderPart extends AllEntities {
   })
   priceExw: string;
 
-    @Column({
+  @Column({
     name: "price_exw_no_discount",
     type: "decimal",
     precision: 10,
@@ -137,9 +136,7 @@ export class OrderPart extends AllEntities {
   })
   priceExwNoDiscount: string;
 
-
-  
-    @Column({
+  @Column({
     name: "price_without_packing",
     type: "decimal",
     precision: 10,
@@ -148,7 +145,7 @@ export class OrderPart extends AllEntities {
   })
   priceWithoutPacking: string;
 
-   @Column({
+  @Column({
     name: "packing",
     type: "decimal",
     precision: 10,
@@ -157,8 +154,7 @@ export class OrderPart extends AllEntities {
   })
   packing: string;
 
-  
-   @Column({
+  @Column({
     name: "total_price_standart",
     type: "decimal",
     precision: 10,
@@ -167,8 +163,7 @@ export class OrderPart extends AllEntities {
   })
   totalPriceStandart: string;
 
-
-    @Column({
+  @Column({
     name: "total_price_man",
     type: "decimal",
     precision: 10,
@@ -177,7 +172,7 @@ export class OrderPart extends AllEntities {
   })
   totalPriceMan: string;
 
-   @Column({
+  @Column({
     name: "netto_by_unit",
     type: "decimal",
     precision: 10,
@@ -186,7 +181,7 @@ export class OrderPart extends AllEntities {
   })
   nettoByUnit: string;
 
-    @Column({
+  @Column({
     name: "total_netto",
     type: "decimal",
     precision: 10,
@@ -195,8 +190,7 @@ export class OrderPart extends AllEntities {
   })
   totalNetto: string;
 
-  
-    @Column({
+  @Column({
     name: "transport_man",
     type: "decimal",
     precision: 10,
@@ -205,8 +199,7 @@ export class OrderPart extends AllEntities {
   })
   transportMan: string;
 
-    
-    @Column({
+  @Column({
     name: "cip_price",
     type: "decimal",
     precision: 10,
@@ -215,7 +208,7 @@ export class OrderPart extends AllEntities {
   })
   cipPrice: string;
 
-   @Column({
+  @Column({
     name: "tax",
     type: "decimal",
     precision: 10,
@@ -224,8 +217,7 @@ export class OrderPart extends AllEntities {
   })
   tax: string;
 
-
-     @Column({
+  @Column({
     name: "accessory_cost",
     type: "decimal",
     precision: 10,
@@ -234,7 +226,7 @@ export class OrderPart extends AllEntities {
   })
   accessoryCost: string;
 
-     @Column({
+  @Column({
     name: "declaration",
     type: "decimal",
     precision: 10,
@@ -243,7 +235,7 @@ export class OrderPart extends AllEntities {
   })
   declaration: string;
 
-     @Column({
+  @Column({
     name: "ddp_price",
     type: "decimal",
     precision: 10,
@@ -252,7 +244,7 @@ export class OrderPart extends AllEntities {
   })
   ddpPrice: string;
 
-     @Column({
+  @Column({
     name: "unit_ddp_price",
     type: "decimal",
     precision: 10,
@@ -261,7 +253,7 @@ export class OrderPart extends AllEntities {
   })
   unitDdpPrice: string;
 
-     @Column({
+  @Column({
     name: "percentage",
     type: "decimal",
     precision: 10,
@@ -270,8 +262,7 @@ export class OrderPart extends AllEntities {
   })
   percentage: string;
 
-
-     @Column({
+  @Column({
     name: "sell_price_client_stock",
     type: "decimal",
     precision: 10,
@@ -280,8 +271,14 @@ export class OrderPart extends AllEntities {
   })
   sellPriceClientStock: string;
 
-  
-     @Column({
+  @Column({
+    name: "rabatgrup_ind",
+    type: "int",
+    nullable: true,
+  })
+  rabatgrupInd: number;
+
+  @Column({
     name: "total_sell_price_client_ordered",
     type: "decimal",
     precision: 10,
@@ -290,7 +287,7 @@ export class OrderPart extends AllEntities {
   })
   totalSellPriceClientOrdered: string;
 
-   @Column({
+  @Column({
     name: "sell_price_unit_which_in_stock",
     type: "decimal",
     precision: 10,
@@ -299,8 +296,7 @@ export class OrderPart extends AllEntities {
   })
   sellPriceUnitWhichInStock: string;
 
-  
-   @Column({
+  @Column({
     name: "reserved",
     type: "decimal",
     precision: 10,
@@ -326,7 +322,7 @@ export class OrderPart extends AllEntities {
     nullable: true,
   })
   totalSellPriceOrderedWhichInStock: string;
-   
+
   @ManyToOne(() => Order, (order) => order.orderParts)
   order: Order;
 

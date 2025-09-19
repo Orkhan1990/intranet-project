@@ -16,8 +16,14 @@ export class PriceListHist extends AllEntities {
   @Column({ type: "varchar", length: 50 })
   origKod: string;
 
-  @Column({ type: "double" })
-  price: number;
+ @Column({
+    name: "price",
+    type: "decimal",
+    precision: 10,
+    scale: 2,
+    nullable: true,
+  })
+  price: string;
 
     @Column({ type: "int" })
   weight: number;

@@ -6,8 +6,12 @@ import { PriceListHist } from "../entites/PriceListHist";
 import { Type } from "../enums/allEnums";
 import errorHandler from "../middleware/errorHandler";
 import { log } from "console";
+import { Rabatgrup } from "../entites/Rabatgrup";
+import { OrderPart } from "../entites/OrderPart";
 
 const priceListHistRepo = AppDataSource.getRepository(PriceListHist);
+const rabatgrupRepo = AppDataSource.getRepository(Rabatgrup);
+const orderPartRepository = AppDataSource.getRepository(OrderPart);
 
 export const createPriceList = async (
   req: Request,
@@ -62,7 +66,7 @@ export const createPriceList = async (
         const hist = new PriceListHist();
         hist.rabatgrup = isNaN(rabatgrup) ? 0 : rabatgrup;
         hist.weight = isNaN(weight) ? 0 : weight;
-        hist.price = isNaN(price / 100) ? 0 : price / 100;
+        hist.price = isNaN(price) ? "0.00" : (price / 100).toFixed(2);
         hist.name = name || "";
         hist.namede = nameDe || "";
         hist.origKod = origKod || "";
@@ -116,9 +120,8 @@ export const checkPriceList = async (
 ) => {
   try {
     const { origKods } = req.body;
-
-
-
+    // console.log({ origKods });
+    
 
     if (!origKods || !Array.isArray(origKods) || origKods.length === 0) {
       return res
@@ -126,14 +129,68 @@ export const checkPriceList = async (
         .json({ success: false, message: "origKods array is required" });
     }
 
-
     const foundParts = await priceListHistRepo
       .createQueryBuilder("priceListHist")
       .where("priceListHist.origKod IN (:...origKods)", { origKods })
       .getMany();
-     log(foundParts);
+    // log(foundParts);
+
+    if (foundParts.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No matching parts found" });
+    }
+
+    const orderParts = await orderPartRepository
+      .createQueryBuilder("orderPart")
+      .where("orderPart.origCode IN (:...origKods)", { origKods })
+      .getMany();
+
+
+      console.log({orderParts});
+      
+
+    const updatedOrderParts = await Promise.all(
+      orderParts.map(async (part) => {
+        const match = foundParts.find(
+          (foundPart) => part.origCode === foundPart.origKod
+        );
+
+        // console.log({match});
+        
+
+        if (match) {
+          part.partName = match.name;
+          part.stockQuantity = "100";
+          part.price = match.price;
+          part.priceExwNoDiscount = match.price;
+          part.rabatgrupInd = match.rabatgrup;
+          await orderPartRepository.save(part);
+        }
+
+        return part;
+      })
+    );
+    // log(updatedOrderParts);
+
+    const getDiscount = await Promise.all(
+      foundParts.map(async (part) => {
+        return await rabatgrupRepo.findOneBy({ rabatgrupInd: part.rabatgrup });
+      })
+    );
+
+     console.log(getDiscount);
+
+
+     const calculationOrderparts = updatedOrderParts.map((part, index) => {
+      for (let i = 0; i < getDiscount.length; i++) {
+
+      }
+     })
+     
+
     return res.status(200).json({ success: true, data: foundParts });
   } catch (error) {
-    next(errorHandler(401,error.message))
+    next(errorHandler(401, error.message));
   }
 };
