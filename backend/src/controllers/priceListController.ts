@@ -120,8 +120,6 @@ export const checkPriceList = async (
 ) => {
   try {
     const { origKods } = req.body;
-    // console.log({ origKods });
-    
 
     if (!origKods || !Array.isArray(origKods) || origKods.length === 0) {
       return res
@@ -133,7 +131,6 @@ export const checkPriceList = async (
       .createQueryBuilder("priceListHist")
       .where("priceListHist.origKod IN (:...origKods)", { origKods })
       .getMany();
-    // log(foundParts);
 
     if (foundParts.length === 0) {
       return res
@@ -146,22 +143,15 @@ export const checkPriceList = async (
       .where("orderPart.origCode IN (:...origKods)", { origKods })
       .getMany();
 
-
-      console.log({orderParts});
-      
-
     const updatedOrderParts = await Promise.all(
       orderParts.map(async (part) => {
         const match = foundParts.find(
           (foundPart) => part.origCode === foundPart.origKod
         );
 
-        // console.log({match});
-        
-
         if (match) {
           part.partName = match.name;
-          part.stockQuantity = "100";
+          part.stockQuantity = "100"; // Example hardcoded value
           part.price = match.price;
           part.priceExwNoDiscount = match.price;
           part.rabatgrupInd = match.rabatgrup;
@@ -171,25 +161,40 @@ export const checkPriceList = async (
         return part;
       })
     );
-    // log(updatedOrderParts);
 
-    const getDiscount = await Promise.all(
+    const getDiscounts = await Promise.all(
       foundParts.map(async (part) => {
         return await rabatgrupRepo.findOneBy({ rabatgrupInd: part.rabatgrup });
       })
     );
 
-     console.log(getDiscount);
+    const calculationOrderParts = await Promise.all(
+      getDiscounts.map(async (discount) => {
+        const match = updatedOrderParts.find(
+          (item) => discount?.rabatgrupInd === item?.rabatgrupInd
+        );
 
+        if (match && discount) {
+          const price = Number(match.price);
+          const discountPercent = parseFloat(discount.discount);
 
-     const calculationOrderparts = updatedOrderParts.map((part, index) => {
-      for (let i = 0; i < getDiscount.length; i++) {
+          const priceWithoutPacking = price - (price * discountPercent) / 100;
+          const packing = parseFloat(((price * 1.75) / 100).toFixed(2));
+          const totalWithPacking = parseFloat((priceWithoutPacking + packing).toFixed(2));
 
-      }
-     })
-     
+          match.priceWithoutPacking = priceWithoutPacking.toFixed(2);
+          match.packing = packing.toFixed(2);
+          match.priceExw = totalWithPacking.toFixed(2);
+          match.totalPriceMan = totalWithPacking.toFixed(2);
 
-    return res.status(200).json({ success: true, data: foundParts });
+          await orderPartRepository.save(match);
+        }
+
+        return match;
+      })
+    );
+
+    return res.status(200).json({ success: true, data: calculationOrderParts });
   } catch (error) {
     next(errorHandler(401, error.message));
   }
