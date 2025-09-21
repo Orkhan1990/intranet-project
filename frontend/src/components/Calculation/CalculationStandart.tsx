@@ -58,7 +58,14 @@ const CalculationStandart = ({
   delivering,
 }: CalculationStandartInterface) => {
   const [partsOrigKods, setPartsOrigKod] = useState<number[]>([]);
-  const[error,setError]=useState<string|null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [priceExw, setPriceExw] = useState<number>(0);
+  const[transport,setTransport]=useState<number>(0);
+  const[priceExww,setPriceExww]=useState<number>(0);
+  const [transportValue,setTransportValue]=useState<number>(0);
+  const[transportManValue,setTransportManValue]=useState<number>(0);
+  const[taxValue,setTaxValue]=useState<number>(0);
+  
 
   useEffect(() => {
     const getOrigKods = () => {
@@ -68,16 +75,14 @@ const CalculationStandart = ({
     getOrigKods();
   }, [order]);
 
-
-  const countViaPriceList= async (partsOrigKods:any)=>{
+  const countViaPriceList = async (partsOrigKods: any) => {
     try {
-      const data=await findOrigKodFromPriceList(partsOrigKods,setError);
+      const data = await findOrigKodFromPriceList(partsOrigKods, setError);
       console.log(data);
-    } catch (error:any) {
-      setError(error)
+    } catch (error: any) {
+      setError(error);
     }
-  }
-
+  };
 
   return (
     <div>
@@ -252,10 +257,10 @@ const CalculationStandart = ({
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
-            <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
+            <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
+            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
               <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
             </td>
-            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
@@ -367,7 +372,7 @@ const CalculationStandart = ({
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2"></td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.priceExw}/>
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -375,7 +380,7 @@ const CalculationStandart = ({
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.priceExwNoDiscount}/>
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -383,7 +388,7 @@ const CalculationStandart = ({
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.priceWithoutPacking}/>
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -391,7 +396,7 @@ const CalculationStandart = ({
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.packing}/>
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -399,7 +404,7 @@ const CalculationStandart = ({
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.totalPrice}/>
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -577,7 +582,11 @@ const CalculationStandart = ({
         </tbody>
       </table>
       <div className="flex gap-2 mt-1 ml-2 items-end">
-        <Button color={"blue"} size={"xs"} onClick={() => countViaPriceList(partsOrigKods)}>
+        <Button
+          color={"blue"}
+          size={"xs"}
+          onClick={() => countViaPriceList(partsOrigKods)}
+        >
           Price ExW əldə etmək
         </Button>
         <Button color={"blue"} size={"xs"}>
