@@ -57,27 +57,29 @@ const CalculationStandart = ({
   supplierId,
   delivering,
 }: CalculationStandartInterface) => {
-  const [partsOrigKods, setPartsOrigKod] = useState<number[]>([]);
+  const [orderPartsId, setOrderPartsId] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [priceExw, setPriceExw] = useState<number>(0);
-  const[transport,setTransport]=useState<number>(0);
-  const[priceExww,setPriceExww]=useState<number>(0);
-  const [transportValue,setTransportValue]=useState<number>(0);
-  const[transportManValue,setTransportManValue]=useState<number>(0);
-  const[taxValue,setTaxValue]=useState<number>(0);
-  
+  const [transport, setTransport] = useState<number>(0);
+  const [priceExww, setPriceExww] = useState<number>(0);
+  const [transportValue, setTransportValue] = useState<number>(0);
+  const [transportManValue, setTransportManValue] = useState<number>(0);
+  const [taxValue, setTaxValue] = useState<number>(0);
+  const [updatePage, setUpdatePage] = useState<boolean>(false);
 
   useEffect(() => {
-    const getOrigKods = () => {
-      const origKods = order?.orderParts.map((part: any) => part.origCode);
-      setPartsOrigKod(origKods);
+    const getOrderPartsInfo = () => {
+      if (!order?.orderParts?.length) return;
+
+      const origKodObjects = order.orderParts.map((part: any) =>part.id);
+      setOrderPartsId(origKodObjects);
     };
-    getOrigKods();
+    getOrderPartsInfo();
   }, [order]);
 
-  const countViaPriceList = async (partsOrigKods: any) => {
+  const countViaPriceList = async (orderPartsId: any) => {
     try {
-      const data = await findOrigKodFromPriceList(partsOrigKods, setError);
+      const data = await findOrigKodFromPriceList(orderPartsId, setError);
       console.log(data);
     } catch (error: any) {
       setError(error);
@@ -372,7 +374,10 @@ const CalculationStandart = ({
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2"></td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.priceExw}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={orderPart.priceExw}
+                    />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -380,7 +385,10 @@ const CalculationStandart = ({
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.priceExwNoDiscount}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={orderPart.priceExwNoDiscount}
+                    />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -388,7 +396,10 @@ const CalculationStandart = ({
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.priceWithoutPacking}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={orderPart.priceWithoutPacking}
+                    />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -396,7 +407,10 @@ const CalculationStandart = ({
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.packing}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={orderPart.packing}
+                    />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -404,7 +418,10 @@ const CalculationStandart = ({
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={orderPart.totalPrice}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={orderPart.totalPrice}
+                    />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -585,7 +602,7 @@ const CalculationStandart = ({
         <Button
           color={"blue"}
           size={"xs"}
-          onClick={() => countViaPriceList(partsOrigKods)}
+          onClick={() => countViaPriceList(orderPartsId)}
         >
           Price ExW əldə etmək
         </Button>

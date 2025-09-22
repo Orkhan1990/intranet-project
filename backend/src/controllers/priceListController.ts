@@ -119,18 +119,40 @@ export const checkPriceList = async (
   next: NextFunction
 ) => {
   try {
-    const { origKods } = req.body;
+    const { orderPartsId } = req.body;
+    // console.log({ orderPartsId });
 
-    if (!origKods || !Array.isArray(origKods) || origKods.length === 0) {
+    if (
+      !orderPartsId ||
+      !Array.isArray(orderPartsId) ||
+      orderPartsId.length === 0
+    ) {
       return res
-        .status(400)
-        .json({ success: false, message: "origKods array is required" });
+      .status(400)
+      .json({ success: false, message: "origKods array is required" });
     }
 
+   const orderParts = await orderPartRepository
+  .createQueryBuilder("orderPart")
+  .where("orderPart.id IN (:...orderPartsId)", { orderPartsId })
+  .getMany();
+
+  if (orderParts.length === 0) {
+    return res
+      .status(404)
+      .json({ success: false, message: "No order parts found for given IDs" });
+  }
+
+  const origKods = orderParts.map(part => part.origCode);
+
+      // console.log({ origKods });
+      
+    
     const foundParts = await priceListHistRepo
       .createQueryBuilder("priceListHist")
       .where("priceListHist.origKod IN (:...origKods)", { origKods })
       .getMany();
+
 
     if (foundParts.length === 0) {
       return res
@@ -138,10 +160,6 @@ export const checkPriceList = async (
         .json({ success: false, message: "No matching parts found" });
     }
 
-    const orderParts = await orderPartRepository
-      .createQueryBuilder("orderPart")
-      .where("orderPart.origCode IN (:...origKods)", { origKods })
-      .getMany();
 
     const updatedOrderParts = await Promise.all(
       orderParts.map(async (part) => {
@@ -173,19 +191,20 @@ export const checkPriceList = async (
         const match = updatedOrderParts.find(
           (item) => discount?.rabatgrupInd === item?.rabatgrupInd
         );
-
         if (match && discount) {
           const price = Number(match.price);
           const discountPercent = parseFloat(discount.discount);
 
           const priceWithoutPacking = price - (price * discountPercent) / 100;
           const packing = parseFloat(((price * 1.75) / 100).toFixed(2));
-          const totalWithPacking = parseFloat((priceWithoutPacking + packing).toFixed(2));
+          const totalWithPacking = parseFloat(
+            (priceWithoutPacking + packing).toFixed(2)
+          );
 
           match.priceWithoutPacking = priceWithoutPacking.toFixed(2);
           match.packing = packing.toFixed(2);
           match.priceExw = totalWithPacking.toFixed(2);
-          match.totalPriceMan = totalWithPacking.toFixed(2);
+          match.totalPrice = totalWithPacking.toFixed(2);
 
           await orderPartRepository.save(match);
         }

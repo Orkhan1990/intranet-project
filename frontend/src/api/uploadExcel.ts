@@ -27,9 +27,9 @@ export const uploadExcell = async (
 };
 
 
-export const findOrigKodFromPriceList=async(origKods:any,setError:any)=>{
+export const findOrigKodFromPriceList=async(orderPartsId:any,setError:any)=>{
   try {
-    const response=await axios.post(`${VITE_API_BASE_URL}priceList/checkPriceList`,{origKods});
+    const response=await axios.post(`${VITE_API_BASE_URL}priceList/checkPriceList`,{orderPartsId});
     return response.data;
   } catch (error:any) {
     console.log(error);
