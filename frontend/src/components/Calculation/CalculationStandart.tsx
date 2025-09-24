@@ -3,12 +3,13 @@ import { OrderInterface } from "../../types";
 import { LuEuro } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { findOrigKodFromPriceList } from "../../api/uploadExcel";
+import { calculateStandartOrderPrice, findOrigKodFromPriceList } from "../../api/uploadExcel";
 
 interface CalculationStandartInterface {
   order: OrderInterface;
   supplierId: number;
   delivering: string;
+  setRefreshPage: (value: boolean) => void;
 }
 
 interface Part {
@@ -56,16 +57,16 @@ const CalculationStandart = ({
   order,
   supplierId,
   delivering,
+  setRefreshPage
 }: CalculationStandartInterface) => {
   const [orderPartsId, setOrderPartsId] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [priceExw, setPriceExw] = useState<number>(0);
-  const [transport, setTransport] = useState<number>(0);
-  const [priceExww, setPriceExww] = useState<number>(0);
-  const [transportValue, setTransportValue] = useState<number>(0);
-  const [transportManValue, setTransportManValue] = useState<number>(0);
-  const [taxValue, setTaxValue] = useState<number>(0);
-  const [updatePage, setUpdatePage] = useState<boolean>(false);
+  const [totalPriceMan,setTotalPriceMan]=useState<number>(0);
+  const [priceExwValue,setPriceExwValue]=useState<number>(0);
+
+
+  console.log({ totalPriceMan });
+  
 
   useEffect(() => {
     const getOrderPartsInfo = () => {
@@ -75,16 +76,28 @@ const CalculationStandart = ({
       setOrderPartsId(origKodObjects);
     };
     getOrderPartsInfo();
+    // if(updatePage){
+    //   window.location.reload();
+    // }
   }, [order]);
 
-  const countViaPriceList = async (orderPartsId: any) => {
+  const countViaPriceList = async (orderPartsId: any,delivering:any) => {
     try {
-      const data = await findOrigKodFromPriceList(orderPartsId, setError);
+      const data = await findOrigKodFromPriceList(orderPartsId, setError,delivering);
       console.log(data);
+      setRefreshPage(true);
     } catch (error: any) {
       setError(error);
     }
   };
+  
+
+   const calculateStandartOrder=(totalPriceMan:any,orderPartsId:any)=>{
+     const data=calculateStandartOrderPrice(totalPriceMan,orderPartsId);
+     console.log(data);
+   }
+
+
 
   return (
     <div>
@@ -261,7 +274,7 @@ const CalculationStandart = ({
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="totalPriceMan" onChange={(e:any)=>setTotalPriceMan(e.target.value)}/>
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -377,6 +390,7 @@ const CalculationStandart = ({
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                       value={orderPart.priceExw}
+                      onChange={(e:any)=>setPriceExwValue(e.target.value)}
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -598,15 +612,15 @@ const CalculationStandart = ({
           </tr>
         </tbody>
       </table>
-      <div className="flex gap-2 mt-1 ml-2 items-end">
+      <div className="flex gap-2 mt-5 ml-2 items-end">
         <Button
           color={"blue"}
           size={"xs"}
-          onClick={() => countViaPriceList(orderPartsId)}
+          onClick={() => countViaPriceList(orderPartsId,delivering)}
         >
           Price ExW əldə etmək
         </Button>
-        <Button color={"blue"} size={"xs"}>
+        <Button color={"blue"} size={"xs"} onClick={()=>calculateStandartOrder(totalPriceMan,orderPartsId)}>
           Hesabla
         </Button>
         <Link to={"#"} className="underline text-blue-800">

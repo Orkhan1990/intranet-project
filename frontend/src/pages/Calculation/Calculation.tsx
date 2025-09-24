@@ -48,6 +48,8 @@ const Calculation = () => {
     ],
   });
 
+  const [refreshPage,setRefreshPage]=useState<boolean>(false);
+
 
   const location=useLocation();
   const params=new URLSearchParams(location.search);
@@ -55,7 +57,6 @@ const Calculation = () => {
   const supplierId=parseInt(params.get('supplierId')||'');
   const isStandartClient=params.get('isStandartClient')==='true';
   const delivering=(params.get('delivering')||'');
-  // console.log(orderId,supplierId,liquidity);
   console.log(order,error);
   
   
@@ -73,7 +74,7 @@ const Calculation = () => {
     };
     fetchOrderParts();
 
-  }, [orderId]);
+  }, [orderId,refreshPage]);
 
 
 
@@ -82,7 +83,7 @@ const Calculation = () => {
   // console.log(isStandartClient);
   
   return (
-    isStandartClient?<CalculationStandart order={order} supplierId={supplierId} delivering={delivering}/>:<CalculationLocal order={order} supplierId={supplierId} delivering={delivering}/>
+    isStandartClient?<CalculationStandart order={order} supplierId={supplierId} delivering={delivering} setRefreshPage={setRefreshPage}/>:<CalculationLocal order={order} supplierId={supplierId} delivering={delivering}/>
   )
 };
 

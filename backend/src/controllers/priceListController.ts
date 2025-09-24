@@ -119,8 +119,8 @@ export const checkPriceList = async (
   next: NextFunction
 ) => {
   try {
-    const { orderPartsId } = req.body;
-    // console.log({ orderPartsId });
+    const { orderPartsId,delivering,totalPriceMan } = req.body;
+    console.log({totalPriceMan});
 
     if (
       !orderPartsId ||
@@ -173,6 +173,7 @@ export const checkPriceList = async (
           part.price = match.price;
           part.priceExwNoDiscount = match.price;
           part.rabatgrupInd = match.rabatgrup;
+          part.delivering=delivering;
           await orderPartRepository.save(part);
         }
 
@@ -186,35 +187,54 @@ export const checkPriceList = async (
       })
     );
 
-    const calculationOrderParts = await Promise.all(
-      getDiscounts.map(async (discount) => {
-        const match = updatedOrderParts.find(
-          (item) => discount?.rabatgrupInd === item?.rabatgrupInd
-        );
-        if (match && discount) {
-          const price = Number(match.price);
-          const discountPercent = parseFloat(discount.discount);
-
-          const priceWithoutPacking = price - (price * discountPercent) / 100;
-          const packing = parseFloat(((price * 1.75) / 100).toFixed(2));
-          const totalWithPacking = parseFloat(
-            (priceWithoutPacking + packing).toFixed(2)
-          );
-
-          match.priceWithoutPacking = priceWithoutPacking.toFixed(2);
-          match.packing = packing.toFixed(2);
-          match.priceExw = totalWithPacking.toFixed(2);
-          match.totalPrice = totalWithPacking.toFixed(2);
-
-          await orderPartRepository.save(match);
-        }
-
-        return match;
-      })
+   const calculationOrderParts = await Promise.all(
+  getDiscounts.map(async (discount) => {
+    const matches = updatedOrderParts.filter(
+      (item) => discount?.rabatgrupInd === item?.rabatgrupInd
     );
 
-    return res.status(200).json({ success: true, data: calculationOrderParts });
+    for (const item of matches) {
+      if (item.rabatgrupInd && discount) {
+        const price = Number(item.priceExwNoDiscount); // use base price
+        const discountPercent = parseFloat(discount.discount);
+
+        const priceWithoutPacking = price - (price * discountPercent) / 100;
+        const packing = parseFloat(((price * 1.75) / 100).toFixed(2));
+        const totalWithPacking = parseFloat(
+          (priceWithoutPacking + packing).toFixed(2)
+        );
+
+        item.priceWithoutPacking = priceWithoutPacking.toFixed(2);
+        item.packing = packing.toFixed(2);
+        item.priceExw = totalWithPacking.toFixed(2);
+        item.totalPrice = totalWithPacking.toFixed(2);
+
+        await orderPartRepository.save(item);
+      }
+    }
+
+    return matches;
+  })
+);
+
+const flatOrderParts = calculationOrderParts.flat();
+
+console.log({ flatOrderParts });
+
+
+    return res.status(200).json({ success: true, data: flatOrderParts });
   } catch (error) {
     next(errorHandler(401, error.message));
   }
 };
+
+export const calculateStandartOrderPrice = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {totalPriceMan } = req.body;
+    console.log({totalPriceMan});}catch (error) {
+    next(errorHandler(401, error.message));
+  }}

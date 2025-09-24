@@ -26,13 +26,33 @@ export const uploadExcell = async (
   }
 };
 
-
-export const findOrigKodFromPriceList=async(orderPartsId:any,setError:any)=>{
+export const findOrigKodFromPriceList = async (
+  orderPartsId: any,
+  setError: any,
+  delivering: any
+) => {
   try {
-    const response=await axios.post(`${VITE_API_BASE_URL}priceList/checkPriceList`,{orderPartsId});
+    console.log({ delivering });
+
+    const response = await axios.post(
+      `${VITE_API_BASE_URL}priceList/checkPriceList`,
+      { orderPartsId, delivering }
+    );
     return response.data;
-  } catch (error:any) {
+  } catch (error: any) {
     console.log(error);
     setError(error.response?.data || error.message);
   }
-}
+};
+
+export const calculateStandartOrderPrice = async (totalPriceMan: any,orderPartsId:any) => {
+  try {
+    const response = await axios.post(
+      `${VITE_API_BASE_URL}priceList/calculateStandartOrderPrice`,
+      { totalPriceMan,orderPartsId }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.log(error);
+  }
+};
