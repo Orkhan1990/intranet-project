@@ -45,11 +45,11 @@ export const findOrigKodFromPriceList = async (
   }
 };
 
-export const calculateStandartOrderPrice = async (totalPriceMan: any,orderPartsId:any) => {
+export const calculateStandartOrderPrice = async (inputValues:any,orderPartsId:any) => {
   try {
     const response = await axios.post(
       `${VITE_API_BASE_URL}priceList/calculateStandartOrderPrice`,
-      { totalPriceMan,orderPartsId }
+      { inputValues,orderPartsId }
     );
     return response.data;
   } catch (error: any) {

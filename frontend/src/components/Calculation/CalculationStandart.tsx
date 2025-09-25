@@ -53,6 +53,17 @@ interface Part {
   totalSellPriceOrderedWhichInStock: string;
 }
 
+interface InputValues{
+  totalPriceMan:number;
+  priceExw:number;
+  transport:number;
+  transportMan:number;
+  tax:number;
+  accessoryCost:number;
+  decleration:number;
+  percentage:number;
+}
+
 const CalculationStandart = ({
   order,
   supplierId,
@@ -61,12 +72,23 @@ const CalculationStandart = ({
 }: CalculationStandartInterface) => {
   const [orderPartsId, setOrderPartsId] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [totalPriceMan,setTotalPriceMan]=useState<number>(0);
-  const [priceExwValue,setPriceExwValue]=useState<number>(0);
+  const[inputValues,setInputValues]=useState<InputValues>({
+    totalPriceMan:0,
+    priceExw:0,
+    transport:0,
+    transportMan:0,
+    tax:0,
+    accessoryCost:0,
+    decleration:0,
+    percentage:0
+  })
 
-
-  console.log({ totalPriceMan });
+  console.log({inputValues});
   
+ 
+  const handleChange=(e:any)=>{
+      setInputValues({...inputValues,[e.target.name]:e.target.value})
+  }
 
   useEffect(() => {
     const getOrderPartsInfo = () => {
@@ -76,9 +98,6 @@ const CalculationStandart = ({
       setOrderPartsId(origKodObjects);
     };
     getOrderPartsInfo();
-    // if(updatePage){
-    //   window.location.reload();
-    // }
   }, [order]);
 
   const countViaPriceList = async (orderPartsId: any,delivering:any) => {
@@ -92,8 +111,8 @@ const CalculationStandart = ({
   };
   
 
-   const calculateStandartOrder=(totalPriceMan:any,orderPartsId:any)=>{
-     const data=calculateStandartOrderPrice(totalPriceMan,orderPartsId);
+   const calculateStandartOrder=(inputValues:InputValues,orderPartsId:any)=>{
+     const data=calculateStandartOrderPrice(inputValues,orderPartsId);
      console.log(data);
    }
 
@@ -240,10 +259,10 @@ const CalculationStandart = ({
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="accessoryCost" onChange={handleChange}/>
             </td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="decleration" onChange={handleChange}/>
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
@@ -274,19 +293,19 @@ const CalculationStandart = ({
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="totalPriceMan" onChange={(e:any)=>setTotalPriceMan(e.target.value)}/>
+              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="totalPriceMan" onChange={handleChange}/>
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"  name="transport" onChange={handleChange} />
             </td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="transportMan" onChange={handleChange}/>
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="tax" onChange={handleChange}/>
               <span className="text-sm">%</span>
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -294,7 +313,7 @@ const CalculationStandart = ({
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" />
+              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="percentage" onChange={handleChange}/>
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -390,7 +409,8 @@ const CalculationStandart = ({
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                       value={orderPart.priceExw}
-                      onChange={(e:any)=>setPriceExwValue(e.target.value)}
+                      onChange={handleChange}
+                      name="priceExw"
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -620,7 +640,7 @@ const CalculationStandart = ({
         >
           Price ExW əldə etmək
         </Button>
-        <Button color={"blue"} size={"xs"} onClick={()=>calculateStandartOrder(totalPriceMan,orderPartsId)}>
+        <Button color={"blue"} size={"xs"} onClick={()=>calculateStandartOrder(inputValues,orderPartsId)}>
           Hesabla
         </Button>
         <Link to={"#"} className="underline text-blue-800">

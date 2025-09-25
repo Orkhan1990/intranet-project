@@ -8,6 +8,8 @@ import errorHandler from "../middleware/errorHandler";
 import { log } from "console";
 import { Rabatgrup } from "../entites/Rabatgrup";
 import { OrderPart } from "../entites/OrderPart";
+import { In } from 'typeorm';
+
 
 const priceListHistRepo = AppDataSource.getRepository(PriceListHist);
 const rabatgrupRepo = AppDataSource.getRepository(Rabatgrup);
@@ -119,8 +121,8 @@ export const checkPriceList = async (
   next: NextFunction
 ) => {
   try {
-    const { orderPartsId,delivering,totalPriceMan } = req.body;
-    console.log({totalPriceMan});
+    const { orderPartsId, delivering, totalPriceMan } = req.body;
+    console.log({ totalPriceMan });
 
     if (
       !orderPartsId ||
@@ -128,38 +130,38 @@ export const checkPriceList = async (
       orderPartsId.length === 0
     ) {
       return res
-      .status(400)
-      .json({ success: false, message: "origKods array is required" });
+        .status(400)
+        .json({ success: false, message: "origKods array is required" });
     }
 
-   const orderParts = await orderPartRepository
-  .createQueryBuilder("orderPart")
-  .where("orderPart.id IN (:...orderPartsId)", { orderPartsId })
-  .getMany();
+    const orderParts = await orderPartRepository
+      .createQueryBuilder("orderPart")
+      .where("orderPart.id IN (:...orderPartsId)", { orderPartsId })
+      .getMany();
 
-  if (orderParts.length === 0) {
-    return res
-      .status(404)
-      .json({ success: false, message: "No order parts found for given IDs" });
-  }
+    if (orderParts.length === 0) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: "No order parts found for given IDs",
+        });
+    }
 
-  const origKods = orderParts.map(part => part.origCode);
+    const origKods = orderParts.map((part) => part.origCode);
 
-      // console.log({ origKods });
-      
-    
+    // console.log({ origKods });
+
     const foundParts = await priceListHistRepo
       .createQueryBuilder("priceListHist")
       .where("priceListHist.origKod IN (:...origKods)", { origKods })
       .getMany();
-
 
     if (foundParts.length === 0) {
       return res
         .status(404)
         .json({ success: false, message: "No matching parts found" });
     }
-
 
     const updatedOrderParts = await Promise.all(
       orderParts.map(async (part) => {
@@ -173,7 +175,7 @@ export const checkPriceList = async (
           part.price = match.price;
           part.priceExwNoDiscount = match.price;
           part.rabatgrupInd = match.rabatgrup;
-          part.delivering=delivering;
+          part.delivering = delivering;
           await orderPartRepository.save(part);
         }
 
@@ -187,40 +189,39 @@ export const checkPriceList = async (
       })
     );
 
-   const calculationOrderParts = await Promise.all(
-  getDiscounts.map(async (discount) => {
-    const matches = updatedOrderParts.filter(
-      (item) => discount?.rabatgrupInd === item?.rabatgrupInd
-    );
-
-    for (const item of matches) {
-      if (item.rabatgrupInd && discount) {
-        const price = Number(item.priceExwNoDiscount); // use base price
-        const discountPercent = parseFloat(discount.discount);
-
-        const priceWithoutPacking = price - (price * discountPercent) / 100;
-        const packing = parseFloat(((price * 1.75) / 100).toFixed(2));
-        const totalWithPacking = parseFloat(
-          (priceWithoutPacking + packing).toFixed(2)
+    const calculationOrderParts = await Promise.all(
+      getDiscounts.map(async (discount) => {
+        const matches = updatedOrderParts.filter(
+          (item) => discount?.rabatgrupInd === item?.rabatgrupInd
         );
 
-        item.priceWithoutPacking = priceWithoutPacking.toFixed(2);
-        item.packing = packing.toFixed(2);
-        item.priceExw = totalWithPacking.toFixed(2);
-        item.totalPrice = totalWithPacking.toFixed(2);
+        for (const item of matches) {
+          if (item.rabatgrupInd && discount) {
+            const price = Number(item.priceExwNoDiscount); // use base price
+            const discountPercent = parseFloat(discount.discount);
 
-        await orderPartRepository.save(item);
-      }
-    }
+            const priceWithoutPacking = price - (price * discountPercent) / 100;
+            const packing = parseFloat(((price * 1.75) / 100).toFixed(2));
+            const totalWithPacking = parseFloat(
+              (priceWithoutPacking + packing).toFixed(2)
+            );
 
-    return matches;
-  })
-);
+            item.priceWithoutPacking = priceWithoutPacking.toFixed(2);
+            item.packing = packing.toFixed(2);
+            item.priceExw = totalWithPacking.toFixed(2);
+            item.totalPrice = totalWithPacking.toFixed(2);
 
-const flatOrderParts = calculationOrderParts.flat();
+            await orderPartRepository.save(item);
+          }
+        }
 
-console.log({ flatOrderParts });
+        return matches;
+      })
+    );
 
+    const flatOrderParts = calculationOrderParts.flat();
+
+    console.log({ flatOrderParts });
 
     return res.status(200).json({ success: true, data: flatOrderParts });
   } catch (error) {
@@ -234,7 +235,31 @@ export const calculateStandartOrderPrice = async (
   next: NextFunction
 ) => {
   try {
-    const {totalPriceMan } = req.body;
-    console.log({totalPriceMan});}catch (error) {
+    const { inputValues, orderPartsId } = req.body;
+    console.log({ inputValues, orderPartsId });
+    if (!orderPartsId) {
+     next(errorHandler(401, "orderPartsId is required"));
+    }
+
+const orderParts = await orderPartRepository.find({
+  where: { id: In(orderPartsId) }
+}); 
+    if (orderParts.length === 0) {
+      next(errorHandler(401, "No order parts found for given IDs"));
+    }
+    console.log({ orderParts });
+
+    const updatedOrderParts = await Promise.all(
+      orderParts.map(async (part) => {
+        const {priceExw,transportMan,totalPriceMan, transport, customs, decleration, percentage } = inputValues;
+        const totalPrice=(priceExw*part.count).toFixed(2)
+        part.priceExw = part.priceExw===null&&priceExw;
+        part.totalPrice=part.totalPrice===null&&totalPrice;
+        part.totalPriceMan=((+totalPrice)*totalPriceMan).toFixed(2);
+
+      }))
+    
+ } catch (error) {
     next(errorHandler(401, error.message));
-  }}
+  }
+};
