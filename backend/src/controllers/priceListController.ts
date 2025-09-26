@@ -251,11 +251,15 @@ const orderParts = await orderPartRepository.find({
 
     const updatedOrderParts = await Promise.all(
       orderParts.map(async (part) => {
-        const {priceExw,transportMan,totalPriceMan, transport, customs, decleration, percentage } = inputValues;
-        const totalPrice=(priceExw*part.count).toFixed(2)
+        const {priceExw,tax,transportMan,totalPriceMan, transport, customs, decleration, percentage } = inputValues;
+        const totalPrice=(priceExw*part.count).toFixed(2);
+        const totalPriceManResult=((+totalPrice)*totalPriceMan).toFixed(2);
         part.priceExw = part.priceExw===null&&priceExw;
         part.totalPrice=part.totalPrice===null&&totalPrice;
-        part.totalPriceMan=((+totalPrice)*totalPriceMan).toFixed(2);
+        part.totalPriceMan=totalPriceManResult;
+        part.cipPrice= totalPriceManResult;
+        part.ddpPrice=totalPriceManResult;
+        part.tax= ((+totalPriceManResult*tax)/100).toFixed(2);
 
       }))
     

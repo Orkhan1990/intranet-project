@@ -19,6 +19,7 @@ import Order from './pages/Order/Order';
 import EditOrder from './pages/Order/EditOrder';
 import Calculation from './pages/Calculation/Calculation';
 import PriceList from './pages/PriceList/PriceList';
+import Statistics from './pages/Statistics/Statistics';
 
 
 
@@ -41,7 +42,9 @@ function App() {
       <Route path="/orders" element={<Layout><Order/></Layout>} />  
       <Route path="/editOrder/:id" element={<Layout><EditOrder/></Layout>} />   
       <Route path="/calculation" element={<Calculation/>}/>   
-      <Route path="/priceList" element={<Layout><PriceList/></Layout>}/>       
+      <Route path="/priceList" element={<Layout><PriceList/></Layout>}/>
+      <Route path="/statistics" element={<Layout><Statistics/></Layout>}/>       
+       
     
     
      
