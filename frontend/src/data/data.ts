@@ -19,7 +19,7 @@ export const navbarList:NavbarListInterface[] = [
           },
           {
               title:"Statistika",
-              url:"/statistic"
+              url:"/statistics"
           },
           {
               title:"Işçilərin faizi",
