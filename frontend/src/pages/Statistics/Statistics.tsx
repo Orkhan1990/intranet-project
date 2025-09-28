@@ -1,8 +1,11 @@
-import { Button, TabItem } from "flowbite-react";
+import { Button} from "flowbite-react";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // required
 import WorkerCard from "../../components/Statistics/WorkerCard";
+import Incoming from "../../components/Statistics/Incoming";
+import Expenses from "../../components/Statistics/Expenses";
+import Briqada from "../../components/Statistics/Briqada";
 
 const Statistics = () => {
   const [startDate, setStartDate] = useState(null);
@@ -68,14 +71,14 @@ const Statistics = () => {
             </div>
             <div>
               {activeTab === "İş kartı" && <WorkerCard />}
-              {activeTab === "Gəlir" && <div>Gəlir məzmunu</div>}
-              {activeTab === "Xərc" && <div>Xərc məzmunu</div>}
-              {activeTab === "Briqada" && <div>Briqada məzmunu</div>}
+              {activeTab === "Gəlir" && <Incoming/>}
+              {activeTab === "Xərc" && <Expenses/>}
+              {activeTab === "Briqada" && <Briqada/>}
             </div>
           </div>
         </div>
 
-        <Button color={"blue"} size={"sm"} className="w-28">Axtar</Button>
+        <Button color={"blue"} size={"sm"} className="w-28">Nəticəyə bax</Button>
       </form>
     </div>
   );

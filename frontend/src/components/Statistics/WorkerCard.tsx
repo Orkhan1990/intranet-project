@@ -1,45 +1,45 @@
-import { Button, Select, TextInput } from "flowbite-react";
+import {Select, TextInput } from "flowbite-react";
 
 const WorkerCard = () => {
   return (
-    <div className=" border border-yellow-300 p-10 rounded-md">
+    <div className="w-[97%] border border-yellow-300 p-4 rounded-md">
       <form action="" className="flex gap-10 items-center">
         <div className="flex flex-col gap-3">
-          <div className="flex gap-3 items-center">
-            <input type="radio" className="h-2 w-2 cursor-pointer" />
-            <label htmlFor="" className="text-sm">
+          <div className="flex  gap-3 items-center">
+            <TextInput type="radio" sizing={"sm"} className="cursor-pointer" />
+            <label htmlFor="" className="text-sm ">
               Bütün kartlar
             </label>
           </div>
           <div className="flex gap-3 items-center">
-            <input type="radio" className="h-2 w-2 cursor-pointer" />
+            <TextInput type="radio" sizing={"sm"} className="cursor-pointer" />
             <label htmlFor="" className="text-sm">
               Açıq kartlar
             </label>
           </div>
           <div className="flex gap-3 items-center">
-            <input type="radio" className="h-2 w-2 cursor-pointer" />
+            <TextInput type="radio" sizing={"sm"} className="cursor-pointer" />
             <label htmlFor="" className="text-sm">
               Bağlı kartlar
             </label>
           </div>
         </div>
         <div className="flex flex-col gap-5">
-          <div className="flex gap-5 items-center">
+          <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
               Kartın nömrəsi
             </label>
             <TextInput type="text" sizing={"sm"} />
           </div>
-          <div className="flex gap-5 items-center">
+          <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
               Ban nömrəsi
             </label>
             <TextInput type="text" sizing={"sm"} />
           </div>
-          <div className="flex gap-5 items-center">
+          <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
-              Kartın nömrəsi
+              Ödəniş növü
             </label>
             <Select className="w-36 cursor-pointer" sizing={"sm"}>
               <option value="">Köçürmə</option>
@@ -51,7 +51,7 @@ const WorkerCard = () => {
         </div>
 
         <div className="flex flex-col gap-5">
-          <div className="flex gap-5 items-center">
+          <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
               Müştərilər
             </label>
@@ -64,7 +64,7 @@ const WorkerCard = () => {
             </Select>
           </div>
 
-          <div className="flex gap-5 items-center">
+          <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
               Brend
             </label>
@@ -77,7 +77,7 @@ const WorkerCard = () => {
             </Select>
           </div>
 
-          <div className="flex gap-5 items-center">
+          <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
               İşçilər
             </label>
@@ -90,7 +90,7 @@ const WorkerCard = () => {
             </Select>
           </div>
 
-          <div className="flex gap-5 items-center">
+          <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
               Maşının nömrəsi
             </label>
@@ -100,29 +100,29 @@ const WorkerCard = () => {
 
         <div className="flex flex-col gap-5">
           <div className="flex gap-20">
-            <div className="flex gap-3 items-center">
+            {/* <div className="flex gap-3 items-center">
               <input type="radio" className="h-2 w-2 cursor-pointer" />
               <label htmlFor="" className="text-sm">
                 Bütün kartlar
               </label>
-            </div>
+            </div> */}
 
             <div className="flex gap-3 items-center">
-              <input type="radio" className="h-2 w-2 cursor-pointer" />
+              <TextInput type="radio" sizing={"sm"}  className="cursor-pointer" />
               <label htmlFor="" className="text-sm">
                 Moyka
               </label>
             </div>
 
             <div className="flex gap-3 items-center">
-              <input type="radio" className="h-2 w-2 cursor-pointer" />
+              <TextInput type="radio" sizing={"sm"}  className="cursor-pointer" />
               <label htmlFor="" className="text-sm">
                 Yağlama
               </label>
             </div>
 
             <div className="flex gap-3 items-center">
-              <input type="radio" className="h-2 w-2 cursor-pointer" />
+              <TextInput type="radio" sizing={"sm"}  className="cursor-pointer" />
               <label htmlFor="" className="text-sm">
                 Rab0
               </label>
@@ -130,7 +130,7 @@ const WorkerCard = () => {
           </div>
 
           <div className="flex gap-5">
-            <div className="flex gap-5 items-center">
+            <div className="flex flex-col gap-1">
               <label htmlFor="" className="text-sm">
                 Qəbulçu
               </label>
@@ -143,14 +143,14 @@ const WorkerCard = () => {
               </Select>
             </div>
 
-            <div className="flex gap-3 items-center">
+            <div className="flex flex-col gap-1">
               <label htmlFor="" className="text-sm">
                 Min
               </label>
               <TextInput type="text" sizing={"sm"} />
             </div>
 
-              <div className="flex gap-3 items-center">
+              <div className="flex flex-col gap-1">
               <label htmlFor="" className="text-sm">
                 Max
               </label>
@@ -159,7 +159,7 @@ const WorkerCard = () => {
           </div>
 
             <div className="flex gap-5">
-            <div className="flex gap-3 items-center">
+            <div className="flex flex-col gap-1">
               <label htmlFor="" className="text-sm">
                 Müştəri növü
               </label>
@@ -172,7 +172,7 @@ const WorkerCard = () => {
             </div>
 
 
-             <div className="flex gap-3 items-center">
+             <div className="flex flex-col gap-1">
               <label htmlFor="" className="text-sm">
                 Hüquqi/Fiziki
               </label>
