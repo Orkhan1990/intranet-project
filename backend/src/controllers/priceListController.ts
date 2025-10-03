@@ -8,8 +8,7 @@ import errorHandler from "../middleware/errorHandler";
 import { log } from "console";
 import { Rabatgrup } from "../entites/Rabatgrup";
 import { OrderPart } from "../entites/OrderPart";
-import { In } from 'typeorm';
-
+import { In } from "typeorm";
 
 const priceListHistRepo = AppDataSource.getRepository(PriceListHist);
 const rabatgrupRepo = AppDataSource.getRepository(Rabatgrup);
@@ -140,12 +139,10 @@ export const checkPriceList = async (
       .getMany();
 
     if (orderParts.length === 0) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "No order parts found for given IDs",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "No order parts found for given IDs",
+      });
     }
 
     const origKods = orderParts.map((part) => part.origCode);
@@ -236,34 +233,115 @@ export const calculateStandartOrderPrice = async (
 ) => {
   try {
     const { inputValues, orderPartsId } = req.body;
-    console.log({ inputValues, orderPartsId });
+
     if (!orderPartsId) {
-     next(errorHandler(401, "orderPartsId is required"));
+      return next(errorHandler(401, "orderPartsId is required"));
     }
 
-const orderParts = await orderPartRepository.find({
-  where: { id: In(orderPartsId) }
-}); 
+    const orderParts = await orderPartRepository.find({
+      where: { id: In(orderPartsId) },
+    });
+
     if (orderParts.length === 0) {
-      next(errorHandler(401, "No order parts found for given IDs"));
+      return next(errorHandler(401, "No order parts found for given IDs"));
     }
-    console.log({ orderParts });
 
-    const updatedOrderParts = await Promise.all(
-      orderParts.map(async (part) => {
-        const {priceExw,tax,transportMan,totalPriceMan, transport, customs, decleration, percentage } = inputValues;
-        const totalPrice=(priceExw*part.count).toFixed(2);
-        const totalPriceManResult=((+totalPrice)*totalPriceMan).toFixed(2);
-        part.priceExw = part.priceExw===null&&priceExw;
-        part.totalPrice=part.totalPrice===null&&totalPrice;
-        part.totalPriceMan=totalPriceManResult;
-        part.cipPrice= totalPriceManResult;
-        part.ddpPrice=totalPriceManResult;
-        part.tax= ((+totalPriceManResult*tax)/100).toFixed(2);
+    const {
+      priceExw,
+      tax,
+      transportMan,
+      totalPriceMan,
+      transport,
+      customs,
+      decleration,
+      percentage,
+    } = inputValues;
 
-      }))
-    
- } catch (error) {
-    next(errorHandler(401, error.message));
+    if (priceExw === null || priceExw === 0 || priceExw === "0") {
+      const updatedOrderParts = await Promise.all(
+        orderParts.map(async (part) => {
+          const totalPrice = (+part.priceExw * part.count).toFixed(2);
+          const totalPriceManResult = (+totalPrice * totalPriceMan).toFixed(2);
+          const taxResult = ((+totalPriceManResult * tax) / 100).toFixed(2);
+          const profit = (
+            ((+totalPriceManResult + +taxResult) * percentage) /
+            100
+          ).toFixed(2);
+          // console.log(totalPrice);
+
+          part.totalPriceManValue = totalPriceMan;
+          part.totalPriceMan = totalPriceManResult;
+          part.cipPrice = totalPriceManResult;
+
+          const ddpPrice = (+totalPriceManResult + (+taxResult)).toFixed(2);
+          part.ddpPrice = ddpPrice;
+          part.unitDdpPrice = ddpPrice;
+
+          part.taxValue = tax;
+          part.tax = taxResult;
+          part.percentage = percentage;
+          part.profit = profit;
+
+          const fullSellPrice = (
+            +profit +
+            +totalPriceManResult +
+            +taxResult
+          ).toFixed(2);
+
+          part.sellPriceClientStock = fullSellPrice;
+          part.unitSellPrice = fullSellPrice;
+
+          return await orderPartRepository.save(part);
+        })
+      );
+
+      res.status(200).json(updatedOrderParts);
+    } else {
+      console.log("bura dusmelidi");
+      
+
+        const updatedOrderParts = await Promise.all(
+        orderParts.map(async (part) => {
+          const totalPrice = (priceExw * part.count).toFixed(2);
+          const totalPriceManResult = (+totalPrice * totalPriceMan).toFixed(2);
+          const taxResult = ((+totalPriceManResult * tax) / 100).toFixed(2);
+          const profit = (
+            ((+totalPriceManResult + (+taxResult)) * percentage) /
+            100
+          ).toFixed(2);
+          console.log(totalPrice);
+          
+
+          part.totalPrice=totalPrice;
+          part.totalPriceManValue = totalPriceMan;
+          part.totalPriceMan = totalPriceManResult;
+          part.cipPrice = totalPriceManResult;
+
+          const ddpPrice = (+totalPriceManResult + +taxResult).toFixed(2);
+          part.ddpPrice = ddpPrice;
+          part.unitDdpPrice = ddpPrice;
+
+          part.taxValue = tax;
+          part.tax = taxResult;
+          part.percentage = percentage;
+          part.profit = profit;
+
+          const fullSellPrice = (
+            +profit +
+            +totalPriceManResult +
+            +taxResult
+          ).toFixed(2);
+
+          part.sellPriceClientStock = fullSellPrice;
+          part.unitSellPrice = fullSellPrice;
+
+          return await orderPartRepository.save(part);
+        })
+      );
+
+      res.status(200).json(updatedOrderParts);
+    }
+  } catch (error) {
+    return next(errorHandler(401, error.message));
   }
 };

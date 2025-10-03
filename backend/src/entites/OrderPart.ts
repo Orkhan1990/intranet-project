@@ -8,7 +8,6 @@ import {
 } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Order } from "./Order";
-import { Supplier } from "./Supplier";
 import { SupplierOrderParts } from "./SupplierOrderParts";
 
 @Entity({ name: "order_parts" })
@@ -28,6 +27,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   price: string;
 
@@ -37,8 +37,19 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   totalPrice: string;
+
+  @Column({
+    name: "transport_value",
+    type: "decimal",
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
+  transportValue: string;
 
   @Column({
     name: "transport",
@@ -46,6 +57,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   transport: string;
 
@@ -55,6 +67,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   sipPrice: string;
 
@@ -64,6 +77,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   unitSipPrice: string;
 
@@ -73,6 +87,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   percent: string;
 
@@ -82,6 +97,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   profit: string;
 
@@ -91,6 +107,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   sellPrice: string;
 
@@ -100,13 +117,14 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   unitSellPrice: string;
 
-  @Column({ name: "stock_quantity", nullable: true })
+  @Column({ name: "stock_quantity", nullable: true, default: 0 })
   stockQuantity: string;
 
-  @Column({ name: "part_name", nullable: true })
+  @Column({ name: "part_name", nullable: true, default: 0 })
   partName: string;
 
   @Column({ nullable: true, default: 0 })
@@ -124,6 +142,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   priceExw: string;
 
@@ -133,6 +152,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   priceExwNoDiscount: string;
 
@@ -142,6 +162,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   priceWithoutPacking: string;
 
@@ -151,6 +172,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   packing: string;
 
@@ -160,8 +182,19 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   totalPriceStandart: string;
+
+  @Column({
+    name: "total_price_man_value",
+    type: "decimal",
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
+  totalPriceManValue: string;
 
   @Column({
     name: "total_price_man",
@@ -169,6 +202,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   totalPriceMan: string;
 
@@ -178,6 +212,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   nettoByUnit: string;
 
@@ -187,8 +222,19 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   totalNetto: string;
+
+  @Column({
+    name: "transport_man_value",
+    type: "decimal",
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
+  transportManValue: string;
 
   @Column({
     name: "transport_man",
@@ -196,6 +242,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   transportMan: string;
 
@@ -205,8 +252,19 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   cipPrice: string;
+
+  @Column({
+    name: "tax_value",
+    type: "decimal",
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
+  taxValue: string;
 
   @Column({
     name: "tax",
@@ -214,6 +272,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   tax: string;
 
@@ -223,8 +282,29 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   accessoryCost: string;
+
+  @Column({
+    name: "accessory_cost_value",
+    type: "decimal",
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
+  accessoryCostValue: string;
+
+  @Column({
+    name: "declaration_value",
+    type: "decimal",
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
+  declarationValue: string;
 
   @Column({
     name: "declaration",
@@ -232,6 +312,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   declaration: string;
 
@@ -241,6 +322,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   ddpPrice: string;
 
@@ -250,8 +332,19 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   unitDdpPrice: string;
+
+  @Column({
+    name: "percentage_value",
+    type: "decimal",
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
+  percentageValue: string;
 
   @Column({
     name: "percentage",
@@ -259,6 +352,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   percentage: string;
 
@@ -268,6 +362,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   sellPriceClientStock: string;
 
@@ -275,6 +370,7 @@ export class OrderPart extends AllEntities {
     name: "rabatgrup_ind",
     type: "int",
     nullable: true,
+    default: 0,
   })
   rabatgrupInd: number;
 
@@ -284,6 +380,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   totalSellPriceClientOrdered: string;
 
@@ -293,6 +390,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   sellPriceUnitWhichInStock: string;
 
@@ -302,6 +400,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   reserved: string;
 
@@ -311,6 +410,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   totalSellPriceWhichInStock: string;
 
@@ -320,6 +420,7 @@ export class OrderPart extends AllEntities {
     precision: 10,
     scale: 2,
     nullable: true,
+    default: 0,
   })
   totalSellPriceOrderedWhichInStock: string;
 

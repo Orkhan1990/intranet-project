@@ -90,7 +90,7 @@ export interface PartsInterface {
   count: number;
   price: number;
   salesPrice: number;
-  barcode:string
+  barcode: string;
 }
 
 export interface WarehouseInterface {
@@ -105,28 +105,51 @@ export interface WarehouseInterface {
 }
 
 export interface OrderPartsInterface {
-  id:number,
+  id: number;
   origCode: string;
   count: number;
   checkOnWarehouse: boolean;
   stockQuantity: number;
   partName: string;
-  price:number,
-  totalPrice:number,
-  transport:number,
-  sipPrice:number,
-  unitSipPrice:number,
-  percent:number,
-  profit:number,
-  sellPrice:number,
-  unitSellPrice:number,
-  delivering:string;
+  price: number;
+  totalPrice: number;
+  transport: number;
+  sipPrice: number;
+  unitSipPrice: number;
+  percent: number;
+  profit: number;
+  sellPrice: number;
+  unitSellPrice: number;
+  delivering: string;
+  totalPriceManValue: string;
+  nettoByUnit: string;
+  totalNetto: string;
+  transportManValue: string;
+  transportMan: string;
+  cipPrice: string;
+  taxValue: string;
+  tax: string;
+  accessoryCost: string;
+  accessoryCostValue: string;
+  declarationValue: string;
+  declaration: string;
+  ddpPrice: string;
+  unitDdpPrice: string;
+  percentageValue: string;
+  percentage: string;
+  sellPriceClientStock: string;
+  rabatgrupInd: number;
+  totalSellPriceClientOrdered: string;
+  sellPriceUnitWhichInStock: string;
+  reserved: string;
+  totalSellPriceWhichInStock: string;
+  totalSellPriceOrderedWhichInStock: string;
 }
 
 export interface OrderInterface {
-  id:number,
+  id: number;
   project: string;
-  cardNumber:string;
+  cardNumber: string;
   orderType: OrderType;
   clientId: number;
   manufacturer: string;
@@ -142,156 +165,145 @@ export interface OrderInterface {
   initialPayment: number;
   comment: string;
   oil: boolean;
-  orderParts:OrderPartsInterface[]
+  orderParts: OrderPartsInterface[];
 }
 
 export interface ResponsibleUserInterface {
-  id:number;
-  userName:string;
-  email:string;
-  lastName:string;
-  firstName:string;
+  id: number;
+  userName: string;
+  email: string;
+  lastName: string;
+  firstName: string;
 }
 
-export interface OrderHistoryInterface{
-  id:number,
-  step:string,
-  confirm:boolean,
-  showHide:boolean,
-  showResult:boolean,
-  message:string,
-  reject:string,
-  file:string,
-  date:Date
-  user:ResponsibleUserInterface,
-  supplierOrderHistories:SupplierOrderHistoriesInterface[]
-
+export interface OrderHistoryInterface {
+  id: number;
+  step: string;
+  confirm: boolean;
+  showHide: boolean;
+  showResult: boolean;
+  message: string;
+  reject: string;
+  file: string;
+  date: Date;
+  user: ResponsibleUserInterface;
+  supplierOrderHistories: SupplierOrderHistoriesInterface[];
 }
 
-export interface SupplierOrderHistoriesInterface
-  {
-    id:number,
-    date:Date,
-    file:string,
-    supplier:{
-      id:number,
-      contactPerson:string,
-      country:string,
-      supplier:string,
-      email:string
-    }
-  }
+export interface SupplierOrderHistoriesInterface {
+  id: number;
+  date: Date;
+  file: string;
+  supplier: {
+    id: number;
+    contactPerson: string;
+    country: string;
+    supplier: string;
+    email: string;
+  };
+}
 
-
-export interface EditOrderInterface{
-  id:number,
-  project:string,
-  cardNumber:string,
-  orderType: string,
-  client:ClientInterface,
-  manufacturer:string,
-  model:string,
-  chassisNumber:string,
-  engineNumber:string,
-  produceYear:string,
-  km:string,
-  vehicleNumber:string,
-  confirm:boolean,
-  accept:boolean,
-  acceptMessage:string,
-  rejectMessage:string,
-  confirmDate:Date,
-  paymentType: PayType,
-  isExcellFile:boolean,
-  isResponsible:boolean,
-  isFinishCalculation:boolean,
-  responsibleDate:Date,
-  delivering: DeliverType,
-  deliveringType:string,
-  initialPayment:number,
-  responsibleUser:UserInterface,
-  comment:string,
-  oil:boolean,
+export interface EditOrderInterface {
+  id: number;
+  project: string;
+  cardNumber: string;
+  orderType: string;
+  client: ClientInterface;
+  manufacturer: string;
+  model: string;
+  chassisNumber: string;
+  engineNumber: string;
+  produceYear: string;
+  km: string;
+  vehicleNumber: string;
+  confirm: boolean;
+  accept: boolean;
+  acceptMessage: string;
+  rejectMessage: string;
+  confirmDate: Date;
+  paymentType: PayType;
+  isExcellFile: boolean;
+  isResponsible: boolean;
+  isFinishCalculation: boolean;
+  responsibleDate: Date;
+  delivering: DeliverType;
+  deliveringType: string;
+  initialPayment: number;
+  responsibleUser: UserInterface;
+  comment: string;
+  oil: boolean;
   orderParts: OrderPartsInterface[];
-  orderHistory:OrderHistoryInterface[]
+  orderHistory: OrderHistoryInterface[];
 }
 
-
-export interface SupplierInterface{
-  id:number,
-  supplier:string,
-  country:string,
-  contactPerson:string,
-  phone:string,
-  email:string,
-  paymentType:string,
-  deliverType:string,
-  deliverPeriod:string,
-  creditLine:string,
-  creditNote:string,
-  creditDuration:string;
+export interface SupplierInterface {
+  id: number;
+  supplier: string;
+  country: string;
+  contactPerson: string;
+  phone: string;
+  email: string;
+  paymentType: string;
+  deliverType: string;
+  deliverPeriod: string;
+  creditLine: string;
+  creditNote: string;
+  creditDuration: string;
 }
 
-
-
-export interface BrandInterface{
-  id:number,
-  name:string
+export interface BrandInterface {
+  id: number;
+  name: string;
 }
 
-
-export interface StockInfoInterface{
+export interface StockInfoInterface {
   origCode: string;
   inStock: boolean;
   inStockQuantity: number;
   requiredQuantity: number;
 }
 
-export interface MergDataInterface{
-  origCode:string,
-  requiredQuantity:number,
-  inStockQuantity:number,
-  inStock:boolean,
-  partName:string,
-  count:number,
-  isStockAvailable:boolean
+export interface MergDataInterface {
+  origCode: string;
+  requiredQuantity: number;
+  inStockQuantity: number;
+  inStock: boolean;
+  partName: string;
+  count: number;
+  isStockAvailable: boolean;
 }
-
 
 export interface SupplierOrderPartsInterface {
-
-    supplier:{
-      id:number;
-      supplier:string;
-      country:string;
-    };
-    orderPart:OrderPartsInterface;
-    date:Date;
-    origCode:string;
-    count:number;
-    isTheBestSupplier:boolean;
-    delivering: string;
-    price:string;
-    totalPrice:string;
-    transport:string;
-    sipPrice:string;
-    unitSipPrice:string;
-    percent:string;
-    profit:string;
-    sellPrice:string;
-    unitSellPrice:string;
-    stockQuantity:string;
-    partName:string;
+  supplier: {
+    id: number;
+    supplier: string;
+    country: string;
+  };
+  orderPart: OrderPartsInterface;
+  date: Date;
+  origCode: string;
+  count: number;
+  isTheBestSupplier: boolean;
+  delivering: string;
+  price: string;
+  totalPrice: string;
+  transport: string;
+  sipPrice: string;
+  unitSipPrice: string;
+  percent: string;
+  profit: string;
+  sellPrice: string;
+  unitSellPrice: string;
+  stockQuantity: string;
+  partName: string;
 }
 
-
-
-export interface PriceListHistInterface{
+export interface PriceListHistInterface {
   name: string;
   nameDe: string;
   price: number;
   quantity: number;
-  year:string;
+  year: string;
   month: string;
   kod: string;
   origKod: string;
