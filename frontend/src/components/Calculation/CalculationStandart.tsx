@@ -3,7 +3,10 @@ import { OrderInterface } from "../../types";
 import { LuEuro } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { calculateStandartOrderPrice, findOrigKodFromPriceList } from "../../api/uploadExcel";
+import {
+  calculateStandartOrderPrice,
+  findOrigKodFromPriceList,
+} from "../../api/uploadExcel";
 
 interface CalculationStandartInterface {
   order: OrderInterface;
@@ -12,72 +15,103 @@ interface CalculationStandartInterface {
   setRefreshPage: (value: boolean) => void;
 }
 
-
-interface InputValues{
-  totalPriceMan:number;
-  priceExw:number;
-  transport:number;
-  transportMan:number;
-  tax:number;
-  accessoryCost:number;
-  decleration:number;
-  percentage:number;
-}
+// interface InputValues {
+//   totalPriceMan: number;
+//   priceExw: number;
+//   transport: number;
+//   transportMan: number;
+//   tax: number;
+//   accessoryCost: number;
+//   decleration: number;
+//   percentage: number;
+// }
 
 const CalculationStandart = ({
   order,
   supplierId,
   delivering,
-  setRefreshPage
+  setRefreshPage,
 }: CalculationStandartInterface) => {
   const [orderPartsId, setOrderPartsId] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const[inputValues,setInputValues]=useState<InputValues>({
-    totalPriceMan:0,
-    priceExw:0,
-    transport:0,
-    transportMan:0,
-    tax:0,
-    accessoryCost:0,
-    decleration:0,
-    percentage:0
-  })
+  const [editableOrderParts, setEditableOrderParts] = useState(
+  order.orderParts.map((part) => ({
+    id: part.id,
+    priceExw: part.priceExw ?? 0,
+    taxValue: part.taxValue ?? 0,
+    percentageValue: part.percentageValue ?? 0,
+    accessoryCostValue:part.accessoryCostValue ?? 0,
+    declarationValue:part.declarationValue ?? 0,
+    transport:part.transport ?? 0,
+    transportManValue:part.transportManValue ?? 0,
+    totalPriceManValue:part.totalPriceManValue ??0
+  }))
+);
 
-  console.log({inputValues});
-  
- 
-  const handleChange=(e:any)=>{
-      setInputValues({...inputValues,[e.target.name]:e.target.value})
-  }
+  // const [inputValues, setInputValues] = useState<InputValues>({
+  //   totalPriceMan: 0,
+  //   priceExw: 0,
+  //   transport: 0,
+  //   transportMan: 0,
+  //   tax: 0,
+  //   accessoryCost: 0,
+  //   decleration: 0,
+  //   percentage: 0,
+  // });
+
+  // console.log({ inputValues });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const { name, value } = e.target;
+    const updated = [...editableOrderParts];
+    updated[index] = {
+      ...updated[index],
+      [name]: parseFloat(value),
+    };
+    setEditableOrderParts(updated);
+  };
+  //  const handleChange = (e: any) => {
+  //     setInputValues({ ...inputValues, [e.target.name]: e.target.value });
+  //   };
 
   useEffect(() => {
+    if (order?.orderParts) {
+      setEditableOrderParts(order.orderParts);
+    }
     const getOrderPartsInfo = () => {
       if (!order?.orderParts?.length) return;
 
-      const origKodObjects = order.orderParts.map((part: any) =>part.id);
+      const origKodObjects = order.orderParts.map((part: any) => part.id);
       setOrderPartsId(origKodObjects);
     };
     getOrderPartsInfo();
   }, [order]);
 
-  const countViaPriceList = async (orderPartsId: any,delivering:any) => {
+  const countViaPriceList = async (orderPartsId: any, delivering: any) => {
     try {
-      const data = await findOrigKodFromPriceList(orderPartsId, setError,delivering);
+      const data = await findOrigKodFromPriceList(
+        orderPartsId,
+        setError,
+        delivering
+      );
       console.log(data);
       setRefreshPage(true);
     } catch (error: any) {
       setError(error);
     }
   };
-  
 
-   const calculateStandartOrder=async(inputValues:InputValues,orderPartsId:any)=>{
-     const data=await calculateStandartOrderPrice(inputValues,orderPartsId);
+  const calculateStandartOrder = async (
+    // inputValues: InputValues,
+    orderPartsId: any
+  ) => {
+    const data = await calculateStandartOrderPrice(inputValues, orderPartsId);
     setRefreshPage(true);
-     console.log(data);
-   }
-
-
+    console.log(data);
+  };
 
   return (
     <div>
@@ -220,10 +254,20 @@ const CalculationStandart = ({
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="accessoryCost" onChange={handleChange} value={order.orderParts[0].accessoryCostValue}/>
+              <input
+                className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                name="accessoryCostValue"
+                onChange={(e) => handleChange(e, 0)}
+                value={editableOrderParts[0]?.accessoryCostValue || ""}
+              />
             </td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="decleration" onChange={handleChange} value={order.orderParts[0].declarationValue}/>
+              <input
+                className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                name="declarationValue"
+                onChange={(e) => handleChange(e, 0)}
+                value={editableOrderParts[0]?.declarationValue || ""}
+              />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
@@ -254,19 +298,39 @@ const CalculationStandart = ({
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="totalPriceMan" onChange={handleChange} value={order.orderParts[0].totalPriceManValue}/>
+              <input
+                className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                name="totalPriceManValue"
+                onChange={(e) => handleChange(e, 0)}
+                value={editableOrderParts[0]?.totalPriceManValue || ""}
+              />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"  name="transport" onChange={handleChange} value={order.orderParts[0].transportMan}/>
+              <input
+                className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                name="transport"
+                onChange={(e) => handleChange(e, 0)}
+                value={editableOrderParts[0]?.transport || ""}
+              />
             </td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="transportMan" onChange={handleChange} value={order.orderParts[0].transportManValue}/>
+              <input
+                className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                name="transportManValue"
+                onChange={(e) => handleChange(e, 0)}
+                value={editableOrderParts[0]?.transportManValue || ""}
+              />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="tax" onChange={handleChange} value={+Number(order.orderParts[0].taxValue)}/>
+              <input
+                className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                name="taxValue"
+                onChange={(e) => handleChange(e, 0)}
+                value={editableOrderParts[0]?.taxValue || ""}
+              />
               <span className="text-sm">%</span>
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -274,7 +338,12 @@ const CalculationStandart = ({
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
-              <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" name="percentage" onChange={handleChange}/>
+              <input
+                className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                name="percentageValue"
+                onChange={(e) => handleChange(e, 0)}
+                value={editableOrderParts[0]?.percentageValue || ""}
+              />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -323,8 +392,8 @@ const CalculationStandart = ({
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
           </tr>
 
-          {order &&
-            order.orderParts.map((orderPart: any, index: number) => (
+          {editableOrderParts &&
+          editableOrderParts.map((orderPart: any, index: number) => (
               <tr className="h-7" key={index}>
                 <td className="px-1  text-xs w-[15px] font-[400] border border-dashed border-black p-2 ">
                   {index + 1}
@@ -369,8 +438,8 @@ const CalculationStandart = ({
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={orderPart.priceExw}
-                      onChange={handleChange}
+                      value={editableOrderParts[index]?.priceExw || ""}
+                      onChange={(e) => handleChange(e, index)}
                       name="priceExw"
                     />
                     <span className="text-black font-[400]">
@@ -382,7 +451,10 @@ const CalculationStandart = ({
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={orderPart.priceExwNoDiscount}
+                      value={
+                        editableOrderParts[index]?.priceExwNoDiscount || ""
+                      }
+                      onChange={(e) => handleChange(e, index)}
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -393,7 +465,9 @@ const CalculationStandart = ({
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={orderPart.priceWithoutPacking}
+                      value={parseFloat(
+                        orderPart.priceWithoutPacking
+                      ).toString()}
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -404,7 +478,7 @@ const CalculationStandart = ({
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={orderPart.packing}
+                      value={parseFloat(orderPart.packing).toString()}
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -424,23 +498,35 @@ const CalculationStandart = ({
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.totalPriceMan).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.totalPriceMan).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.nettoByUnit).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.nettoByUnit).toString()}
+                    />
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.totalNetto).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.totalNetto).toString()}
+                    />
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-center">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.transport).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.transport).toString()}
+                    />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
                     </span>
@@ -448,96 +534,156 @@ const CalculationStandart = ({
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.transportMan).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.transportMan).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.sipPrice).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.sipPrice).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.tax).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.tax).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.accessoryCost).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.accessoryCost).toString()}
+                    />
                     <span className="text-black font-[400] text-sm">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.decleration).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.declaration).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.ddpPrice).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.ddpPrice).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.unitDdpPrice).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.unitDdpPrice).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"  name="percentage" onChange={handleChange} value={parseFloat(orderPart.percentage).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      name="percentage"
+                      value={editableOrderParts[index]?.percentage || ""}
+                      onChange={(e) => handleChange(e, index)}
+                    />
                     <span className="text-black font-[400]">%</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.profit).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.profit).toString()}
+                    />
                     <span className="text-black font-[400] text-sm">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.sellPriceClientStock).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(
+                        orderPart.sellPriceClientStock
+                      ).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.unitSellPrice).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.unitSellPrice).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.totalSellPriceClientOrdered).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(
+                        orderPart.totalSellPriceClientOrdered
+                      ).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"  value={parseFloat(orderPart.sellPriceUnitWhichInStock).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(
+                        orderPart.sellPriceUnitWhichInStock
+                      ).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-1 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.reserved).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(orderPart.reserved).toString()}
+                    />
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"  value={parseFloat(orderPart.totalSellPriceWhichInStock).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(
+                        orderPart.totalSellPriceWhichInStock
+                      ).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
                 <td className="px-1  font-[300] text-xs border border-dashed border-black p-2">
                   <div className="flex gap-2 items-end">
-                    <input className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]" value={parseFloat(orderPart.totalSellPriceOrderedWhichInStock).toString()}/>
+                    <input
+                      className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
+                      value={parseFloat(
+                        orderPart.totalSellPriceOrderedWhichInStock
+                      ).toString()}
+                    />
                     <span className="text-black font-[400]">man</span>
                   </div>
                 </td>
@@ -597,11 +743,15 @@ const CalculationStandart = ({
         <Button
           color={"blue"}
           size={"xs"}
-          onClick={() => countViaPriceList(orderPartsId,delivering)}
+          onClick={() => countViaPriceList(orderPartsId, delivering)}
         >
           Price ExW əldə etmək
         </Button>
-        <Button color={"blue"} size={"xs"} onClick={()=>calculateStandartOrder(inputValues,orderPartsId)}>
+        <Button
+          color={"blue"}
+          size={"xs"}
+          onClick={() => calculateStandartOrder(orderPartsId)}
+        >
           Hesabla
         </Button>
         <Link to={"#"} className="underline text-blue-800">

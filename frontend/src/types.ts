@@ -144,6 +144,8 @@ export interface OrderPartsInterface {
   reserved: string;
   totalSellPriceWhichInStock: string;
   totalSellPriceOrderedWhichInStock: string;
+  priceExw:string;
+  priceExwNoDiscount: string;
 }
 
 export interface OrderInterface {

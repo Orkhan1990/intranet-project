@@ -67,6 +67,8 @@ const Calculation = () => {
         reserved: "0",
         totalSellPriceWhichInStock: "0",
         totalSellPriceOrderedWhichInStock: "0",
+        priceExw:"0",
+          priceExwNoDiscount:"0"
       },
     ],
   });
