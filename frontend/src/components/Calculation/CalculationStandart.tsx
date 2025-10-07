@@ -15,16 +15,51 @@ interface CalculationStandartInterface {
   setRefreshPage: (value: boolean) => void;
 }
 
-// interface InputValues {
-//   totalPriceMan: number;
-//   priceExw: number;
-//   transport: number;
-//   transportMan: number;
-//   tax: number;
-//   accessoryCost: number;
-//   decleration: number;
-//   percentage: number;
-// }
+interface EditableOrderPart {
+   id: number;
+  // origCode: string;
+  // count: number;
+  // checkOnWarehouse: boolean;
+  // stockQuantity: number;
+  // partName: string;
+  // price: number;
+  // totalPrice: number;
+  // sipPrice: number;
+  // unitSipPrice: number;
+  // percent: number;
+  // profit: number;
+  // sellPrice: number;
+  // unitSellPrice: number;
+  // delivering: string;
+  // nettoByUnit: string;
+  // totalNetto: string;
+  // transportMan: string;
+  // cipPrice: string;
+  // tax: string;
+  // accessoryCost: string;
+  // declaration: string;
+  // ddpPrice: string;
+  // unitDdpPrice: string;
+  // sellPriceClientStock: string;
+  // rabatgrupInd: number;
+  // totalSellPriceClientOrdered: string;
+  // sellPriceUnitWhichInStock: string;
+  // reserved: string;
+  // totalSellPriceWhichInStock: string;
+  // totalSellPriceOrderedWhichInStock: string;
+  priceExw:string;
+  taxValue: string;
+  percentageValue: string;
+  accessoryCostValue: string;
+  declarationValue: string;
+  transport: number;
+  transportManValue: string;
+  totalPriceManValue: string;
+  percentage: string;
+  priceExwNoDiscount: string;
+}
+
+
 
 const CalculationStandart = ({
   order,
@@ -34,53 +69,47 @@ const CalculationStandart = ({
 }: CalculationStandartInterface) => {
   const [orderPartsId, setOrderPartsId] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [editableOrderParts, setEditableOrderParts] = useState(
-  order.orderParts.map((part) => ({
-    id: part.id,
-    priceExw: part.priceExw ?? 0,
-    taxValue: part.taxValue ?? 0,
-    percentageValue: part.percentageValue ?? 0,
-    accessoryCostValue:part.accessoryCostValue ?? 0,
-    declarationValue:part.declarationValue ?? 0,
-    transport:part.transport ?? 0,
-    transportManValue:part.transportManValue ?? 0,
-    totalPriceManValue:part.totalPriceManValue ??0
-  }))
-);
+const [editableOrderParts, setEditableOrderParts] = useState<EditableOrderPart[]>([]);
 
-  // const [inputValues, setInputValues] = useState<InputValues>({
-  //   totalPriceMan: 0,
-  //   priceExw: 0,
-  //   transport: 0,
-  //   transportMan: 0,
-  //   tax: 0,
-  //   accessoryCost: 0,
-  //   decleration: 0,
-  //   percentage: 0,
-  // });
+console.log(editableOrderParts);
 
-  // console.log({ inputValues });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
-    const { name, value } = e.target;
-    const updated = [...editableOrderParts];
-    updated[index] = {
-      ...updated[index],
-      [name]: parseFloat(value),
-    };
-    setEditableOrderParts(updated);
+ 
+const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement>,
+  index: number
+) => {
+  const { name, value } = e.target;
+  const updated = [...editableOrderParts];
+  updated[index] = {
+    ...updated[index],
+    [name]: parseFloat(value) || 0,
   };
-  //  const handleChange = (e: any) => {
-  //     setInputValues({ ...inputValues, [e.target.name]: e.target.value });
-  //   };
+  setEditableOrderParts(updated);
+};
+
 
   useEffect(() => {
-    if (order?.orderParts) {
-      setEditableOrderParts(order.orderParts);
-    }
+
+      if (order?.orderParts) {
+    const initialized = order.orderParts.map((part) => ({
+      id: part.id,
+      priceExw: part.priceExw ?? 0,
+      taxValue: part.taxValue ?? 0,
+      percentageValue: part.percentageValue ?? 0,
+      accessoryCostValue: part.accessoryCostValue ?? 0,
+      declarationValue: part.declarationValue ?? 0,
+      transport: part.transport ?? 0,
+      transportManValue: part.transportManValue ?? 0,
+      totalPriceManValue: part.totalPriceManValue ?? 0,
+      percentage: part.percentage ?? 0,
+      priceExwNoDiscount: part.priceExwNoDiscount ?? 0,
+    }));
+    setEditableOrderParts(initialized);
+  }
+
+    // if (order?.orderParts) {
+    //   setEditableOrderParts(order.orderParts);
+    // }
     const getOrderPartsInfo = () => {
       if (!order?.orderParts?.length) return;
 
@@ -104,14 +133,25 @@ const CalculationStandart = ({
     }
   };
 
-  const calculateStandartOrder = async (
-    // inputValues: InputValues,
-    orderPartsId: any
-  ) => {
-    const data = await calculateStandartOrderPrice(inputValues, orderPartsId);
-    setRefreshPage(true);
+  const calculateStandartOrder = async () => {
+  try {
+    const data = await calculateStandartOrderPrice(editableOrderParts, orderPartsId);
+
+    // Optional: if backend returns updated order
+    // update local state (or re-fetch full order)
+    // if (data?.updatedOrderParts) {
+    //   setEditableOrderParts(data.updatedOrderParts);
+    // }
+
     console.log(data);
-  };
+    
+
+    setRefreshPage(true); // trigger parent refresh if needed
+  } catch (err: any) {
+    console.error(err);
+    setError(err.message || "An error occurred during calculation.");
+  }
+};
 
   return (
     <div>
@@ -438,7 +478,7 @@ const CalculationStandart = ({
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={editableOrderParts[index]?.priceExw || ""}
+                    value={Number(orderPart.priceExw || 0)}
                       onChange={(e) => handleChange(e, index)}
                       name="priceExw"
                     />
@@ -451,9 +491,7 @@ const CalculationStandart = ({
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={
-                        editableOrderParts[index]?.priceExwNoDiscount || ""
-                      }
+                      value={Number(orderPart.priceExwNoDiscount || 0)}
                       onChange={(e) => handleChange(e, index)}
                     />
                     <span className="text-black font-[400]">
@@ -465,9 +503,9 @@ const CalculationStandart = ({
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(
-                        orderPart.priceWithoutPacking
-                      ).toString()}
+                    value={Number(orderPart.priceWithoutPacking || 0)}
+
+
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -478,7 +516,7 @@ const CalculationStandart = ({
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.packing).toString()}
+                    value={Number(orderPart.tax || 0)}
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -750,7 +788,7 @@ const CalculationStandart = ({
         <Button
           color={"blue"}
           size={"xs"}
-          onClick={() => calculateStandartOrder(orderPartsId)}
+          onClick={() => calculateStandartOrder()}
         >
           Hesabla
         </Button>
