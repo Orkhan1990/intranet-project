@@ -356,16 +356,25 @@ export const calculateStandartOrderPrice = async (
   try {
     const { editableOrderParts } = req.body;
 
+    // console.log(editableOrderParts);
+    
+
     if (!editableOrderParts || !Array.isArray(editableOrderParts)) {
       return next(errorHandler(400, "editableOrderParts is required and must be an array."));
     }
 
     const orderPartsId = editableOrderParts.map((p: any) => p.id);
 
+    // console.log(orderPartsId);
+    
+
     const existingParts = await orderPartRepository.find({
       where: { id: In(orderPartsId) },
     });
 
+
+    console.log(existingParts);
+    
     if (existingParts.length === 0) {
       return next(errorHandler(404, "No order parts found for the provided IDs."));
     }

@@ -113,7 +113,7 @@ export interface OrderPartsInterface {
   partName: string;
   price: number;
   totalPrice: number;
-  transport: number;
+  transport: string;
   sipPrice: number;
   unitSipPrice: number;
   percent: number;
@@ -146,6 +146,7 @@ export interface OrderPartsInterface {
   totalSellPriceOrderedWhichInStock: string;
   priceExw:string;
   priceExwNoDiscount: string;
+  transportValue:string
 }
 
 export interface OrderInterface {

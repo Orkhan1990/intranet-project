@@ -16,7 +16,18 @@ interface CalculationStandartInterface {
 }
 
 interface EditableOrderPart {
-   id: number;
+  id: number;
+  priceExw: string;
+  taxValue: string;
+  percentageValue: string;
+  accessoryCostValue: string;
+  declarationValue: string;
+  transport: string;
+  transportManValue: string;
+  totalPriceManValue: string;
+  percentage: string;
+  priceExwNoDiscount: string;
+  transportValue: string;
   // origCode: string;
   // count: number;
   // checkOnWarehouse: boolean;
@@ -47,19 +58,7 @@ interface EditableOrderPart {
   // reserved: string;
   // totalSellPriceWhichInStock: string;
   // totalSellPriceOrderedWhichInStock: string;
-  priceExw:string;
-  taxValue: string;
-  percentageValue: string;
-  accessoryCostValue: string;
-  declarationValue: string;
-  transport: number;
-  transportManValue: string;
-  totalPriceManValue: string;
-  percentage: string;
-  priceExwNoDiscount: string;
 }
-
-
 
 const CalculationStandart = ({
   order,
@@ -69,43 +68,43 @@ const CalculationStandart = ({
 }: CalculationStandartInterface) => {
   const [orderPartsId, setOrderPartsId] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
-const [editableOrderParts, setEditableOrderParts] = useState<EditableOrderPart[]>([]);
+  const [editableOrderParts, setEditableOrderParts] = useState<
+    EditableOrderPart[]
+  >([]);
 
-console.log(editableOrderParts);
+  console.log(editableOrderParts);
 
- 
-const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement>,
-  index: number
-) => {
-  const { name, value } = e.target;
-  const updated = [...editableOrderParts];
-  updated[index] = {
-    ...updated[index],
-    [name]: parseFloat(value) || 0,
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const { name, value } = e.target;
+    const updated = [...editableOrderParts];
+    updated[index] = {
+      ...updated[index],
+      [name]: parseFloat(value) || 0,
+    };
+    setEditableOrderParts(updated);
   };
-  setEditableOrderParts(updated);
-};
-
 
   useEffect(() => {
-
-      if (order?.orderParts) {
-    const initialized = order.orderParts.map((part) => ({
-      id: part.id,
-      priceExw: part.priceExw ?? 0,
-      taxValue: part.taxValue ?? 0,
-      percentageValue: part.percentageValue ?? 0,
-      accessoryCostValue: part.accessoryCostValue ?? 0,
-      declarationValue: part.declarationValue ?? 0,
-      transport: part.transport ?? 0,
-      transportManValue: part.transportManValue ?? 0,
-      totalPriceManValue: part.totalPriceManValue ?? 0,
-      percentage: part.percentage ?? 0,
-      priceExwNoDiscount: part.priceExwNoDiscount ?? 0,
-    }));
-    setEditableOrderParts(initialized);
-  }
+    if (order?.orderParts) {
+      const initialized = order.orderParts.map((part) => ({
+        id: part.id,
+        priceExw: part.priceExw ?? 0,
+        taxValue: part.taxValue ?? 0,
+        percentageValue: part.percentageValue ?? 0,
+        accessoryCostValue: part.accessoryCostValue ?? 0,
+        declarationValue: part.declarationValue ?? 0,
+        transport: part.transport ?? 0,
+        transportManValue: part.transportManValue ?? 0,
+        totalPriceManValue: part.totalPriceManValue ?? 0,
+        percentage: part.percentage ?? 0,
+        priceExwNoDiscount: part.priceExwNoDiscount ?? 0,
+        transportValue: part.transportValue ?? 0,
+      }));
+      setEditableOrderParts(initialized);
+    }
 
     // if (order?.orderParts) {
     //   setEditableOrderParts(order.orderParts);
@@ -134,24 +133,26 @@ const handleChange = (
   };
 
   const calculateStandartOrder = async () => {
-  try {
-    const data = await calculateStandartOrderPrice(editableOrderParts, orderPartsId);
+    try {
+      const data = await calculateStandartOrderPrice(
+        editableOrderParts,
+        orderPartsId
+      );
 
-    // Optional: if backend returns updated order
-    // update local state (or re-fetch full order)
-    // if (data?.updatedOrderParts) {
-    //   setEditableOrderParts(data.updatedOrderParts);
-    // }
+      // Optional: if backend returns updated order
+      // update local state (or re-fetch full order)
+      // if (data?.updatedOrderParts) {
+      //   setEditableOrderParts(data.updatedOrderParts);
+      // }
 
-    console.log(data);
-    
+      console.log(data);
 
-    setRefreshPage(true); // trigger parent refresh if needed
-  } catch (err: any) {
-    console.error(err);
-    setError(err.message || "An error occurred during calculation.");
-  }
-};
+      setRefreshPage(true); // trigger parent refresh if needed
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "An error occurred during calculation.");
+    }
+  };
 
   return (
     <div>
@@ -298,7 +299,7 @@ const handleChange = (
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="accessoryCostValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={editableOrderParts[0]?.accessoryCostValue || ""}
+                value={Number(editableOrderParts[0]?.accessoryCostValue) || 0}
               />
             </td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">
@@ -306,7 +307,7 @@ const handleChange = (
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="declarationValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={editableOrderParts[0]?.declarationValue || ""}
+                value={Number(editableOrderParts[0]?.declarationValue) || 0}
               />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
@@ -342,7 +343,7 @@ const handleChange = (
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="totalPriceManValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={editableOrderParts[0]?.totalPriceManValue || ""}
+                value={Number(editableOrderParts[0]?.totalPriceManValue) || 0}
               />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -350,9 +351,9 @@ const handleChange = (
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
               <input
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                name="transport"
+                name="transportValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={editableOrderParts[0]?.transport || ""}
+                value={Number(editableOrderParts[0]?.transportValue) || 0}
               />
             </td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
@@ -360,7 +361,7 @@ const handleChange = (
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="transportManValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={editableOrderParts[0]?.transportManValue || ""}
+                value={Number(editableOrderParts[0]?.transportManValue) || 0}
               />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -369,7 +370,7 @@ const handleChange = (
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="taxValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={editableOrderParts[0]?.taxValue || ""}
+                value={Number(editableOrderParts[0]?.taxValue) || 0}
               />
               <span className="text-sm">%</span>
             </td>
@@ -382,7 +383,7 @@ const handleChange = (
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="percentageValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={editableOrderParts[0]?.percentageValue || ""}
+                value={Number(editableOrderParts[0]?.percentageValue) || 0}
               />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -433,7 +434,7 @@ const handleChange = (
           </tr>
 
           {editableOrderParts &&
-          editableOrderParts.map((orderPart: any, index: number) => (
+            editableOrderParts.map((orderPart: any, index: number) => (
               <tr className="h-7" key={index}>
                 <td className="px-1  text-xs w-[15px] font-[400] border border-dashed border-black p-2 ">
                   {index + 1}
@@ -478,7 +479,7 @@ const handleChange = (
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                    value={Number(orderPart.priceExw || 0)}
+                      value={Number(orderPart.priceExw || 0)}
                       onChange={(e) => handleChange(e, index)}
                       name="priceExw"
                     />
@@ -503,9 +504,7 @@ const handleChange = (
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                    value={Number(orderPart.priceWithoutPacking || 0)}
-
-
+                      value={Number(orderPart.priceWithoutPacking || 0)}
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -516,7 +515,7 @@ const handleChange = (
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                    value={Number(orderPart.tax || 0)}
+                      value={Number(orderPart.packing || 0)}
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -527,7 +526,7 @@ const handleChange = (
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.totalPrice).toString()}
+                      value={Number(orderPart.totalPrice || 0)}
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -538,7 +537,7 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.totalPriceMan).toString()}
+                      value={Number(orderPart.totalPriceMan || 0)}
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -547,7 +546,7 @@ const handleChange = (
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.nettoByUnit).toString()}
+                      value={Number(orderPart.nettoByUnit || 0)}
                     />
                   </div>
                 </td>
@@ -555,7 +554,7 @@ const handleChange = (
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.totalNetto).toString()}
+                      value={Number(orderPart.totalNetto || 0)}
                     />
                   </div>
                 </td>
@@ -563,7 +562,9 @@ const handleChange = (
                   <div className="flex gap-1 items-center">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.transport).toString()}
+                      value={Number(orderPart.transport || 0)}
+                      name="transport"
+                      readOnly
                     />
                     <span className="text-black font-[400]">
                       <LuEuro className="text-sm" />
@@ -574,7 +575,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.transportMan).toString()}
+                      value={Number(orderPart.transportMan || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -583,7 +585,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.sipPrice).toString()}
+                      value={Number(orderPart.sipPrice || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -592,7 +595,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.tax).toString()}
+                      value={Number(orderPart.tax || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -601,7 +605,8 @@ const handleChange = (
                   <div className="flex gap-1 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.accessoryCost).toString()}
+                      value={Number(orderPart.accessoryCost || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400] text-sm">man</span>
                   </div>
@@ -610,7 +615,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.declaration).toString()}
+                      value={Number(orderPart.declaration || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -619,7 +625,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.ddpPrice).toString()}
+                      value={Number(orderPart.ddpPrice || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -628,7 +635,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.unitDdpPrice).toString()}
+                      value={Number(orderPart.unitDdpPrice || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -638,8 +646,9 @@ const handleChange = (
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                       name="percentage"
-                      value={editableOrderParts[index]?.percentage || ""}
+                      value={Number(orderPart.percentage || 0)}
                       onChange={(e) => handleChange(e, index)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">%</span>
                   </div>
@@ -648,7 +657,8 @@ const handleChange = (
                   <div className="flex gap-1 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.profit).toString()}
+                      value={Number(orderPart.profit || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400] text-sm">man</span>
                   </div>
@@ -657,9 +667,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(
-                        orderPart.sellPriceClientStock
-                      ).toString()}
+                      value={Number(orderPart.sellPriceClientStock || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -668,7 +677,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.unitSellPrice).toString()}
+                      value={Number(orderPart.unitSellPrice || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -677,9 +687,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(
-                        orderPart.totalSellPriceClientOrdered
-                      ).toString()}
+                      value={Number(orderPart.totalSellPriceClientOrdered || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -688,9 +697,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(
-                        orderPart.sellPriceUnitWhichInStock
-                      ).toString()}
+                      value={Number(orderPart.sellPriceUnitWhichInStock || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -699,7 +707,8 @@ const handleChange = (
                   <div className="flex gap-1 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(orderPart.reserved).toString()}
+                      value={Number(orderPart.reserved || 0)}
+                      readOnly
                     />
                   </div>
                 </td>
@@ -707,9 +716,8 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(
-                        orderPart.totalSellPriceWhichInStock
-                      ).toString()}
+                      value={Number(orderPart.totalSellPriceWhichInStock || 0)}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
@@ -718,9 +726,10 @@ const handleChange = (
                   <div className="flex gap-2 items-end">
                     <input
                       className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
-                      value={parseFloat(
-                        orderPart.totalSellPriceOrderedWhichInStock
-                      ).toString()}
+                      value={Number(
+                        orderPart.totalSellPriceOrderedWhichInStock || 0
+                      )}
+                      readOnly
                     />
                     <span className="text-black font-[400]">man</span>
                   </div>
