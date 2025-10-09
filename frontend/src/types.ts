@@ -121,21 +121,15 @@ export interface OrderPartsInterface {
   sellPrice: number;
   unitSellPrice: number;
   delivering: string;
-  totalPriceManValue: string;
   nettoByUnit: string;
   totalNetto: string;
-  transportManValue: string;
   transportMan: string;
   cipPrice: string;
-  taxValue: string;
   tax: string;
   accessoryCost: string;
-  accessoryCostValue: string;
-  declarationValue: string;
   declaration: string;
   ddpPrice: string;
   unitDdpPrice: string;
-  percentageValue: string;
   percentage: string;
   sellPriceClientStock: string;
   rabatgrupInd: number;
@@ -144,12 +138,18 @@ export interface OrderPartsInterface {
   reserved: string;
   totalSellPriceWhichInStock: string;
   totalSellPriceOrderedWhichInStock: string;
-  priceExw:string;
   priceExwNoDiscount: string;
-  transportValue:string;
   totalPriceMan:string;
   priceWithoutPacking:string;
   packing:string
+  accessoryCostValue: number;
+  declarationValue: number;
+  totalPriceManValue: number;
+  transportValue:number;
+  transportManValue: number;
+  percentageValue: number;
+  taxValue: number;
+  priceExw:number;
 }
 
 export interface OrderInterface {

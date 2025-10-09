@@ -17,17 +17,17 @@ interface CalculationStandartInterface {
 
 interface EditableOrderPart {
   id: number;
-  priceExw: string;
-  taxValue: string;
-  percentageValue: string;
-  accessoryCostValue: string;
-  declarationValue: string;
+  priceExw: number;
+  taxValue: number;
+  percentageValue: number;
+  accessoryCostValue: number;
+  declarationValue: number;
   transport: string;
-  transportManValue: string;
-  totalPriceManValue: string;
+  transportManValue: number;
+  totalPriceManValue: number;
   percentage: string;
   priceExwNoDiscount: string;
-  transportValue: string;
+  transportValue: number;
   totalPriceMan: string;
   // origCode: string;
   // count: number;
@@ -73,7 +73,7 @@ const CalculationStandart = ({
     EditableOrderPart[]
   >([]);
 
-  console.log(editableOrderParts,supplierId,error);
+  console.log(editableOrderParts, supplierId, error);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -83,7 +83,7 @@ const CalculationStandart = ({
     const updated = [...editableOrderParts];
     updated[index] = {
       ...updated[index],
-      [name]: parseFloat(value) || 0,
+        [name]: value,
     };
     setEditableOrderParts(updated);
   };
@@ -95,17 +95,17 @@ const CalculationStandart = ({
         partName: part.partName ?? 0,
         origCode: part.origCode ?? 0,
         count: part.count ?? 0,
-        priceExw: part.priceExw ?? 0,
-        taxValue: part.taxValue ?? 0,
-        percentageValue: part.percentageValue ?? 0,
-        accessoryCostValue: part.accessoryCostValue ?? 0,
-        declarationValue: part.declarationValue ?? 0,
+        priceExw: parseFloat((part.priceExw).toString()) ?? 0,
+        accessoryCostValue: parseFloat((part.accessoryCostValue).toString()) ?? 0,
+        declarationValue: parseFloat((part.declarationValue).toString()) ?? 0,
+        transportValue:parseFloat((part.transportValue).toString())??0,
+        transportManValue: parseFloat((part.transportManValue).toString()) ?? 0,
+        totalPriceManValue: parseFloat((part.totalPriceManValue).toString()) ?? 0,
+        taxValue: parseFloat((part.taxValue).toString()) ?? 0,
+        percentageValue: parseFloat((part.percentageValue).toString()) ?? 0,
         transport: part.transport ?? 0,
-        transportManValue: part.transportManValue ?? 0,
-        totalPriceManValue: part.totalPriceManValue ?? 0,
         percentage: part.percentage ?? 0,
         priceExwNoDiscount: part.priceExwNoDiscount ?? 0,
-        transportValue: part.transportValue ?? 0,
         ddpPrice: part.ddpPrice ?? 0,
         stockQuantity: part.stockQuantity ?? 0,
         price: part.price ?? 0,
@@ -133,10 +133,9 @@ const CalculationStandart = ({
         totalSellPriceOrderedWhichInStock:
           part.totalSellPriceOrderedWhichInStock ?? 0,
         totalPriceMan: part.totalPriceMan ?? 0,
-        rabatgrupInd: part.rabatgrupInd??0,
-        priceWithoutPacking:part.priceWithoutPacking??0,
-        packing:part.packing??0
-
+        rabatgrupInd: part.rabatgrupInd ?? 0,
+        priceWithoutPacking: part.priceWithoutPacking ?? 0,
+        packing: part.packing ?? 0,
       }));
       setEditableOrderParts(initialized);
     }
@@ -153,7 +152,11 @@ const CalculationStandart = ({
     getOrderPartsInfo();
   }, [order]);
 
-  const countViaPriceList = async (orderPartsId: any, delivering: any,editableOrderParts:any) => {
+  const countViaPriceList = async (
+    orderPartsId: any,
+    delivering: any,
+    editableOrderParts: any
+  ) => {
     try {
       const data = await findOrigKodFromPriceList(
         orderPartsId,
@@ -335,7 +338,7 @@ const CalculationStandart = ({
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="accessoryCostValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={Number(editableOrderParts[0]?.accessoryCostValue) || 0}
+                value={editableOrderParts[0]?.accessoryCostValue|| 0}
               />
             </td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200">
@@ -343,7 +346,7 @@ const CalculationStandart = ({
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="declarationValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={Number(editableOrderParts[0]?.declarationValue) || 0}
+                value={editableOrderParts[0]?.declarationValue || 0}
               />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
@@ -379,7 +382,7 @@ const CalculationStandart = ({
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="totalPriceManValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={Number(editableOrderParts[0]?.totalPriceManValue) || 0}
+                value={editableOrderParts[0]?.totalPriceManValue ?? ""}
               />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -389,7 +392,7 @@ const CalculationStandart = ({
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="transportValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={Number(editableOrderParts[0]?.transportValue) || 0}
+                value={editableOrderParts[0]?.transportValue || 0}
               />
             </td>
             <td className="px-1  text-center  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red">
@@ -397,7 +400,7 @@ const CalculationStandart = ({
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="transportManValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={Number(editableOrderParts[0]?.transportManValue) || 0}
+                value={editableOrderParts[0]?.transportManValue || 0}
               />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -406,7 +409,7 @@ const CalculationStandart = ({
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="taxValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={Number(editableOrderParts[0]?.taxValue) || 0}
+                value={editableOrderParts[0]?.taxValue|| 0}
               />
               <span className="text-sm">%</span>
             </td>
@@ -419,7 +422,7 @@ const CalculationStandart = ({
                 className="w-24 h-6 border border-black rounded-sm outline-none p-1 text-black font-[400]"
                 name="percentageValue"
                 onChange={(e) => handleChange(e, 0)}
-                value={Number(editableOrderParts[0]?.percentageValue) || 0}
+                value={editableOrderParts[0]?.percentageValue || 0}
               />
             </td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-custom-red"></td>
@@ -826,7 +829,9 @@ const CalculationStandart = ({
         <Button
           color={"blue"}
           size={"xs"}
-          onClick={() => countViaPriceList(orderPartsId, delivering,editableOrderParts)}
+          onClick={() =>
+            countViaPriceList(orderPartsId, delivering, editableOrderParts)
+          }
         >
           Price ExW əldə etmək
         </Button>
