@@ -14,8 +14,6 @@ const priceListHistRepo = AppDataSource.getRepository(PriceListHist);
 const rabatgrupRepo = AppDataSource.getRepository(Rabatgrup);
 const orderPartRepository = AppDataSource.getRepository(OrderPart);
 
-
-
 export const createPriceList = async (
   req: Request,
   res: Response,
@@ -26,29 +24,37 @@ export const createPriceList = async (
     const filePath = req.file?.path;
 
     if (!filePath) {
-      return res.status(400).json({ success: false, message: "CSV file is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "CSV file is required" });
     }
 
     if (!year || !month || !type) {
-      return res.status(400).json({ success: false, message: "Missing year, month, or type" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing year, month, or type" });
     }
 
     if (!Object.values(Type).includes(type)) {
-      return res.status(400).json({ success: false, message: "Invalid type value" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid type value" });
     }
 
     // Clear existing records first
     await AppDataSource.getRepository(PriceListHist).clear();
 
     const BATCH_SIZE = 1000;
-let batch: Partial<PriceListHist>[] = [];
+    let batch: Partial<PriceListHist>[] = [];
     let totalInserted = 0;
 
     const stream = fs.createReadStream(filePath);
     const csvStream = parse({ headers: false, delimiter: ";" })
       .on("error", (error) => {
         console.error("❌ CSV Parsing Error:", error);
-        return res.status(500).json({ success: false, message: "CSV parsing error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "CSV parsing error" });
       })
       .on("data", async (row) => {
         // Map and validate row
@@ -59,18 +65,17 @@ let batch: Partial<PriceListHist>[] = [];
         const nameDe = row[4];
         const origKod = row[5];
 
-      const record: Partial<PriceListHist> = {
-  rabatgrup: isNaN(rabatgrup) ? 0 : rabatgrup,
-  weight: isNaN(weight) ? 0 : weight,
-  price: isNaN(price) ? "0.00" : (price / 100).toFixed(2),
-  name: name || "",
-  namede: nameDe || "",
-  origKod: origKod || "",
-  year: parseInt(year),
-  month: parseInt(month),
-  type: type as Type,
-};
-       
+        const record: Partial<PriceListHist> = {
+          rabatgrup: isNaN(rabatgrup) ? 0 : rabatgrup,
+          weight: isNaN(weight) ? 0 : weight,
+          price: isNaN(price) ? "0.00" : (price / 100).toFixed(2),
+          name: name || "",
+          namede: nameDe || "",
+          origKod: origKod || "",
+          year: parseInt(year),
+          month: parseInt(month),
+          type: type as Type,
+        };
 
         batch.push(record);
 
@@ -78,8 +83,7 @@ let batch: Partial<PriceListHist>[] = [];
           csvStream.pause(); // Pause reading while we write to DB
 
           try {
-            await AppDataSource
-              .getRepository(PriceListHist)
+            await AppDataSource.getRepository(PriceListHist)
               .createQueryBuilder()
               .insert()
               .into(PriceListHist)
@@ -91,7 +95,9 @@ let batch: Partial<PriceListHist>[] = [];
             batch = [];
           } catch (dbError) {
             console.error("❌ DB Insert Error:", dbError);
-            return res.status(500).json({ success: false, message: "Database insert error" });
+            return res
+              .status(500)
+              .json({ success: false, message: "Database insert error" });
           }
 
           csvStream.resume(); // Resume reading
@@ -101,8 +107,7 @@ let batch: Partial<PriceListHist>[] = [];
         // Insert remaining records
         if (batch.length > 0) {
           try {
-            await AppDataSource
-              .getRepository(PriceListHist)
+            await AppDataSource.getRepository(PriceListHist)
               .createQueryBuilder()
               .insert()
               .into(PriceListHist)
@@ -110,10 +115,14 @@ let batch: Partial<PriceListHist>[] = [];
               .execute();
 
             totalInserted += batch.length;
-            console.log(`✅ Final insert done. Total inserted: ${totalInserted}`);
+            console.log(
+              `✅ Final insert done. Total inserted: ${totalInserted}`
+            );
           } catch (dbError) {
             console.error("❌ Final DB Insert Error:", dbError);
-            return res.status(500).json({ success: false, message: "Final database insert error" });
+            return res
+              .status(500)
+              .json({ success: false, message: "Final database insert error" });
           }
         }
 
@@ -131,10 +140,11 @@ let batch: Partial<PriceListHist>[] = [];
     stream.pipe(csvStream);
   } catch (err) {
     console.error("❌ Unexpected Error:", err);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
-
 
 // export const createPriceList = async (
 //   req: Request,
@@ -242,8 +252,8 @@ export const checkPriceList = async (
   next: NextFunction
 ) => {
   try {
-    const { orderPartsId, delivering, totalPriceMan } = req.body;
-    console.log({ totalPriceMan });
+    const { orderPartsId, delivering, editableOrderParts } = req.body;
+    console.log({ editableOrderParts });
 
     if (
       !orderPartsId ||
@@ -255,26 +265,14 @@ export const checkPriceList = async (
         .json({ success: false, message: "origKods array is required" });
     }
 
-    const orderParts = await orderPartRepository
-      .createQueryBuilder("orderPart")
-      .where("orderPart.id IN (:...orderPartsId)", { orderPartsId })
-      .getMany();
-
-    if (orderParts.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No order parts found for given IDs",
-      });
-    }
-
-    const origKods = orderParts.map((part) => part.origCode);
-
-    // console.log({ origKods });
+    const origKods = editableOrderParts.map((part: any) => part.origCode);
 
     const foundParts = await priceListHistRepo
       .createQueryBuilder("priceListHist")
       .where("priceListHist.origKod IN (:...origKods)", { origKods })
       .getMany();
+
+    console.log({ foundParts });
 
     if (foundParts.length === 0) {
       return res
@@ -283,7 +281,7 @@ export const checkPriceList = async (
     }
 
     const updatedOrderParts = await Promise.all(
-      orderParts.map(async (part) => {
+      editableOrderParts.map(async (part: any) => {
         const match = foundParts.find(
           (foundPart) => part.origCode === foundPart.origKod
         );
@@ -357,26 +355,30 @@ export const calculateStandartOrderPrice = async (
     const { editableOrderParts } = req.body;
 
     // console.log(editableOrderParts);
-    
 
     if (!editableOrderParts || !Array.isArray(editableOrderParts)) {
-      return next(errorHandler(400, "editableOrderParts is required and must be an array."));
+      return next(
+        errorHandler(
+          400,
+          "editableOrderParts is required and must be an array."
+        )
+      );
     }
 
     const orderPartsId = editableOrderParts.map((p: any) => p.id);
 
     // console.log(orderPartsId);
-    
 
     const existingParts = await orderPartRepository.find({
       where: { id: In(orderPartsId) },
     });
 
-
     console.log(existingParts);
-    
+
     if (existingParts.length === 0) {
-      return next(errorHandler(404, "No order parts found for the provided IDs."));
+      return next(
+        errorHandler(404, "No order parts found for the provided IDs.")
+      );
     }
 
     const updatedOrderParts = await Promise.all(
@@ -425,4 +427,3 @@ export const calculateStandartOrderPrice = async (
     return next(errorHandler(500, error.message));
   }
 };
-

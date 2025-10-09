@@ -29,14 +29,15 @@ export const uploadExcell = async (
 export const findOrigKodFromPriceList = async (
   orderPartsId: any,
   setError: any,
-  delivering: any
+  delivering: any,
+  editableOrderParts:any
 ) => {
   try {
     console.log({ delivering });
 
     const response = await axios.post(
       `${VITE_API_BASE_URL}priceList/checkPriceList`,
-      { orderPartsId, delivering }
+      { orderPartsId, delivering,editableOrderParts }
     );
     return response.data;
   } catch (error: any) {

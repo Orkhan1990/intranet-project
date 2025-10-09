@@ -146,7 +146,10 @@ export interface OrderPartsInterface {
   totalSellPriceOrderedWhichInStock: string;
   priceExw:string;
   priceExwNoDiscount: string;
-  transportValue:string
+  transportValue:string;
+  totalPriceMan:string;
+  priceWithoutPacking:string;
+  packing:string
 }
 
 export interface OrderInterface {

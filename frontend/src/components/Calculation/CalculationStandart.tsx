@@ -28,6 +28,7 @@ interface EditableOrderPart {
   percentage: string;
   priceExwNoDiscount: string;
   transportValue: string;
+  totalPriceMan: string;
   // origCode: string;
   // count: number;
   // checkOnWarehouse: boolean;
@@ -72,7 +73,7 @@ const CalculationStandart = ({
     EditableOrderPart[]
   >([]);
 
-  console.log(editableOrderParts);
+  console.log(editableOrderParts,supplierId,error);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -91,6 +92,9 @@ const CalculationStandart = ({
     if (order?.orderParts) {
       const initialized = order.orderParts.map((part) => ({
         id: part.id,
+        partName: part.partName ?? 0,
+        origCode: part.origCode ?? 0,
+        count: part.count ?? 0,
         priceExw: part.priceExw ?? 0,
         taxValue: part.taxValue ?? 0,
         percentageValue: part.percentageValue ?? 0,
@@ -102,6 +106,37 @@ const CalculationStandart = ({
         percentage: part.percentage ?? 0,
         priceExwNoDiscount: part.priceExwNoDiscount ?? 0,
         transportValue: part.transportValue ?? 0,
+        ddpPrice: part.ddpPrice ?? 0,
+        stockQuantity: part.stockQuantity ?? 0,
+        price: part.price ?? 0,
+        totalPrice: part.totalPrice ?? 0,
+        sipPrice: part.sipPrice ?? 0,
+        unitSipPrice: part.unitSipPrice ?? 0,
+        percent: part.percent ?? 0,
+        profit: part.profit ?? 0,
+        sellPrice: part.sellPrice ?? 0,
+        unitSellPrice: part.unitSellPrice ?? 0,
+        delivering: part.delivering ?? 0,
+        nettoByUnit: part.nettoByUnit ?? 0,
+        totalNetto: part.totalNetto ?? 0,
+        transportMan: part.transportMan ?? 0,
+        cipPrice: part.cipPrice ?? 0,
+        tax: part.tax ?? 0,
+        accessoryCost: part.accessoryCost ?? 0,
+        declaration: part.declaration ?? 0,
+        unitDdpPrice: part.unitDdpPrice ?? 0,
+        sellPriceClientStock: part.sellPriceClientStock ?? 0,
+        totalSellPriceClientOrdered: part.totalSellPriceClientOrdered ?? 0,
+        sellPriceUnitWhichInStock: part.sellPriceUnitWhichInStock ?? 0,
+        reserved: part.reserved ?? 0,
+        totalSellPriceWhichInStock: part.totalSellPriceWhichInStock ?? 0,
+        totalSellPriceOrderedWhichInStock:
+          part.totalSellPriceOrderedWhichInStock ?? 0,
+        totalPriceMan: part.totalPriceMan ?? 0,
+        rabatgrupInd: part.rabatgrupInd??0,
+        priceWithoutPacking:part.priceWithoutPacking??0,
+        packing:part.packing??0
+
       }));
       setEditableOrderParts(initialized);
     }
@@ -118,12 +153,13 @@ const CalculationStandart = ({
     getOrderPartsInfo();
   }, [order]);
 
-  const countViaPriceList = async (orderPartsId: any, delivering: any) => {
+  const countViaPriceList = async (orderPartsId: any, delivering: any,editableOrderParts:any) => {
     try {
       const data = await findOrigKodFromPriceList(
         orderPartsId,
         setError,
-        delivering
+        delivering,
+        editableOrderParts
       );
       console.log(data);
       setRefreshPage(true);
@@ -790,7 +826,7 @@ const CalculationStandart = ({
         <Button
           color={"blue"}
           size={"xs"}
-          onClick={() => countViaPriceList(orderPartsId, delivering)}
+          onClick={() => countViaPriceList(orderPartsId, delivering,editableOrderParts)}
         >
           Price ExW əldə etmək
         </Button>

@@ -36,7 +36,7 @@ const Calculation = () => {
         partName: "",
         price: 0,
         totalPrice: 0,
-        transport: 0,
+        transport: "0",
         sipPrice: 0,
         unitSipPrice: 0,
         percent: 0,
@@ -67,8 +67,12 @@ const Calculation = () => {
         reserved: "0",
         totalSellPriceWhichInStock: "0",
         totalSellPriceOrderedWhichInStock: "0",
-        priceExw:"0",
-          priceExwNoDiscount:"0"
+        priceExw: "0",
+        priceExwNoDiscount: "0",
+        totalPriceMan: "0",
+        transportValue:"0",
+        priceWithoutPacking:"0",
+        packing:"0"
       },
     ],
   });
