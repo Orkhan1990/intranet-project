@@ -162,10 +162,11 @@ const CalculationStandart = ({
         orderPartsId,
         setError,
         delivering,
-        editableOrderParts
+        editableOrderParts,
+        setRefreshPage
       );
-      console.log(data);
       setRefreshPage(true);
+      console.log(data);
     } catch (error: any) {
       setError(error);
     }

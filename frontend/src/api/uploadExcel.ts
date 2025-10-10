@@ -30,7 +30,8 @@ export const findOrigKodFromPriceList = async (
   orderPartsId: any,
   setError: any,
   delivering: any,
-  editableOrderParts:any
+  editableOrderParts:any,
+  setRefreshPage:any
 ) => {
   try {
     console.log({ delivering });
@@ -39,6 +40,7 @@ export const findOrigKodFromPriceList = async (
       `${VITE_API_BASE_URL}priceList/checkPriceList`,
       { orderPartsId, delivering,editableOrderParts }
     );
+    setRefreshPage(true);
     return response.data;
   } catch (error: any) {
     console.log(error);

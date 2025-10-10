@@ -253,7 +253,7 @@ export const checkPriceList = async (
 ) => {
   try {
     const { orderPartsId, delivering, editableOrderParts } = req.body;
-    console.log({ editableOrderParts });
+    // console.log({ editableOrderParts });
 
     if (
       !orderPartsId ||
@@ -272,7 +272,7 @@ export const checkPriceList = async (
       .where("priceListHist.origKod IN (:...origKods)", { origKods })
       .getMany();
 
-    console.log({ foundParts });
+    // console.log({ foundParts });
 
     if (foundParts.length === 0) {
       return res
@@ -286,6 +286,9 @@ export const checkPriceList = async (
           (foundPart) => part.origCode === foundPart.origKod
         );
 
+        console.log(part.totalPrice);
+        
+
         if (match) {
           part.partName = match.name;
           part.stockQuantity = "100"; // Example hardcoded value
@@ -293,6 +296,7 @@ export const checkPriceList = async (
           part.priceExwNoDiscount = match.price;
           part.rabatgrupInd = match.rabatgrup;
           part.delivering = delivering;
+          // part.totalPrice=+(match.price)*part.count;
           await orderPartRepository.save(part);
         }
 
@@ -326,8 +330,7 @@ export const checkPriceList = async (
             item.priceWithoutPacking = priceWithoutPacking.toFixed(2);
             item.packing = packing.toFixed(2);
             item.priceExw = totalWithPacking.toFixed(2);
-            item.totalPrice = totalWithPacking.toFixed(2);
-
+            item.totalPrice = (totalWithPacking*item.count).toFixed(2);
             await orderPartRepository.save(item);
           }
         }
@@ -338,7 +341,7 @@ export const checkPriceList = async (
 
     const flatOrderParts = calculationOrderParts.flat();
 
-    console.log({ flatOrderParts });
+    // console.log({ flatOrderParts });
 
     return res.status(200).json({ success: true, data: flatOrderParts });
   } catch (error) {
@@ -373,7 +376,7 @@ export const calculateStandartOrderPrice = async (
       where: { id: In(orderPartsId) },
     });
 
-    console.log(existingParts);
+    // console.log(existingParts);
 
     if (existingParts.length === 0) {
       return next(
