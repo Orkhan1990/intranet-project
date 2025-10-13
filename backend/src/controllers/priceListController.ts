@@ -357,76 +357,96 @@ export const calculateStandartOrderPrice = async (
   try {
     const { editableOrderParts } = req.body;
 
-    // console.log(editableOrderParts);
-
     if (!editableOrderParts || !Array.isArray(editableOrderParts)) {
       return next(
-        errorHandler(
-          400,
-          "editableOrderParts is required and must be an array."
-        )
+        errorHandler(400, "editableOrderParts is required and must be an array.")
       );
     }
 
     const orderPartsId = editableOrderParts.map((p: any) => p.id);
 
-    // console.log(orderPartsId);
-
     const existingParts = await orderPartRepository.find({
       where: { id: In(orderPartsId) },
     });
 
-    // console.log(existingParts);
-
     if (existingParts.length === 0) {
-      return next(
-        errorHandler(404, "No order parts found for the provided IDs.")
-      );
+      return next(errorHandler(404, "No order parts found for the provided IDs."));
     }
 
-    const updatedOrderParts = await Promise.all(
-      editableOrderParts.map(async (inputPart: any) => {
-        const existingPart = existingParts.find((p) => p.id === inputPart.id);
-        if (!existingPart) return null;
+    // ✅ Shared values from frontend (defaults used if not provided)
+    const sharedValues = {
+      priceExw: editableOrderParts.find(p => p.priceExw != null)?.priceExw ?? 0,
+      totalPriceManValue: editableOrderParts.find(p => p.totalPriceManValue != null)?.totalPriceManValue ?? 1,
+      transportValue: editableOrderParts.find(p => p.transportValue != null)?.transportValue ?? 0,
+      transportManValue: editableOrderParts.find(p => p.transportManValue != null)?.transportManValue ?? 0,
+      taxValue: editableOrderParts.find(p => p.taxValue != null)?.taxValue ?? 0,
+      percentage: editableOrderParts.find(p => p.percentage != null)?.percentage ?? 0,
+      declarationValue: editableOrderParts.find(p => p.declarationValue != null)?.declarationValue ?? 0,
+      accessoryCostValue: editableOrderParts.find(p => p.accessoryCostValue != null)?.accessoryCostValue ?? 0,
+    };
 
-        // Extract values from frontend payload (with fallbacks)
-        const {
-          priceExw = 0,
-          count = existingPart.count || 1,
-          taxValue = 0,
-          percentage = 0,
-          totalPriceManValue = 1,
-        } = inputPart;
+    // 🧠 Map for fast lookup
+    const existingPartsMap = new Map<number, OrderPart>();
+    existingParts.forEach((part) => existingPartsMap.set(part.id, part));
 
-        // Calculation
-        const totalPrice = +(priceExw * count).toFixed(2);
-        const totalPriceMan = +(totalPrice * totalPriceManValue).toFixed(2);
-        const tax = +((totalPriceMan * taxValue) / 100).toFixed(2);
-        const profit = +(((totalPriceMan + tax) * percentage) / 100).toFixed(2);
-        const ddpPrice = +(totalPriceMan + tax).toFixed(2);
-        const fullSellPrice = +(totalPriceMan + tax + profit).toFixed(2);
+    const updatedParts: OrderPart[] = [];
 
-        // Update entity
-        existingPart.priceExw = priceExw;
-        existingPart.totalPrice = totalPrice.toString();
-        existingPart.totalPriceManValue = totalPriceManValue;
-        existingPart.totalPriceMan = totalPriceMan.toString();
-        existingPart.cipPrice = totalPriceMan.toString();
-        existingPart.taxValue = taxValue;
-        existingPart.tax = tax.toString();
-        existingPart.percentage = percentage;
-        existingPart.profit = profit.toString();
-        existingPart.ddpPrice = ddpPrice.toString();
-        existingPart.unitDdpPrice = ddpPrice.toString();
-        existingPart.sellPriceClientStock = fullSellPrice.toString();
-        existingPart.unitSellPrice = fullSellPrice.toString();
+    for (const inputPart of editableOrderParts) {
+      const dbPart = existingPartsMap.get(inputPart.id);
+      if (!dbPart) continue;
 
-        return await orderPartRepository.save(existingPart);
-      })
-    );
+      // 🛠 Apply values — fallback order: input → db → shared → default
+      const priceExw = inputPart.priceExw ?? dbPart.priceExw ?? sharedValues.priceExw;
+      const count = inputPart.count ?? dbPart.count ?? 1;
+      const taxValue = inputPart.taxValue ?? dbPart.taxValue ?? sharedValues.taxValue;
+      const percentage = inputPart.percentage ?? dbPart.percentage ?? sharedValues.percentage;
+      const totalPriceManValue = inputPart.totalPriceManValue ?? dbPart.totalPriceManValue ?? sharedValues.totalPriceManValue;
+      const transportManValue = inputPart.transportManValue ?? dbPart.transportManValue ?? sharedValues.transportManValue;
+      const transportValue=inputPart.transportValue??dbPart.transportValue??sharedValues.transportValue;
 
-    res.status(200).json({ updatedOrderParts });
+      // 🧮 Calculations
+      const totalPrice = +(priceExw * count).toFixed(2);
+      const totalPriceMan = +(totalPrice * totalPriceManValue).toFixed(2);
+      const tax = +((totalPriceMan * taxValue) / 100).toFixed(2);
+      const profit = +(((totalPriceMan + tax) * percentage) / 100).toFixed(2);
+      const ddpPrice = +(totalPriceMan + tax).toFixed(2);
+      const fullSellPrice = +(totalPriceMan + tax + profit).toFixed(2);
+
+      // ✅ Update part object
+      dbPart.priceExw = priceExw;
+      dbPart.count = count;
+      dbPart.totalPrice = totalPrice.toFixed(2);
+      dbPart.totalPriceManValue = totalPriceManValue;
+      dbPart.totalPriceMan = totalPriceMan.toFixed(2);
+      dbPart.cipPrice = totalPriceMan.toFixed(2);
+      dbPart.taxValue = taxValue;
+      dbPart.tax = tax.toFixed(2);
+      dbPart.percentage = percentage;
+      dbPart.profit = profit.toFixed(2);
+      dbPart.ddpPrice = ddpPrice.toFixed(2);
+      dbPart.unitDdpPrice = ddpPrice.toFixed(2);
+      dbPart.sellPriceClientStock = fullSellPrice.toFixed(2);
+      dbPart.unitSellPrice = fullSellPrice.toFixed(2);
+      dbPart.transportManValue = transportManValue;
+      dbPart.transportValue=transportValue;
+
+      // Optionally set others
+      dbPart.declarationValue = sharedValues.declarationValue;
+      dbPart.accessoryCostValue = sharedValues.accessoryCostValue;
+
+      updatedParts.push(dbPart);
+    }
+
+    // 💾 Save all at once
+    const savedParts = await orderPartRepository.save(updatedParts);
+
+    return res.status(200).json({
+      updatedOrderParts: savedParts,
+    });
   } catch (error: any) {
     return next(errorHandler(500, error.message));
   }
 };
+
+
+

@@ -101,6 +101,9 @@ const Calculation = () => {
       setOrder(data);
     };
     fetchOrderParts();
+    if(refreshPage){
+      setRefreshPage(false);
+    }
   }, [orderId, refreshPage]);
 
   // const isStandartClient = order.orderType === OrderType.Standart_Client;
