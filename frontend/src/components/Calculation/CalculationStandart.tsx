@@ -688,7 +688,6 @@ const CalculationStandart = ({
                       name="percentage"
                       value={Number(orderPart.percentage || 0)}
                       onChange={(e) => handleChange(e, index)}
-                      readOnly
                     />
                     <span className="text-black font-[400]">%</span>
                   </div>
