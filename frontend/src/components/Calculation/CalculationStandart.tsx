@@ -29,6 +29,12 @@ interface EditableOrderPart {
   priceExwNoDiscount: string;
   transportValue: number;
   totalPriceMan: string;
+  totalPrice: number;
+  tax:string;
+  ddpPrice: string;
+  profit: number;
+  sellPriceClientStock: string;
+
   // origCode: string;
   // count: number;
   // checkOnWarehouse: boolean;
@@ -52,7 +58,6 @@ interface EditableOrderPart {
   // declaration: string;
   // ddpPrice: string;
   // unitDdpPrice: string;
-  // sellPriceClientStock: string;
   // rabatgrupInd: number;
   // totalSellPriceClientOrdered: string;
   // sellPriceUnitWhichInStock: string;
@@ -74,6 +79,17 @@ const CalculationStandart = ({
   >([]);
 
   console.log(editableOrderParts, supplierId, error);
+
+  const calculateAllTotalPrice=editableOrderParts.reduce((acc, part) => acc + (+part.totalPrice || 0), 0);
+  const calculateTax=editableOrderParts.reduce((acc, part) => acc + (+part.tax || 0), 0);
+  const calculateddpPrice=editableOrderParts.reduce((acc, part) => acc + (+part.ddpPrice || 0), 0);
+  const calculateProfit=editableOrderParts.reduce((acc, part) => acc + (+part.profit || 0), 0);
+    const calculateSellPriceClientStock=editableOrderParts.reduce((acc, part) => acc + (+part.sellPriceClientStock || 0), 0);
+
+
+  
+
+  
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -801,21 +817,21 @@ const CalculationStandart = ({
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
-            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
+            <td className="px-1  font-[300] text-xs border border-dashed text-center border-black p-2 bg-yellow-200">{calculateAllTotalPrice}</td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  text-xs w-[15px] font-[300] border border-dashed border-black p-2 bg-custom-yellow"></td>
             <td className="px-1 font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
+            <td className="px-1  font-[300] text-xs border text-center border-dashed border-black p-2 bg-yellow-200">{calculateTax}</td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
+            <td className="px-1  font-[300] text-xs border text-center border-dashed border-black p-2 bg-yellow-200">{calculateddpPrice}</td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
-            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
-            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
-            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
-            <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
+            <td className="px-1  font-[300] text-xs border text-center border-dashed border-black p-2 bg-yellow-200">{calculateProfit}</td>
+            <td className="px-1  font-[300] text-xs border text-center border-dashed border-black p-2 bg-yellow-200">{calculateSellPriceClientStock}</td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
             <td className="px-1  font-[300] text-xs border border-dashed border-black p-2 bg-yellow-200"></td>
