@@ -6,67 +6,82 @@ import NewPartsComponent from "../../components/NewPartsComponent";
 import * as XLSX from "xlsx";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBrands } from '../../redux-toolkit/features/brand/brandSlice';
+import { fetchSuppliers } from '../../redux-toolkit/features/supplier/supplierSlice';
+import { RootState, AppDispatch } from '../../redux-toolkit/store/store';
+
+
 
 const ImportWarehouse = () => {
  
-  const[brands,setBrands]=useState<BrandInterface[]>([]);
+  // const[brands,setBrands]=useState<BrandInterface[]>([]);
   const[error,setError]=useState<string>("");
   const[success,setSuccess]=useState<string>("")
-  const[suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
+  // const[suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
   const navigate=useNavigate();
 
+  const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(()=>{
-       const getBrands=async()=>{
-        try {
-          const res = await fetch(
-            "http://localhost:3013/api/v1/brand/getBrands",
-            {
-              method: "GET",
-              credentials: "include", // added this part
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-  
-          const data = await res.json();
-          if (!res.ok || data.success === false) {
-            setError(data.message);
-          }
-          setBrands(data);
-        } catch (error:any) {
-          setError(error.message)
-        }
-       }
-       getBrands();
+const { brands, loading: brandsLoading, error: brandsError } = useSelector((state: RootState) => state.brand);
+const { suppliers, loading: suppliersLoading, error: suppliersError } = useSelector((state: RootState) => state.supplier);
 
-       const getSuplliers=async()=>{
-        try {
-          const res = await fetch(
-            "http://localhost:3013/api/v1/supplier/getSuppliers",
-            {
-              method: "GET",
-              credentials: "include", // added this part
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+useEffect(() => {
+  dispatch(fetchBrands());
+  dispatch(fetchSuppliers());
+}, [dispatch]);
+
+  // useEffect(()=>{
+  //      const getBrands=async()=>{
+  //       try {
+  //         const res = await fetch(
+  //           "http://localhost:3013/api/v1/brand/getBrands",
+  //           {
+  //             method: "GET",
+  //             credentials: "include", // added this part
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //             },
+  //           }
+  //         );
   
-          const data = await res.json();
-          if (!res.ok || data.success === false) {
-            setError(data.message);
-          }
-          setSuppliers(data);
+  //         const data = await res.json();
+  //         if (!res.ok || data.success === false) {
+  //           setError(data.message);
+  //         }
+  //         setBrands(data);
+  //       } catch (error:any) {
+  //         setError(error.message)
+  //       }
+  //      }
+  //      getBrands();
+
+  //      const getSuplliers=async()=>{
+  //       try {
+  //         const res = await fetch(
+  //           "http://localhost:3013/api/v1/supplier/getSuppliers",
+  //           {
+  //             method: "GET",
+  //             credentials: "include", // added this part
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //             },
+  //           }
+  //         );
+  
+  //         const data = await res.json();
+  //         if (!res.ok || data.success === false) {
+  //           setError(data.message);
+  //         }
+  //         setSuppliers(data);
           
-        } catch (error:any) {
-          setError(error.message)
-        }
-       }
+  //       } catch (error:any) {
+  //         setError(error.message)
+  //       }
+  //      }
 
-       getSuplliers();
-  },[])
+  //      getSuplliers();
+  // },[])
 
   const wareHouseInitialValues: WarehouseInterface = {
     requestId: 0,
@@ -169,7 +184,7 @@ const ImportWarehouse = () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Zayavka nömrəsi
                 </label>
-                <Field as={Select} name="requestId" className="w-20">
+                <Field as={Select} name="requestId" className="w-20" sizing="sm">
                   <option value="1">1</option>
                 </Field>
               </div>
@@ -178,7 +193,7 @@ const ImportWarehouse = () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Təchizatçı
                 </label>
-                <Field as={Select} name="supplierId" className="w-96">
+                <Field as={Select} name="supplierId" className="w-96" sizing="sm">
                   {
                     suppliers.length>0&&suppliers.map((item:SupplierInterface,index:number)=>(
                       <option value={item.id} key={index}>{item.supplier}</option>
@@ -191,14 +206,14 @@ const ImportWarehouse = () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Hesab
                 </label>
-                <Field as={TextInput} name="invoice" />
+                <Field as={TextInput} name="invoice" sizing="sm"/>
               </div>
 
               <div className="flex  items-center mt-5">
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Bazar
                 </label>
-                <Field as={Select} name="market" className="w-32">
+                <Field as={Select} name="market" className="w-32" sizing="sm">
                   <option value={Market.Local}>Yerli</option>
                   <option value={Market.External}>Xarici</option>
                   <option value={Market.Based_On_The_Act}>Akt Əsasında</option>
@@ -209,7 +224,7 @@ const ImportWarehouse = () => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Ödəniş üsulu
                 </label>
-                <Field as={Select} name="paymentType" className="w-32">
+                <Field as={Select} name="paymentType" className="w-32" sizing="sm">
                   <option value={PayType.Cash}>Nağd</option>
                   <option value={PayType.Transfer}>Xarici</option>
                 </Field>
@@ -224,6 +239,7 @@ const ImportWarehouse = () => {
                   rows={7}
                   name="comment"
                   className="w-1/2"
+                  sizing="sm"
                 />
               </div>
 
