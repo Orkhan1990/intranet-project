@@ -42,3 +42,38 @@ export const getSupplierDatas = async () => {
     );
   }
 };
+
+export const createInvoice = async (invoiceData: any) => {
+    try {
+        const response = await axios.post(`${VITE_API_BASE_URL}invoice/createInvoice`, invoiceData);
+        const data:any = response.data;
+
+        if (!response.status.toString().startsWith("2") || data.success === false) {
+            throw new Error(data.message || "Faktura yaradılmadı");
+        }
+        return data;
+        
+    } catch (error:any) {
+        console.log(error);
+         throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+    }
+}
+
+export const getOrdersData = async () => {
+  try {
+    const response = await axios.get(`${VITE_API_BASE_URL}order/getAllOrders`);
+    const data:any = response.data;
+
+    if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "Sifariş məlumatları alınmadı");
+    }
+    return data; // This should be an array of orders
+    } catch (error: any) {
+    console.error("getOrdersData error:", error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  }
+};

@@ -5,6 +5,7 @@ import { persistReducer,persistStore} from 'redux-persist';
 import authReducer from "../features/auth/authSlice";
 import brandReducer from '../features/brand/brandSlice';
 import supplierReducer from '../features/supplier/supplierSlice';
+import orderReducer from '../features/order/orderSlice';
 
 
 
@@ -12,6 +13,7 @@ const rootReducer=combineReducers({
   auth:authReducer,
   brand: brandReducer,
   supplier: supplierReducer,
+  order: orderReducer
 })
 
 const persistConfig={

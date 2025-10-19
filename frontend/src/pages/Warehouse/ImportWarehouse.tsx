@@ -1,5 +1,5 @@
 import { Field, FieldArray, Form, Formik } from "formik";
-import {  BrandInterface, SupplierInterface, WarehouseInterface } from "../../types";
+import {  OrderInterface, SupplierInterface, WarehouseInterface } from "../../types";
 import { Liquidity, Market, PayType } from "../../enums/projectEnums";
 import { Button, Select,Textarea, TextInput } from "flowbite-react";
 import NewPartsComponent from "../../components/NewPartsComponent";
@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchBrands } from '../../redux-toolkit/features/brand/brandSlice';
 import { fetchSuppliers } from '../../redux-toolkit/features/supplier/supplierSlice';
 import { RootState, AppDispatch } from '../../redux-toolkit/store/store';
+import { createInvoice } from "../../api/allApi";
+import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
 
 
 
@@ -25,63 +27,16 @@ const ImportWarehouse = () => {
 
 const { brands, loading: brandsLoading, error: brandsError } = useSelector((state: RootState) => state.brand);
 const { suppliers, loading: suppliersLoading, error: suppliersError } = useSelector((state: RootState) => state.supplier);
+const { orders, loading: ordersLoading, error: ordersError } = useSelector((state: RootState) => state.order);
+
 
 useEffect(() => {
   dispatch(fetchBrands());
   dispatch(fetchSuppliers());
+  dispatch(fetchOrders());
 }, [dispatch]);
 
-  // useEffect(()=>{
-  //      const getBrands=async()=>{
-  //       try {
-  //         const res = await fetch(
-  //           "http://localhost:3013/api/v1/brand/getBrands",
-  //           {
-  //             method: "GET",
-  //             credentials: "include", // added this part
-  //             headers: {
-  //               "Content-Type": "application/json",
-  //             },
-  //           }
-  //         );
-  
-  //         const data = await res.json();
-  //         if (!res.ok || data.success === false) {
-  //           setError(data.message);
-  //         }
-  //         setBrands(data);
-  //       } catch (error:any) {
-  //         setError(error.message)
-  //       }
-  //      }
-  //      getBrands();
 
-  //      const getSuplliers=async()=>{
-  //       try {
-  //         const res = await fetch(
-  //           "http://localhost:3013/api/v1/supplier/getSuppliers",
-  //           {
-  //             method: "GET",
-  //             credentials: "include", // added this part
-  //             headers: {
-  //               "Content-Type": "application/json",
-  //             },
-  //           }
-  //         );
-  
-  //         const data = await res.json();
-  //         if (!res.ok || data.success === false) {
-  //           setError(data.message);
-  //         }
-  //         setSuppliers(data);
-          
-  //       } catch (error:any) {
-  //         setError(error.message)
-  //       }
-  //      }
-
-  //      getSuplliers();
-  // },[])
 
   const wareHouseInitialValues: WarehouseInterface = {
     requestId: 0,
@@ -136,20 +91,21 @@ useEffect(() => {
   const onsubmit =async (values: WarehouseInterface) => {
     console.log(values);
     try {
-      const res = await fetch("http://localhost:3013/api/v1/invoice/createInvoice", 
-        {
-        method: "POST",
-        credentials: 'include',
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      // const res = await fetch("http://localhost:3013/api/v1/invoice/createInvoice", 
+      //   {
+      //   method: "POST",
+      //   credentials: 'include',
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(values),
+      // });
 
-      const data = await res.json();
+      // const data = await res.json();
+      const data=await createInvoice(values);
         console.log(data);
         
-      if(!res.ok||data.success===false){
+      if(data.success===false){
         setError(data.message);
         return;
       }else{
@@ -157,13 +113,13 @@ useEffect(() => {
         navigate('/warehouse');
         window.scrollTo(0,0);
       }
-
-      
-      
     } catch (error:any) {
       setError(error)
     }
   };
+
+
+
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
       <h2 className="font-semibold text-xl text-center  mb-[50px]">
@@ -185,7 +141,11 @@ useEffect(() => {
                   Zayavka nömrəsi
                 </label>
                 <Field as={Select} name="requestId" className="w-20" sizing="sm">
-                  <option value="1">1</option>
+                  {
+                    orders.length>0&&orders.map((item:OrderInterface,index:number)=>(
+                      <option value={item.id} key={index}>{item.id}</option>
+                    ))
+                  }
                 </Field>
               </div>
 
