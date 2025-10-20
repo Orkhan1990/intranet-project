@@ -6,6 +6,7 @@ import { User } from "./User";
 import { OrderHistory } from "./OrderHistory";
 import { OrderStage, OrderStatus } from "../enums/allEnums";
 import { Supplier } from "./Supplier";
+import { Invoice } from "./Invoice";
 
 @Entity({ name: "orders" })
 export class Order extends AllEntities {
@@ -167,4 +168,7 @@ export class Order extends AllEntities {
 
   @ManyToOne(() => User, (user) => user.responsibleUserOrders, { nullable: true })
   responsibleUser: User;
+
+  @ManyToOne(() => Invoice, (invoice) => invoice.order, {onDelete:"CASCADE"})
+  invoices: Invoice[];
 }

@@ -20,6 +20,7 @@ const ImportWarehouse = () => {
   // const[brands,setBrands]=useState<BrandInterface[]>([]);
   const[error,setError]=useState<string>("");
   const[success,setSuccess]=useState<string>("")
+  const[addingValue,setAddingValue]=useState<number>(1);
   // const[suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
   const navigate=useNavigate();
 
@@ -61,6 +62,10 @@ useEffect(() => {
     message: "",
   };
 
+  const handleAddingValue=(e:any)=>{
+    setAddingValue(Number(e.target.value));
+  }
+
   const handleFileChange = (event: any, setFieldValue: any) => {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -91,17 +96,6 @@ useEffect(() => {
   const onsubmit =async (values: WarehouseInterface) => {
     console.log(values);
     try {
-      // const res = await fetch("http://localhost:3013/api/v1/invoice/createInvoice", 
-      //   {
-      //   method: "POST",
-      //   credentials: 'include',
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(values),
-      // });
-
-      // const data = await res.json();
       const data=await createInvoice(values);
         console.log(data);
         
@@ -252,25 +246,35 @@ useEffect(() => {
                           />
                         ))}
                       </table>
-                      <Button
-                        color="blue"
-                        size="xs"
-                        className="mt-5"
-                        onClick={() =>
-                          push({
-                            kod: "",
-                            origKod: "",
-                            nameParts: "",
-                            brand:Number(brands[0]?.id || 0),
-                            liquidity: Liquidity.Fast,
-                            count: 0,
-                            price: 0,
-                            salesPrice: 0,
-                          })
-                        }
-                      >
-                        Əlavə et <span className="ml-2 ">+</span>
-                      </Button>
+                      <div className="flex gap-3  items-center mt-5">
+                        <TextInput sizing={"sm"} className="w-20" onChange={handleAddingValue}/>
+
+                    <Button
+  color="blue"
+  size="xs"
+  onClick={() => {
+    const countToAdd = addingValue > 0 ? addingValue : 1;
+    for (let i = 0; i < countToAdd; i++) {
+      push({
+        kod: "",
+        origKod: "",
+        nameParts: "",
+        brand: Number(brands[0]?.id || 0),
+        liquidity: Liquidity.Fast,
+        count: 0,
+        price: 0,
+        salesPrice: 0,
+        barcode: "",
+      });
+    }
+  }}
+>
+  Əlavə et <span className="ml-2 ">+</span>
+</Button>
+
+
+                      </div>
+                     
                     </div>
                   )}
                 </FieldArray>

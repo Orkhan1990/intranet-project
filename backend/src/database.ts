@@ -9,7 +9,6 @@ import { CardJob} from "./entites/CardJob";
 import { CardWorkerJob} from "./entites/CardWorkerJob";
 import { Supplier } from "./entites/Supplier";
 import { Brand } from "./entites/Brand";
-import { Invoice} from "./entites/Invoice";
 import { SparePart} from "./entites/SparePart";
 import { Order } from "./entites/Order";
 import { OrderPart } from "./entites/OrderPart";
@@ -19,6 +18,7 @@ import { SupplierOrderParts } from "./entites/SupplierOrderParts";
 import { PriceList } from "./entites/PriceList";
 import { PriceListHist } from "./entites/PriceListHist";
 import { Rabatgrup } from "./entites/Rabatgrup";
+import { Invoice} from "./entites/Invoice";
 dotenv.config();
 
 

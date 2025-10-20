@@ -3,8 +3,6 @@ import { Liquidity } from "../../enums/projectEnums";
 import { BrandInterface } from "../../types";
 import { FcOk } from "react-icons/fc";
 import { FaXmark } from "react-icons/fa6";
-import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
-import { MdKeyboardDoubleArrowRight } from "react-icons/md";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 
@@ -42,6 +40,9 @@ const Warehouse = () => {
     barcode: "",
   });
 
+
+  console.log(error);
+  
 
   const filteredData = sparePartData.filter((data) => {
     return (
@@ -396,7 +397,7 @@ const Warehouse = () => {
           </tbody>
         </table>
       </form>
-       <Link to="/importWarehouse" ><Button color={"blue"} className="mx-5" size={"sm"}>Əlavə et +</Button></Link>
+       <Link to="/importWarehouse" ><Button color={"blue"} className="mx-5" size={"xs"}>Əlavə et +</Button></Link>
       
       {/* <div className="flex justify-center mb-20">
         <button

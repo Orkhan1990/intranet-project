@@ -5,10 +5,16 @@ import { SupplierInterface } from "../../types";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { FaRegEdit } from "react-icons/fa";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { fetchSuppliers } from '../../redux-toolkit/features/supplier/supplierSlice';
+import { RootState, AppDispatch } from '../../redux-toolkit/store/store';
+import { useDispatch, useSelector } from 'react-redux';
+
 
 const Suppliers = () => {
+  
   const [error, setError] = useState("");
-  const [suppliersList, setSupplierList] = useState<SupplierInterface[]>([]);
+  
+  // const [suppliersList, setSupplierList] = useState<SupplierInterface[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<SupplierInterface>({
     id:0,
@@ -25,6 +31,12 @@ const Suppliers = () => {
     creditDuration:""
   }); 
 
+  console.log(selectedSupplier.id);
+  
+
+    const dispatch = useDispatch<AppDispatch>();
+     const { suppliers, loading: suppliersLoading, error: suppliersError } = useSelector((state: RootState) => state.supplier);
+
 
   const handleDeleteClick = (item:any) => {
     setSelectedSupplier(item); // Set the selected supplier for deletion
@@ -35,30 +47,10 @@ const Suppliers = () => {
   
 
   useEffect(() => {
-    const getSuppliers = async () => {
-      try {
-        const res = await fetch(
-          "http://localhost:3013/api/v1/supplier/getSuppliers",
-          {
-            method: "GET",
-            credentials: "include", // added this part
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+    dispatch(fetchSuppliers());
+  }, [dispatch]);
 
-        const data = await res.json();
-        if (!res.ok || data.success === false) {
-          setError(data.message);
-        }
-        setSupplierList(data);
-      } catch (error: any) {
-        setError(error.message);
-      }
-    };
-    getSuppliers();
-  }, []);
+ 
 
   const deleteSupplier = async (id: number) => {
     console.log(id,"qaqa");
@@ -82,7 +74,7 @@ const Suppliers = () => {
         setError(data.message)
       }
       if(res.ok){
-        setSupplierList((prev) => prev.filter((supplier) => supplier.id!== id));
+        dispatch(fetchSuppliers());
         setOpenModal(false)
       }
     } catch (error: any) {
@@ -94,7 +86,7 @@ const Suppliers = () => {
     <div className="min-h-screen mt-[100px] mb-[100px]">
       <h2 className="text-center text-lg font-semibold">Təchizatçılar</h2>
       {
-        suppliersList.length>0?(
+        suppliers.length>0?(
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mt-20">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
@@ -143,7 +135,7 @@ const Suppliers = () => {
             </tr>
           </thead>
           <tbody>
-            {suppliersList.length>0&&suppliersList.map((item: SupplierInterface, index: number) => (
+            {suppliers.length>0&&suppliers.map((item: SupplierInterface, index: number) => (
               <>
                 <tr
                   key={index}
@@ -209,15 +201,18 @@ const Suppliers = () => {
                         <Button
                           color="failure"
                           onClick={()=>deleteSupplier(selectedSupplier?.id)}
+                          size={"xs"}
+                          disabled={error!==""}
                         >
                           {"Bəli, sil"}
                         </Button>
-                        <Button color="gray" onClick={() => setOpenModal(false)}>
+                        <Button color="gray" onClick={() => setOpenModal(false)} size={"xs"}>
                           Xeyr, bağla
                         </Button>
                       </div>
                     </div>
                   </Modal.Body>
+                  <p className="text-xs text-red-800 text-center mb-6 font-semibold">{error}</p>
                 </Modal>
               </>
             ))}

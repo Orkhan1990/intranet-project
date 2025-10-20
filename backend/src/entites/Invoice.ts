@@ -3,13 +3,14 @@ import { AllEntities } from "./AllEntities";
 import { SparePart } from "./SparePart";
 import { User } from "./User";
 import { Supplier } from "./Supplier";
+import { Order } from "./Order";
 
 @Entity({ name: "invoices" })
 export class Invoice extends AllEntities {
 
-  @Column()
-  requestId: string;
-
+  @OneToMany(() => Order, (order) => order.invoices,{onDelete:"CASCADE"})
+  order:Order
+  
   @Column()
   invoice: string;
 
@@ -33,4 +34,6 @@ export class Invoice extends AllEntities {
 
   @ManyToOne(()=>User,(user)=>user.invoices)
   user:User
+
+  
 }

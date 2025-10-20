@@ -7,16 +7,25 @@ import {
 } from "../../types";
 import { Link } from "react-router-dom";
 import { Button } from "flowbite-react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux-toolkit/store/store";
+import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
+import { RootState, AppDispatch } from '../../redux-toolkit/store/store';
+import { useDispatch, useSelector } from 'react-redux';
+
+
+
 
 const Order = () => {
-  const [orders, setOrders] = useState<AllOrdersInterface[]>([]);
+  // const [orders, setOrders] = useState<AllOrdersInterface[]>([]);
   const [error, setError] = useState("");
 
   console.log(error);
 
   const { currentUser } = useSelector((state: RootState) => state.auth);
+
+  const { orders, loading: ordersLoading, error: ordersError } = useSelector((state: RootState) => state.order);
+  const dispatch = useDispatch<AppDispatch>();
+
+
 
   interface OrderHistory {
     stage: string;
@@ -82,31 +91,35 @@ const Order = () => {
   };
 
   useEffect(() => {
-    const getAllOrders = async () => {
-      try {
-        const res = await fetch(
-          "http://localhost:3013/api/v1/order/getAllOrders",
-          {
-            method: "GET",
-            credentials: "include", // added this part
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+    dispatch(fetchOrders());
+  }, [dispatch]);
 
-        const data = await res.json();
-        if (!res.ok || data.success === false) {
-          setError(data.message);
-        }
-        setOrders(data);
-      } catch (error: any) {
-        setError(error.message);
-      }
-    };
+  // useEffect(() => {
+  //   const getAllOrders = async () => {
+  //     try {
+  //       const res = await fetch(
+  //         "http://localhost:3013/api/v1/order/getAllOrders",
+  //         {
+  //           method: "GET",
+  //           credentials: "include", // added this part
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //         }
+  //       );
 
-    getAllOrders();
-  }, []);
+  //       const data = await res.json();
+  //       if (!res.ok || data.success === false) {
+  //         setError(data.message);
+  //       }
+  //       setOrders(data);
+  //     } catch (error: any) {
+  //       setError(error.message);
+  //     }
+  //   };
+
+  //   getAllOrders();
+  // }, []);
 
   //Change TIME FORMAT
 
