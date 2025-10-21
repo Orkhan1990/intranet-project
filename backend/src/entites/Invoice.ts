@@ -8,8 +8,9 @@ import { Order } from "./Order";
 @Entity({ name: "invoices" })
 export class Invoice extends AllEntities {
 
-  @OneToMany(() => Order, (order) => order.invoices,{onDelete:"CASCADE"})
-  order:Order
+  @ManyToOne(() => Order, (order) => order.invoices, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "order_id" }) // <--- This adds the column
+  order: Order;
   
   @Column()
   invoice: string;

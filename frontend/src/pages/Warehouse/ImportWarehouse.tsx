@@ -1,47 +1,57 @@
 import { Field, FieldArray, Form, Formik } from "formik";
-import {  OrderInterface, SupplierInterface, WarehouseInterface } from "../../types";
+import {
+  OrderInterface,
+  SupplierInterface,
+  WarehouseInterface,
+} from "../../types";
 import { Liquidity, Market, PayType } from "../../enums/projectEnums";
-import { Button, Select,Textarea, TextInput } from "flowbite-react";
+import { Button, Select, Textarea, TextInput } from "flowbite-react";
 import NewPartsComponent from "../../components/NewPartsComponent";
 import * as XLSX from "xlsx";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchBrands } from '../../redux-toolkit/features/brand/brandSlice';
-import { fetchSuppliers } from '../../redux-toolkit/features/supplier/supplierSlice';
-import { RootState, AppDispatch } from '../../redux-toolkit/store/store';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
+import { fetchSuppliers } from "../../redux-toolkit/features/supplier/supplierSlice";
+import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { createInvoice } from "../../api/allApi";
 import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
 
-
-
 const ImportWarehouse = () => {
- 
   // const[brands,setBrands]=useState<BrandInterface[]>([]);
-  const[error,setError]=useState<string>("");
-  const[success,setSuccess]=useState<string>("")
-  const[addingValue,setAddingValue]=useState<number>(1);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+  const [addingValue, setAddingValue] = useState<number>(1);
   // const[suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   const dispatch = useDispatch<AppDispatch>();
 
-const { brands, loading: brandsLoading, error: brandsError } = useSelector((state: RootState) => state.brand);
-const { suppliers, loading: suppliersLoading, error: suppliersError } = useSelector((state: RootState) => state.supplier);
-const { orders, loading: ordersLoading, error: ordersError } = useSelector((state: RootState) => state.order);
+  const {
+    brands,
+    loading: brandsLoading,
+    error: brandsError,
+  } = useSelector((state: RootState) => state.brand);
+  const {
+    suppliers,
+    loading: suppliersLoading,
+    error: suppliersError,
+  } = useSelector((state: RootState) => state.supplier);
+  const {
+    orders,
+    loading: ordersLoading,
+    error: ordersError,
+  } = useSelector((state: RootState) => state.order);
 
-
-useEffect(() => {
-  dispatch(fetchBrands());
-  dispatch(fetchSuppliers());
-  dispatch(fetchOrders());
-}, [dispatch]);
-
-
+  useEffect(() => {
+    dispatch(fetchBrands());
+    dispatch(fetchSuppliers());
+    dispatch(fetchOrders());
+  }, [dispatch]);
 
   const wareHouseInitialValues: WarehouseInterface = {
-    requestId: 0,
-    supplierId: suppliers[0]?.id||0,
+    orderId: orders[0]?.id || 0,
+    supplierId: suppliers[0]?.id || 0,
     invoice: "",
     market: Market.Local,
     paymentType: PayType.Cash,
@@ -51,20 +61,20 @@ useEffect(() => {
         kod: "",
         origKod: "",
         nameParts: "",
-        brand:Number(brands[0]?.id||0),
+        brand: Number(brands[0]?.id || 0),
         liquidity: Liquidity.Fast,
         count: 0,
         price: 0,
         salesPrice: 0,
-        barcode:""
+        barcode: "",
       },
     ],
     message: "",
   };
 
-  const handleAddingValue=(e:any)=>{
+  const handleAddingValue = (e: any) => {
     setAddingValue(Number(e.target.value));
-  }
+  };
 
   const handleFileChange = (event: any, setFieldValue: any) => {
     const file = event.target.files[0];
@@ -93,26 +103,24 @@ useEffect(() => {
     reader.readAsArrayBuffer(file);
   };
 
-  const onsubmit =async (values: WarehouseInterface) => {
+  const onsubmit = async (values: WarehouseInterface) => {
     console.log(values);
     try {
-      const data=await createInvoice(values);
-        console.log(data);
-        
-      if(data.success===false){
+      const data = await createInvoice(values);
+      console.log(data);
+
+      if (data.success === false) {
         setError(data.message);
         return;
-      }else{
+      } else {
         setSuccess(data.result);
-        navigate('/warehouse');
-        window.scrollTo(0,0);
+        navigate("/warehouse");
+        window.scrollTo(0, 0);
       }
-    } catch (error:any) {
-      setError(error)
+    } catch (error: any) {
+      setError(error);
     }
   };
-
-
 
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
@@ -120,7 +128,11 @@ useEffect(() => {
         Anbara daxil etmək
       </h2>
 
-      <Formik initialValues={wareHouseInitialValues} onSubmit={onsubmit} enableReinitialize>
+      <Formik
+        initialValues={wareHouseInitialValues}
+        onSubmit={onsubmit}
+        enableReinitialize
+      >
         {({ values, setFieldValue }) => {
           const deletePart = (index: number) => {
             setFieldValue(
@@ -134,12 +146,13 @@ useEffect(() => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Zayavka nömrəsi
                 </label>
-                <Field as={Select} name="requestId" className="w-20" sizing="sm">
-                  {
-                    orders.length>0&&orders.map((item:OrderInterface,index:number)=>(
-                      <option value={item.id} key={index}>{item.id}</option>
-                    ))
-                  }
+                <Field as={Select} name="orderId" className="w-20" sizing="sm">
+                  {orders.length > 0 &&
+                    orders.map((item: OrderInterface, index: number) => (
+                      <option value={item.id} key={index}>
+                        {item.id}
+                      </option>
+                    ))}
                 </Field>
               </div>
 
@@ -147,12 +160,18 @@ useEffect(() => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Təchizatçı
                 </label>
-                <Field as={Select} name="supplierId" className="w-96" sizing="sm">
-                  {
-                    suppliers.length>0&&suppliers.map((item:SupplierInterface,index:number)=>(
-                      <option value={item.id} key={index}>{item.supplier}</option>
-                    ))
-                  }
+                <Field
+                  as={Select}
+                  name="supplierId"
+                  className="w-96"
+                  sizing="sm"
+                >
+                  {suppliers.length > 0 &&
+                    suppliers.map((item: SupplierInterface, index: number) => (
+                      <option value={item.id} key={index}>
+                        {item.supplier}
+                      </option>
+                    ))}
                 </Field>
               </div>
 
@@ -160,7 +179,7 @@ useEffect(() => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Hesab
                 </label>
-                <Field as={TextInput} name="invoice" sizing="sm"/>
+                <Field as={TextInput} name="invoice" sizing="sm" />
               </div>
 
               <div className="flex  items-center mt-5">
@@ -178,7 +197,12 @@ useEffect(() => {
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Ödəniş üsulu
                 </label>
-                <Field as={Select} name="paymentType" className="w-32" sizing="sm">
+                <Field
+                  as={Select}
+                  name="paymentType"
+                  className="w-32"
+                  sizing="sm"
+                >
                   <option value={PayType.Cash}>Nağd</option>
                   <option value={PayType.Transfer}>Xarici</option>
                 </Field>
@@ -247,34 +271,36 @@ useEffect(() => {
                         ))}
                       </table>
                       <div className="flex gap-3  items-center mt-5">
-                        <TextInput sizing={"sm"} className="w-20" onChange={handleAddingValue}/>
+                        <TextInput
+                          sizing={"sm"}
+                          className="w-20"
+                          onChange={handleAddingValue}
+                        />
 
-                    <Button
-  color="blue"
-  size="xs"
-  onClick={() => {
-    const countToAdd = addingValue > 0 ? addingValue : 1;
-    for (let i = 0; i < countToAdd; i++) {
-      push({
-        kod: "",
-        origKod: "",
-        nameParts: "",
-        brand: Number(brands[0]?.id || 0),
-        liquidity: Liquidity.Fast,
-        count: 0,
-        price: 0,
-        salesPrice: 0,
-        barcode: "",
-      });
-    }
-  }}
->
-  Əlavə et <span className="ml-2 ">+</span>
-</Button>
-
-
+                        <Button
+                          color="blue"
+                          size="xs"
+                          onClick={() => {
+                            const countToAdd =
+                              addingValue > 0 ? addingValue : 1;
+                            for (let i = 0; i < countToAdd; i++) {
+                              push({
+                                kod: "",
+                                origKod: "",
+                                nameParts: "",
+                                brand: Number(brands[0]?.id || 0),
+                                liquidity: Liquidity.Fast,
+                                count: 0,
+                                price: 0,
+                                salesPrice: 0,
+                                barcode: "",
+                              });
+                            }
+                          }}
+                        >
+                          Əlavə et <span className="ml-2 ">+</span>
+                        </Button>
                       </div>
-                     
                     </div>
                   )}
                 </FieldArray>
@@ -314,14 +340,12 @@ useEffect(() => {
           );
         }}
       </Formik>
-      {
-        !error&&success&&(<p className="mt-10 ml-10 text-sm text-green-700">{success}</p>)
-
-      }
-      {
-        error&&!success&&(<p className="mt-10 ml-10 text-sm text-red-700">{error}</p>)
-
-      }
+      {!error && success && (
+        <p className="mt-10 ml-10 text-sm text-green-700">{success}</p>
+      )}
+      {error && !success && (
+        <p className="mt-10 ml-10 text-sm text-red-700">{error}</p>
+      )}
     </div>
   );
 };

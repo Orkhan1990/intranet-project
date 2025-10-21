@@ -94,7 +94,7 @@ export interface PartsInterface {
 }
 
 export interface WarehouseInterface {
-  requestId: number;
+  orderId: number;
   supplierId: number;
   invoice: string;
   market: Market;

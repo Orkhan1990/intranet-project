@@ -47,7 +47,10 @@ export const createInvoice = async (invoiceData: any) => {
   try {
     const response = await axios.post(
       `${VITE_API_BASE_URL}invoice/createInvoice`,
-      invoiceData
+      invoiceData,
+      {
+          withCredentials: true
+      }
     );
     const data: any = response.data;
 

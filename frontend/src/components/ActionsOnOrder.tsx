@@ -33,13 +33,20 @@ const ActionsOnOrder = ({
   const [orderPartArrayId, setOrderPartArrayId] = useState<number[]>([]);
   const [supplierId, setSupplierId] = useState<number>(0);
 
-  console.log(selectedSuppliers, "selectedSuppliers");
+  // console.log(selectedSuppliers, "selectedSuppliers");
   // console.log(delivering, error, "delivering");
-  console.log(supplierOrderPartsData, "supplierOrderPartsDatasssss");
-  console.log(orderPartArrayId, "orderPartArrayId");
+  // console.log(supplierOrderPartsData, "supplierOrderPartsDatasssss");
+  // console.log(orderPartArrayId, "orderPartArrayId");
 
   console.clear();
-  console.log({ supplierOrderPartsData });
+  // console.log({ supplierOrderPartsData });
+
+
+  const sortedHistory = [...order.orderHistory].sort(
+  (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+);
+  console.log(sortedHistory);
+  
 
   const uniqueSupplierOrderPartsData = Array.from(
     new Map(
@@ -508,8 +515,8 @@ const ActionsOnOrder = ({
       </h2>
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        {order.orderHistory &&
-          order.orderHistory.map((item: any) => {
+        {sortedHistory &&
+          sortedHistory.map((item: any) => {
             switch (item.step) {
               case "orderConfirm":
                 return (

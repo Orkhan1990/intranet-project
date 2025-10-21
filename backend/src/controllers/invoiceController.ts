@@ -5,11 +5,18 @@ import { AppDataSource } from "../database";
 import { Supplier } from "../entites/Supplier";
 import { Brand } from "../entites/Brand";
 import { Invoice } from "../entites/Invoice";
-import { User } from "../entites/User";
 import { SparePart } from "../entites/SparePart";
+import { Order } from "../entites/Order";
 
 
 
+
+
+ const supplierRepository = AppDataSource.getRepository(Supplier);
+    const brandRepository = AppDataSource.getRepository(Brand);
+    const invoiceRepository = AppDataSource.getRepository(Invoice);
+    const sparePartRepository = AppDataSource.getRepository(SparePart);
+    const orderRepository = AppDataSource.getRepository(Order);
 
 
 interface SparePartInterface{
@@ -25,7 +32,7 @@ interface SparePartInterface{
 
 
 interface InvoiceInterface{
-    requestId:string,
+    orderId: number,
       supplierId:number,
       invoice:string,
       market:string,
@@ -47,7 +54,7 @@ export const createInvoice = async (
 
     const userId=req.userId;
     const {
-      requestId,
+      orderId,
       supplierId,
       invoice,
       market,
@@ -59,13 +66,11 @@ export const createInvoice = async (
       message,
     }:InvoiceInterface = req.body;
 
-    const supplierRepository = AppDataSource.getRepository(Supplier);
-    const brandRepository = AppDataSource.getRepository(Brand);
-    const invoiceRepository = AppDataSource.getRepository(Invoice);
-    const sparePartRepository = AppDataSource.getRepository(SparePart);
+   
 
 
     const getSupplier=await supplierRepository.findOneBy({id:+supplierId});
+    const getOrder=await orderRepository.findOneBy({id:+orderId});
 
     if(!getSupplier){
         next(errorHandler(401,"Təchizatçı yoxdur!!"));
@@ -75,7 +80,7 @@ export const createInvoice = async (
    
 
     const newInvoice=new Invoice();
-    newInvoice.requestId=requestId;
+    newInvoice.order=getOrder;
     newInvoice.supplier=getSupplier;
     newInvoice.invoice=invoice;
     newInvoice.market=market;
@@ -86,34 +91,30 @@ export const createInvoice = async (
 
     await invoiceRepository.save(newInvoice);
  
-    const newPartsArray = await Promise.all(
-      req.body.parts.map(async (part:SparePartInterface) => {
+    const newPartsArray = [];
 
-        const getBrand=await brandRepository.findOneBy({id:part.brand});
+for (const part of req.body.parts) {
+  const getBrand = await brandRepository.findOneBy({ id: part.brand });
 
-        if(!getBrand){
-            next(errorHandler(401,"Belə marka yoxdur!!"));
-            return;
-        }
+  if (!getBrand) {
+    next(errorHandler(401, "Belə marka yoxdur!!"));
+    return;
+  }
 
-        const newSparePart = new SparePart();
-        newSparePart.code = part.kod;
-        newSparePart.origCode = part.origKod;
-        newSparePart.count = part.count;
-        newSparePart.brand = getBrand;
-        newSparePart.liquidity = part.liquidity;
-        newSparePart.name = part.nameParts;
-        newSparePart.sellPrice = part.salesPrice;
-        newSparePart.price = part.price;
-        newSparePart.invoice=newInvoice;
+  const newSparePart = new SparePart();
+  newSparePart.code = part.kod;
+  newSparePart.origCode = part.origKod;
+  newSparePart.count = part.count;
+  newSparePart.brand = getBrand;
+  newSparePart.liquidity = part.liquidity;
+  newSparePart.name = part.nameParts;
+  newSparePart.sellPrice = part.salesPrice;
+  newSparePart.price = part.price;
+  newSparePart.invoice = newInvoice;
 
-        // Save the warehouse part
-        await sparePartRepository.save(newSparePart);
-
-        return newSparePart;
-      })
-    );
-
+  await sparePartRepository.save(newSparePart);
+  newPartsArray.push(newSparePart);
+}
 
 
 
