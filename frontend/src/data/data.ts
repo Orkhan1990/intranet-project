@@ -54,18 +54,23 @@ export const navbarList:NavbarListInterface[] = [
               title:"Sifarişlər",
               url:"/orders"
           },
-          {
-              title:"Anbara daxil etmek",
-              url:"/importWarehouse"
+             {
+              title:"Prixod yarat",
+              url:"/importPrixod"
           },
-          {
-              title:"Anbarı təsdiqləmək",
-              url:"/submitWearhouse"
+           {
+              title:"Prixod siyahısı",
+              url:"/prixodList"
           },
-          {
-              title:"Təchizatçılar",
-              url:"/suppliers"
-          },
+        //   {
+        //       title:"Anbara daxil etmek",
+        //       url:"/importWarehouse"
+        //   },
+        
+        //   {
+        //       title:"Anbarı təsdiqləmək",
+        //       url:"/submitWearhouse"
+        //   },
           {
               title:"Anbarın siyahısı",
               url:"/wareHouse"
@@ -73,6 +78,10 @@ export const navbarList:NavbarListInterface[] = [
           {
               title:"Alətlər",
               url:"/tools"
+          },
+          {
+              title:"Təchizatçılar",
+              url:"/suppliers"
           },
           {
               title:"Barkod məlumatları",

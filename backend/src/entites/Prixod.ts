@@ -5,10 +5,10 @@ import { User } from "./User";
 import { Supplier } from "./Supplier";
 import { Order } from "./Order";
 
-@Entity({ name: "invoices" })
-export class Invoice extends AllEntities {
+@Entity({ name: "prixods" })
+export class Prixod extends AllEntities {
 
-  @ManyToOne(() => Order, (order) => order.invoices, { onDelete: "CASCADE" })
+  @ManyToOne(() => Order, (order) => order.prixods, { onDelete: "CASCADE" })
   @JoinColumn({ name: "order_id" }) // <--- This adds the column
   order: Order;
   
@@ -27,13 +27,13 @@ export class Invoice extends AllEntities {
   @Column({ nullable: true })
   message: string;
 
-  @OneToMany(() => SparePart, (part) => part.invoice) // specify inverse side as a second parameter
+  @OneToMany(() => SparePart, (part) => part.prixod) // specify inverse side as a second parameter
   spareParts: SparePart[];
 
-  @ManyToOne(() => Supplier, (supplier) => supplier.invoices,{onDelete:"CASCADE"})
+  @ManyToOne(() => Supplier, (supplier) => supplier.prixods,{onDelete:"CASCADE"})
   supplier: Supplier;
 
-  @ManyToOne(()=>User,(user)=>user.invoices)
+  @ManyToOne(()=>User,(user)=>user.prixods)
   user:User
 
   

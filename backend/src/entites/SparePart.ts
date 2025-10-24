@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { AllEntities } from "./AllEntities";
-import { Invoice } from "./Invoice";
+import { Prixod } from "./Prixod";
 import { Brand } from "./Brand";
 
 
@@ -43,8 +43,8 @@ export class SparePart extends AllEntities{
   @JoinColumn() // This will create a foreign key in the Brand table
   brand: Brand;
 
-  @ManyToOne(() => Invoice, (invoice) =>invoice.spareParts) // specify inverse side as a second parameter
-  invoice: Invoice
+  @ManyToOne(() => Prixod, (prixod) =>prixod.spareParts) // specify inverse side as a second parameter
+  prixod: Prixod
 
   
 

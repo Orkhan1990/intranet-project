@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne } from 'typeorm';
 import { AllEntities } from './AllEntities';
-import { Invoice} from './Invoice';
+import { Prixod} from './Prixod';
 import { Order } from './Order';
 import { SupplierOrderHistory } from './SuppliersOrderHistory';
 import { SupplierOrderParts } from './SupplierOrderParts';
@@ -43,8 +43,8 @@ export class Supplier extends AllEntities{
     creditDuration: string;
 
 
-    @OneToMany(() =>Invoice, (invoice) => invoice.supplier)
-    invoices: Invoice[];
+    @OneToMany(() =>Prixod, (prixod) => prixod.supplier)
+    prixods: Prixod[];
     
     // @ManyToMany(()=>Order,(order)=>order.suppliers)
     // orders:Order[];

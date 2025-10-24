@@ -4,7 +4,7 @@ import { CustomRequest } from "../middleware/verifyToken";
 import { AppDataSource } from "../database";
 import { Supplier } from "../entites/Supplier";
 import { Brand } from "../entites/Brand";
-import { Invoice } from "../entites/Invoice";
+import { Invoice } from "../entites/Prixod";
 import { SparePart } from "../entites/SparePart";
 import { Order } from "../entites/Order";
 
