@@ -41,13 +41,13 @@ export const getSupplierDatas = async () => {
   }
 };
 
-export const createInvoice = async (invoiceData: any) => {
-  console.log(invoiceData);
+export const createPrixod = async (prixodData: any) => {
+  console.log(prixodData);
   
   try {
     const response = await axios.post(
-      `${VITE_API_BASE_URL}invoice/createInvoice`,
-      invoiceData,
+      `${VITE_API_BASE_URL}prixod/createPrixod`,
+      prixodData,
       {
           withCredentials: true
       }
@@ -99,4 +99,38 @@ export const getClientsData = async () => {
       error.response?.data?.message || error.message || "Xəta baş verdi"
     );
   }
+};
+
+export const getPrixodsData = async () => {
+  try {
+    const response = await axios.get(`${VITE_API_BASE_URL}prixod/getPrixods`);
+    const data: any = response.data;
+    if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "Müştəri məlumatları alınmadı");
+    }
+    return data; // This should be an array of clients
+  } catch (error: any) {
+    console.error("getClientsData error:", error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  }
+};
+
+export const getPrixodById = async (id: number) => {
+  try {
+    const response = await axios.get(`${VITE_API_BASE_URL}prixod/getPrixodById/${id}`, {
+    });
+    const data: any = response.data;
+    if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "Müştəri məlumatları alınmadı");
+    }
+
+    return data; // This should be an array of clients
+  } catch (error: any) {
+    console.error("getClientsData error:", error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  } 
 };

@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
 import { fetchSuppliers } from "../../redux-toolkit/features/supplier/supplierSlice";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
-import { createInvoice } from "../../api/allApi";
+import { createPrixod } from "../../api/allApi";
 import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
 
 const ImportPrixod = () => {
@@ -106,7 +106,7 @@ const ImportPrixod = () => {
   const onsubmit = async (values: WarehouseInterface) => {
     console.log(values);
     try {
-      const data = await createInvoice(values);
+      const data = await createPrixod(values);
       console.log(data);
 
       if (data.success === false) {
@@ -114,7 +114,7 @@ const ImportPrixod = () => {
         return;
       } else {
         setSuccess(data.result);
-        navigate("/warehouse");
+        navigate("/prixodList");
         window.scrollTo(0, 0);
       }
     } catch (error: any) {

@@ -23,6 +23,7 @@ import Statistics from "./pages/Statistics/Statistics";
 import ImportPrixod from "./pages/Prixod/ImportPrixod";
 import { PrixodList } from "./pages/Prixod/PrixodList";
 import NotConfirmPrixod from "./pages/Prixod/NotConfirmPrixod";
+import EditPrixod from "./pages/Prixod/EditPrixod";
 
 function App() {
   return (
@@ -173,6 +174,15 @@ function App() {
             element={
               <Layout>
                 <NotConfirmPrixod/>
+              </Layout>
+            }
+          />
+
+            <Route
+            path="/editPrixod/:id"
+            element={
+              <Layout>
+                <EditPrixod/>
               </Layout>
             }
           />

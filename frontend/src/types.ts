@@ -139,17 +139,17 @@ export interface OrderPartsInterface {
   totalSellPriceWhichInStock: string;
   totalSellPriceOrderedWhichInStock: string;
   priceExwNoDiscount: string;
-  totalPriceMan:string;
-  priceWithoutPacking:string;
-  packing:string
+  totalPriceMan: string;
+  priceWithoutPacking: string;
+  packing: string;
   accessoryCostValue: number;
   declarationValue: number;
   totalPriceManValue: number;
-  transportValue:number;
+  transportValue: number;
   transportManValue: number;
   percentageValue: number;
   taxValue: number;
-  priceExw:number;
+  priceExw: number;
 }
 
 export interface OrderInterface {
@@ -315,4 +315,44 @@ export interface PriceListHistInterface {
   origKod: string;
   type: Type;
   rabatgrup: number;
+}
+
+export interface PrixodInterface {
+  id: number;
+  order: OrderInterface[];
+  invoice: string;
+  market: string;
+  paymentType: string;
+  comment: string;
+  message: string;
+  confirm: boolean;
+  confirmDate: Date;
+  accept: boolean;
+  acceptDate: Date;
+  createdAt: Date;
+}
+
+export interface SparePartInterface {
+  code: string;
+  origCode: string;
+  name: string;
+  liquidity: string;
+  count: number;
+  price: number;
+  sellPrice: number;
+  barcode: string;
+  row: string;
+  column: string;
+  brand:BrandInterface;
+}
+
+export interface EditPrixodInterface {
+  order: OrderInterface;
+  supplier: SupplierInterface;
+  invoice: string;
+  market: Market;
+  paymentType: PayType;
+  comment: string;
+  message?: string;
+  parts: SparePartInterface[];
 }

@@ -1,5 +1,6 @@
 import { Field, FieldArray, Form, Formik } from "formik";
 import {
+  EditPrixodInterface,
   OrderInterface,
   SupplierInterface,
   WarehouseInterface,
@@ -9,21 +10,24 @@ import { Button, Select, Textarea, TextInput } from "flowbite-react";
 import NewPartsComponent from "../../components/NewPartsComponent";
 import * as XLSX from "xlsx";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
 import { fetchSuppliers } from "../../redux-toolkit/features/supplier/supplierSlice";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
-import { createPrixod } from "../../api/allApi";
 import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
+import {fetchPrixodById} from "../../redux-toolkit/features/prixod/prixodSlice";
 
-const ImportWarehouse = () => {
+
+const EditPrixod = () => {
   // const[brands,setBrands]=useState<BrandInterface[]>([]);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const [addingValue, setAddingValue] = useState<number>(1);
   // const[suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
   const navigate = useNavigate();
+
+  const {id}=useParams();
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -42,35 +46,56 @@ const ImportWarehouse = () => {
     loading: ordersLoading,
     error: ordersError,
   } = useSelector((state: RootState) => state.order);
+    const { prixod} = useSelector((state: RootState) => state.prixod);
+
 
   useEffect(() => {
     dispatch(fetchBrands());
     dispatch(fetchSuppliers());
     dispatch(fetchOrders());
-  }, [dispatch]);
+   if (id) dispatch(fetchPrixodById(+id));
+  }, [dispatch,id]);
 
-  const wareHouseInitialValues: WarehouseInterface = {
-    orderId: orders[0]?.id || 0,
-    supplierId: suppliers[0]?.id || 0,
-    invoice: "",
-    market: Market.Local,
-    paymentType: PayType.Cash,
-    comment: "",
-    parts: [
-      {
-        kod: "",
-        origKod: "",
-        nameParts: "",
-        brand: Number(brands[0]?.id || 0),
-        liquidity: Liquidity.Fast,
-        count: 0,
-        price: 0,
-        salesPrice: 0,
-        barcode: "",
-      },
-    ],
-    message: "",
-  };
+  if (error) return <p className="text-center mt-10 text-red-500">Xəta baş verdi: {error}</p>;
+  if (!prixod) return <p className="text-center mt-10 text-gray-500">Prixod tapılmadı.</p>;
+
+ const prixodInitialValues   = {
+  order: prixod.order?.id || 0,
+  supplier: prixod.supplier?.id || 0,
+  invoice: prixod.invoice || "",
+  market: prixod.market || Market.Local,
+  paymentType: prixod.paymentType || PayType.Cash,
+  comment: prixod.comment || "",
+  message: prixod.message || "",
+  parts: prixod.parts?.length
+    ? prixod.parts.map((part) => ({
+        kod: part.code || "",
+        origKod: part.origCode || "",
+        nameParts: part.name || "",
+        brand: Number(part.brand?.id || 0),
+        liquidity: part.liquidity || Liquidity.Fast,
+        count: part.count || 0,
+        price: part.price || 0,
+        salesPrice: part.sellPrice || 0,
+        barcode: part.barcode || "",
+      }))
+    : [
+        {
+          kod: "",
+          origKod: "",
+          nameParts: "",
+          brand: Number(brands[0]?.id || 0),
+          liquidity: Liquidity.Fast,
+          count: 0,
+          price: 0,
+          salesPrice: 0,
+          barcode: "",
+        },
+      ],
+};
+
+console.log(prixod);
+
 
   const handleAddingValue = (e: any) => {
     setAddingValue(Number(e.target.value));
@@ -103,33 +128,19 @@ const ImportWarehouse = () => {
     reader.readAsArrayBuffer(file);
   };
 
-  const onsubmit = async (values: WarehouseInterface) => {
+  const onsubmit = async (values:any) => {
     console.log(values);
-    try {
-      const data = await createPrixod(values);
-      console.log(data);
-
-      if (data.success === false) {
-        setError(data.message);
-        return;
-      } else {
-        setSuccess(data.result);
-        navigate("/warehouse");
-        window.scrollTo(0, 0);
-      }
-    } catch (error: any) {
-      setError(error);
-    }
+   
   };
 
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
       <h2 className="font-semibold text-xl text-center  mb-[50px]">
-        Anbara daxil etmək
+        Prixod yoxlanışı və təsdiqi
       </h2>
 
       <Formik
-        initialValues={wareHouseInitialValues}
+        initialValues={prixodInitialValues}
         onSubmit={onsubmit}
         enableReinitialize
       >
@@ -332,9 +343,9 @@ const ImportWarehouse = () => {
                 <Button size={"xs"} color={"blue"} type="submit">
                   Yadda Saxla
                 </Button>
-                {/* <Button size={"sm"} color={"blue"}>
+                <Button size={"xs"} color={"blue"}>
                   Təsdiqlə
-                </Button> */}
+                </Button>
               </div>
             </Form>
           );
@@ -350,4 +361,4 @@ const ImportWarehouse = () => {
   );
 };
 
-export default ImportWarehouse;
+export default EditPrixod;
