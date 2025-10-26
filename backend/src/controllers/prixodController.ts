@@ -122,7 +122,13 @@ export const getPrixods = async (
 ) => {
   try {
     const allPrixods = await prixodRepository.find({
-      relations: ["spareParts", "spareParts.brand", "user", "supplier", "order"],
+      relations: [
+        "spareParts",
+        "spareParts.brand",
+        "user",
+        "supplier",
+        "order",
+      ],
     });
 
     if (allPrixods.length === 0) {
@@ -144,18 +150,142 @@ export const getPrixodById = async (
   try {
     const { id } = req.params;
     console.log(id);
-    
+
     const prixod = await prixodRepository.findOne({
       where: { id: +id },
-      relations: ["spareParts", "spareParts.brand", "user", "supplier", "order"],
+      relations: [
+        "spareParts",
+        "spareParts.brand",
+        "user",
+        "supplier",
+        "order",
+      ],
     });
     if (!prixod) {
       next(errorHandler(401, "Belə bir giriş tapılmadı!"));
       return;
     }
     res.status(200).json(prixod);
-  }
-  catch (error) {
+  } catch (error) {
     next(errorHandler(401, error));
-  }   
+  }
 };
+
+export const updatePrixod = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const {
+      order,
+      supplier,
+      invoice,
+      market,
+      paymentType,
+      comment,
+      parts,
+      message,
+    } = req.body;
+
+    // 1️⃣ Find the existing prixod
+    const getPrixod = await prixodRepository.findOne({
+      where: { id: +id },
+      relations: ["spareParts"], // include existing parts
+    });
+
+    if (!getPrixod) {
+      return next(errorHandler(404, "Belə bir prixod tapılmadı!"));
+    }
+
+    // 2️⃣ Get supplier and order
+    const getSupplier = await supplierRepository.findOneBy({ id: +supplier });
+    const getOrder = await orderRepository.findOneBy({ id: +order });
+    if (!getSupplier) return next(errorHandler(400, "Təchizatçı yoxdur!"));
+    if (!getOrder) return next(errorHandler(400, "Sifariş tapılmadı!"));
+
+    // 3️⃣ Update prixod main info
+    getPrixod.order = getOrder;
+    getPrixod.supplier = getSupplier;
+    getPrixod.invoice = invoice;
+    getPrixod.market = market;
+    getPrixod.paymentType = paymentType;
+    getPrixod.message = message;
+    getPrixod.comment = comment;
+    getPrixod.confirm = false;
+    getPrixod.accept = false;
+    getPrixod.confirmDate = new Date();
+    getPrixod.acceptDate = new Date();
+    getPrixod.user = { id: req.userId } as any;
+
+    await prixodRepository.save(getPrixod);
+
+    // 4️⃣ Process spare parts
+    const existingParts = getPrixod.spareParts;
+    const updatedParts:any = [];
+
+    for (const part of parts) {
+      const getBrand = await brandRepository.findOneBy({ id: part.brand });
+      if (!getBrand) return next(errorHandler(400, "Belə marka yoxdur!"));
+
+      // Find existing part by code (or you could use ID if available)
+      const existing = existingParts.find((p) => p.code === part.kod);
+
+      if (existing) {
+        // Update existing part
+        existing.code = part.kod;
+        existing.origCode = part.origKod;
+        existing.name = part.nameParts;
+        existing.count = part.count;
+        existing.price = part.price;
+        existing.sellPrice = part.salesPrice;
+        existing.liquidity = part.liquidity;
+        existing.brand = getBrand;
+
+        updatedParts.push(existing);
+      } else {
+        // Create new spare part
+        const newPart = sparePartRepository.create({
+          code: part.kod,
+          origCode: part.origKod,
+          name: part.nameParts,
+          count: part.count,
+          price: part.price,
+          sellPrice: part.salesPrice,
+          liquidity: part.liquidity,
+          brand: getBrand,
+          prixod: getPrixod,
+        });
+        updatedParts.push(newPart);
+      }
+    }
+
+    // 5️⃣ Delete removed parts
+    const removedParts = existingParts.filter(
+      (oldPart) => !updatedParts.some((newPart:any) => newPart.code === oldPart.code)
+    );
+    if (removedParts.length > 0) {
+      await sparePartRepository.remove(removedParts);
+    }
+
+    // 6️⃣ Save updated and new parts
+    await sparePartRepository.save(updatedParts);
+
+    // 7️⃣ Get updated prixod with all relations
+    const updatedPrixod = await prixodRepository.findOne({
+      where: { id: getPrixod.id },
+      relations: ["supplier", "order", "spareParts", "spareParts.brand"],
+    });
+
+    // 8️⃣ Send response
+    return res.status(200).json({
+      message: "Prixod və ehtiyat hissələri uğurla yeniləndi",
+      data: updatedPrixod,
+    });
+  } catch (error) {
+    console.error(error);
+    next(errorHandler(500, error.message || "Server xətası"));
+  }
+};
+

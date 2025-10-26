@@ -354,5 +354,5 @@ export interface EditPrixodInterface {
   paymentType: PayType;
   comment: string;
   message?: string;
-  parts: SparePartInterface[];
+  spareParts: SparePartInterface[];
 }

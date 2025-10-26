@@ -1,9 +1,7 @@
 import { Field, FieldArray, Form, Formik } from "formik";
 import {
-  EditPrixodInterface,
   OrderInterface,
   SupplierInterface,
-  WarehouseInterface,
 } from "../../types";
 import { Liquidity, Market, PayType } from "../../enums/projectEnums";
 import { Button, Select, Textarea, TextInput } from "flowbite-react";
@@ -17,6 +15,7 @@ import { fetchSuppliers } from "../../redux-toolkit/features/supplier/supplierSl
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
 import {fetchPrixodById} from "../../redux-toolkit/features/prixod/prixodSlice";
+import { updatePrixod } from "../../api/allApi";
 
 
 const EditPrixod = () => {
@@ -66,9 +65,9 @@ const EditPrixod = () => {
   market: prixod.market || Market.Local,
   paymentType: prixod.paymentType || PayType.Cash,
   comment: prixod.comment || "",
-  message: prixod.message || "",
-  parts: prixod.parts?.length
-    ? prixod.parts.map((part) => ({
+  message:  "",
+  parts: prixod.spareParts?.length
+    ? prixod.spareParts.map((part) => ({
         kod: part.code || "",
         origKod: part.origCode || "",
         nameParts: part.name || "",
@@ -94,7 +93,7 @@ const EditPrixod = () => {
       ],
 };
 
-console.log(prixod);
+console.log({ prixodInitialValues });
 
 
   const handleAddingValue = (e: any) => {
@@ -129,7 +128,17 @@ console.log(prixod);
   };
 
   const onsubmit = async (values:any) => {
-    console.log(values);
+    console.log({values});
+    
+    const res=updatePrixod(+id!,values);
+    res.then((data)=>{
+      setSuccess("Prixod uğurla yeniləndi");
+      setError("");
+      navigate("/prixodList");
+    }).catch((err)=>{
+      setError(err.message);
+      setSuccess("");
+    });
    
   };
 
@@ -157,7 +166,7 @@ console.log(prixod);
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Zayavka nömrəsi
                 </label>
-                <Field as={Select} name="orderId" className="w-20" sizing="sm">
+                <Field as={Select} name="order" className="w-20" sizing="sm">
                   {orders.length > 0 &&
                     orders.map((item: OrderInterface, index: number) => (
                       <option value={item.id} key={index}>
@@ -173,7 +182,7 @@ console.log(prixod);
                 </label>
                 <Field
                   as={Select}
-                  name="supplierId"
+                  name="supplier"
                   className="w-96"
                   sizing="sm"
                 >
@@ -215,7 +224,7 @@ console.log(prixod);
                   sizing="sm"
                 >
                   <option value={PayType.Cash}>Nağd</option>
-                  <option value={PayType.Transfer}>Xarici</option>
+                  <option value={PayType.Transfer}>Köçürmə</option>
                 </Field>
               </div>
 
