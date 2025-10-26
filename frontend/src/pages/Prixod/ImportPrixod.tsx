@@ -346,6 +346,14 @@ const ImportPrixod = () => {
       {error && !success && (
         <p className="mt-10 ml-10 text-sm text-red-700">{error}</p>
       )}
+
+        <div className="mt-20 bg-[#ccf] h-16 pt-2">
+        <div className="bg-orange-300 h-1 "></div>
+        <div className="bg-orange-200">
+        <h2 className="text-xl ml-20 font-semibold">Tarix</h2>
+
+        </div>
+      </div>
     </div>
   );
 };

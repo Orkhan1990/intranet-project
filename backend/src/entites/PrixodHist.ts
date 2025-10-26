@@ -10,6 +10,7 @@ import {
 import { AllEntities } from "./AllEntities";
 import { User } from "./User";
 import { Order } from "./Order";
+import { Prixod } from "./Prixod";
 
 @Entity({ name: "prixod_hist" })
 export class PrixodHist extends AllEntities {
@@ -20,8 +21,20 @@ export class PrixodHist extends AllEntities {
   @Column({ name: "level" })
   level: string;
 
-  @Column()
+  @Column({default:false})
   confirm: false;
+
+  @Column({ nullable: true })
+  message: string;
+
+  @Column()
+  confirmDate: Date;
+
+  @Column({ default: false })
+  accept: boolean;
+
+  @Column()
+  acceptDate: Date;
 
   @Column({ nullable: true })
   reject: string;
@@ -34,4 +47,10 @@ export class PrixodHist extends AllEntities {
 
   @ManyToOne(() => User, (user) => user.prixods)
   user: User;
+
+  @ManyToOne(() => Prixod, (prixod) => prixod.prixodHist, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "prixod_id" }) // <--- This adds the column
+  prixod: Prixod;
 }

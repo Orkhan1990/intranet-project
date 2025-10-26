@@ -12,6 +12,7 @@ import { SparePart } from "./SparePart";
 import { User } from "./User";
 import { Supplier } from "./Supplier";
 import { Order } from "./Order";
+import { PrixodHist } from "./PrixodHist";
 
 @Entity({ name: "prixods" })
 export class Prixod extends AllEntities {
@@ -56,4 +57,7 @@ export class Prixod extends AllEntities {
 
   @ManyToOne(() => User, (user) => user.prixods)
   user: User;
+
+  @OneToMany(() => PrixodHist, (prixodHist) => prixodHist.prixod)
+  prixodHist: PrixodHist[];
 }

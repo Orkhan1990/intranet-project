@@ -19,12 +19,11 @@ const EditPrixod = () => {
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const [addingValue, setAddingValue] = useState<number>(1);
-  const [message,setMessage]=useState<string>("");
+  const [message, setMessage] = useState<string>("");
   const navigate = useNavigate();
 
   const { id } = useParams();
-  console.log({message});
-  
+  console.log({ message });
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -67,6 +66,7 @@ const EditPrixod = () => {
     paymentType: prixod.paymentType || PayType.Cash,
     comment: prixod.comment || "",
     message: "",
+    prixodHist: [],
     parts: prixod.spareParts?.length
       ? prixod.spareParts.map((part) => ({
           kod: part.code || "",
@@ -101,22 +101,22 @@ const EditPrixod = () => {
   };
 
   const writeMessage = async (value: string, id: any) => {
-  if (!value.trim()) {
-    setError("Mesaj boş ola bilməz!");
-    return;
-  }
+    if (!value.trim()) {
+      setError("Mesaj boş ola bilməz!");
+      return;
+    }
 
-  try {
-    const res = await writeMessageApi(id, value); // call API
-    console.log(res);
-    setSuccess("Mesaj uğurla yazıldı");
-    setError("");
-    setMessage(""); // clear textarea
-  } catch (err: any) {
-    setError(err.response?.data?.message || err.message || "Xəta baş verdi");
-    setSuccess("");
-  }
-};
+    try {
+      const res = await writeMessageApi(id, value); // call API
+      console.log(res);
+      setSuccess("Mesaj uğurla yazıldı");
+      setError("");
+      setMessage(""); // clear textarea
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || "Xəta baş verdi");
+      setSuccess("");
+    }
+  };
 
   const handleFileChange = (event: any, setFieldValue: any) => {
     const file = event.target.files[0];
@@ -357,8 +357,17 @@ const EditPrixod = () => {
                 <div>
                   <div className="w-[400px] flex flex-col gap-2">
                     <h2>Mesaj</h2>
-                    <Textarea rows={5} onChange={(e:any)=>setMessage(e.target.value)} value={message}/>
-                    <Button color={"blue"} className="w-20" size={"xs"} onClick={()=>writeMessage(message,id)}>
+                    <Textarea
+                      rows={5}
+                      onChange={(e: any) => setMessage(e.target.value)}
+                      value={message}
+                    />
+                    <Button
+                      color={"blue"}
+                      className="w-20"
+                      size={"xs"}
+                      onClick={() => writeMessage(message, id)}
+                    >
                       Mesaj Yaz
                     </Button>
                   </div>
@@ -382,6 +391,31 @@ const EditPrixod = () => {
       {error && !success && (
         <p className="mt-10 ml-10 text-sm text-red-700">{error}</p>
       )}
+
+      <div className="mt-20 bg-[#ccf] h-16 pt-2">
+        <div className="bg-orange-300 h-1 "></div>
+        <div className="bg-orange-200">
+          <div className=" ml-20">
+            <h2 className="text-xl font-semibold">Tarix</h2>
+            <table>
+              <thead>
+                {/* <tr>
+              <th className="px-6 py-3 text-left"></th>
+              <th className="px-6 py-3 text-left"></th>
+              <th className="px-6 py-3 text-left"></th>
+            </tr> */}
+              </thead>
+              <tbody>
+                <tr className="">
+                  <td className="">Prixodun Tarixi</td>
+                  <td className="px-6 py-3">Salam</td>
+                  <td className="px-6 py-3">Salam</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

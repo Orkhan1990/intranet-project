@@ -49,3 +49,9 @@ export enum OrderStatus{
     Hengs="hengs",
     Man="man"
   }
+
+  export enum PrixodLevel{
+    PrixodConfirm="prixodConfirm",
+    PrixodAccept="prixodAccept",
+    PrixodComplete="prixodComplete"
+  }

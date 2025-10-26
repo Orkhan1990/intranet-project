@@ -24,6 +24,7 @@ import ImportPrixod from "./pages/Prixod/ImportPrixod";
 import { PrixodList } from "./pages/Prixod/PrixodList";
 import NotConfirmPrixod from "./pages/Prixod/NotConfirmPrixod";
 import EditPrixod from "./pages/Prixod/EditPrixod";
+import WorkerPercentage from "./pages/WorkerPercentage";
 
 function App() {
   return (
@@ -183,6 +184,15 @@ function App() {
             element={
               <Layout>
                 <EditPrixod/>
+              </Layout>
+            }
+          />
+
+            <Route
+            path="/workerPercentage"
+            element={
+              <Layout>
+                <WorkerPercentage/>
               </Layout>
             }
           />

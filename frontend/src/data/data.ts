@@ -23,7 +23,7 @@ export const navbarList:NavbarListInterface[] = [
           },
           {
               title:"Işçilərin faizi",
-              url:"/employeePercent"
+              url:"/workerPercentage"
           },
           {
               title:"Işçilərin zəhmət haqqısı",

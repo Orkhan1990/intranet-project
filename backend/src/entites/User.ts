@@ -35,6 +35,28 @@ export class User extends AllEntities {
     email: string
 
     @Column({
+        nullable:true
+    })
+    phone: string;
+    
+
+    @Column({
+        nullable:true
+    })
+    address: string;
+
+    @Column({
+        default:false,
+    })
+    isWorker: boolean;
+
+     @Column({
+        type:"float",
+        nullable:true
+    })
+    percentage: number;
+
+    @Column({
         default:UserRole.ServiceUser,
         name:"user_role"
     })
