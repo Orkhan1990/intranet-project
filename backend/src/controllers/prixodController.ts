@@ -7,12 +7,14 @@ import { Brand } from "../entites/Brand";
 import { Prixod } from "../entites/Prixod";
 import { SparePart } from "../entites/SparePart";
 import { Order } from "../entites/Order";
+import { User } from "../entites/User";
 
 const supplierRepository = AppDataSource.getRepository(Supplier);
 const brandRepository = AppDataSource.getRepository(Brand);
 const prixodRepository = AppDataSource.getRepository(Prixod);
 const sparePartRepository = AppDataSource.getRepository(SparePart);
 const orderRepository = AppDataSource.getRepository(Order);
+const userRepository = AppDataSource.getRepository(User);
 
 interface SparePartInterface {
   kod: string;
@@ -178,6 +180,7 @@ export const updatePrixod = async (
 ) => {
   try {
     const { id } = req.params;
+    
     const {
       order,
       supplier,
@@ -289,3 +292,34 @@ export const updatePrixod = async (
   }
 };
 
+
+export const writeMessage = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const userId=req.userId;
+    const { message } = req.body;
+
+    console.log(message);
+    
+    const prixod = await prixodRepository.findOneBy({ id: +id });
+
+    const user=await userRepository.findOneBy({id:+userId});  
+
+    if (!prixod) {
+      next(errorHandler(401, "Belə bir giriş tapılmadı!"));
+      return;
+    }
+
+    prixod.message = message;
+    prixod.user = user;
+    await prixodRepository.save(prixod);
+
+    res.status(200).json({ result: "Mesaj yazıldı" });
+  } catch (error) {
+    next(errorHandler(401, error));
+  }
+};

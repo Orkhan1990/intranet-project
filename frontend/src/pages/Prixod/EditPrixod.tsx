@@ -1,8 +1,5 @@
 import { Field, FieldArray, Form, Formik } from "formik";
-import {
-  OrderInterface,
-  SupplierInterface,
-} from "../../types";
+import { OrderInterface, SupplierInterface } from "../../types";
 import { Liquidity, Market, PayType } from "../../enums/projectEnums";
 import { Button, Select, Textarea, TextInput } from "flowbite-react";
 import NewPartsComponent from "../../components/NewPartsComponent";
@@ -14,19 +11,20 @@ import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
 import { fetchSuppliers } from "../../redux-toolkit/features/supplier/supplierSlice";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
-import {fetchPrixodById} from "../../redux-toolkit/features/prixod/prixodSlice";
-import { updatePrixod } from "../../api/allApi";
-
+import { fetchPrixodById } from "../../redux-toolkit/features/prixod/prixodSlice";
+import { updatePrixod, writeMessageApi } from "../../api/allApi";
 
 const EditPrixod = () => {
   // const[brands,setBrands]=useState<BrandInterface[]>([]);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const [addingValue, setAddingValue] = useState<number>(1);
-  // const[suppliers,setSuppliers]=useState<SupplierInterface[]>([]);
+  const [message,setMessage]=useState<string>("");
   const navigate = useNavigate();
 
-  const {id}=useParams();
+  const { id } = useParams();
+  console.log({message});
+  
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -45,60 +43,80 @@ const EditPrixod = () => {
     loading: ordersLoading,
     error: ordersError,
   } = useSelector((state: RootState) => state.order);
-    const { prixod} = useSelector((state: RootState) => state.prixod);
-
+  const { prixod } = useSelector((state: RootState) => state.prixod);
 
   useEffect(() => {
     dispatch(fetchBrands());
     dispatch(fetchSuppliers());
     dispatch(fetchOrders());
-   if (id) dispatch(fetchPrixodById(+id));
-  }, [dispatch,id]);
+    if (id) dispatch(fetchPrixodById(+id));
+  }, [dispatch, id]);
 
-  if (error) return <p className="text-center mt-10 text-red-500">Xəta baş verdi: {error}</p>;
-  if (!prixod) return <p className="text-center mt-10 text-gray-500">Prixod tapılmadı.</p>;
+  if (error)
+    return (
+      <p className="text-center mt-10 text-red-500">Xəta baş verdi: {error}</p>
+    );
+  if (!prixod)
+    return <p className="text-center mt-10 text-gray-500">Prixod tapılmadı.</p>;
 
- const prixodInitialValues   = {
-  order: prixod.order?.id || 0,
-  supplier: prixod.supplier?.id || 0,
-  invoice: prixod.invoice || "",
-  market: prixod.market || Market.Local,
-  paymentType: prixod.paymentType || PayType.Cash,
-  comment: prixod.comment || "",
-  message:  "",
-  parts: prixod.spareParts?.length
-    ? prixod.spareParts.map((part) => ({
-        kod: part.code || "",
-        origKod: part.origCode || "",
-        nameParts: part.name || "",
-        brand: Number(part.brand?.id || 0),
-        liquidity: part.liquidity || Liquidity.Fast,
-        count: part.count || 0,
-        price: part.price || 0,
-        salesPrice: part.sellPrice || 0,
-        barcode: part.barcode || "",
-      }))
-    : [
-        {
-          kod: "",
-          origKod: "",
-          nameParts: "",
-          brand: Number(brands[0]?.id || 0),
-          liquidity: Liquidity.Fast,
-          count: 0,
-          price: 0,
-          salesPrice: 0,
-          barcode: "",
-        },
-      ],
-};
+  const prixodInitialValues = {
+    order: prixod.order?.id || 0,
+    supplier: prixod.supplier?.id || 0,
+    invoice: prixod.invoice || "",
+    market: prixod.market || Market.Local,
+    paymentType: prixod.paymentType || PayType.Cash,
+    comment: prixod.comment || "",
+    message: "",
+    parts: prixod.spareParts?.length
+      ? prixod.spareParts.map((part) => ({
+          kod: part.code || "",
+          origKod: part.origCode || "",
+          nameParts: part.name || "",
+          brand: Number(part.brand?.id || 0),
+          liquidity: part.liquidity || Liquidity.Fast,
+          count: part.count || 0,
+          price: part.price || 0,
+          salesPrice: part.sellPrice || 0,
+          barcode: part.barcode || "",
+        }))
+      : [
+          {
+            kod: "",
+            origKod: "",
+            nameParts: "",
+            brand: Number(brands[0]?.id || 0),
+            liquidity: Liquidity.Fast,
+            count: 0,
+            price: 0,
+            salesPrice: 0,
+            barcode: "",
+          },
+        ],
+  };
 
-console.log({ prixodInitialValues });
-
+  console.log({ prixodInitialValues });
 
   const handleAddingValue = (e: any) => {
     setAddingValue(Number(e.target.value));
   };
+
+  const writeMessage = async (value: string, id: any) => {
+  if (!value.trim()) {
+    setError("Mesaj boş ola bilməz!");
+    return;
+  }
+
+  try {
+    const res = await writeMessageApi(id, value); // call API
+    console.log(res);
+    setSuccess("Mesaj uğurla yazıldı");
+    setError("");
+    setMessage(""); // clear textarea
+  } catch (err: any) {
+    setError(err.response?.data?.message || err.message || "Xəta baş verdi");
+    setSuccess("");
+  }
+};
 
   const handleFileChange = (event: any, setFieldValue: any) => {
     const file = event.target.files[0];
@@ -127,19 +145,22 @@ console.log({ prixodInitialValues });
     reader.readAsArrayBuffer(file);
   };
 
-  const onsubmit = async (values:any) => {
-    console.log({values});
-    
-    const res=updatePrixod(+id!,values);
-    res.then((data)=>{
-      setSuccess("Prixod uğurla yeniləndi");
-      setError("");
-      navigate("/prixodList");
-    }).catch((err)=>{
-      setError(err.message);
-      setSuccess("");
-    });
-   
+  const onsubmit = async (values: any) => {
+    console.log({ values });
+
+    const res = updatePrixod(+id!, values);
+    res
+      .then((data) => {
+        console.log(data);
+        setSuccess("Prixod uğurla yeniləndi");
+        setError("");
+        navigate("/prixodList");
+        window.scrollTo(0, 0);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setSuccess("");
+      });
   };
 
   return (
@@ -180,12 +201,7 @@ console.log({ prixodInitialValues });
                 <label htmlFor="" className="text-sm  w-[200px]">
                   Təchizatçı
                 </label>
-                <Field
-                  as={Select}
-                  name="supplier"
-                  className="w-96"
-                  sizing="sm"
-                >
+                <Field as={Select} name="supplier" className="w-96" sizing="sm">
                   {suppliers.length > 0 &&
                     suppliers.map((item: SupplierInterface, index: number) => (
                       <option value={item.id} key={index}>
@@ -341,8 +357,8 @@ console.log({ prixodInitialValues });
                 <div>
                   <div className="w-[400px] flex flex-col gap-2">
                     <h2>Mesaj</h2>
-                    <Field as={Textarea} rows={5} name="message" />
-                    <Button color={"blue"} className="w-20" size={"xs"}>
+                    <Textarea rows={5} onChange={(e:any)=>setMessage(e.target.value)} value={message}/>
+                    <Button color={"blue"} className="w-20" size={"xs"} onClick={()=>writeMessage(message,id)}>
                       Mesaj Yaz
                     </Button>
                   </div>

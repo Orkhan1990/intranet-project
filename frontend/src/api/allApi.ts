@@ -154,3 +154,23 @@ export const updatePrixod = async (id: number, prixodData: any) => {
     );
   } 
 };
+
+export  const writeMessageApi=async(id:number,message:string)=>{
+  try {
+    const response = await axios.put(`${VITE_API_BASE_URL}prixod/writeMessage/${id}`,{message}, { 
+      withCredentials: true
+    });
+    const data: any = response.data;  
+    if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "Mesaj yazılmadı");
+    }
+    return data;
+  } catch (error: any) {
+    console.log(error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  }
+};  
+
+
