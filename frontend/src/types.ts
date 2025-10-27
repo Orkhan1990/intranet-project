@@ -319,7 +319,7 @@ export interface PriceListHistInterface {
 
 export interface PrixodInterface {
   id: number;
-  order: OrderInterface[];
+  order: OrderInterface;
   invoice: string;
   market: string;
   paymentType: string;
@@ -330,6 +330,7 @@ export interface PrixodInterface {
   accept: boolean;
   acceptDate: Date;
   createdAt: Date;
+  isConfirmed: boolean;
 }
 
 export interface SparePartInterface {
@@ -352,7 +353,12 @@ export interface EditPrixodInterface {
   invoice: string;
   market: Market;
   paymentType: PayType;
+  confirm: boolean;
+  confirmDate: Date;
+  accept: boolean;
+  acceptDate: Date;
   comment: string;
   message?: string;
+  createdAt: Date;
   spareParts: SparePartInterface[];
 }

@@ -323,3 +323,35 @@ export const writeMessage = async (
     next(errorHandler(401, error));
   }
 };
+
+
+export const confirmPrixod = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const userId=req.userId;  
+    const prixod = await prixodRepository.findOneBy({ id: +id });
+
+    const user=await userRepository.findOneBy({id:+userId});
+
+    if (!user) {
+      next(errorHandler(401, "İstifadəçi tapılmadı!"));
+      return;
+    }
+
+    if (!prixod) {
+      next(errorHandler(401, "Belə bir prixod tapılmadı!"));
+      return;
+    }
+    prixod.confirm = true;
+    prixod.confirmDate = new Date();
+    prixod.user = user;
+    await prixodRepository.save(prixod);
+    res.status(200).json({ result: "Prixod təsdiqləndi" });
+  } catch (error) {
+    next(errorHandler(401, error));
+  }
+};

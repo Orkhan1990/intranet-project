@@ -35,6 +35,9 @@ export class Prixod extends AllEntities {
   @Column({ nullable: true })
   message: string;
 
+  @Column({ default: false,name:"is_confirmed" })
+  isConfirmed: boolean;
+
   @Column({ default: false })
   confirm: boolean;
 

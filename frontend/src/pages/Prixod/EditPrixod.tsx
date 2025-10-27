@@ -12,7 +12,11 @@ import { fetchSuppliers } from "../../redux-toolkit/features/supplier/supplierSl
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
 import { fetchPrixodById } from "../../redux-toolkit/features/prixod/prixodSlice";
-import { updatePrixod, writeMessageApi } from "../../api/allApi";
+import {
+  confirmPrixodApi,
+  updatePrixod,
+  writeMessageApi,
+} from "../../api/allApi";
 
 const EditPrixod = () => {
   // const[brands,setBrands]=useState<BrandInterface[]>([]);
@@ -26,22 +30,9 @@ const EditPrixod = () => {
   console.log({ message });
 
   const dispatch = useDispatch<AppDispatch>();
-
-  const {
-    brands,
-    loading: brandsLoading,
-    error: brandsError,
-  } = useSelector((state: RootState) => state.brand);
-  const {
-    suppliers,
-    loading: suppliersLoading,
-    error: suppliersError,
-  } = useSelector((state: RootState) => state.supplier);
-  const {
-    orders,
-    loading: ordersLoading,
-    error: ordersError,
-  } = useSelector((state: RootState) => state.order);
+  const { brands } = useSelector((state: RootState) => state.brand);
+  const { suppliers } = useSelector((state: RootState) => state.supplier);
+  const { orders } = useSelector((state: RootState) => state.order);
   const { prixod } = useSelector((state: RootState) => state.prixod);
 
   useEffect(() => {
@@ -145,6 +136,22 @@ const EditPrixod = () => {
     reader.readAsArrayBuffer(file);
   };
 
+  const confirmPrixodFunction = async (id: any) => {
+    const res = confirmPrixodApi(+id);
+    res
+      .then((data) => {
+        console.log(data);
+        setSuccess("Prixod uğurla təsdiqləndi");
+        setError("");
+        navigate("/prixodList");
+        window.scrollTo(0, 0);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setSuccess("");
+      });
+  };
+
   const onsubmit = async (values: any) => {
     console.log({ values });
 
@@ -162,6 +169,19 @@ const EditPrixod = () => {
         setSuccess("");
       });
   };
+
+  // const renderStatus = (status: string) => {
+  //   switch (status) {
+  //     case "Confirmed":
+  //       return <p className="text-green-600">Prixod təsdiqlənib.</p>;
+  //     case "Pending":
+  //       return <p className="text-yellow-600">Prixod gözləmədədir.</p>;
+  //     case "Cancelled":
+  //       return <p className="text-red-600">Prixod ləğv edilib.</p>;
+  //     default:
+  //       return <p className="text-gray-600">Naməlum status.</p>;
+  //   }
+  // };
 
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
@@ -377,7 +397,11 @@ const EditPrixod = () => {
                 <Button size={"xs"} color={"blue"} type="submit">
                   Yadda Saxla
                 </Button>
-                <Button size={"xs"} color={"blue"}>
+                <Button
+                  size={"xs"}
+                  color={"blue"}
+                  onClick={() => confirmPrixodFunction(id)}
+                >
                   Təsdiqlə
                 </Button>
               </div>
@@ -390,6 +414,87 @@ const EditPrixod = () => {
       )}
       {error && !success && (
         <p className="mt-10 ml-10 text-sm text-red-700">{error}</p>
+      )}
+
+      <div className="w-full bg-orange-200 h-[1px] mt-20"></div>
+
+      {prixod && (
+        <div className="mt-10  ">
+          <div className="">
+            <h2 className="text-lg font-semibold ml-16">
+              Prixod üzrə hərəkətlər
+            </h2>
+            <table className="mt-5 w-full h-20">
+              <thead></thead>
+              <tbody>
+                <tr className="flex gap-52 bg-gray-100 ">
+                  <td className="pl-16">Prixodun yaradılması</td>
+                  <td className="">
+                    {new Date(prixod.createdAt).toLocaleString("az-AZ", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </td>
+                  <td className="pl-16"></td>
+                  <td className="pl-16"></td>
+                  <td className="pl-16"></td>
+                </tr>
+                {prixod.confirm && (
+                  <tr className="w-full flex gap-20 mt-5">
+                    <td className="pl-16">
+                      Ehtiyat hissələri və Zəmanət
+                      <br /> Departament rəhbərinin yoxlanışı
+                    </td>
+                    <td className="">
+                      <div className="flex gap-5">
+                        <div className="flex flex-col gap-2">
+                          <h1 className="text-sm">Mesaj</h1>
+                          <Textarea  rows={6}/>
+                          <Button color={"blue"} size={"xs"} className="w-16">Təsdiqlə</Button>
+                        </div>
+
+                         <div className="flex flex-col gap-2">
+                          <h1 className="text-sm">İmtina səbəbi</h1>
+                          <Textarea rows={6}/>
+                          <Button color={"blue"} size={"xs"} className="w-16">İmtina</Button>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="pl-16"></td>
+                    <td className="pl-16"></td>
+                    <td className="pl-16"></td>
+                  </tr>
+                )}
+
+                {
+                  prixod.accept && (
+                  <tr className="w-full flex gap-20 mt-5 bg-gray-100">
+                    <td className="pl-16">
+                       Ehtiyat hissələri və Zəmanət
+                      <br /> Departament rəhbərinin təsdiqi
+                    </td>
+                    <td className="">
+                      {new Date(prixod.acceptDate).toLocaleString("az-AZ", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </td>
+                    <td className="pl-16"></td>
+                    <td className="pl-16"></td>
+                    <td className="pl-16"></td>
+                  </tr>
+                  )
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
       <div className="mt-20 bg-[#ccf] h-16 pt-2">
@@ -407,9 +512,9 @@ const EditPrixod = () => {
               </thead>
               <tbody>
                 <tr className="">
-                  <td className="">Prixodun Tarixi</td>
+                  {/* <td className="">Prixodun Tarixi</td>
                   <td className="px-6 py-3">Salam</td>
-                  <td className="px-6 py-3">Salam</td>
+                  <td className="px-6 py-3">Salam</td> */}
                 </tr>
               </tbody>
             </table>
