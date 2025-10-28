@@ -191,4 +191,40 @@ export const confirmPrixodApi=async(id:number)=>{
   } 
 };
 
+export const confirmLastPrixodApi=async(id:number,message:string)=>{
+  try {
+    const response = await axios.put(`${VITE_API_BASE_URL}prixod/confirmLastPrixod/${id}`,message, {  
+      withCredentials: true
+    });
+    const data: any = response.data;  
+    if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "Faktura təsdiqlənmədi");
+    }
+    return data;
+  } catch (error: any) {
+    console.log(error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  } 
+};
+
+export const rejectPrixodApi=async(id:number,message:string)=>{
+  try {
+    const response = await axios.put(`${VITE_API_BASE_URL}prixod/rejectPrixod/${id}`,message, {  
+      withCredentials: true
+    });
+    const data: any = response.data;
+    if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "Faktura təsdiqlənmədi");
+    }
+    return data;
+  } catch (error: any) {
+    console.log(error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  }
+};
+
 

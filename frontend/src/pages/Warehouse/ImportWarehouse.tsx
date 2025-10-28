@@ -27,21 +27,9 @@ const ImportWarehouse = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const {
-    brands,
-    loading: brandsLoading,
-    error: brandsError,
-  } = useSelector((state: RootState) => state.brand);
-  const {
-    suppliers,
-    loading: suppliersLoading,
-    error: suppliersError,
-  } = useSelector((state: RootState) => state.supplier);
-  const {
-    orders,
-    loading: ordersLoading,
-    error: ordersError,
-  } = useSelector((state: RootState) => state.order);
+  const { brands } = useSelector((state: RootState) => state.brand);
+  const { suppliers } = useSelector((state: RootState) => state.supplier);
+  const { orders } = useSelector((state: RootState) => state.order);
 
   useEffect(() => {
     dispatch(fetchBrands());

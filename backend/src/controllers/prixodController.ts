@@ -76,7 +76,7 @@ export const createPrixod = async (
     newPrixod.paymentType = paymentType;
     newPrixod.message = message;
     newPrixod.comment = comment;
-    newPrixod.confirm = false;
+    newPrixod.confirm = true;
     newPrixod.accept = false;
     newPrixod.confirmDate = new Date();
     newPrixod.acceptDate = new Date();
@@ -354,4 +354,74 @@ export const confirmPrixod = async (
   } catch (error) {
     next(errorHandler(401, error));
   }
+};
+
+
+export const confirmLastPrixod = async (
+  req: CustomRequest,
+  res: Response,  
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+        const { message } = req.body;
+
+    const userId=req.userId;  
+    const prixod = await prixodRepository.findOneBy({ id: +id });
+    const user=await userRepository.findOneBy({id:+userId});
+
+    if (!user) {
+      next(errorHandler(401, "İstifadəçi tapılmadı!"));
+      return;
+    }
+    if (!prixod) {
+      next(errorHandler(401, "Belə bir prixod tapılmadı!"));
+      return;
+    }
+    prixod.confirm = false;
+    prixod.isConfirmed = true;
+    prixod.confirmDate = new Date();
+    prixod.message = message;
+    prixod.accept = true;
+    prixod.acceptDate = new Date();
+    prixod.user = user;
+    await prixodRepository.save(prixod);
+    res.status(200).json({ result: "Prixod təsdiqləndi" });
+  } catch (error) {
+    next(errorHandler(401, error));
+  }
+};
+
+
+export const rejectPrixod = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const userId=req.userId;  
+    const { message } = req.body;
+    const prixod = await prixodRepository.findOneBy({ id: +id });
+
+    const user=await userRepository.findOneBy({id:+userId});
+    if (!user) {
+      next(errorHandler(401, "İstifadəçi tapılmadı!"));
+      return;
+    }
+    if (!prixod) {
+      next(errorHandler(401, "Belə bir prixod tapılmadı!"));
+      return;
+    }
+  
+    // prixod.accept = false;
+    // prixod.acceptDate = new Date();
+    prixod.message = message;
+    prixod.user = user;
+    await prixodRepository.save(prixod);
+    res.status(200).json({ result: "Prixod rədd edildi" });
+  }
+  catch (error) {
+    next(errorHandler(401, error));
+  } 
 };

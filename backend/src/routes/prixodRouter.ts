@@ -1,5 +1,5 @@
 import express from "express";
-import {confirmPrixod, createPrixod , getPrixodById, getPrixods, updatePrixod, writeMessage } from "../controllers/prixodController";
+import {confirmLastPrixod, confirmPrixod, createPrixod , getPrixodById, getPrixods, rejectPrixod, updatePrixod, writeMessage } from "../controllers/prixodController";
 import verifyToken from "../middleware/verifyToken";
 
 
@@ -12,6 +12,8 @@ router.get("/getPrixodById/:id",getPrixodById);
 router.put("/updatePrixod/:id",verifyToken,updatePrixod);
 router.put("/writeMessage/:id",verifyToken,writeMessage);
 router.put("/confirmPrixod/:id",verifyToken,confirmPrixod);
+router.put("/confirmLastPrixod/:id",verifyToken,confirmLastPrixod);
+router.put("/rejectPrixod/:id",verifyToken,rejectPrixod);
 
 
 

@@ -13,7 +13,9 @@ import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
 import { fetchPrixodById } from "../../redux-toolkit/features/prixod/prixodSlice";
 import {
+  confirmLastPrixodApi,
   confirmPrixodApi,
+  rejectPrixodApi,
   updatePrixod,
   writeMessageApi,
 } from "../../api/allApi";
@@ -25,6 +27,7 @@ const EditPrixod = () => {
   const [addingValue, setAddingValue] = useState<number>(1);
   const [message, setMessage] = useState<string>("");
   const navigate = useNavigate();
+  const [refreshPage, setRefreshPage] = useState<boolean>(false);
 
   const { id } = useParams();
   console.log({ message });
@@ -40,7 +43,10 @@ const EditPrixod = () => {
     dispatch(fetchSuppliers());
     dispatch(fetchOrders());
     if (id) dispatch(fetchPrixodById(+id));
-  }, [dispatch, id]);
+    if (refreshPage){
+      setRefreshPage(false)
+    };
+  }, [dispatch, id,refreshPage]);
 
   if (error)
     return (
@@ -145,6 +151,7 @@ const EditPrixod = () => {
         setError("");
         navigate("/prixodList");
         window.scrollTo(0, 0);
+        setRefreshPage(true);
       })
       .catch((err) => {
         setError(err.message);
@@ -183,6 +190,36 @@ const EditPrixod = () => {
   //   }
   // };
 
+  const confirmLastPrixod = async (id: any,message:string) => {
+    const res = confirmLastPrixodApi(+id,message);
+    res
+      .then((data) => {
+        console.log(data);
+        setSuccess("Prixod uğurla təsdiqləndi");  
+        setError("");
+        navigate("/prixodList");
+        setRefreshPage(true);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setSuccess("");
+      });
+    }
+
+    const rejectPrixod = async (id: any,message:string) => {
+      const res = rejectPrixodApi(+id,message);
+      res
+        .then((data) => {
+          console.log(data);
+          setSuccess("Prixod uğurla rədd edildi");  
+          setError("");
+          setRefreshPage(true);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setSuccess("");
+        });
+      }
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
       <h2 className="font-semibold text-xl text-center  mb-[50px]">
@@ -409,9 +446,9 @@ const EditPrixod = () => {
           );
         }}
       </Formik>
-      {!error && success && (
+      {/* {!error && success && (
         <p className="mt-10 ml-10 text-sm text-green-700">{success}</p>
-      )}
+      )} */}
       {error && !success && (
         <p className="mt-10 ml-10 text-sm text-red-700">{error}</p>
       )}
@@ -452,14 +489,14 @@ const EditPrixod = () => {
                       <div className="flex gap-5">
                         <div className="flex flex-col gap-2">
                           <h1 className="text-sm">Mesaj</h1>
-                          <Textarea  rows={6}/>
-                          <Button color={"blue"} size={"xs"} className="w-16">Təsdiqlə</Button>
+                          <Textarea  rows={6} onChange={(e:any)=>setMessage(e.target.value)}/>
+                          <Button color={"blue"} size={"xs"} className="w-16" onClick={()=>confirmLastPrixod(id,message)}>Təsdiqlə</Button>
                         </div>
 
                          <div className="flex flex-col gap-2">
                           <h1 className="text-sm">İmtina səbəbi</h1>
-                          <Textarea rows={6}/>
-                          <Button color={"blue"} size={"xs"} className="w-16">İmtina</Button>
+                          <Textarea rows={6} onChange={(e:any)=>setMessage(e.target.value)}/>
+                          <Button color={"blue"} size={"xs"} className="w-16" onClick={()=>rejectPrixod(id,message)}>İmtina</Button>
                         </div>
                       </div>
                     </td>
@@ -471,7 +508,7 @@ const EditPrixod = () => {
 
                 {
                   prixod.accept && (
-                  <tr className="w-full flex gap-20 mt-5 bg-gray-100">
+                  <tr className="w-full flex gap-36 mt-5 bg-gray-100">
                     <td className="pl-16">
                        Ehtiyat hissələri və Zəmanət
                       <br /> Departament rəhbərinin təsdiqi

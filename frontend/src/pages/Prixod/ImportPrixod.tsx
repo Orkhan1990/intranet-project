@@ -27,21 +27,9 @@ const ImportPrixod = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const {
-    brands,
-    loading: brandsLoading,
-    error: brandsError,
-  } = useSelector((state: RootState) => state.brand);
-  const {
-    suppliers,
-    loading: suppliersLoading,
-    error: suppliersError,
-  } = useSelector((state: RootState) => state.supplier);
-  const {
-    orders,
-    loading: ordersLoading,
-    error: ordersError,
-  } = useSelector((state: RootState) => state.order);
+  const { brands } = useSelector((state: RootState) => state.brand);
+  const { suppliers } = useSelector((state: RootState) => state.supplier);
+  const { orders } = useSelector((state: RootState) => state.order);
 
   useEffect(() => {
     dispatch(fetchBrands());
@@ -124,9 +112,7 @@ const ImportPrixod = () => {
 
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
-      <h2 className="font-semibold text-xl text-center  mb-[50px]">
-        Prixod
-      </h2>
+      <h2 className="font-semibold text-xl text-center  mb-[50px]">Prixod</h2>
 
       <Formik
         initialValues={wareHouseInitialValues}
@@ -204,7 +190,7 @@ const ImportPrixod = () => {
                   sizing="sm"
                 >
                   <option value={PayType.Cash}>Nağd</option>
-                  <option value={PayType.Transfer}>Xarici</option>
+                  <option value={PayType.Transfer}>Köçürmə</option>
                 </Field>
               </div>
 
@@ -347,11 +333,10 @@ const ImportPrixod = () => {
         <p className="mt-10 ml-10 text-sm text-red-700">{error}</p>
       )}
 
-        <div className="mt-20 bg-[#ccf] h-16 pt-2">
+      <div className="mt-20 bg-[#ccf] h-16 pt-2">
         <div className="bg-orange-300 h-1 "></div>
         <div className="bg-orange-200">
-        <h2 className="text-xl ml-20 font-semibold">Tarix</h2>
-
+          <h2 className="text-xl ml-20 font-semibold">Tarix</h2>
         </div>
       </div>
     </div>

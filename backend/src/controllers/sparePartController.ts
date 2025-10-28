@@ -19,7 +19,7 @@ export const getSpareParts = async (
     // });
 
     const spareParts = await sparePartRepository.find({
-      where: { prixod: { confirm: true } },
+      where: { prixod: { isConfirmed: true } },
       relations: { brand: true, prixod: true },
     });
 
