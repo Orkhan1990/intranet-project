@@ -222,8 +222,8 @@ const EditPrixod = () => {
       }
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
-      <h2 className="font-semibold text-xl text-center  mb-[50px]">
-        Prixod yoxlanışı və təsdiqi
+      <h2 className="font-bold text-2xl text-center text-blue-700 mb-10">
+        Mədaxil yoxlanışı və təsdiqi
       </h2>
 
       <Formik
@@ -319,7 +319,7 @@ const EditPrixod = () => {
                   {({ push }) => (
                     <div className="border text-sm w-[95%] p-5 rounded-md ">
                       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <thead className="text-xs bg-blue-100 text-blue-900">
                           <tr>
                             <th scope="col" className="px-6 py-3 text-center">
                               №
@@ -436,8 +436,8 @@ const EditPrixod = () => {
                 </Button>
                 <Button
                   size={"xs"}
-                  color={"blue"}
                   onClick={() => confirmPrixodFunction(id)}
+                  className="text-white bg-green-700"
                 >
                   Təsdiqlə
                 </Button>
@@ -496,7 +496,7 @@ const EditPrixod = () => {
                          <div className="flex flex-col gap-2">
                           <h1 className="text-sm">İmtina səbəbi</h1>
                           <Textarea rows={6} onChange={(e:any)=>setMessage(e.target.value)}/>
-                          <Button color={"blue"} size={"xs"} className="w-16" onClick={()=>rejectPrixod(id,message)}>İmtina</Button>
+                          <Button  size={"xs"} className="w-16 text-white bg-red-700" onClick={()=>rejectPrixod(id,message)}>İmtina</Button>
                         </div>
                       </div>
                     </td>

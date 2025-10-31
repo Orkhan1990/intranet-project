@@ -22,9 +22,9 @@ import PriceList from "./pages/PriceList/PriceList";
 import Statistics from "./pages/Statistics/Statistics";
 import ImportPrixod from "./pages/Prixod/ImportPrixod";
 import { PrixodList } from "./pages/Prixod/PrixodList";
-import NotConfirmPrixod from "./pages/Prixod/NotConfirmPrixod";
 import EditPrixod from "./pages/Prixod/EditPrixod";
 import WorkerPercentage from "./pages/WorkerPercentage";
+import { ConfirmPrixod } from "./pages/Prixod/ConfirmPrixod";
 
 function App() {
   return (
@@ -174,7 +174,7 @@ function App() {
             path="/prixod5"
             element={
               <Layout>
-                <NotConfirmPrixod/>
+                <ConfirmPrixod/>
               </Layout>
             }
           />

@@ -112,7 +112,7 @@ const ImportPrixod = () => {
 
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
-      <h2 className="font-semibold text-xl text-center  mb-[50px]">Prixod</h2>
+      <h2 className="font-bold text-2xl text-center text-blue-700 mb-10">Mədaxil</h2>
 
       <Formik
         initialValues={wareHouseInitialValues}
@@ -212,7 +212,7 @@ const ImportPrixod = () => {
                   {({ push }) => (
                     <div className="border text-sm w-[95%] p-5 rounded-md ">
                       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <thead className="text-xs bg-blue-100 text-blue-900">
                           <tr>
                             <th scope="col" className="px-6 py-3 text-center">
                               №

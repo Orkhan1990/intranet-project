@@ -54,7 +54,7 @@ export class User extends AllEntities {
         type:"float",
         nullable:true
     })
-    percentage: number;
+    percent: number;
 
     @Column({
         default:UserRole.ServiceUser,
