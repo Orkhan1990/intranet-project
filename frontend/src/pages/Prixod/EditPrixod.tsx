@@ -438,6 +438,7 @@ const EditPrixod = () => {
                   size={"xs"}
                   onClick={() => confirmPrixodFunction(id)}
                   className="text-white bg-green-700"
+                 disabled={prixod.accept}
                 >
                   Təsdiqlə
                 </Button>

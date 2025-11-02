@@ -44,7 +44,8 @@ export const createPrixod = async (
   next: NextFunction
 ) => {
   try {
-    console.log(req.body);
+
+    
 
     const userId = req.userId;
     const {
@@ -76,7 +77,7 @@ export const createPrixod = async (
     newPrixod.paymentType = paymentType;
     newPrixod.message = message;
     newPrixod.comment = comment;
-    newPrixod.confirm = true;
+    newPrixod.confirm = false;
     newPrixod.accept = false;
     newPrixod.confirmDate = new Date();
     newPrixod.acceptDate = new Date();
@@ -151,7 +152,7 @@ export const getPrixodById = async (
 ) => {
   try {
     const { id } = req.params;
-    console.log(id);
+    // console.log(id);
 
     const prixod = await prixodRepository.findOne({
       where: { id: +id },
@@ -303,7 +304,7 @@ export const writeMessage = async (
     const userId=req.userId;
     const { message } = req.body;
 
-    console.log(message);
+    // console.log(message);
     
     const prixod = await prixodRepository.findOneBy({ id: +id });
 
@@ -335,7 +336,10 @@ export const confirmPrixod = async (
     const userId=req.userId;  
     const prixod = await prixodRepository.findOneBy({ id: +id });
 
-    const user=await userRepository.findOneBy({id:+userId});
+    const user=await userRepository.findOneBy({id:userId});
+
+    console.log({user});
+    
 
     if (!user) {
       next(errorHandler(401, "İstifadəçi tapılmadı!"));
@@ -364,7 +368,7 @@ export const confirmLastPrixod = async (
 ) => {
   try {
     const { id } = req.params;
-        const { message } = req.body;
+    const { message } = req.body;
 
     const userId=req.userId;  
     const prixod = await prixodRepository.findOneBy({ id: +id });

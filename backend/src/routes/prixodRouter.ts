@@ -11,7 +11,7 @@ router.get("/getPrixods",getPrixods)
 router.get("/getPrixodById/:id",getPrixodById);
 router.put("/updatePrixod/:id",verifyToken,updatePrixod);
 router.put("/writeMessage/:id",verifyToken,writeMessage);
-router.put("/confirmPrixod/:id",verifyToken,confirmPrixod);
+router.put("/confirmPrixod/:id",confirmPrixod);
 router.put("/confirmLastPrixod/:id",verifyToken,confirmLastPrixod);
 router.put("/rejectPrixod/:id",verifyToken,rejectPrixod);
 
