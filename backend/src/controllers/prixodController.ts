@@ -8,6 +8,7 @@ import { Prixod } from "../entites/Prixod";
 import { SparePart } from "../entites/SparePart";
 import { Order } from "../entites/Order";
 import { User } from "../entites/User";
+import { PrixodHist } from "../entites/PrixodHist";
 
 const supplierRepository = AppDataSource.getRepository(Supplier);
 const brandRepository = AppDataSource.getRepository(Brand);
@@ -15,6 +16,7 @@ const prixodRepository = AppDataSource.getRepository(Prixod);
 const sparePartRepository = AppDataSource.getRepository(SparePart);
 const orderRepository = AppDataSource.getRepository(Order);
 const userRepository = AppDataSource.getRepository(User);
+const prixodHistReposiroty = AppDataSource.getRepository(PrixodHist);
 
 interface SparePartInterface {
   kod: string;
@@ -44,9 +46,6 @@ export const createPrixod = async (
   next: NextFunction
 ) => {
   try {
-
-    
-
     const userId = req.userId;
     const {
       orderId,
@@ -63,6 +62,12 @@ export const createPrixod = async (
 
     const getSupplier = await supplierRepository.findOneBy({ id: +supplierId });
     const getOrder = await orderRepository.findOneBy({ id: +orderId });
+    const user = await userRepository.findOneBy({ id: userId });
+
+    if (!user) {
+      next(errorHandler(401, "Belə istifadəçi tapılmadı!"));
+      return;
+    }
 
     if (!getSupplier) {
       next(errorHandler(401, "Təchizatçı yoxdur!!"));
@@ -84,6 +89,19 @@ export const createPrixod = async (
     newPrixod.user = { id: userId } as any;
 
     await prixodRepository.save(newPrixod);
+
+    const prixodHist = new PrixodHist();
+    prixodHist.prixod = newPrixod;
+    prixodHist.user = user;
+    prixodHist.accept = false;
+    prixodHist.confirm = false;
+    prixodHist.confirmDate = new Date();
+    prixodHist.acceptDate = new Date();
+    prixodHist.order = getOrder;
+    prixodHist.level = "created";
+    prixodHist.date = new Date();
+
+    await prixodHistReposiroty.save(prixodHist);
 
     const newPartsArray = [];
 
@@ -131,6 +149,8 @@ export const getPrixods = async (
         "user",
         "supplier",
         "order",
+        "prixodHist",
+        "prixodHist.user",
       ],
     });
 
@@ -162,6 +182,8 @@ export const getPrixodById = async (
         "user",
         "supplier",
         "order",
+        "prixodHist",
+        "prixodHist.user",
       ],
     });
     if (!prixod) {
@@ -181,7 +203,8 @@ export const updatePrixod = async (
 ) => {
   try {
     const { id } = req.params;
-    
+    const userId = req.userId;
+
     const {
       order,
       supplier,
@@ -206,6 +229,9 @@ export const updatePrixod = async (
     // 2️⃣ Get supplier and order
     const getSupplier = await supplierRepository.findOneBy({ id: +supplier });
     const getOrder = await orderRepository.findOneBy({ id: +order });
+    const user = await userRepository.findOneBy({ id: userId });
+    if (!user)
+      return next(errorHandler(401, "Belə bir istifadəçi mövcud deyil"));
     if (!getSupplier) return next(errorHandler(400, "Təchizatçı yoxdur!"));
     if (!getOrder) return next(errorHandler(400, "Sifariş tapılmadı!"));
 
@@ -225,9 +251,22 @@ export const updatePrixod = async (
 
     await prixodRepository.save(getPrixod);
 
+    const prixodHist = new PrixodHist();
+    prixodHist.prixod = getPrixod;
+    prixodHist.user = user;
+    prixodHist.accept = false;
+    prixodHist.confirm = false;
+    prixodHist.confirmDate = new Date();
+    prixodHist.acceptDate = new Date();
+    prixodHist.order = getOrder;
+    prixodHist.level = "updated";
+    prixodHist.date = new Date();
+
+    await prixodHistReposiroty.save(prixodHist);
+
     // 4️⃣ Process spare parts
     const existingParts = getPrixod.spareParts;
-    const updatedParts:any = [];
+    const updatedParts: any = [];
 
     for (const part of parts) {
       const getBrand = await brandRepository.findOneBy({ id: part.brand });
@@ -267,7 +306,8 @@ export const updatePrixod = async (
 
     // 5️⃣ Delete removed parts
     const removedParts = existingParts.filter(
-      (oldPart) => !updatedParts.some((newPart:any) => newPart.code === oldPart.code)
+      (oldPart) =>
+        !updatedParts.some((newPart: any) => newPart.code === oldPart.code)
     );
     if (removedParts.length > 0) {
       await sparePartRepository.remove(removedParts);
@@ -293,7 +333,6 @@ export const updatePrixod = async (
   }
 };
 
-
 export const writeMessage = async (
   req: CustomRequest,
   res: Response,
@@ -301,14 +340,14 @@ export const writeMessage = async (
 ) => {
   try {
     const { id } = req.params;
-    const userId=req.userId;
+    const userId = req.userId;
     const { message } = req.body;
 
     // console.log(message);
-    
+
     const prixod = await prixodRepository.findOneBy({ id: +id });
 
-    const user=await userRepository.findOneBy({id:+userId});  
+    const user = await userRepository.findOneBy({ id: +userId });
 
     if (!prixod) {
       next(errorHandler(401, "Belə bir giriş tapılmadı!"));
@@ -325,7 +364,6 @@ export const writeMessage = async (
   }
 };
 
-
 export const confirmPrixod = async (
   req: CustomRequest,
   res: Response,
@@ -333,13 +371,12 @@ export const confirmPrixod = async (
 ) => {
   try {
     const { id } = req.params;
-    const userId=req.userId;  
+    const userId = req.userId;
     const prixod = await prixodRepository.findOneBy({ id: +id });
+    const user = await userRepository.findOneBy({ id: userId });
+    const order = await orderRepository.findOneBy({ id: prixod.order.id });
 
-    const user=await userRepository.findOneBy({id:userId});
-
-    console.log({user});
-    
+    // console.log({ user });
 
     if (!user) {
       next(errorHandler(401, "İstifadəçi tapılmadı!"));
@@ -354,25 +391,38 @@ export const confirmPrixod = async (
     prixod.confirmDate = new Date();
     prixod.user = user;
     await prixodRepository.save(prixod);
+
+    const prixodHist = new PrixodHist();
+    prixodHist.prixod = prixod;
+    prixodHist.user = user;
+    prixodHist.accept = false;
+    prixodHist.confirm = true;
+    prixodHist.confirmDate = new Date();
+    prixodHist.acceptDate = new Date();
+    prixodHist.order = order;
+    prixodHist.level = "confirmed";
+    prixodHist.date = new Date();
+    await prixodHistReposiroty.save(prixodHist);
+
     res.status(200).json({ result: "Prixod təsdiqləndi" });
   } catch (error) {
     next(errorHandler(401, error));
   }
 };
 
-
 export const confirmLastPrixod = async (
   req: CustomRequest,
-  res: Response,  
+  res: Response,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params;
     const { message } = req.body;
 
-    const userId=req.userId;  
+    const userId = req.userId;
     const prixod = await prixodRepository.findOneBy({ id: +id });
-    const user=await userRepository.findOneBy({id:+userId});
+    const user = await userRepository.findOneBy({ id: +userId });
+    const order = await orderRepository.findOneBy({ id: prixod.order.id });
 
     if (!user) {
       next(errorHandler(401, "İstifadəçi tapılmadı!"));
@@ -390,12 +440,25 @@ export const confirmLastPrixod = async (
     prixod.acceptDate = new Date();
     prixod.user = user;
     await prixodRepository.save(prixod);
+
+    const prixodHist = new PrixodHist();
+    prixodHist.prixod = prixod;
+    prixodHist.user = user;
+    prixodHist.accept = true;
+    prixodHist.confirm = false;
+    prixodHist.confirmDate = new Date();
+    prixodHist.acceptDate = new Date();
+    prixodHist.order = order;
+    prixodHist.level = "accept";
+    prixodHist.date = new Date();
+    prixodHist.message = message;
+    await prixodHistReposiroty.save(prixodHist);
+
     res.status(200).json({ result: "Prixod təsdiqləndi" });
   } catch (error) {
     next(errorHandler(401, error));
   }
 };
-
 
 export const rejectPrixod = async (
   req: CustomRequest,
@@ -404,11 +467,12 @@ export const rejectPrixod = async (
 ) => {
   try {
     const { id } = req.params;
-    const userId=req.userId;  
+    const userId = req.userId;
     const { message } = req.body;
     const prixod = await prixodRepository.findOneBy({ id: +id });
+    const user = await userRepository.findOneBy({ id: +userId });
+    const order = await orderRepository.findOneBy({ id: prixod.order.id });
 
-    const user=await userRepository.findOneBy({id:+userId});
     if (!user) {
       next(errorHandler(401, "İstifadəçi tapılmadı!"));
       return;
@@ -417,15 +481,28 @@ export const rejectPrixod = async (
       next(errorHandler(401, "Belə bir prixod tapılmadı!"));
       return;
     }
-  
+
     // prixod.accept = false;
     // prixod.acceptDate = new Date();
     prixod.message = message;
     prixod.user = user;
     await prixodRepository.save(prixod);
+
+    const prixodHist = new PrixodHist();
+    prixodHist.prixod = prixod;
+    prixodHist.user = user;
+    prixodHist.accept = false;
+    prixodHist.confirm = false;
+    prixodHist.confirmDate = new Date();
+    prixodHist.acceptDate = new Date();
+    prixodHist.order = order;
+    prixodHist.level = "reject";
+    prixodHist.date = new Date();
+    prixodHist.message = message;
+    await prixodHistReposiroty.save(prixodHist);
+
     res.status(200).json({ result: "Prixod rədd edildi" });
-  }
-  catch (error) {
+  } catch (error) {
     next(errorHandler(401, error));
-  } 
+  }
 };

@@ -30,7 +30,7 @@ const EditPrixod = () => {
   const [refreshPage, setRefreshPage] = useState<boolean>(false);
 
   const { id } = useParams();
-  console.log({ message });
+  // console.log({ message });
 
   const dispatch = useDispatch<AppDispatch>();
   const { brands } = useSelector((state: RootState) => state.brand);
@@ -91,7 +91,7 @@ const EditPrixod = () => {
         ],
   };
 
-  console.log({ prixodInitialValues });
+  // console.log({ prixodInitialValues });
 
   const handleAddingValue = (e: any) => {
     setAddingValue(Number(e.target.value));

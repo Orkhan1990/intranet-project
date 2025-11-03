@@ -22,7 +22,7 @@ export class PrixodHist extends AllEntities {
   level: string;
 
   @Column({default:false})
-  confirm: false;
+  confirm: boolean;
 
   @Column({ nullable: true })
   message: string;
