@@ -344,7 +344,20 @@ export interface SparePartInterface {
   barcode: string;
   row: string;
   column: string;
-  brand:BrandInterface;
+  brand: BrandInterface;
+}
+
+export interface PrixodHistInterface {
+  level: string;
+  confirm: boolean;
+  message: string;
+  confirmDate: Date;
+  accept: boolean;
+  acceptDate: Date;
+  reject: string;
+  date: Date;
+  file: string;
+  user:UserInterface
 }
 
 export interface EditPrixodInterface {
@@ -361,4 +374,5 @@ export interface EditPrixodInterface {
   message?: string;
   createdAt: Date;
   spareParts: SparePartInterface[];
+  prixodHist: PrixodHistInterface[];
 }

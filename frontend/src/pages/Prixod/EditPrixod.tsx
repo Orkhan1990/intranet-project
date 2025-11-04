@@ -38,15 +38,17 @@ const EditPrixod = () => {
   const { orders } = useSelector((state: RootState) => state.order);
   const { prixod } = useSelector((state: RootState) => state.prixod);
 
+  console.log({ prixod });
+
   useEffect(() => {
     dispatch(fetchBrands());
     dispatch(fetchSuppliers());
     dispatch(fetchOrders());
     if (id) dispatch(fetchPrixodById(+id));
-    if (refreshPage){
-      setRefreshPage(false)
-    };
-  }, [dispatch, id,refreshPage]);
+    if (refreshPage) {
+      setRefreshPage(false);
+    }
+  }, [dispatch, id, refreshPage]);
 
   if (error)
     return (
@@ -190,12 +192,12 @@ const EditPrixod = () => {
   //   }
   // };
 
-  const confirmLastPrixod = async (id: any,message:string) => {
-    const res = confirmLastPrixodApi(+id,message);
+  const confirmLastPrixod = async (id: any, message: string) => {
+    const res = confirmLastPrixodApi(+id, message);
     res
       .then((data) => {
         console.log(data);
-        setSuccess("Prixod uğurla təsdiqləndi");  
+        setSuccess("Prixod uğurla təsdiqləndi");
         setError("");
         navigate("/prixodList");
         setRefreshPage(true);
@@ -204,22 +206,22 @@ const EditPrixod = () => {
         setError(err.message);
         setSuccess("");
       });
-    }
+  };
 
-    const rejectPrixod = async (id: any,message:string) => {
-      const res = rejectPrixodApi(+id,message);
-      res
-        .then((data) => {
-          console.log(data);
-          setSuccess("Prixod uğurla rədd edildi");  
-          setError("");
-          setRefreshPage(true);
-        })
-        .catch((err) => {
-          setError(err.message);
-          setSuccess("");
-        });
-      }
+  const rejectPrixod = async (id: any, message: string) => {
+    const res = rejectPrixodApi(+id, message);
+    res
+      .then((data) => {
+        console.log(data);
+        setSuccess("Prixod uğurla rədd edildi");
+        setError("");
+        setRefreshPage(true);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setSuccess("");
+      });
+  };
   return (
     <div className="min-h-screen mt-[100px] mb-[100px]">
       <h2 className="font-bold text-2xl text-center text-blue-700 mb-10">
@@ -438,7 +440,7 @@ const EditPrixod = () => {
                   size={"xs"}
                   onClick={() => confirmPrixodFunction(id)}
                   className="text-white bg-green-700"
-                 disabled={prixod.accept}
+                  disabled={prixod.accept}
                 >
                   Təsdiqlə
                 </Button>
@@ -490,14 +492,33 @@ const EditPrixod = () => {
                       <div className="flex gap-5">
                         <div className="flex flex-col gap-2">
                           <h1 className="text-sm">Mesaj</h1>
-                          <Textarea  rows={6} onChange={(e:any)=>setMessage(e.target.value)}/>
-                          <Button color={"blue"} size={"xs"} className="w-16" onClick={()=>confirmLastPrixod(id,message)}>Təsdiqlə</Button>
+                          <Textarea
+                            rows={6}
+                            onChange={(e: any) => setMessage(e.target.value)}
+                          />
+                          <Button
+                            color={"blue"}
+                            size={"xs"}
+                            className="w-16"
+                            onClick={() => confirmLastPrixod(id, message)}
+                          >
+                            Təsdiqlə
+                          </Button>
                         </div>
 
-                         <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2">
                           <h1 className="text-sm">İmtina səbəbi</h1>
-                          <Textarea rows={6} onChange={(e:any)=>setMessage(e.target.value)}/>
-                          <Button  size={"xs"} className="w-16 text-white bg-red-700" onClick={()=>rejectPrixod(id,message)}>İmtina</Button>
+                          <Textarea
+                            rows={6}
+                            onChange={(e: any) => setMessage(e.target.value)}
+                          />
+                          <Button
+                            size={"xs"}
+                            className="w-16 text-white bg-red-700"
+                            onClick={() => rejectPrixod(id, message)}
+                          >
+                            İmtina
+                          </Button>
                         </div>
                       </div>
                     </td>
@@ -507,11 +528,10 @@ const EditPrixod = () => {
                   </tr>
                 )}
 
-                {
-                  prixod.accept && (
+                {prixod.accept && (
                   <tr className="w-full flex gap-36 mt-5 bg-gray-100">
                     <td className="pl-16">
-                       Ehtiyat hissələri və Zəmanət
+                      Ehtiyat hissələri və Zəmanət
                       <br /> Departament rəhbərinin təsdiqi
                     </td>
                     <td className="">
@@ -527,8 +547,7 @@ const EditPrixod = () => {
                     <td className="pl-16"></td>
                     <td className="pl-16"></td>
                   </tr>
-                  )
-                }
+                )}
               </tbody>
             </table>
           </div>
@@ -548,13 +567,47 @@ const EditPrixod = () => {
               <th className="px-6 py-3 text-left"></th>
             </tr> */}
               </thead>
-              <tbody>
-                <tr className="">
-                  {/* <td className="">Prixodun Tarixi</td>
-                  <td className="px-6 py-3">Salam</td>
-                  <td className="px-6 py-3">Salam</td> */}
-                </tr>
-              </tbody>
+           <tbody>
+  {prixod?.prixodHist?.length ? (
+    prixod.prixodHist.map((hist: any, index: number) => (
+      <tr key={index} className="border-b border-gray-300">
+       
+        <td className="px-6 py-3 capitalize">
+          {hist.level === "confirmed"
+            ? "Təsdiqləndi"
+            : hist.level === "created"
+            ? "Yaradıldı"
+            : hist.level === "rejected"
+            ? "Rədd edildi"
+            : hist.level}
+        </td>
+        <td className="px-6 py-3">
+          {`${ hist.user?.firstName} ${hist.user?.lastName}`    || "Naməlum istifadəçi"}
+        </td>
+        <td className="px-6 py-3">
+          {hist.comment || "-"}
+        </td>
+
+         <td className="px-6 py-3">
+          {new Date(hist.date).toLocaleString("az-AZ", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td className="px-6 py-3 text-gray-500" colSpan={5}>
+        Hələlik tarixçə yoxdur.
+      </td>
+    </tr>
+  )}
+</tbody>
+
             </table>
           </div>
         </div>

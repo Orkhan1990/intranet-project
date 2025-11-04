@@ -372,9 +372,11 @@ export const confirmPrixod = async (
   try {
     const { id } = req.params;
     const userId = req.userId;
-    const prixod = await prixodRepository.findOneBy({ id: +id });
+    const prixod = await prixodRepository.findOne({
+      where: { id: +id },
+      relations: ["order"], // ensures prixod.order is loaded
+    });
     const user = await userRepository.findOneBy({ id: userId });
-    const order = await orderRepository.findOneBy({ id: prixod.order.id });
 
     // console.log({ user });
 
@@ -399,7 +401,7 @@ export const confirmPrixod = async (
     prixodHist.confirm = true;
     prixodHist.confirmDate = new Date();
     prixodHist.acceptDate = new Date();
-    prixodHist.order = order;
+    prixodHist.order = prixod.order;
     prixodHist.level = "confirmed";
     prixodHist.date = new Date();
     await prixodHistReposiroty.save(prixodHist);
@@ -420,9 +422,11 @@ export const confirmLastPrixod = async (
     const { message } = req.body;
 
     const userId = req.userId;
-    const prixod = await prixodRepository.findOneBy({ id: +id });
+    const prixod = await prixodRepository.findOne({
+      where: { id: +id },
+      relations: ["order"], // ensures prixod.order is loaded
+    });
     const user = await userRepository.findOneBy({ id: +userId });
-    const order = await orderRepository.findOneBy({ id: prixod.order.id });
 
     if (!user) {
       next(errorHandler(401, "İstifadəçi tapılmadı!"));
@@ -448,7 +452,7 @@ export const confirmLastPrixod = async (
     prixodHist.confirm = false;
     prixodHist.confirmDate = new Date();
     prixodHist.acceptDate = new Date();
-    prixodHist.order = order;
+    prixodHist.order = prixod.order;
     prixodHist.level = "accept";
     prixodHist.date = new Date();
     prixodHist.message = message;
@@ -469,9 +473,11 @@ export const rejectPrixod = async (
     const { id } = req.params;
     const userId = req.userId;
     const { message } = req.body;
-    const prixod = await prixodRepository.findOneBy({ id: +id });
+     const prixod = await prixodRepository.findOne({
+      where: { id: +id },
+      relations: ["order"], // ensures prixod.order is loaded
+    });
     const user = await userRepository.findOneBy({ id: +userId });
-    const order = await orderRepository.findOneBy({ id: prixod.order.id });
 
     if (!user) {
       next(errorHandler(401, "İstifadəçi tapılmadı!"));
@@ -495,7 +501,7 @@ export const rejectPrixod = async (
     prixodHist.confirm = false;
     prixodHist.confirmDate = new Date();
     prixodHist.acceptDate = new Date();
-    prixodHist.order = order;
+    prixodHist.order = prixod.order;
     prixodHist.level = "reject";
     prixodHist.date = new Date();
     prixodHist.message = message;
