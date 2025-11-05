@@ -6,9 +6,7 @@ import { FaXmark } from "react-icons/fa6";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 
-
-
-interface SparePartInterafce {
+interface SparePartInterface {
   code: string;
   origCode: string;
   name: string;
@@ -20,14 +18,12 @@ interface SparePartInterafce {
   barcode: string;
   createdAt: Date;
 }
-const numbers: number[] = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-];
+
+const numbers = Array.from({ length: 18 }, (_, i) => i + 1);
+
 const Warehouse = () => {
   const [error, setError] = useState("");
-  const [sparePartData, setSparePartData] = useState<SparePartInterafce[]>([]);
-  // const [currentPage,setCurrentPage]=useState(1);
-  // const[itemsPerPage]=useState(7);
+  const [sparePartData, setSparePartData] = useState<SparePartInterface[]>([]);
   const [queryData, setQueryData] = useState({
     code: "",
     origCode: "",
@@ -40,397 +36,203 @@ const Warehouse = () => {
     barcode: "",
   });
 
-
-  console.log(error);
-  
-
   const filteredData = sparePartData.filter((data) => {
     return (
       (queryData.code
-        ? (data.code.toLocaleLowerCase() || "").includes(queryData.code)
+        ? data.code.toLowerCase().includes(queryData.code.toLowerCase())
         : true) &&
       (queryData.origCode
-        ? (data.origCode.toLocaleLowerCase() || "").includes(queryData.origCode)
+        ? data.origCode.toLowerCase().includes(queryData.origCode.toLowerCase())
         : true) &&
       (queryData.brand
-        ? (data.brand.name.toLowerCase() || "").includes(
-            queryData.brand.toLowerCase()
-          )
+        ? data.brand.name.toLowerCase().includes(queryData.brand.toLowerCase())
         : true) &&
       (queryData.name
-        ? (data.name.toLowerCase() || "").includes(queryData.name.toLowerCase())
+        ? data.name.toLowerCase().includes(queryData.name.toLowerCase())
         : true) &&
       (queryData.liquidity
-        ? (data.liquidity.toLowerCase() || "").includes(
-            queryData.liquidity.toLowerCase()
-          )
+        ? data.liquidity.toLowerCase().includes(queryData.liquidity.toLowerCase())
         : true) &&
-      (queryData.barcode
-        ? (data.barcode || "").includes(queryData.barcode)
-        : true) &&
-      (queryData.count
-        ? data.count.toString().includes(queryData.count.toString())
-        : true) &&
-      (queryData.price
-        ? data.price.toString().includes(queryData.price.toString())
-        : true) &&
-      (queryData.sellPrice
-        ? data.sellPrice.toString().includes(queryData.sellPrice.toString())
-        : true)
+      (queryData.barcode ? data.barcode.includes(queryData.barcode) : true)
     );
   });
 
-  // const totalPages=Math.ceil(sparePartData.length/itemsPerPage);
-  // const paginate=(pageNumber:number)=>setCurrentPage(pageNumber);
-
-  // const indexOfLastItem = currentPage * itemsPerPage;
-  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-
-
-
-
-  const countAllParts = filteredData.reduce((accumluator, currentValue) => {
-    return accumluator + currentValue.price;
-  }, 0);
+  const countAllParts = filteredData.reduce(
+    (acc, item) => acc + item.price,
+    0
+  );
   const countAllSellPrice = filteredData.reduce(
-    (accumluator, currentValue) => {
-      return accumluator + currentValue.sellPrice;
-    },
+    (acc, item) => acc + item.sellPrice,
     0
   );
 
   useEffect(() => {
-    const getAllInvoice = async () => {
+    const getAllSpareParts = async () => {
       try {
-        const res = await fetch(
-          "http://localhost:3013/api/v1/sparePart/getAllSpareParts",
-          {
-            method: "GET",
-            credentials: "include", // added this part
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
+        const res = await fetch("http://localhost:3013/api/v1/sparePart/getAllSpareParts", {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
         const data = await res.json();
-        console.log(data);
-
         if (!res.ok || data.success === false) {
           setError(data.message);
         } else {
           setSparePartData(data);
         }
-      } catch (error: any) {
-        setError(error);
+      } catch (err: any) {
+        setError(err.message);
       }
     };
-
-    getAllInvoice();
+    getAllSpareParts();
   }, []);
 
-  const getCreatedDate = (date: Date) => {
+ const getCreatedDate = (date: Date) => {
   const d = new Date(date);
   const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-indexed
   const year = d.getFullYear();
   const hours = String(d.getHours()).padStart(2, "0");
   const minutes = String(d.getMinutes()).padStart(2, "0");
+
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 };
-  console.log(queryData);
 
   const handleChange = (e: any) => {
     const { id, value } = e.target;
     setQueryData((prev) => ({ ...prev, [id]: value }));
   };
 
- 
-
   return (
-    <div className="min-h-screen relative mb-[100px]">
-      <form>
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <div className="min-h-screen px-4 sm:px-8 py-6 bg-gray-50 dark:bg-gray-900">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100">
+          Anbar
+        </h1>
+        <Link to="/importWarehouse">
+          <Button color="blue" size="xs">
+            Əlavə et +
+          </Button>
+        </Link>
+      </div>
+
+      {/* Table container */}
+      <div className="overflow-x-auto shadow-md rounded-lg border border-gray-200 dark:border-gray-700">
+        <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300">
+          <thead className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 sticky top-0">
             <tr>
-              <th scope="col" className="px-6 py-3">
-                Orijinal kod
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Kod
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Brend
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Adı
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Say
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Rezerv
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Likvidlik
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Qiymət
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Satış qiyməti
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Barkod
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Yerləşmə yeri
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Çap
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Yaradılma tarixi
-              </th>
+              {[
+                "Orijinal kod",
+                "Kod",
+                "Brend",
+                "Adı",
+                "Say",
+                "Rezerv",
+                "Likvidlik",
+                "Qiymət",
+                "Satış qiyməti",
+                "Barkod",
+                "Yerləşmə yeri",
+                "Çap",
+                "Yaradılma tarixi",
+              ].map((header) => (
+                <th key={header} scope="col" className="px-4 py-3 text-xs sm:text-sm font-medium">
+                  {header}
+                </th>
+              ))}
+            </tr>
+            {/* Filter Row */}
+            <tr className="bg-white dark:bg-gray-900 border-b dark:border-gray-700">
+              {[
+                "origCode",
+                "code",
+                "brand",
+                "name",
+                "count",
+                "",
+                "liquidity",
+                "price",
+                "sellPrice",
+                "barcode",
+              ].map((field, i) => (
+                <td key={i} className="px-4 py-2">
+                  {field && (
+                    <input
+                      id={field}
+                      onChange={handleChange}
+                      placeholder="Axtar..."
+                      className="w-full border rounded-md px-2 py-1 text-xs sm:text-sm dark:bg-gray-800 dark:border-gray-700"
+                    />
+                  )}
+                </td>
+              ))}
             </tr>
           </thead>
+
           <tbody>
-            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-              <td className="px-6 py-4">
-                <input
-                  className="border w-24 pl-1"
-                  name="code"
-                  id="code"
-                  onChange={handleChange}
-                />
-              </td>
-              <td className="px-6 py-4">
-                <input
-                  className="border w-24 pl-1"
-                  name="origCode"
-                  id="origCode"
-                  onChange={handleChange}
-                />
-              </td>
-              <td className="px-6 py-4">
-                <input
-                  className="border w-24 pl-1"
-                  name="brand"
-                  id="brand"
-                  onChange={handleChange}
-                />
-              </td>
-              <td className="px-6 py-4">
-                <input
-                  className="border w-24 pl-1"
-                  name="name"
-                  id="name"
-                  onChange={handleChange}
-                />
-              </td>
-              <td className="px-6 py-4">
-                <input
-                  className="border w-20 pl-1"
-                  name="count"
-                  id="count"
-                  onChange={handleChange}
-                />
-              </td>
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4">
-                <input
-                  className="border w-24 pl-1"
-                  name="liquidity"
-                  id="liquidity"
-                  onChange={handleChange}
-                />
-              </td>
-              <td className="px-6 py-4">
-                <input
-                  className="border w-24 pl-1"
-                  name="price"
-                  id="price"
-                  onChange={handleChange}
-                />
-              </td>
-              <td className="px-6 py-4">
-                <input
-                  className="border w-24 pl-1"
-                  name="sellPrice"
-                  id="sellPrice"
-                  onChange={handleChange}
-                />
-              </td>
-              <td className="px-6 py-4">
-                <input
-                  className="border w-24 pl-1"
-                  name="barcode"
-                  id="barcode"
-                  onChange={handleChange}
-                />
-              </td>
-            </tr>
-            {filteredData.length > 0 &&
-              filteredData.map((data: SparePartInterafce, index: number) => (
+            {filteredData.length > 0 ? (
+              filteredData.map((data, index) => (
                 <tr
                   key={index}
-                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                  className="bg-white dark:bg-gray-900 border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
-                  <td className="px-6 py-4">{data.code}</td>
-                  <td className="px-6 py-4">{data.origCode}</td>
-                  <td className="px-6 py-4">{data.brand.name}</td>
-                  <td className="px-6 py-4">
-                    <input
-                      type="text"
-                      value={data.name}
-                      className="rounded-lg text-xs"
-                    />
-                  </td>
-                  <td className="px-6 py-4">
-                    <input
-                      type="text"
-                      value={data.count}
-                      className="rounded-lg text-xs w-20"
-                    />
-                  </td>
-                  <td className="px-6 py-4"></td>
-                  <td className="px-6 py-4">{data.liquidity}</td>
-                  <td className="px-6 py-4">
-                    <input
-                      type="text"
-                      value={data.price}
-                      className="rounded-lg text-xs w-20"
-                    />
-                  </td>
-                  <td className="px-6 py-4">
-                    <input
-                      type="text"
-                      value={data.sellPrice}
-                      className="rounded-lg text-xs w-20"
-                    />
-                  </td>
-                  <td className="px-6 py-4">{data.barcode}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex  gap-2">
-                      <div className="flex gap-1 items-center">
-                        <label htmlFor="">Rəf</label>
-                        <select name="" id="" className="text-xs rounded-md ">
-                          <option value=""></option>
-                          {numbers.map((item: number, index: number) => (
-                            <option key={index} value={item}>
-                              {item}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="flex gap-1 items-center">
-                        <label htmlFor="">Yer</label>
-                        <select name="" id="" className="text-xs rounded-md ">
-                          <option value=""></option>
-                          {numbers.map((item: number, index: number) => (
-                            <option key={index} value={item}>
-                              {item}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                  <td className="px-4 py-3">{data.origCode}</td>
+                  <td className="px-4 py-3">{data.code}</td>
+                  <td className="px-4 py-3">{data.brand.name}</td>
+                  <td className="px-4 py-3">{data.name}</td>
+                  <td className="px-4 py-3 text-center">{data.count}</td>
+                  <td className="px-4 py-3 text-center">—</td>
+                  <td className="px-4 py-3 text-center">{data.liquidity}</td>
+                  <td className="px-4 py-3 text-center">{data.price}</td>
+                  <td className="px-4 py-3 text-center">{data.sellPrice}</td>
+                  <td className="px-4 py-3">{data.barcode}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
+                      <select className="text-xs rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+                        <option value="">Rəf</option>
+                        {numbers.map((n) => (
+                          <option key={n}>{n}</option>
+                        ))}
+                      </select>
+                      <select className="text-xs rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+                        <option value="">Yer</option>
+                        {numbers.map((n) => (
+                          <option key={n}>{n}</option>
+                        ))}
+                      </select>
                     </div>
                   </td>
-                  <td>
-                    <div className="flex gap-2">
-                      <div className="flex  gap-2">
-                        <div className="flex gap-1 items-center">
-                          <label htmlFor="">Say</label>
-                          <select name="" id="" className="text-xs rounded-md ">
-                            <option value=""></option>
-                            {numbers.map((item: number, index: number) => (
-                              <option key={index} value={item}>
-                                {item}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="flex">
-                          <div className="flex gap-1 items-center">
-                            <label htmlFor="">Çap sayı</label>
-                            <select
-                              name=""
-                              id=""
-                              className=" rounded-md text-xs"
-                            >
-                              <option value=""></option>
-                              {numbers.map((item: number, index: number) => (
-                                <option key={index} value={item}>
-                                  {item}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <button className="bg-blue-500 text-xs text-white rounded-md p-1 hover:bg-blue-700 ">
-                          Çap et
-                        </button>
-                      </div>
-                    </div>
+                  <td className="px-4 py-3">
+                    <Button size="xs" color="blue">
+                      Çap et
+                    </Button>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <span>
-                        {data.barcode ? (
-                          <FcOk className=" w-5 h-5" />
-                        ) : (
-                          <FaXmark className="text-white bg-red-700 w-5 h-5 p-1 rounded-full" />
-                        )}
-                      </span>
-                      <span>{getCreatedDate(data.createdAt)}</span>
-                    </div>
+                  <td className="px-4 py-3 flex items-center gap-2">
+                    {data.barcode ? (
+                      <FcOk className="w-5 h-5" />
+                    ) : (
+                      <FaXmark className="text-red-500 w-4 h-4" />
+                    )}
+                    <span>{getCreatedDate(data.createdAt)}</span>
                   </td>
                 </tr>
-              ))}
-            <tr>
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4"></td>
-              <td className="px-6 py-4">{countAllParts}</td>
-              <td className="px-6 py-4">{countAllSellPrice}</td>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={13} className="text-center py-6 text-gray-500">
+                  Məlumat tapılmadı.
+                </td>
+              </tr>
+            )}
+            {/* Totals */}
+            <tr className="bg-gray-100 dark:bg-gray-800 font-medium">
+              <td colSpan={7}></td>
+              <td className="px-4 py-3">{countAllParts}</td>
+              <td className="px-4 py-3">{countAllSellPrice}</td>
             </tr>
           </tbody>
         </table>
-      </form>
-       <Link to="/importWarehouse" ><Button color={"blue"} className="mx-5" size={"xs"}>Əlavə et +</Button></Link>
-      
-      {/* <div className="flex justify-center mb-20">
-        <button
-          onClick={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="text-white bg-blue-600 px-5 py-1 rounded-md cursor-pointer hover:bg-blue-800 mr-1"
-        >
-          <MdKeyboardDoubleArrowLeft className="text-2xl"/>
-        </button>
-
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            onClick={() => paginate(index + 1)}
-            className={currentPage === index + 1 ? "active text-white bg-blue-600 px-5 py-1 rounded-md cursor-pointer hover:bg-blue-800 mr-1" : " bg-blue-300 px-5 py-1 rounded-md cursor-pointer hover:bg-blue-800 mr-1"}
-          >
-            {index + 1}
-          </button>
-        ))}
-
-        <button
-          onClick={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="text-white bg-blue-600 px-5 py-1 rounded-md cursor-pointer hover:bg-blue-800"
-        >
-          <MdKeyboardDoubleArrowRight className="text-2xl"/>
-        </button>
-      </div> */}
+      </div>
     </div>
   );
 };
