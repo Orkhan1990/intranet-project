@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchPrixods } from "../../redux-toolkit/features/prixod/prixodSlice";
 import { Link } from "react-router-dom";
-import { Button} from "flowbite-react";
+import { Button } from "flowbite-react";
 import { HiPlus } from "react-icons/hi";
 
 // interface Order {
@@ -41,9 +41,12 @@ export const ConfirmPrixod = () => {
         </h2>
 
         <Link to="/importPrixod">
-            
-          <Button color="blue" size={"xs"} className=" flex gap-2 item-center text-center">
-            <HiPlus/>
+          <Button
+            color="blue"
+            size={"xs"}
+            className=" flex gap-2 item-center text-center"
+          >
+            <HiPlus />
             Əlavə et
           </Button>
         </Link>
@@ -100,7 +103,7 @@ export const ConfirmPrixod = () => {
                     </td>
 
                     <td className="px-4 py-3 text-center">
-                      <input type="checkbox"/>
+                      <input type="checkbox" />
                     </td>
 
                     <td className="px-4 py-3 text-center">
@@ -108,17 +111,25 @@ export const ConfirmPrixod = () => {
                     </td>
 
                     <td className="px-4 py-3 text-center truncate max-w-[200px]">
-                      {prixod.message || "-"}
+                      {prixod.comment || "-"}
                     </td>
 
                     <td className="px-4 py-3 text-center whitespace-nowrap">
-                      {new Date(prixod.createdAt).toLocaleString("az-AZ", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {(() => {
+                        const date = new Date(prixod.createdAt);
+                        const day = String(date.getDate()).padStart(2, "0");
+                        const month = String(date.getMonth() + 1).padStart(
+                          2,
+                          "0"
+                        );
+                        const year = date.getFullYear();
+                        const hours = String(date.getHours()).padStart(2, "0");
+                        const minutes = String(date.getMinutes()).padStart(
+                          2,
+                          "0"
+                        );
+                        return `${day}/${month}/${year} ${hours}:${minutes}`;
+                      })()}
                     </td>
                   </tr>
                 ))

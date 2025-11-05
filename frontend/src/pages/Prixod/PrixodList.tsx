@@ -28,7 +28,7 @@ export const PrixodList = () => {
   }, [dispatch]);
 
   const unconfirmedPrixods = useMemo(
-    () => prixods.filter((p:any) => !p.isConfirmed),
+    () => prixods.filter((p: any) => !p.isConfirmed),
     [prixods]
   );
 
@@ -63,13 +63,19 @@ export const PrixodList = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-8 text-gray-500 italic">
+                  <td
+                    colSpan={4}
+                    className="text-center py-8 text-gray-500 italic"
+                  >
                     Yüklənir...
                   </td>
                 </tr>
               ) : unconfirmedPrixods.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-8 text-gray-500 italic">
+                  <td
+                    colSpan={4}
+                    className="text-center py-8 text-gray-500 italic"
+                  >
                     Təsdiqlənməmiş mədaxil tapılmadı.
                   </td>
                 </tr>
@@ -88,16 +94,24 @@ export const PrixodList = () => {
                       {prixod.order?.id ?? "-"}
                     </td>
                     <td className="px-4 py-3 text-center truncate max-w-[200px]">
-                      {prixod.message || "-"}
+                      {prixod.comment || "-"}
                     </td>
                     <td className="px-4 py-3 text-center whitespace-nowrap">
-                      {new Date(prixod.createdAt).toLocaleString("az-AZ", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {(() => {
+                        const date = new Date(prixod.createdAt);
+                        const day = String(date.getDate()).padStart(2, "0");
+                        const month = String(date.getMonth() + 1).padStart(
+                          2,
+                          "0"
+                        );
+                        const year = date.getFullYear();
+                        const hours = String(date.getHours()).padStart(2, "0");
+                        const minutes = String(date.getMinutes()).padStart(
+                          2,
+                          "0"
+                        );
+                        return `${day}/${month}/${year} ${hours}:${minutes}`;
+                      })()}
                     </td>
                   </tr>
                 ))
@@ -116,7 +130,7 @@ export const PrixodList = () => {
             Təsdiqlənməmiş mədaxil tapılmadı.
           </p>
         ) : (
-          unconfirmedPrixods.map((prixod:any) => (
+          unconfirmedPrixods.map((prixod: any) => (
             <div
               key={prixod.id}
               className="bg-white rounded-lg shadow-md border border-gray-100 p-4"

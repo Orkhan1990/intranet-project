@@ -470,13 +470,21 @@ const EditPrixod = () => {
                 <tr className="flex gap-52 bg-gray-100 ">
                   <td className="pl-16 text-xs">Prixodun yaradılması</td>
                   <td className="text-xs">
-                    {new Date(prixod.createdAt).toLocaleString("az-AZ", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {(() => {
+                      const date = new Date(prixod.createdAt);
+                      const day = String(date.getDate()).padStart(2, "0");
+                      const month = String(date.getMonth() + 1).padStart(
+                        2,
+                        "0"
+                      );
+                      const year = date.getFullYear();
+                      const hours = String(date.getHours()).padStart(2, "0");
+                      const minutes = String(date.getMinutes()).padStart(
+                        2,
+                        "0"
+                      );
+                      return `${day}/${month}/${year} ${hours}:${minutes}`;
+                    })()}
                   </td>
                   <td className="pl-16"></td>
                   <td className="pl-16"></td>
@@ -535,13 +543,21 @@ const EditPrixod = () => {
                       <br /> Departament rəhbərinin təsdiqi
                     </td>
                     <td className="text-xs">
-                      {new Date(prixod.acceptDate).toLocaleString("az-AZ", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {(() => {
+                        const date = new Date(prixod.acceptDate);
+                        const day = String(date.getDate()).padStart(2, "0");
+                        const month = String(date.getMonth() + 1).padStart(
+                          2,
+                          "0"
+                        );
+                        const year = date.getFullYear();
+                        const hours = String(date.getHours()).padStart(2, "0");
+                        const minutes = String(date.getMinutes()).padStart(
+                          2,
+                          "0"
+                        );
+                        return `${day}/${month}/${year} ${hours}:${minutes}`;
+                      })()}
                     </td>
                     <td className="pl-16"></td>
                     <td className="pl-16"></td>
@@ -606,13 +622,24 @@ const EditPrixod = () => {
                       </td>
 
                       <td className="px-6 py-3 text-xs">
-                        {new Date(hist.date).toLocaleString("az-AZ", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {(() => {
+                          const date = new Date(hist.date);
+                          const day = String(date.getDate()).padStart(2, "0");
+                          const month = String(date.getMonth() + 1).padStart(
+                            2,
+                            "0"
+                          );
+                          const year = date.getFullYear();
+                          const hours = String(date.getHours()).padStart(
+                            2,
+                            "0"
+                          );
+                          const minutes = String(date.getMinutes()).padStart(
+                            2,
+                            "0"
+                          );
+                          return `${day}/${month}/${year} ${hours}:${minutes}`;
+                        })()}
                       </td>
                     </tr>
                   ))

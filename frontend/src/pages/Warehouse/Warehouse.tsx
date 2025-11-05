@@ -131,9 +131,14 @@ const Warehouse = () => {
   }, []);
 
   const getCreatedDate = (date: Date) => {
-    const d = new Date(date);
-    return d.toLocaleDateString("en-GB");
-  };
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
   console.log(queryData);
 
   const handleChange = (e: any) => {
@@ -144,7 +149,7 @@ const Warehouse = () => {
  
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative mb-[100px]">
       <form>
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
