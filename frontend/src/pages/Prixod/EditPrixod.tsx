@@ -38,7 +38,7 @@ const EditPrixod = () => {
   const { orders } = useSelector((state: RootState) => state.order);
   const { prixod } = useSelector((state: RootState) => state.prixod);
 
-  console.log({ prixod });
+  // console.log({ prixod });
 
   useEffect(() => {
     dispatch(fetchBrands());
@@ -223,7 +223,7 @@ const EditPrixod = () => {
       });
   };
   return (
-    <div className="min-h-screen mt-[100px] mb-[100px]">
+    <div className="min-h-screen mt-[100px] mb-[200px]">
       <h2 className="font-bold text-2xl text-center text-blue-700 mb-10">
         Mədaxil yoxlanışı və təsdiqi
       </h2>
@@ -462,14 +462,14 @@ const EditPrixod = () => {
         <div className="mt-10  ">
           <div className="">
             <h2 className="text-lg font-semibold ml-16">
-              Prixod üzrə hərəkətlər
+              Mədaxil üzrə hərəkətlər
             </h2>
             <table className="mt-5 w-full h-20">
               <thead></thead>
               <tbody>
                 <tr className="flex gap-52 bg-gray-100 ">
-                  <td className="pl-16">Prixodun yaradılması</td>
-                  <td className="">
+                  <td className="pl-16 text-xs">Prixodun yaradılması</td>
+                  <td className="text-xs">
                     {new Date(prixod.createdAt).toLocaleString("az-AZ", {
                       year: "numeric",
                       month: "2-digit",
@@ -484,7 +484,7 @@ const EditPrixod = () => {
                 </tr>
                 {prixod.confirm && (
                   <tr className="w-full flex gap-20 mt-5">
-                    <td className="pl-16">
+                    <td className="pl-16 text-xs">
                       Ehtiyat hissələri və Zəmanət
                       <br /> Departament rəhbərinin yoxlanışı
                     </td>
@@ -530,11 +530,11 @@ const EditPrixod = () => {
 
                 {prixod.accept && (
                   <tr className="w-full flex gap-36 mt-5 bg-gray-100">
-                    <td className="pl-16">
+                    <td className="pl-16 text-xs">
                       Ehtiyat hissələri və Zəmanət
                       <br /> Departament rəhbərinin təsdiqi
                     </td>
-                    <td className="">
+                    <td className="text-xs">
                       {new Date(prixod.acceptDate).toLocaleString("az-AZ", {
                         year: "numeric",
                         month: "2-digit",
@@ -554,10 +554,10 @@ const EditPrixod = () => {
         </div>
       )}
 
-      <div className="mt-20 bg-[#ccf] h-16 pt-2">
+      <div className="mt-20 bg-[#ccf] h-16 pt-2 mb-10">
         <div className="bg-orange-300 h-1 "></div>
         <div className="bg-orange-200">
-          <div className=" ml-20">
+          <div className=" ml-16">
             <h2 className="text-xl font-semibold">Tarix</h2>
             <table>
               <thead>
@@ -567,47 +567,63 @@ const EditPrixod = () => {
               <th className="px-6 py-3 text-left"></th>
             </tr> */}
               </thead>
-           <tbody>
-  {prixod?.prixodHist?.length ? (
-    prixod.prixodHist.map((hist: any, index: number) => (
-      <tr key={index} className="border-b border-gray-300">
-       
-        <td className="px-6 py-3 capitalize">
-          {hist.level === "confirmed"
-            ? "Təsdiqləndi"
-            : hist.level === "created"
-            ? "Yaradıldı"
-            : hist.level === "rejected"
-            ? "Rədd edildi"
-            : hist.level}
-        </td>
-        <td className="px-6 py-3">
-          {`${ hist.user?.firstName} ${hist.user?.lastName}`    || "Naməlum istifadəçi"}
-        </td>
-        <td className="px-6 py-3">
-          {hist.comment || "-"}
-        </td>
+              <tbody>
+                {prixod?.prixodHist?.length ? (
+                  prixod.prixodHist.map((hist: any, index: number) => (
+                    <tr key={index} className="border-b border-gray-300">
+                      <td className="py-3 capitalize text-xs">
+                        {hist.level === "confirmed" ? (
+                          "Mədaxil təsdiqə göndərildi"
+                        ) : hist.level === "reject" ? (
+                          "Imtina edildi"
+                        ) : hist.level === "accept" ? (
+                          <>
+                            Ehtiyat hissələri və Zəmanət <br /> Departament
+                            rəhbərinin təsdiqi
+                          </>
+                        ) : (
+                          "Mədaxil yaradıldı"
+                        )}
+                      </td>
+                      <td className="px-6 py-3 text-xs">
+                        {hist.level === "accept" && "Təsdiqləndi"}{" "}
+                      </td>
+                      <td className="px-6 py-3 text-xs">
+                        {`${hist.user?.firstName} ${hist.user?.lastName}` ||
+                          "Naməlum istifadəçi"}
+                      </td>
 
-         <td className="px-6 py-3">
-          {new Date(hist.date).toLocaleString("az-AZ", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td className="px-6 py-3 text-gray-500" colSpan={5}>
-        Hələlik tarixçə yoxdur.
-      </td>
-    </tr>
-  )}
-</tbody>
+                      <td
+                        className={`px-6 py-3 text-xs ${
+                          hist.level === "accept"
+                            ? "text-green-700"
+                            : hist.level === "reject"
+                              ? "text-red-700"
+                              : ""
+                        }`}
+                      >
+                        {hist.message || "-"}
+                      </td>
 
+                      <td className="px-6 py-3 text-xs">
+                        {new Date(hist.date).toLocaleString("az-AZ", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td className="px-6 py-3 text-gray-500" colSpan={5}>
+                      Hələlik tarixçə yoxdur.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
             </table>
           </div>
         </div>

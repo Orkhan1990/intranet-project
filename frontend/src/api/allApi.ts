@@ -193,7 +193,7 @@ export const confirmPrixodApi=async(id:number)=>{
 
 export const confirmLastPrixodApi=async(id:number,message:string)=>{
   try {
-    const response = await axios.put(`${VITE_API_BASE_URL}prixod/confirmLastPrixod/${id}`,message, {  
+    const response = await axios.put(`${VITE_API_BASE_URL}prixod/confirmLastPrixod/${id}`,{message}, {  
       withCredentials: true
     });
     const data: any = response.data;  
@@ -211,7 +211,7 @@ export const confirmLastPrixodApi=async(id:number,message:string)=>{
 
 export const rejectPrixodApi=async(id:number,message:string)=>{
   try {
-    const response = await axios.put(`${VITE_API_BASE_URL}prixod/rejectPrixod/${id}`,message, {  
+    const response = await axios.put(`${VITE_API_BASE_URL}prixod/rejectPrixod/${id}`,{message}, {  
       withCredentials: true
     });
     const data: any = response.data;

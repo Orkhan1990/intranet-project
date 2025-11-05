@@ -421,6 +421,8 @@ export const confirmLastPrixod = async (
     const { id } = req.params;
     const { message } = req.body;
 
+    console.log(message);
+    
     const userId = req.userId;
     const prixod = await prixodRepository.findOne({
       where: { id: +id },
