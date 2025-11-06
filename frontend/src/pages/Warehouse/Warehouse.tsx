@@ -174,6 +174,9 @@ const Warehouse = () => {
                   )}
                 </td>
               ))}
+              <td></td>
+              <td></td>
+              <td></td>
             </tr>
           </thead>
 
@@ -248,7 +251,6 @@ const Warehouse = () => {
               <td className="px-4 py-3"></td>
               <td className="px-4 py-3"></td>
               <td className="px-4 py-3"></td>
-
             </tr>
           </tbody>
         </table>
