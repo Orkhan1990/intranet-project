@@ -7,6 +7,7 @@ import brandReducer from '../features/brand/brandSlice';
 import supplierReducer from '../features/supplier/supplierSlice';
 import orderReducer from '../features/order/orderSlice';
 import prixodReducer from '../features/prixod/prixodSlice';
+import userReducer from "../features/user/userSlice";
 
 
 
@@ -15,7 +16,8 @@ const rootReducer=combineReducers({
   brand: brandReducer,
   supplier: supplierReducer,
   order: orderReducer,
-  prixod: prixodReducer
+  prixod: prixodReducer,
+  user:userReducer
 })
 
 const persistConfig={

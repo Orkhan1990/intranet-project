@@ -36,6 +36,9 @@ const Warehouse = () => {
     barcode: "",
   });
 
+  console.log(error);
+  
+
   const filteredData = sparePartData.filter((data) => {
     return (
       (queryData.code

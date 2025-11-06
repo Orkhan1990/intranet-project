@@ -6,11 +6,11 @@ import errorHandler from "../middleware/errorHandler";
 import { UserRole } from "../enums/userRole";
 import { In } from "typeorm";
 
+const userRepository = AppDataSource.getRepository(User);
 export const createUser = async (req: Request, res: Response) => {
   try {
     const { userName, email, password } = req.body;
 
-    const userRepository = AppDataSource.getRepository(User);
    const existUser=await userRepository.findOneBy({ email});
    console.log(existUser);
    
@@ -83,3 +83,6 @@ export const getOfficeWorkers=async(req:Request,res:Response,next:NextFunction)=
     next(errorHandler(401,error))
   }
 }
+
+
+

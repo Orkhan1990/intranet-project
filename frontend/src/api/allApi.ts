@@ -228,3 +228,22 @@ export const rejectPrixodApi=async(id:number,message:string)=>{
 };
 
 
+export const getUsersData= async()=>{
+  try {
+
+    const response=await axios.get(`${VITE_API_BASE_URL}user/getWorkers`);
+    const data: any = response.data;
+    if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "İstifadəçi məlumatları alınmadı");
+    }
+    return data;
+    
+  } catch (error:any) {
+     console.log(error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  }
+}
+
+
