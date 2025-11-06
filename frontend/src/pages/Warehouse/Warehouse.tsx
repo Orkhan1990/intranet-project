@@ -37,7 +37,6 @@ const Warehouse = () => {
   });
 
   console.log(error);
-  
 
   const filteredData = sparePartData.filter((data) => {
     return (
@@ -54,16 +53,15 @@ const Warehouse = () => {
         ? data.name.toLowerCase().includes(queryData.name.toLowerCase())
         : true) &&
       (queryData.liquidity
-        ? data.liquidity.toLowerCase().includes(queryData.liquidity.toLowerCase())
+        ? data.liquidity
+            .toLowerCase()
+            .includes(queryData.liquidity.toLowerCase())
         : true) &&
       (queryData.barcode ? data.barcode.includes(queryData.barcode) : true)
     );
   });
 
-  const countAllParts = filteredData.reduce(
-    (acc, item) => acc + item.price,
-    0
-  );
+  const countAllParts = filteredData.reduce((acc, item) => acc + item.price, 0);
   const countAllSellPrice = filteredData.reduce(
     (acc, item) => acc + item.sellPrice,
     0
@@ -72,11 +70,14 @@ const Warehouse = () => {
   useEffect(() => {
     const getAllSpareParts = async () => {
       try {
-        const res = await fetch("http://localhost:3013/api/v1/sparePart/getAllSpareParts", {
-          method: "GET",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        });
+        const res = await fetch(
+          "http://localhost:3013/api/v1/sparePart/getAllSpareParts",
+          {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
         const data = await res.json();
         if (!res.ok || data.success === false) {
           setError(data.message);
@@ -90,16 +91,16 @@ const Warehouse = () => {
     getAllSpareParts();
   }, []);
 
- const getCreatedDate = (date: Date) => {
-  const d = new Date(date);
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-indexed
-  const year = d.getFullYear();
-  const hours = String(d.getHours()).padStart(2, "0");
-  const minutes = String(d.getMinutes()).padStart(2, "0");
+  const getCreatedDate = (date: Date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-indexed
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
 
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
-};
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
 
   const handleChange = (e: any) => {
     const { id, value } = e.target;
@@ -139,7 +140,11 @@ const Warehouse = () => {
                 "Çap",
                 "Yaradılma tarixi",
               ].map((header) => (
-                <th key={header} scope="col" className="px-4 py-3 text-xs sm:text-sm font-medium">
+                <th
+                  key={header}
+                  scope="col"
+                  className="px-4 py-3 text-xs sm:text-sm font-medium"
+                >
                   {header}
                 </th>
               ))}
@@ -229,9 +234,21 @@ const Warehouse = () => {
             )}
             {/* Totals */}
             <tr className="bg-gray-100 dark:bg-gray-800 font-medium">
-              <td colSpan={7}></td>
-              <td className="px-4 py-3">{countAllParts}</td>
-              <td className="px-4 py-3">{countAllSellPrice}</td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3 text-center">{countAllParts}</td>
+              <td className="px-4 py-3 text-center">{countAllSellPrice}</td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3"></td>
+              <td className="px-4 py-3"></td>
+
             </tr>
           </tbody>
         </table>
