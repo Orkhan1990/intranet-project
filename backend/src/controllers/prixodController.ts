@@ -9,6 +9,8 @@ import { SparePart } from "../entites/SparePart";
 import { Order } from "../entites/Order";
 import { User } from "../entites/User";
 import { PrixodHist } from "../entites/PrixodHist";
+import { transporter } from "../utils/mailer";
+import nodemailer from "nodemailer";
 
 const supplierRepository = AppDataSource.getRepository(Supplier);
 const brandRepository = AppDataSource.getRepository(Brand);
@@ -126,6 +128,26 @@ export const createPrixod = async (
 
       await sparePartRepository.save(newSparePart);
       newPartsArray.push(newSparePart);
+    }
+
+    if (user.email) {
+      await transporter.sendMail({
+        from: `"Yeni Mədaxilin yaradılması" <${process.env.SMTP_USER}>`,
+        to: user.email,
+        subject: "Yeni Mədaxil yaradıldı ✅",
+        html: `
+          <h2>Salam, ${user.firstName} ${user.lastName}</h2>
+          <p>Yeni <b>Mədaxil</b> yaradıldı və sistemə əlavə olundu.</p>
+          <ul>
+            <li><b>Invoice:</b> ${invoice || "-"}</li>
+            <li><b>Təchizatçı:</b> ${getSupplier.supplier}</li>
+            <li><b>Bazar:</b> ${market}</li>
+            <li><b>Ödəniş növü:</b> ${paymentType}</li>
+          </ul>
+          <p>Tarix: ${new Date().toLocaleString("az-AZ")}</p>
+          <p>Hörmətlə,<br><b>İntranet</b></p>
+        `,
+      });
     }
 
     res.status(200).json({
@@ -406,6 +428,26 @@ export const confirmPrixod = async (
     prixodHist.date = new Date();
     await prixodHistReposiroty.save(prixodHist);
 
+    if (user.email) {
+      await transporter.sendMail({
+        from: `"Mədaxilin təsdiqi" <${process.env.SMTP_USER}>`,
+        to: user.email,
+        subject: "Mədaxilin təsdiqi ✅",
+        html: `
+          <h2>Salam, ${user.firstName} ${user.lastName}</h2>
+          <p>Yeni <b>Mədaxil</b> təsdiqə göndərildi.</p>
+          <ul>
+            <li><b>Invoice:</b> ${prixod.invoice || "-"}</li>
+            <li><b>Təchizatçı:</b> ${prixod.supplier}</li>
+            <li><b>Bazar:</b> ${prixod.market}</li>
+            <li><b>Ödəniş növü:</b> ${prixod.paymentType}</li>
+          </ul>
+          <p>Tarix: ${new Date().toLocaleString("az-AZ")}</p>
+          <p>Hörmətlə,<br><b>Intranet</b></p>
+        `,
+      });
+    }
+
     res.status(200).json({ result: "Prixod təsdiqləndi" });
   } catch (error) {
     next(errorHandler(401, error));
@@ -422,7 +464,7 @@ export const confirmLastPrixod = async (
     const { message } = req.body;
 
     console.log(message);
-    
+
     const userId = req.userId;
     const prixod = await prixodRepository.findOne({
       where: { id: +id },
@@ -460,6 +502,26 @@ export const confirmLastPrixod = async (
     prixodHist.message = message;
     await prixodHistReposiroty.save(prixodHist);
 
+    if (user.email) {
+      await transporter.sendMail({
+        from: `"Mədaxilin təsdiqi" <${process.env.SMTP_USER}>`,
+        to: user.email,
+        subject: "Mədaxilin təsdiqi ✅",
+        html: `
+          <h2>Salam, ${user.firstName} ${user.lastName}</h2>
+          <p>${prixod.id} nömrəli <b>mədaxil</b> təsdiqləndi və anbara əlavə olundu.</p>
+          <ul>
+            <li><b>Invoice:</b> ${prixod.invoice || "-"}</li>
+            <li><b>Təchizatçı:</b> ${prixod.supplier.supplier}</li>
+            <li><b>Bazar:</b> ${prixod.market}</li>
+            <li><b>Ödəniş növü:</b> ${prixod.paymentType}</li>
+          </ul>
+          <p>Tarix: ${new Date().toLocaleString("az-AZ")}</p>
+          <p>Hörmətlə,<br><b>Intranet</b></p>
+        `,
+      });
+    }
+
     res.status(200).json({ result: "Prixod təsdiqləndi" });
   } catch (error) {
     next(errorHandler(401, error));
@@ -475,7 +537,7 @@ export const rejectPrixod = async (
     const { id } = req.params;
     const userId = req.userId;
     const { message } = req.body;
-     const prixod = await prixodRepository.findOne({
+    const prixod = await prixodRepository.findOne({
       where: { id: +id },
       relations: ["order"], // ensures prixod.order is loaded
     });
@@ -508,6 +570,28 @@ export const rejectPrixod = async (
     prixodHist.date = new Date();
     prixodHist.message = message;
     await prixodHistReposiroty.save(prixodHist);
+
+    if (user.email) {
+      await transporter.sendMail({
+        from: `"Mədaxildən İmtina" <${process.env.SMTP_USER}>`,
+        to: user.email,
+        subject: "Mədaxildən İmtina ❌",
+        html: `
+          <h2>Salam, ${user.firstName} ${user.lastName}</h2>
+          <p>${prixod.id} nömrəli <b>mədaxil</b> imtina olundu.</p>
+          <ul>
+            <li><b>Invoice:</b> ${prixod.invoice || "-"}</li>
+            <li><b>Təchizatçı:</b> ${prixod.supplier.supplier}</li>
+            <li><b>Bazar:</b> ${prixod.market}</li>
+            <li><b>Ödəniş növü:</b> ${prixod.paymentType}</li>
+            <li><b>Imtina səbəbi:</b> ${message}</li>
+
+          </ul>
+          <p>Tarix: ${new Date().toLocaleString("az-AZ")}</p>
+          <p>Hörmətlə,<br><b>Intranet</b></p>
+        `,
+      });
+    }
 
     res.status(200).json({ result: "Prixod rədd edildi" });
   } catch (error) {

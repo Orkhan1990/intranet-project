@@ -55,11 +55,11 @@ export const navbarList:NavbarListInterface[] = [
               url:"/orders"
           },
              {
-              title:"Prixod yarat",
+              title:"Mədaxil yarat",
               url:"/importPrixod"
           },
            {
-              title:"Prixod siyahısı",
+              title:"Mədaxil siyahısı",
               url:"/prixodList"
           },
         //   {

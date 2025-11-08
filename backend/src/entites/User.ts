@@ -1,4 +1,4 @@
-import { Entity, Column, OneToMany, OneToOne, JoinColumn} from "typeorm"
+import { Entity, Column, OneToMany, OneToOne, JoinColumn, ManyToMany} from "typeorm"
 import { AllEntities } from "./AllEntities"
 import { UserRole } from "../enums/userRole"
 import { Client } from "./Client"
@@ -68,7 +68,7 @@ export class User extends AllEntities {
     @OneToMany(() => Client, (client) => client.user)
     clients: Client[]
 
-    @OneToMany(() => CardProblem, (cardProblem) => cardProblem.serviceWorkers)
+    @ManyToMany(() => CardProblem, (cardProblem) => cardProblem.serviceWorkers)
     cardProblems: CardProblem[];
 
     @OneToOne(() => CardWorkerJob)

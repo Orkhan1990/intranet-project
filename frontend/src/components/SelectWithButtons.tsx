@@ -36,7 +36,7 @@ const SelectWithButtons = ({ workers, name, value, onChange,push,remove,index }:
             </option>
           ))}
       </Field>
-      <Button color={"blue"} onClick={()=>push('')}>+</Button>
+      <Button color={"blue"}  onClick={()=>push('')}>+</Button>
     </div>
   );
 };

@@ -25,6 +25,7 @@ import { PrixodList } from "./pages/Prixod/PrixodList";
 import EditPrixod from "./pages/Prixod/EditPrixod";
 import WorkerPercentage from "./pages/WorkerPercentage";
 import { ConfirmPrixod } from "./pages/Prixod/ConfirmPrixod";
+import WarehouseListSelected from "./pages/Warehouse/WarehouseListSelected";
 
 function App() {
   return (
@@ -194,6 +195,13 @@ function App() {
               <Layout>
                 <WorkerPercentage/>
               </Layout>
+            }
+          />
+
+           <Route
+            path="/warehouseSelected"
+            element={
+                <WarehouseListSelected/>
             }
           />
 

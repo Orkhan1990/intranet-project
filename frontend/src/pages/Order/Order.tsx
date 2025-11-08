@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
-import {
-  ClientInterface,
-  OrderPartsInterface,
-  UserInterface,
-} from "../../types";
+import { useEffect} from "react";
+// import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
+// import {
+//   ClientInterface,
+//   OrderPartsInterface,
+//   UserInterface,
+// } from "../../types";
 import { Link } from "react-router-dom";
 import { Button } from "flowbite-react";
 import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
@@ -16,57 +16,57 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const Order = () => {
   // const [orders, setOrders] = useState<AllOrdersInterface[]>([]);
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
 
-  console.log(error);
+  // console.log(error);
 
   const { currentUser } = useSelector((state: RootState) => state.auth);
 
-  const { orders, loading: ordersLoading, error: ordersError } = useSelector((state: RootState) => state.order);
+  const { orders} = useSelector((state: RootState) => state.order);
   const dispatch = useDispatch<AppDispatch>();
 
 
 
-  interface OrderHistory {
-    stage: string;
-    confirm: boolean;
-    confirmDate: string;
-    accept: boolean;
-    acceptDate: string;
-    acceptMessage: string;
-  }
+  // interface OrderHistory {
+  //   stage: string;
+  //   confirm: boolean;
+  //   confirmDate: string;
+  //   accept: boolean;
+  //   acceptDate: string;
+  //   acceptMessage: string;
+  // }
 
-  interface AllOrdersInterface {
-    id: number;
-    project: string;
-    cardNumber: string;
-    orderType: OrderType;
-    client: ClientInterface;
-    manufacturer: string;
-    model: string;
-    chassisNumber: string;
-    engineNumber: string;
-    produceYear: string;
-    km: string;
-    status: string;
-    stage: string;
-    vehicleNumber: string;
-    paymentType: PayType;
-    delivering: DeliverType;
-    deliveringType: string;
-    initialPayment: number;
-    orderHistory: OrderHistory[];
-    comment: string;
-    oil: boolean;
-    user: UserInterface;
-    orderParts: OrderPartsInterface[];
-    createdAt: string;
-    confirmWarehouseDate: string | null;
-    responsibleStartDate: string | null;
-    requestToSupplierDate: string | null;
-    respoenseFromSupplierDate: string | null;
-    giveOrderDate:string|null //EDIT THIS WORD IN BACKEND
-  }
+  // interface AllOrdersInterface {
+  //   id: number;
+  //   project: string;
+  //   cardNumber: string;
+  //   orderType: OrderType;
+  //   client: ClientInterface;
+  //   manufacturer: string;
+  //   model: string;
+  //   chassisNumber: string;
+  //   engineNumber: string;
+  //   produceYear: string;
+  //   km: string;
+  //   status: string;
+  //   stage: string;
+  //   vehicleNumber: string;
+  //   paymentType: PayType;
+  //   delivering: DeliverType;
+  //   deliveringType: string;
+  //   initialPayment: number;
+  //   orderHistory: OrderHistory[];
+  //   comment: string;
+  //   oil: boolean;
+  //   user: UserInterface;
+  //   orderParts: OrderPartsInterface[];
+  //   createdAt: string;
+  //   confirmWarehouseDate: string | null;
+  //   responsibleStartDate: string | null;
+  //   requestToSupplierDate: string | null;
+  //   respoenseFromSupplierDate: string | null;
+  //   giveOrderDate:string|null //EDIT THIS WORD IN BACKEND
+  // }
 
   const getStageResult = (result: any) => {
     // const currentStep=result.orderHistory[result.orderHistory.length-1]?.step
@@ -217,7 +217,7 @@ const Order = () => {
             </thead>
             <tbody>
               {orders.length > 0 &&
-                orders.map((order: AllOrdersInterface, index: number) => {
+                orders.map((order: any, index: number) => {
 
                     const checkUser = currentUser?.id === order.user.id;
                   return (
