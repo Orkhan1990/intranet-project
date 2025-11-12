@@ -4,6 +4,7 @@ import {
   TextInput,
   Button,
   Textarea,
+  Spinner,
 } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -16,14 +17,7 @@ import NewCardAddParts from "../components/NewCardAddParts";
 import AddCharges from "../components/AddCharges";
 import { ClientInterface, NewCardInterface } from "../types";
 
-const types = [
-  "Tiqac",
-  "Yarı pricep",
-  "Pricep",
-  "Avtobus",
-  "Neoplan",
-  "Digər Texnika",
-];
+const types = ["Tiqac", "Yarı pricep", "Pricep", "Avtobus", "Neoplan", "Digər Texnika"];
 
 const newCardInitialValues: NewCardInterface = {
   clientId: 0,
@@ -41,12 +35,7 @@ const newCardInitialValues: NewCardInterface = {
   servisInfo: false,
   comments: "",
   recommendation: "",
-  problems: [
-    {
-      description: "",
-      serviceWorkers: [""],
-    },
-  ],
+  problems: [{ description: "", serviceWorkers: [""] }],
   jobs: [
     {
       code: "",
@@ -58,23 +47,25 @@ const newCardInitialValues: NewCardInterface = {
       jobWorkers: [{ workerAv: "", workerId: 0 }],
     },
   ],
-  expences: [
-    {
-      description: "",
-      price: 0,
-    },
-  ],
+  expences: [{ description: "", price: 0 }],
 };
 
-const SectionCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <div className="bg-white p-6 rounded-lg shadow-md space-y-5">
-    <h3 className="text-lg font-semibold text-blue-700 border-b pb-2">{title}</h3>
-    {children}
+const SectionCard = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-5 transition-all hover:shadow-lg">
+    <h3 className="text-xl font-semibold text-blue-700 border-b pb-2">{title}</h3>
+    <div className="space-y-4">{children}</div>
   </div>
 );
 
 const NewCard = () => {
   const [error, setError] = useState<string | boolean>(false);
+  const [loading, setLoading] = useState(true);
   const [clients, setClients] = useState<ClientInterface[]>([]);
   const [workers, setWorkers] = useState<any[]>([]);
   const [openGedis, setOpenGedis] = useState(false);
@@ -82,10 +73,6 @@ const NewCard = () => {
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
   const [expencePrice, setExpencePrice] = useState<number[]>([0]);
-
-   console.log(error,openBobcatWarranty,openAmmannWarranty);
-   
-
 
   const handlePriceUpdate = (index: number, price: number) => {
     const newPrice = [...jobPrices];
@@ -129,6 +116,8 @@ const NewCard = () => {
         setClients(clientsData);
       } catch (err: any) {
         setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -138,20 +127,37 @@ const NewCard = () => {
     console.log(values);
   };
 
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner size="xl" />
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 space-y-8">
-      <h2 className="text-center text-2xl font-bold text-gray-800 mb-4">
-        Yeni Kart Yarat
-      </h2>
+    <div className="min-h-screen bg-gray-50 py-6 px-3 md:px-8 space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-extrabold text-gray-800 mb-1">
+          Yeni Kart Yarat
+        </h2>
+        <p className="text-gray-500 text-sm">
+          Texnikanın məlumatlarını və iş detallarını daxil edin.
+        </p>
+      </div>
+
+      {error && (
+        <div className="bg-red-100 text-red-800 p-3 rounded-md text-center">
+          {error}
+        </div>
+      )}
 
       <Formik initialValues={newCardInitialValues} onSubmit={onSubmit}>
         {({ values, setFieldValue }) => (
           <Form className="space-y-8">
-            {/* CLIENT SECTION */}
+            {/* Client Section */}
             <SectionCard title="Müştəri Məlumatları">
-              <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-                <div className="flex-1 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 items-end gap-4">
+                <div>
                   <Label htmlFor="clientId" value="Müştəri adı" />
                   <Field as={Select} id="clientId" name="clientId" className="w-full mt-1">
                     <option value="">Müştərini seç</option>
@@ -164,16 +170,16 @@ const NewCard = () => {
                 </div>
                 <Link
                   to="/newClient"
-                  className="text-blue-600 flex items-center gap-2 whitespace-nowrap"
+                  className="text-blue-600 text-sm flex items-center gap-2 justify-end md:justify-start"
                 >
                   <FaPlus /> Yeni müştəri yarat
                 </Link>
               </div>
             </SectionCard>
 
-            {/* WARRANTY/TRIP SECTION */}
+            {/* Warranty / Trip Section */}
             <SectionCard title="Gediş və Zəmanət">
-              <div className="flex flex-wrap gap-5">
+              <div className="flex flex-wrap gap-5 text-sm">
                 <label className="flex items-center gap-2">
                   <input type="checkbox" onChange={(e) => setOpenGedis(e.target.checked)} />
                   Gediş
@@ -189,37 +195,26 @@ const NewCard = () => {
               </div>
 
               {openGedis && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
-                  <div>
-                    <Label value="Hara" />
-                    <TextInput />
-                  </div>
-                  <div>
-                    <Label value="Maşınla" />
-                    <Select>
-                      <option>Mitsubishi L200</option>
-                      <option>Man TGL 12.240</option>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label value="Məsafə (Km)" />
-                    <TextInput />
-                  </div>
-                  <div>
-                    <Label value="İşçilər getdi (sürücü ilə birlikdə)" />
-                    <TextInput />
-                  </div>
-                  <div>
-                    <Label value="İş saatları (səyahət daxil olmaqla)" />
-                    <TextInput />
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  {[
+                    "Hara",
+                    "Maşınla",
+                    "Məsafə (Km)",
+                    "İşçilər getdi (sürücü ilə birlikdə)",
+                    "İş saatları (səyahət daxil olmaqla)",
+                  ].map((label, i) => (
+                    <div key={i}>
+                      <Label value={label} />
+                      <TextInput className="mt-1" />
+                    </div>
+                  ))}
                 </div>
               )}
             </SectionCard>
 
-            {/* MACHINE INFO */}
+            {/* Machine Info */}
             <SectionCard title="Texniki Məlumat">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div>
                   <Label value="Texnikanın növü" />
                   <Field as={Select} name="type" className="w-full mt-1">
@@ -240,66 +235,40 @@ const NewCard = () => {
                   </Field>
                 </div>
 
-                <div>
-                  <Label value="Model" />
-                  <Field as={TextInput} name="model" className="w-full mt-1" />
-                </div>
-                <div>
-                  <Label value="Şassi nömrəsi" />
-                  <Field as={TextInput} name="sassi" className="w-full mt-1" />
-                </div>
+                <Field as={TextInput} name="model" placeholder="Model" />
+                <Field as={TextInput} name="sassi" placeholder="Şassi nömrəsi" />
+                <Field as={TextInput} name="carNumber" placeholder="Maşın nömrəsi" />
+                <Field as={Select} name="produceDate" className="w-full mt-1">
+                  {[2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
+                    <option key={y}>{y}</option>
+                  ))}
+                </Field>
 
-                <div>
-                  <Label value="Maşın nömrəsi" />
-                  <Field as={TextInput} name="carNumber" className="w-full mt-1" />
-                </div>
-                <div>
-                  <Label value="İstehsal tarixi" />
-                  <Field as={Select} name="produceDate" className="w-full mt-1">
-                    {[2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
-                      <option key={y}>{y}</option>
-                    ))}
-                  </Field>
-                </div>
+                <Field as={TextInput} name="km" placeholder="Km/Motosaat" />
+                <Field as={TextInput} name="qostNumber" placeholder="Dövlət nömrəsi" />
+                <Field as={Select} name="paymentType">
+                  <option value="transfer">Köçürülmə</option>
+                  <option value="cash">Nağd</option>
+                  <option value="warranty">Qarantiya</option>
+                  <option value="internal">Daxili iş</option>
+                  <option value="pos">POS</option>
+                </Field>
+              </div>
 
-                <div>
-                  <Label value="Km/Motosaat" />
-                  <Field as={TextInput} name="km" className="w-full mt-1" />
-                </div>
-                <div>
-                  <Label value="Dövlət nömrəsi" />
-                  <Field as={TextInput} name="qostNumber" className="w-full mt-1" />
-                </div>
-
-                <div>
-                  <Label value="Ödəniş üsulu" />
-                  <Field as={Select} name="paymentType" className="w-full mt-1">
-                    <option value="transfer">Köçürülmə</option>
-                    <option value="cash">Nağd</option>
-                    <option value="warranty">Qarantiya</option>
-                    <option value="internal">Daxili iş</option>
-                    <option value="pos">POS</option>
-                  </Field>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Field type="checkbox" name="nds" />
-                  <Label value="ƏDV (18%)" />
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Field type="checkbox" name="repairAgain" />
-                  <Label value="Təkrar təmir" />
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Field type="checkbox" name="servisInfo" />
-                  <Label value="Servis məlumatı" />
-                </div>
+              <div className="flex flex-wrap gap-5 mt-4 text-sm">
+                <label className="flex items-center gap-2">
+                  <Field type="checkbox" name="nds" /> ƏDV (18%)
+                </label>
+                <label className="flex items-center gap-2">
+                  <Field type="checkbox" name="repairAgain" /> Təkrar təmir
+                </label>
+                <label className="flex items-center gap-2">
+                  <Field type="checkbox" name="servisInfo" /> Servis məlumatı
+                </label>
               </div>
             </SectionCard>
 
-            {/* PROBLEMS */}
+            {/* Problems */}
             <FieldArray name="problems">
               {({ push, remove }) => (
                 <SectionCard title="Problemlər">
@@ -313,20 +282,21 @@ const NewCard = () => {
                       />
                     </div>
                   ))}
-                  <div className="flex gap-3 justify-end">
+                  <div className="flex justify-end gap-3">
                     <Button
                       onClick={() => push({ description: "", serviceWorkers: [""] })}
                       color="blue"
+                      size="xs"
                       type="button"
-                      size={"xs"}
                     >
                       Əlavə et +
                     </Button>
                     <Button
-                      onClick={() => values.problems.length > 1 && remove(values.problems.length - 1)}
+                      onClick={() => remove(values.problems.length - 1)}
                       color="gray"
+                      size="xs"
                       type="button"
-                      size={"xs"}
+                      disabled={values.problems.length <= 1}
                     >
                       Azalt -
                     </Button>
@@ -335,31 +305,43 @@ const NewCard = () => {
               )}
             </FieldArray>
 
-            {/* JOBS */}
+            {/* Jobs */}
             <FieldArray name="jobs">
               {({ push, remove }) => (
                 <SectionCard title="İşçilik">
                   <div className="overflow-x-auto">
-                    {values.jobs.map((_, index) => (
-                      <NewCardWorkers
-                        key={index}
-                        workers={workers}
-                        name={`jobs[${index}]`}
-                        values={values.jobs[index]}
-                        jobWorkerPrice={(price) => handlePriceUpdate(index, price)}
-                      />
-                    ))}
+                    <table className="w-full text-xs text-gray-600">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="text-center p-2">Kod</th>
+                          <th className="text-center p-2">Adı</th>
+                          <th className="text-center p-2">AV</th>
+                          <th className="text-center p-2">Qiymət</th>
+                          <th className="text-center p-2">Endirim(%)</th>
+                          <th className="text-center p-2">Yağ</th>
+                          <th className="text-center p-2">İşçilər</th>
+                        </tr>
+                      </thead>
+                      {values.jobs.map((_, index) => (
+                        <NewCardWorkers
+                          key={index}
+                          workers={workers}
+                          name={`jobs[${index}]`}
+                          values={values.jobs[index]}
+                          jobWorkerPrice={(price) => handlePriceUpdate(index, price)}
+                        />
+                      ))}
+                    </table>
                   </div>
 
                   <div className="flex justify-between items-center mt-4">
-                    <div className="font-semibold text-gray-700">
-                      Cəmi: {totalPrice.toFixed(2)} AZN
+                    <div className="text-sm font-semibold">
+                      Cəmi: <span className="text-blue-700">{totalPrice} AZN</span>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                       <Button
                         color="blue"
-                        type="button"
-                        size={"xs"}
+                        size="xs"
                         onClick={() =>
                           push({
                             code: "",
@@ -368,7 +350,7 @@ const NewCard = () => {
                             price: 0,
                             discount: 0,
                             oil: "",
-                            jobWorkers: [{ workerAv: "", workerId: 0 }],
+                            jobWorkers: [{ workerAv: "", workerId: "" }],
                           })
                         }
                       >
@@ -376,14 +358,9 @@ const NewCard = () => {
                       </Button>
                       <Button
                         color="gray"
-                        size={"xs"}
-                        type="button"
-                        onClick={() => {
-                          if (values.jobs.length > 1) {
-                            remove(values.jobs.length - 1);
-                            setJobPrices(jobPrices.slice(0, -1));
-                          }
-                        }}
+                        size="xs"
+                        onClick={() => remove(values.jobs.length - 1)}
+                        disabled={values.jobs.length <= 1}
                       >
                         Azalt -
                       </Button>
@@ -393,7 +370,7 @@ const NewCard = () => {
               )}
             </FieldArray>
 
-            {/* EXPENSES */}
+            {/* Expenses */}
             <FieldArray name="expences">
               {({ push, remove }) => (
                 <SectionCard title="Xərclər">
@@ -405,45 +382,43 @@ const NewCard = () => {
                       values={values.expences[index]}
                     />
                   ))}
-                  <div className="text-right font-semibold">
-                    Cəmi: {totalExpencesPrice.toFixed(2)} AZN
-                  </div>
-                  <div className="flex justify-end gap-3 mt-3">
-                    <Button color="blue" size={"xs"} onClick={() => push({ description: "", price: 0 })}>
-                      Əlavə et +
-                    </Button>
-                    <Button
-                      color="gray"
-                      size={"xs"}
-                      onClick={() => {
-                        if (values.expences.length > 1) {
-                          remove(values.expences.length - 1);
-                          setExpencePrice(expencePrice.slice(0, -1));
-                        }
-                      }}
-                    >
-                      Azalt -
-                    </Button>
+                  <div className="flex justify-between items-center">
+                    <div className="font-semibold text-sm">
+                      Cəmi: {totalExpencesPrice.toFixed(2)} AZN
+                    </div>
+                    <div className="flex gap-2">
+                      <Button color="blue" size="xs" onClick={() => push({ description: "", price: 0 })}>
+                        Əlavə et +
+                      </Button>
+                      <Button
+                        color="gray"
+                        size="xs"
+                        onClick={() => remove(values.expences.length - 1)}
+                        disabled={values.expences.length <= 1}
+                      >
+                        Azalt -
+                      </Button>
+                    </div>
                   </div>
                 </SectionCard>
               )}
             </FieldArray>
 
-            {/* PARTS SECTION */}
+            {/* Parts */}
             <NewCardAddParts />
 
-            {/* COMMENTS */}
+            {/* Comments */}
             <SectionCard title="İş haqqında şərhlər">
               <Field as={Textarea} rows={4} name="comments" placeholder="Şərh yazın..." />
             </SectionCard>
 
-            {/* RECOMMENDATION */}
+            {/* Recommendation */}
             <SectionCard title="Məsləhətlər">
               <Field as={Textarea} rows={4} name="recommendation" placeholder="Məsləhət yazın..." />
             </SectionCard>
 
-            {/* TOTALS */}
-            <div className="bg-gray-100 rounded-md p-4 text-right space-y-1 font-medium">
+            {/* Totals */}
+            <div className="bg-gray-100 rounded-md p-4 text-right font-medium space-y-1">
               <div>Cəm: {totalPriceWithoutNds.toFixed(2)} AZN</div>
               {values.nds && (
                 <>
@@ -455,13 +430,13 @@ const NewCard = () => {
               )}
             </div>
 
-            {/* ACTION BUTTONS */}
+            {/* Footer Actions */}
             <div className="sticky bottom-0 bg-white border-t shadow-inner flex flex-wrap justify-end gap-3 p-4">
-              <Button type="submit" color="blue" size={"xs"}>
+              <Button type="submit" color="blue" size="sm">
                 Yadda Saxla
               </Button>
-              <Button color="gray" size={"xs"}>Kartı Bağla</Button>
-              <Button color="purple" size={"xs"}>
+              <Button color="gray" size="sm">Kartı Bağla</Button>
+              <Button color="purple" size="sm">
                 <FiPrinter className="mr-2" /> Çap et
               </Button>
             </div>
