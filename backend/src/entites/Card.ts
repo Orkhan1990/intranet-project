@@ -49,13 +49,27 @@ export class Card extends AllEntities {
   @Column({ nullable: true })
   recommendation: string;
 
+  @Column({ type: "float", default: 0, name: "parts_total_price" })
+  partsTotalPrice: number;
+
+  @Column({ type: "float", default: 0, name: "work_sum" })
+  workSum: number;
+
+  @Column({ type: "float", default: 0, name: "parts_sum_own" })
+  partsSumOwn: number;
+
+  @Column({ type: "float", default: 0, name: "work_sum_own" })
+  workSumOwn: number;
+
   @ManyToOne(() => Client, (client) => client.cards)
   client: Client;
 
   @Column()
   clientId: number;
 
-  @OneToMany(() => CardProblem, (cardProblem) => cardProblem.card, { cascade: true })
+  @OneToMany(() => CardProblem, (cardProblem) => cardProblem.card, {
+    cascade: true,
+  })
   cardProblems: CardProblem[];
 
   @OneToMany(() => CardJob, (cardJob) => cardJob.card, { cascade: true })
@@ -64,4 +78,3 @@ export class Card extends AllEntities {
   @OneToMany(() => CardPart, (cardPart) => cardPart.card, { cascade: true })
   cardParts: CardPart[];
 }
-
