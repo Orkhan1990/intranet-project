@@ -19,10 +19,13 @@ const NewCardWorkers = ({
   name,
   jobWorkerPrice,
 }: CardWorkersInterface) => {
+
+
+
   const price = (values.av || 0) * 50 * (1 - (values.discount || 0) / 100);
   useEffect(() => {
     jobWorkerPrice(price);
-  }, [price]);
+  }, [price,values.av, values.discount]);
 
   return (
     <tbody>
@@ -95,11 +98,13 @@ const NewCardWorkers = ({
               <div className="flex flex-col gap-2">
                 {values.jobWorkers.map((_, index: number) => (
                   <NewCardWorkersName
+                  key={index}
                     workers={workers}
                     name={`${name}.jobWorkers[${index}]`}
                     index={index}
                     push={push}
                     remove={remove}
+                    values={values}
                   />
                 ))}
               </div>

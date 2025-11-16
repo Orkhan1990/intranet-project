@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { SparePart } from "./SparePart";
 import { Card } from "./Card";
@@ -14,7 +14,7 @@ export class CardPart extends AllEntities {
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   date: Date;
 
-    @Column({ type: "double", nullable: true, name: "sold_price" })
+  @Column({ type: "double", nullable: true, name: "sold_price" })
   soldPrice: number;
 
   @Column({ type: "double", nullable: true, name: "net_price" })
@@ -23,10 +23,14 @@ export class CardPart extends AllEntities {
   @Column({ type: "double", nullable: true })
   count: number;
 
-  @OneToMany(() => SparePart, (sparePart) => sparePart.cardPart)
-  spareParts: SparePart[];
+  @ManyToOne(() => SparePart, (sp) => sp.cardParts, { eager: true })
+  @JoinColumn({ name: "spare_part_id" })
+  sparePart: SparePart;
 
-  @ManyToOne(() => Card, (card) => card.cardParts)
-   @JoinColumn()
+  @ManyToOne(() => Card, (card) => card.cardParts, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "card_id" })
   card: Card;
+
+  @Column({ name: "card_id" })
+  cardId: number;
 }

@@ -1,37 +1,64 @@
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Client } from "./Client";
 import { CardProblem } from "./CardProblem";
 import { CardJob } from "./CardJob";
 import { CardPart } from "./CardPart";
+import { User } from "./User";
+import { WorkerSalary } from "./WorkerSalary";
+import { CardExpense } from "./CardExpense";
 
 @Entity({ name: "cards" })
 export class Card extends AllEntities {
-  @Column()
+  @Column({ name: "type", nullable: true })
   type: string;
 
-  @Column()
+  @Column({ name: "manufactured", nullable: true })
   manufactured: string;
 
-  @Column()
+  @Column({ name: "model", nullable: true })
   model: string;
 
-  @Column()
+  @Column({ default: true, name: "is_open" })
+  isOpen: boolean;
+
+  @Column({ type: "double", default: 0, name: "parts_total_price" })
+  partsTotalPrice: number;
+
+  @Column({ type: "double", default: 0, name: "work_sum" })
+  workSum: number;
+
+  @Column({ type: "double", default: 0, name: "parts_sum_own" })
+  partsSumOwn: number;
+
+  @Column({ type: "double", default: 0, name: "work_sum_own" })
+  workSumOwn: number;
+
+  @Column({ type: "double", default: 0, name: "av_sum" })
+  avSum: number;
+
+  @Column({ name: "sassi", nullable: true })
   sassi: string;
 
-  @Column({ name: "car_number" })
+  @Column({ type: "timestamp", name: "open_date", default: () => "CURRENT_TIMESTAMP" })
+  openDate: Date;
+
+  @Column({ type: "timestamp", name: "close_date", nullable: true })
+  closeDate: Date | null;
+
+  @Column({ name: "car_number", nullable: true })
   carNumber: string;
 
-  @Column({ name: "produce_date" })
+  @Column({ name: "produce_date", nullable: true })
   produceDate: string;
 
-  @Column()
+  @Column({ name: "km", nullable: true })
   km: string;
 
-  @Column({ name: "qost_number" })
+  @Column({ name: "qost_number", nullable: true })
   qostNumber: string;
 
-  @Column({ name: "payment_type" })
+  @Column({ name: "payment_type", nullable: true })
   paymentType: string;
 
   @Column({ default: false })
@@ -49,27 +76,16 @@ export class Card extends AllEntities {
   @Column({ nullable: true })
   recommendation: string;
 
-  @Column({ type: "float", default: 0, name: "parts_total_price" })
-  partsTotalPrice: number;
-
-  @Column({ type: "float", default: 0, name: "work_sum" })
-  workSum: number;
-
-  @Column({ type: "float", default: 0, name: "parts_sum_own" })
-  partsSumOwn: number;
-
-  @Column({ type: "float", default: 0, name: "work_sum_own" })
-  workSumOwn: number;
-
-  @ManyToOne(() => Client, (client) => client.cards)
+  // Client
+  @ManyToOne(() => Client, (client) => client.cards, { onDelete: "SET NULL" })
+  @JoinColumn({ name: "clientId" })
   client: Client;
 
-  @Column()
+  @Column({ name: "clientId", nullable: true })
   clientId: number;
 
-  @OneToMany(() => CardProblem, (cardProblem) => cardProblem.card, {
-    cascade: true,
-  })
+  // Relations
+  @OneToMany(() => CardProblem, (cardProblem) => cardProblem.card, { cascade: true })
   cardProblems: CardProblem[];
 
   @OneToMany(() => CardJob, (cardJob) => cardJob.card, { cascade: true })
@@ -77,4 +93,19 @@ export class Card extends AllEntities {
 
   @OneToMany(() => CardPart, (cardPart) => cardPart.card, { cascade: true })
   cardParts: CardPart[];
+
+  // User (creator / owner)
+  @ManyToOne(() => User, (user) => user.cards, { nullable: true, onDelete: "SET NULL" })
+  @JoinColumn({ name: "user_id" })
+  user: User;
+
+  @Column({ name: "user_id", nullable: true })
+  userId: number;
+
+  // Salaries & expenses
+  @OneToMany(() => WorkerSalary, (ws) => ws.card)
+  workerSalaries: WorkerSalary[];
+
+  @OneToMany(() => CardExpense, (e) => e.card)
+  expenses: CardExpense[];
 }

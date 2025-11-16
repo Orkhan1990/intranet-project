@@ -4,7 +4,7 @@ import NoPage from "./pages/NoPage";
 import Protected from "./components/Protected";
 import Home from "./pages/Home";
 import SignUp from "./pages/Auth/SignUp";
-import NewCard from "./pages/NewCard";
+import NewCard from "./pages/Card/NewCard";
 import NewClient from "./pages/Client/NewClient";
 import ClientList from "./pages/Client/ClientList";
 import ImportWarehouse from "./pages/Warehouse/ImportWarehouse";
@@ -26,6 +26,7 @@ import EditPrixod from "./pages/Prixod/EditPrixod";
 import WorkerPercentage from "./pages/WorkerPercentage";
 import { ConfirmPrixod } from "./pages/Prixod/ConfirmPrixod";
 import WarehouseListSelected from "./pages/Warehouse/WarehouseListSelected";
+import CardList from "./pages/Card/CardList";
 
 function App() {
   return (
@@ -136,6 +137,16 @@ function App() {
               </Layout>
             }
           />
+          
+           <Route
+            path="/cardList"
+            element={
+              <Layout>
+                <CardList />
+              </Layout>
+            }
+          />
+
           <Route path="/calculation" element={<Calculation />} />
           <Route
             path="/priceList"

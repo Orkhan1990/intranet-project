@@ -17,9 +17,11 @@ interface AddChargesInterface{
 const AddCharges = ({name,values,expenceUpdatePrice}:AddChargesInterface) => {
 
 
-  useEffect(()=>{
-       expenceUpdatePrice(+values.price)
-  },[values.price])
+  useEffect(() => {
+    // ✨ Number çevirməyi burada et, amma input-u pozmasın deyə values.price string qalsın
+    const priceNumber = values.price || 0;
+    expenceUpdatePrice(priceNumber);
+  }, [values.price]);
  
   return (
    <div className="border p-5 rounded-md">

@@ -1,13 +1,8 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne
-} from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Prixod } from "./Prixod";
 import { Brand } from "./Brand";
-import { CardPart} from "./CardPart";
+import { CardPart } from "./CardPart";
 
 @Entity({ name: "spare_parts" })
 export class SparePart extends AllEntities {
@@ -41,13 +36,20 @@ export class SparePart extends AllEntities {
   @Column({ nullable: true })
   column: string;
 
-  @ManyToOne(() => Brand, (brand) => brand.spareParts)
-  @JoinColumn() // This will create a foreign key in the Brand table
+  // 🔹 Brand relation
+  @ManyToOne(() => Brand, (brand) => brand.spareParts, { nullable: true })
+  @JoinColumn({ name: "brand_id" })
   brand: Brand;
 
-  @ManyToOne(() => Prixod, (prixod) => prixod.spareParts) // specify inverse side as a second parameter
+  // 🔹 Prixod relation
+  @ManyToOne(() => Prixod, (prixod) => prixod.spareParts, { nullable: true })
+  @JoinColumn({ name: "prixod_id" })
   prixod: Prixod;
 
-  @ManyToOne(() => CardPart, (cardPart) => cardPart.spareParts) // specify inverse side as a second parameter
-  cardPart: CardPart;
+  @Column({ name: "prixod_id", nullable: true })
+  prixodId: number;
+
+  // 🔹 Card parts relation
+  @OneToMany(() => CardPart, (cardPart) => cardPart.sparePart)
+  cardParts: CardPart[];
 }
