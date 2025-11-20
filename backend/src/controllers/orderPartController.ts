@@ -65,7 +65,7 @@ export const getSupplierOrderPartsData = async (
     .where("sop.order_part_id IN (:...ids)", { ids: orderPartIdArray })
     .getMany();
 
-    console.log(supplierOrderParts);
+    // console.log(supplierOrderParts);
     res.status(200).json(supplierOrderParts);
   } catch (error) {
     next(errorHandler(401, error));
@@ -80,7 +80,7 @@ export const choosingBestSupplier = async ( req: Request,
 
     const{id}=req.params;
     const{orderPartArrayId,orderhistoryId,orderId}=req.body
-     console.log(orderPartArrayId)
+    //  console.log(orderPartArrayId)
 
      if(!id || !orderPartArrayId || orderPartArrayId.length === 0) {
       return next(errorHandler(400, "Supplier ID and order part IDs are required"));

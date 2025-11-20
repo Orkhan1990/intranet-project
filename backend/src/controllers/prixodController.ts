@@ -62,6 +62,9 @@ export const createPrixod = async (
       message,
     }: PrixodInterface = req.body;
 
+    console.log(req.body);
+    
+
     const getSupplier = await supplierRepository.findOneBy({ id: +supplierId });
     const getOrder = await orderRepository.findOneBy({ id: +orderId });
     const user = await userRepository.findOneBy({ id: userId });
@@ -88,7 +91,7 @@ export const createPrixod = async (
     newPrixod.accept = false;
     newPrixod.confirmDate = new Date();
     newPrixod.acceptDate = new Date();
-    newPrixod.user = { id: userId } as any;
+    newPrixod.user = user;
 
     await prixodRepository.save(newPrixod);
 
@@ -396,7 +399,7 @@ export const confirmPrixod = async (
     const userId = req.userId;
     const prixod = await prixodRepository.findOne({
       where: { id: +id },
-      relations: ["order"], // ensures prixod.order is loaded
+      relations: ["order","supplier"], // ensures prixod.order is loaded
     });
     const user = await userRepository.findOneBy({ id: userId });
 
@@ -438,7 +441,7 @@ export const confirmPrixod = async (
           <p>Yeni <b>Mədaxil</b> təsdiqə göndərildi.</p>
           <ul>
             <li><b>Invoice:</b> ${prixod.invoice || "-"}</li>
-            <li><b>Təchizatçı:</b> ${prixod.supplier}</li>
+            <li><b>Təchizatçı:</b> ${prixod.supplier.supplier}</li>
             <li><b>Bazar:</b> ${prixod.market}</li>
             <li><b>Ödəniş növü:</b> ${prixod.paymentType}</li>
           </ul>
@@ -463,12 +466,12 @@ export const confirmLastPrixod = async (
     const { id } = req.params;
     const { message } = req.body;
 
-    console.log(message);
+    // console.log(message);
 
     const userId = req.userId;
     const prixod = await prixodRepository.findOne({
       where: { id: +id },
-      relations: ["order"], // ensures prixod.order is loaded
+      relations: ["order","supplier"], // ensures prixod.order is loaded
     });
     const user = await userRepository.findOneBy({ id: +userId });
 
@@ -539,7 +542,7 @@ export const rejectPrixod = async (
     const { message } = req.body;
     const prixod = await prixodRepository.findOne({
       where: { id: +id },
-      relations: ["order"], // ensures prixod.order is loaded
+      relations: ["order","supplier"], // ensures prixod.order is loaded
     });
     const user = await userRepository.findOneBy({ id: +userId });
 

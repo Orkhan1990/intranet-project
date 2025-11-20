@@ -120,30 +120,53 @@ export const createCard = async (
         workSumOwn += income;
       }
     }
-    const card = queryRunner.manager.create(Card, {
-      clientId: Number(cardData.clientId),
-      type: cardData.type,
-      manufactured: cardData.manufactured,
-      model: cardData.model,
-      sassi: cardData.sassi,
-      carNumber: cardData.carNumber,
-      produceDate: cardData.produceDate,
-      km: cardData.km,
-      qostNumber: cardData.qostNumber,
-      paymentType: cardData.paymentType,
-      nds: cardData.nds,
-      repairAgain: cardData.repairAgain,
-      servisInfo: cardData.servisInfo,
-      comments: cardData.comments,
-      recommendation: cardData.recommendation,
-      workSum: workSum,
-      avSum: avSum,
-      openDate: new Date(),
-      workSumOwn: workSumOwn,
-      userId: userId,
-    });
 
-    const savedCard = await queryRunner.manager.save(card);
+    const newCard=new Card();
+    newCard.clientId=Number(cardData.clientId);
+      newCard.type= cardData.type;
+      newCard.manufactured= cardData.manufactured;
+      newCard.model= cardData.model;
+      newCard.sassi= cardData.sassi;
+      newCard.carNumber= cardData.carNumber;
+      newCard.produceDate= cardData.produceDate;
+      newCard.km= cardData.km;
+      newCard.qostNumber= cardData.qostNumber;
+      newCard.paymentType= cardData.paymentType;
+      newCard.nds= cardData.nds;
+      newCard.repairAgain= cardData.repairAgain;
+      newCard.servisInfo= cardData.servisInfo;
+      newCard.comments= cardData.comments;
+      newCard.recommendation= cardData.recommendation;
+      newCard.workSum= workSum;
+      newCard.avSum= avSum;
+      newCard.openDate= new Date();
+      newCard.workSumOwn= workSumOwn;
+      newCard.userId= userId;
+
+    // const card = queryRunner.manager.create(Card, {
+    //   clientId: Number(cardData.clientId),
+    //   type: cardData.type,
+    //   manufactured: cardData.manufactured,
+    //   model: cardData.model,
+    //   sassi: cardData.sassi,
+    //   carNumber: cardData.carNumber,
+    //   produceDate: cardData.produceDate,
+    //   km: cardData.km,
+    //   qostNumber: cardData.qostNumber,
+    //   paymentType: cardData.paymentType,
+    //   nds: cardData.nds,
+    //   repairAgain: cardData.repairAgain,
+    //   servisInfo: cardData.servisInfo,
+    //   comments: cardData.comments,
+    //   recommendation: cardData.recommendation,
+    //   workSum: workSum,
+    //   avSum: avSum,
+    //   openDate: new Date(),
+    //   workSumOwn: workSumOwn,
+    //   userId: userId,
+    // });
+
+    const savedCard = await cardRepository.save(newCard);
 
     // =============================
     // 2) PROBLEMLƏRİ YARAT
