@@ -21,6 +21,8 @@ const userRepository = AppDataSource.getRepository(User);
 const workerSalaryRepo = AppDataSource.getRepository(WorkerSalary);
 const cardJobRepo = AppDataSource.getRepository(CardJob);
 const cardWorkerJobRepo = AppDataSource.getRepository(CardWorkerJob);
+const cardProblemRepository = AppDataSource.getRepository(CardProblem);
+const cardExpenseRespoisitory = AppDataSource.getRepository(CardExpense);
 
 export const addToCard = async (
   req: Request,
@@ -143,28 +145,8 @@ export const createCard = async (
       newCard.workSumOwn= workSumOwn;
       newCard.userId= userId;
 
-    // const card = queryRunner.manager.create(Card, {
-    //   clientId: Number(cardData.clientId),
-    //   type: cardData.type,
-    //   manufactured: cardData.manufactured,
-    //   model: cardData.model,
-    //   sassi: cardData.sassi,
-    //   carNumber: cardData.carNumber,
-    //   produceDate: cardData.produceDate,
-    //   km: cardData.km,
-    //   qostNumber: cardData.qostNumber,
-    //   paymentType: cardData.paymentType,
-    //   nds: cardData.nds,
-    //   repairAgain: cardData.repairAgain,
-    //   servisInfo: cardData.servisInfo,
-    //   comments: cardData.comments,
-    //   recommendation: cardData.recommendation,
-    //   workSum: workSum,
-    //   avSum: avSum,
-    //   openDate: new Date(),
-    //   workSumOwn: workSumOwn,
-    //   userId: userId,
-    // });
+    
+
 
     const savedCard = await cardRepository.save(newCard);
 
@@ -173,12 +155,13 @@ export const createCard = async (
     // =============================
     if (Array.isArray(cardData.problems)) {
       for (const p of cardData.problems) {
-        const problem = queryRunner.manager.create(CardProblem, {
-          description: p.description,
-          cardId: savedCard.id,
-        });
 
-        const savedProblem = await queryRunner.manager.save(problem);
+        const newCardProblem=new CardProblem();
+        newCardProblem.description=p.description;
+        newCardProblem.cardId=savedCard.id;
+    
+
+        const savedProblem = await cardProblemRepository.save(newCardProblem);
 
         // serviceWorkers varsa ManyToMany append edirik
         if (Array.isArray(p.serviceWorkers)) {
@@ -187,7 +170,7 @@ export const createCard = async (
               .createQueryBuilder()
               .relation(CardProblem, "serviceWorkers")
               .of(savedProblem)
-              .add(Number(workerId));
+              .add(Number(workerId)); 
           }
         }
       }
@@ -204,31 +187,41 @@ if (Array.isArray(cardData.jobs)) {
 
     const price = av * 50 * (1 - discount / 100);
 
-    const job = queryRunner.manager.create(CardJob, {
-      code: j.code,
-      name: j.name,
-      av: av,
-      price: price,
-      discount: discount,
-      oil: j.oil,
-      cardId: savedCard.id,
-    });
+    const newJob=new CardJob();
+    newJob.code=j.code;
+    newJob.name=j.name;
+    newJob.av=av;
+    newJob.price=price;
+    newJob.discount=discount;
+    newJob.oil=j.oil;
+    newJob.cardId=savedCard.id;
 
-    const savedJob = await queryRunner.manager.save(job);
+  
+
+      const savedJob=await cardJobRepo.save(newJob);
 
     // jobWorkers
     if (Array.isArray(j.jobWorkers)) {
       for (const jw of j.jobWorkers) {
         const workerId = Number(jw.workerId);
 
-        // WorkerJob daxil edirik
-        const workerJob = queryRunner.manager.create(CardWorkerJob, {
-          workerAv: Number(jw.workerAv),
-          userId: workerId,
-          cardJobId: savedJob.id,
-        });
+        const user= await userRepository.findOneBy({ id:workerId});
+        if(!user){
+          next(errorHandler(404, "İşçi tapılmadı"));
+          return;
+        }
 
-        await queryRunner.manager.save(workerJob);
+        // WorkerJob daxil edirik
+        const newWorkerJob=new CardWorkerJob();
+        newWorkerJob.workerAv=Number(jw.workerAv);
+        newWorkerJob.user=user;
+        newWorkerJob.cardJobId=savedJob.id;
+        newWorkerJob.salaryPercent=user.percent;
+        newWorkerJob.earnedSalary=user.percent * av * 50 / 100;
+
+    
+
+        await cardWorkerJobRepo.save(newWorkerJob);
 
         // USER faizini götürürük
         const percent = workerMap.get(workerId) || 0;
@@ -237,15 +230,14 @@ if (Array.isArray(cardData.jobs)) {
         const amount = av * 50 * (percent / 100);
 
         // WorkerSalary INSERT
-        await workerSalaryRepo.save(
-          workerSalaryRepo.create({
-            workerId,
-            cardId: savedCard.id,
-            cardJobId: savedJob.id,
-            amount,
-            date: new Date()
-          })
-        );
+
+        const newWorkerSalary=new WorkerSalary();
+        newWorkerSalary.workerId=workerId;
+        newWorkerSalary.cardId=savedCard.id;
+        newWorkerSalary.cardJobId=savedJob.id;
+        newWorkerSalary.amount=amount;
+        newWorkerSalary.date=new Date();
+        await workerSalaryRepo.save(newWorkerSalary);
       }
     }
   }
@@ -257,26 +249,24 @@ if (Array.isArray(cardData.jobs)) {
     // =============================
     if (Array.isArray(cardData.expences)) {
       for (const e of cardData.expences) {
-        const exp = queryRunner.manager.create(CardExpense, {
-          description: e.description,
-          price: Number(e.price),
-          cardId: savedCard.id,
-        });
 
-        await queryRunner.manager.save(exp);
+        const newExpense=new CardExpense();
+        newExpense.description=e.description;
+        newExpense.price=Number(e.price);
+        newExpense.cardId=savedCard.id;
+     
+        await cardExpenseRespoisitory.save(newExpense);
       }
     }
 
    
 
-    await queryRunner.commitTransaction();
 
     res.status(201).json({
       message: "Kart yaradıldı",
       card: savedCard,
     });
   } catch (error) {
-    await queryRunner.rollbackTransaction();
     console.log(error);
     next(errorHandler(500, error));
   } finally {
