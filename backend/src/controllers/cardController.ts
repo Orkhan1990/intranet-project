@@ -64,203 +64,194 @@ export const createCard = async (
   next: NextFunction
 ) => {
   const queryRunner = AppDataSource.createQueryRunner();
-
   await queryRunner.connect();
   await queryRunner.startTransaction();
 
   try {
-    const { cardData} = req.body;
-
-    
-
+    const { cardData } = req.body;
     const userId = req.userId;
 
-    console.log("CARD DATA:", cardData);
+    log(cardData);
 
     // =============================
-    // 1) CARD YARAT
+    // 1) AV TOPLAMI
     // =============================
     const avSum = cardData.jobs.reduce(
-      (sum: any, j: any) => sum + Number(j.av || 0),
+      (sum: number, job: any) => sum + Number(job.av || 0), //bu duzdur
       0
     );
+
+    // =============================
+    // 2) WORKER-ID-LƏRİ YIĞIRIQ
+    // =============================
     const workerIds = cardData.jobs.flatMap((j: any) =>
       j.jobWorkers.map((jw: any) => Number(jw.workerId))
     );
 
     const uniqueWorkerIds = [...new Set(workerIds)];
 
-    // user-lərin faizlərini gətiririk
+    // İŞÇİ FAİZLƏRİNİ GƏTİRİRİK
     const workers = await userRepository.find({
       where: { id: In(uniqueWorkerIds) },
     });
 
-   const workSum = cardData.jobs.reduce((sum:any, j:any) => {
-  const av = Number(j.av || 0);
-  const discount = Number(j.discount || 0);
-  const price = av * 50 * (1 - discount / 100);
-  return sum + price;
-}, 0);
-
-    // map şəklində saxlayaq
     const workerMap = new Map();
-    workers.forEach((w) => {
-      workerMap.set(w.id, w.percent); // məsələn 15%
-    });
+    workers.forEach((w) => workerMap.set(w.id, w.percent));
 
-    let workSumOwn = 0;
+    // =============================
+    // 3) ÜMUMİ ENDİRİMLİ MƏBLƏĞ HESABLANMASI
+    // =============================
 
-    for (const job of cardData.jobs) {
-      const jobAv = Number(job.av) || 0;
+    const workSum = cardData.jobs.reduce((sum: number, j: any) => {
+      const av = Number(j.av || 0);
+      const globalDiscount = Number(j.discount || 0);
+      const price = av * 50 * (1 - globalDiscount / 100);
+      return sum + price;
+    }, 0);
 
-      for (const jw of job.jobWorkers) {
+    const workSumOwn = cardData.jobs.reduce((sum: number, j: any) => {
+      const av = Number(j.av || 0);
+      const globalDiscount = Number(j.discount || 0);
+      // const price = av * 50 * (1 - globalDiscount / 100);
+      let workerTotalSumOwn = 0;
+      for (const jw of j.jobWorkers) {
+        const avWorker = Number(jw.workerAv || 0);
         const workerId = Number(jw.workerId);
-        const percent = workerMap.get(workerId) || 0;
+        const workerPercent = workerMap.get(workerId) || 0;
 
-        const income = jobAv * (percent / 100);
-
-        workSumOwn += income;
+        const price =
+          50 * avWorker * (1 - globalDiscount / 100) * (workerPercent / 100);
+        // ⭐ DÜZGÜN MAAS DÜSTURU
+        workerTotalSumOwn += price;
       }
-    }
+      return sum + workerTotalSumOwn;
+    }, 0);
 
-    const newCard=new Card();
-    newCard.clientId=Number(cardData.clientId);
-      newCard.type= cardData.type;
-      newCard.manufactured= cardData.manufactured;
-      newCard.model= cardData.model;
-      newCard.sassi= cardData.sassi;
-      newCard.carNumber= cardData.carNumber;
-      newCard.produceDate= cardData.produceDate;
-      newCard.km= cardData.km;
-      newCard.qostNumber= cardData.qostNumber;
-      newCard.paymentType= cardData.paymentType;
-      newCard.nds= cardData.nds;
-      newCard.repairAgain= cardData.repairAgain;
-      newCard.servisInfo= cardData.servisInfo;
-      newCard.comments= cardData.comments;
-      newCard.recommendation= cardData.recommendation;
-      newCard.workSum= workSum;
-      newCard.avSum= avSum;
-      newCard.openDate= new Date();
-      newCard.workSumOwn= workSumOwn;
-      newCard.userId= userId;
-
-    
-
+    // =============================
+    // 4) CARD CREATE
+    // =============================
+    const newCard = new Card();
+    newCard.clientId = Number(cardData.clientId);
+    newCard.type = cardData.type;
+    newCard.manufactured = cardData.manufactured;
+    newCard.model = cardData.model;
+    newCard.sassi = cardData.sassi;
+    newCard.carNumber = cardData.carNumber;
+    newCard.produceDate = cardData.produceDate;
+    newCard.km = cardData.km;
+    newCard.qostNumber = cardData.qostNumber;
+    newCard.paymentType = cardData.paymentType;
+    newCard.nds = cardData.nds;
+    newCard.repairAgain = cardData.repairAgain;
+    newCard.servisInfo = cardData.servisInfo;
+    newCard.comments = cardData.comments;
+    newCard.recommendation = cardData.recommendation;
+    newCard.workSum = workSum;
+    newCard.workSumOwn = workSumOwn;
+    newCard.avSum = avSum;
+    newCard.openDate = new Date();
+    newCard.userId = userId;
 
     const savedCard = await cardRepository.save(newCard);
 
     // =============================
-    // 2) PROBLEMLƏRİ YARAT
+    // 5) PROBLEMLƏR (CardProblem)
     // =============================
     if (Array.isArray(cardData.problems)) {
       for (const p of cardData.problems) {
+        const prob = new CardProblem();
+        prob.description = p.description;
+        prob.cardId = savedCard.id;
 
-        const newCardProblem=new CardProblem();
-        newCardProblem.description=p.description;
-        newCardProblem.cardId=savedCard.id;
-    
+        const savedProblem = await cardProblemRepository.save(prob);
 
-        const savedProblem = await cardProblemRepository.save(newCardProblem);
-
-        // serviceWorkers varsa ManyToMany append edirik
         if (Array.isArray(p.serviceWorkers)) {
           for (const workerId of p.serviceWorkers) {
-            await queryRunner.manager
+            await cardProblemRepository.manager
               .createQueryBuilder()
               .relation(CardProblem, "serviceWorkers")
-              .of(savedProblem)
-              .add(Number(workerId)); 
+              .of(savedProblem.id) // <-- Burda .id vermək daha doğrudur
+              .add(workerId);
           }
         }
       }
     }
 
     // =============================
-    // 3) JOB-ları və WorkerJob-ları yarat
+    // 6) JOBLAR + WORKERJOB + WORKER SALARY
     // =============================
+    // if (Array.isArray(cardData.jobs)) {
+    //   for (const j of cardData.jobs) {
+    //     const av = Number(j.av || 0);
+    //     // const discount = globalDiscount;
 
-if (Array.isArray(cardData.jobs)) {
-  for (const j of cardData.jobs) {
-    const av = Number(j.av || 0);
-    const discount = Number(j.discount || 0);
+    //     const price = av * 50;
 
-    const price = av * 50 * (1 - discount / 100);
+    //     const newJob = new CardJob();
+    //     newJob.code = j.code;
+    //     newJob.name = j.name;
+    //     newJob.av = av;
+    //     newJob.price = price;
+    //     // newJob.discount = discount;
+    //     newJob.oil = j.oil;
+    //     newJob.cardId = savedCard.id;
 
-    const newJob=new CardJob();
-    newJob.code=j.code;
-    newJob.name=j.name;
-    newJob.av=av;
-    newJob.price=price;
-    newJob.discount=discount;
-    newJob.oil=j.oil;
-    newJob.cardId=savedCard.id;
+    //     const savedJob = await cardJobRepo.save(newJob);
 
-  
+    //     // ==============================
+    //     // İşçilər
+    //     // ==============================
+    //     if (Array.isArray(j.jobWorkers)) {
+    //       for (const jw of j.jobWorkers) {
+    //         const workerId = Number(jw.workerId);
+    //         const user = await userRepository.findOneBy({ id: workerId });
 
-      const savedJob=await cardJobRepo.save(newJob);
+    //         if (!user) {
+    //           next(errorHandler(404, "İşçi tapılmadı"));
+    //           return;
+    //         }
 
-    // jobWorkers
-    if (Array.isArray(j.jobWorkers)) {
-      for (const jw of j.jobWorkers) {
-        const workerId = Number(jw.workerId);
+    //         // WorkerJob CREATE
+    //         const wj = new CardWorkerJob();
+    //         wj.workerAv = Number(jw.workerAv);
+    //         wj.user = user;
+    //         wj.cardJobId = savedJob.id;
+    //         wj.salaryPercent = user.percent;
 
-        const user= await userRepository.findOneBy({ id:workerId});
-        if(!user){
-          next(errorHandler(404, "İşçi tapılmadı"));
-          return;
-        }
+    //         // ⭐ DÜZGÜN MAAS DÜSTURU
+    //         wj.earnedSalary =
+    //           av * 50 * (1 - discount / 100) * (user.percent / 100);
 
-        // WorkerJob daxil edirik
-        const newWorkerJob=new CardWorkerJob();
-        newWorkerJob.workerAv=Number(jw.workerAv);
-        newWorkerJob.user=user;
-        newWorkerJob.cardJobId=savedJob.id;
-        newWorkerJob.salaryPercent=user.percent;
-        newWorkerJob.earnedSalary=user.percent * av * 50 / 100;
+    //         await cardWorkerJobRepo.save(wj);
 
-    
+    //         // WorkerSalary table
+    //         const sal = new WorkerSalary();
+    //         sal.workerId = workerId;
+    //         sal.cardId = savedCard.id;
+    //         sal.cardJobId = savedJob.id;
+    //         sal.amount =
+    //           av * 50 * (1 - discount / 100) * (user.percent / 100);
+    //         sal.date = new Date();
 
-        await cardWorkerJobRepo.save(newWorkerJob);
-
-        // USER faizini götürürük
-        const percent = workerMap.get(workerId) || 0;
-
-        // MAİSH HESABLANMASI
-        const amount = av * 50 * (percent / 100);
-
-        // WorkerSalary INSERT
-
-        const newWorkerSalary=new WorkerSalary();
-        newWorkerSalary.workerId=workerId;
-        newWorkerSalary.cardId=savedCard.id;
-        newWorkerSalary.cardJobId=savedJob.id;
-        newWorkerSalary.amount=amount;
-        newWorkerSalary.date=new Date();
-        await workerSalaryRepo.save(newWorkerSalary);
-      }
-    }
-  }
-}
-
+    //         await workerSalaryRepo.save(sal);
+    //       }
+    //     }
+    //   }
+    // }
 
     // =============================
-    // 4) XƏRCLƏR (expences)
+    // 7) XƏRCLƏR
     // =============================
     if (Array.isArray(cardData.expences)) {
       for (const e of cardData.expences) {
+        const exp = new CardExpense();
+        exp.description = e.description;
+        exp.price = Number(e.price);
+        exp.cardId = savedCard.id;
 
-        const newExpense=new CardExpense();
-        newExpense.description=e.description;
-        newExpense.price=Number(e.price);
-        newExpense.cardId=savedCard.id;
-     
-        await cardExpenseRespoisitory.save(newExpense);
+        await cardExpenseRespoisitory.save(exp);
       }
     }
-
-   
-
 
     res.status(201).json({
       message: "Kart yaradıldı",

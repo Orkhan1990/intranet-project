@@ -32,6 +32,12 @@ export class CardWorkerJob extends AllEntities {
   })
   earnedSalary: number;
 
+  // @Column({
+  //   type: "timestamp",
+  //   nullable: true,
+  // })
+  // date: Date;
+
   // 🔹 Relation to CardJob
   @ManyToOne(() => CardJob, (job) => job.workers, {
     onDelete: "CASCADE",

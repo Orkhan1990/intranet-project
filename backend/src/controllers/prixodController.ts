@@ -134,7 +134,7 @@ export const createPrixod = async (
     }
 
     if (user.email) {
-      await transporter.sendMail({
+       transporter.sendMail({
         from: `"Yeni Mədaxilin yaradılması" <${process.env.SMTP_USER}>`,
         to: user.email,
         subject: "Yeni Mədaxil yaradıldı ✅",
@@ -432,7 +432,7 @@ export const confirmPrixod = async (
     await prixodHistReposiroty.save(prixodHist);
 
     if (user.email) {
-      await transporter.sendMail({
+        transporter.sendMail({
         from: `"Mədaxilin təsdiqi" <${process.env.SMTP_USER}>`,
         to: user.email,
         subject: "Mədaxilin təsdiqi ✅",
@@ -506,7 +506,7 @@ export const confirmLastPrixod = async (
     await prixodHistReposiroty.save(prixodHist);
 
     if (user.email) {
-      await transporter.sendMail({
+        transporter.sendMail({
         from: `"Mədaxilin təsdiqi" <${process.env.SMTP_USER}>`,
         to: user.email,
         subject: "Mədaxilin təsdiqi ✅",
@@ -575,7 +575,7 @@ export const rejectPrixod = async (
     await prixodHistReposiroty.save(prixodHist);
 
     if (user.email) {
-      await transporter.sendMail({
+        transporter.sendMail({
         from: `"Mədaxildən İmtina" <${process.env.SMTP_USER}>`,
         to: user.email,
         subject: "Mədaxildən İmtina ❌",
