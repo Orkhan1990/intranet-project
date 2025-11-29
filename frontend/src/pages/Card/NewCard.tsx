@@ -160,7 +160,8 @@ const NewCard = () => {
       if (response.success === false) {
         setError(response.message);
       } else {
-        navigate("/cardsList");
+        navigate("/statistics");
+        window.scrollTo(0, 0);
       }
       console.log("Card created:", response);
     } catch (err: any) {

@@ -5,7 +5,6 @@ import { CardProblem } from "./CardProblem";
 import { CardJob } from "./CardJob";
 import { CardPart } from "./CardPart";
 import { User } from "./User";
-import { WorkerSalary } from "./WorkerSalary";
 import { CardExpense } from "./CardExpense";
 
 @Entity({ name: "cards" })
@@ -40,7 +39,11 @@ export class Card extends AllEntities {
   @Column({ name: "sassi", nullable: true })
   sassi: string;
 
-  @Column({ type: "timestamp", name: "open_date", default: () => "CURRENT_TIMESTAMP" })
+  @Column({
+    type: "timestamp",
+    name: "open_date",
+    default: () => "CURRENT_TIMESTAMP",
+  })
   openDate: Date;
 
   @Column({ type: "timestamp", name: "close_date", nullable: true })
@@ -85,7 +88,9 @@ export class Card extends AllEntities {
   clientId: number;
 
   // Relations
-  @OneToMany(() => CardProblem, (cardProblem) => cardProblem.card, { cascade: true })
+  @OneToMany(() => CardProblem, (cardProblem) => cardProblem.card, {
+    cascade: true,
+  })
   cardProblems: CardProblem[];
 
   @OneToMany(() => CardJob, (cardJob) => cardJob.card, { cascade: true })
@@ -95,16 +100,15 @@ export class Card extends AllEntities {
   cardParts: CardPart[];
 
   // User (creator / owner)
-  @ManyToOne(() => User, (user) => user.cards, { nullable: true, onDelete: "SET NULL" })
+  @ManyToOne(() => User, (user) => user.cards, {
+    nullable: true,
+    onDelete: "SET NULL",
+  })
   @JoinColumn({ name: "user_id" })
   user: User;
 
   @Column({ name: "user_id", nullable: true })
   userId: number;
-
-  // Salaries & expenses
-  @OneToMany(() => WorkerSalary, (ws) => ws.card)
-  workerSalaries: WorkerSalary[];
 
   @OneToMany(() => CardExpense, (e) => e.card)
   expenses: CardExpense[];

@@ -2,7 +2,6 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { CardWorkerJob } from "./CardWorkerJob";
 import { Card } from "./Card";
-import { WorkerSalary } from "./WorkerSalary";
 
 @Entity({ name: "card_jobs" })
 export class CardJob extends AllEntities {
@@ -34,6 +33,4 @@ export class CardJob extends AllEntities {
   @Column({ name: "card_id" })
   cardId: number;
 
-  @OneToMany(() => WorkerSalary, (ws) => ws.cardJob)
-  workerSalaries: WorkerSalary[];
 }

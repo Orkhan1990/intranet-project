@@ -15,7 +15,6 @@ import { CardWorkerJob } from "./CardWorkerJob";
 import { Order } from "./Order";
 import { OrderHistory } from "./OrderHistory";
 import { Card } from "./Card";
-import { WorkerSalary } from "./WorkerSalary";
 
 @Entity({ name: "users" })
 export class User extends AllEntities {
@@ -80,7 +79,5 @@ export class User extends AllEntities {
   @OneToMany(() => Card, (card) => card.user)
   cards: Card[];
 
-  // 🔹 WORKER SALARIES
-  @OneToMany(() => WorkerSalary, (ws) => ws.worker)
-  workerSalaries: WorkerSalary[];
+
 }

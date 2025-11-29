@@ -12,13 +12,11 @@ import { CardWorkerJob } from "../entites/CardWorkerJob";
 import { CardExpense } from "../entites/CardExpense";
 import { User } from "../entites/User";
 import { In } from "typeorm";
-import { WorkerSalary } from "../entites/WorkerSalary";
 
 const cardParts = AppDataSource.getRepository(CardPart);
 const cardRepository = AppDataSource.getRepository(Card);
 const sparePartsRepository = AppDataSource.getRepository(SparePart);
 const userRepository = AppDataSource.getRepository(User);
-const workerSalaryRepo = AppDataSource.getRepository(WorkerSalary);
 const cardJobRepo = AppDataSource.getRepository(CardJob);
 const cardWorkerJobRepo = AppDataSource.getRepository(CardWorkerJob);
 const cardProblemRepository = AppDataSource.getRepository(CardProblem);
@@ -180,64 +178,56 @@ export const createCard = async (
     // =============================
     // 6) JOBLAR + WORKERJOB + WORKER SALARY
     // =============================
-    // if (Array.isArray(cardData.jobs)) {
-    //   for (const j of cardData.jobs) {
-    //     const av = Number(j.av || 0);
-    //     // const discount = globalDiscount;
+    if (Array.isArray(cardData.jobs)) {
+      for (const j of cardData.jobs) {
+        const av = Number(j.av || 0);
+        const discount = Number(j.discount || 0);
 
-    //     const price = av * 50;
+        const price = av * 50* (1 - discount / 100);
 
-    //     const newJob = new CardJob();
-    //     newJob.code = j.code;
-    //     newJob.name = j.name;
-    //     newJob.av = av;
-    //     newJob.price = price;
-    //     // newJob.discount = discount;
-    //     newJob.oil = j.oil;
-    //     newJob.cardId = savedCard.id;
+        const newJob = new CardJob();
+        newJob.code = j.code;
+        newJob.name = j.name;
+        newJob.av = av;
+        newJob.price = price;
+        newJob.discount = discount;
+        newJob.oil = j.oil;
+        newJob.cardId = savedCard.id;
+        
 
-    //     const savedJob = await cardJobRepo.save(newJob);
+        const savedJob = await cardJobRepo.save(newJob);
 
-    //     // ==============================
-    //     // İşçilər
-    //     // ==============================
-    //     if (Array.isArray(j.jobWorkers)) {
-    //       for (const jw of j.jobWorkers) {
-    //         const workerId = Number(jw.workerId);
-    //         const user = await userRepository.findOneBy({ id: workerId });
+        // ==============================
+        // İşçilər
+        // ==============================
+        if (Array.isArray(j.jobWorkers)) {
+          for (const jw of j.jobWorkers) {
+            const workerId = Number(jw.workerId);
+            const user = await userRepository.findOneBy({ id: workerId });
 
-    //         if (!user) {
-    //           next(errorHandler(404, "İşçi tapılmadı"));
-    //           return;
-    //         }
+            if (!user) {
+              next(errorHandler(404, "İşçi tapılmadı"));
+              return;
+            }
 
-    //         // WorkerJob CREATE
-    //         const wj = new CardWorkerJob();
-    //         wj.workerAv = Number(jw.workerAv);
-    //         wj.user = user;
-    //         wj.cardJobId = savedJob.id;
-    //         wj.salaryPercent = user.percent;
+            // WorkerJob CREATE
+            const wj = new CardWorkerJob();
+            wj.workerAv = Number(jw.workerAv);
+            wj.user = user;
+            wj.cardJobId = savedJob.id;
+            wj.salaryPercent = user.percent;
+            wj.date = new Date();
 
-    //         // ⭐ DÜZGÜN MAAS DÜSTURU
-    //         wj.earnedSalary =
-    //           av * 50 * (1 - discount / 100) * (user.percent / 100);
+            // ⭐ DÜZGÜN MAAS DÜSTURU
+            wj.earnedSalary =Number(jw.workerAv) * 50 * (1 - discount / 100) * (user.percent / 100);
 
-    //         await cardWorkerJobRepo.save(wj);
+            await cardWorkerJobRepo.save(wj);
 
-    //         // WorkerSalary table
-    //         const sal = new WorkerSalary();
-    //         sal.workerId = workerId;
-    //         sal.cardId = savedCard.id;
-    //         sal.cardJobId = savedJob.id;
-    //         sal.amount =
-    //           av * 50 * (1 - discount / 100) * (user.percent / 100);
-    //         sal.date = new Date();
-
-    //         await workerSalaryRepo.save(sal);
-    //       }
-    //     }
-    //   }
-    // }
+  
+          }
+        }
+      }
+    }
 
     // =============================
     // 7) XƏRCLƏR
