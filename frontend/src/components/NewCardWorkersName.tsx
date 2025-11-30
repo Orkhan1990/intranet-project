@@ -28,10 +28,13 @@ const NewCardWorkersName = ({
 
   // Worker AV dəyişiləndə limit yoxlaması
   const handleAvChange = (e: any) => {
-    const newAv = Number(e.target.value);
+    const newAv = e.target.value;
+    console.log(newAv);
+    console.log()
+    
     const currentAv = Number(values.jobWorkers[index].workerAv);
 
-    const newSum = jobWorkersAvSum - currentAv + newAv;
+    const newSum = jobWorkersAvSum - currentAv +(Number(newAv));
 
     if (newSum > values.av) {
       alert("İşçilərin AV cəmi əsas AV-dan çox ola bilməz!");
@@ -54,9 +57,10 @@ const NewCardWorkersName = ({
 
         <div className="flex gap-2 w-[200px]">
           <TextInput
-            min={0}
+            type="text"
             className="w-[70px]"
             value={values.jobWorkers[index].workerAv}
+            name={`${name}.workerAv`}
             onChange={handleAvChange}
             sizing="sm"
           />
