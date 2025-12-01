@@ -6,13 +6,31 @@ import WorkerCard from "../../components/Statistics/WorkerCard";
 import Incoming from "../../components/Statistics/Incoming";
 import Expenses from "../../components/Statistics/Expenses";
 import Briqada from "../../components/Statistics/Briqada";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 
 const Statistics = () => {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  const dispatch: AppDispatch = useDispatch();
+
 
   const tabs = ["İş kartı", "Gəlir", "Xərc", "Briqada"];
+
+    const filters = useSelector((state: RootState) => state.filter);
+
+
+     const handleFetch = () => {
+    // Backend-ə göndərmək üçün filters obyektinə startDate və endDate əlavə edirik
+    dispatch(
+      fetchCards({
+        ...filters,
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+      })
+    );
+  };
 
   return (
     <div className="min-h-screen  ml-20 mt-20">
@@ -78,7 +96,7 @@ const Statistics = () => {
           </div>
         </div>
 
-        <Button color={"blue"} size={"sm"} className="w-28">Nəticəyə bax</Button>
+        <Button color={"blue"} size={"sm"} className="w-28" onClick={handleFetch}>Nəticəyə bax</Button>
       </form>
     </div>
   );
