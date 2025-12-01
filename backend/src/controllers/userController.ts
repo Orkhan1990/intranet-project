@@ -7,6 +7,18 @@ import { UserRole } from "../enums/userRole";
 import { In } from "typeorm";
 
 const userRepository = AppDataSource.getRepository(User);
+
+
+export const  getAllUsers=async(req:Request,res:Response,next:NextFunction)=>{
+  try {
+    const users=await userRepository.find();
+    res.status(201).json(users);
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}
+
+
 export const createUser = async (req: Request, res: Response) => {
   try {
     const { userName, email, password } = req.body;
@@ -84,5 +96,25 @@ export const getOfficeWorkers=async(req:Request,res:Response,next:NextFunction)=
   }
 }
 
+
+export const getReceptionWorkers=async(req:Request,res:Response,next:NextFunction)=>{
+  try { 
+    const userRepository=AppDataSource.getRepository(User);
+
+    const receptionWorkers=await userRepository.find({
+      where:{
+        isReception:true,
+        userRole:UserRole.OfficeUser
+      }
+    })  
+    if(!receptionWorkers){
+      next(errorHandler(401,"Qəbul işçiləri mövcud deyil!"));
+      return;
+    }   
+    res.status(201).json(receptionWorkers);
+  } catch (error) {
+    next(errorHandler(401,error))
+  }
+}
 
 

@@ -14,6 +14,10 @@ export interface UserInterface {
   password: string;
   lastName: string;
   firstName: string;
+  isReception: boolean;
+  isWorker: boolean;
+  percent: number;
+  userRole: string;
 }
 
 export interface ClientInterface {
@@ -113,7 +117,7 @@ export interface OrderPartsInterface {
   partName: string;
   price: number;
   totalPrice: number;
-  transport: string;
+  transport: number;
   sipPrice: number;
   unitSipPrice: number;
   percent: number;

@@ -1,6 +1,33 @@
 import {Select, TextInput } from "flowbite-react";
+import { RootState, AppDispatch } from "../../redux-toolkit/store/store"
+import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
+import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
+import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
 
 const WorkerCard = () => {
+
+
+  const dispatch: AppDispatch = useDispatch();
+  const { users } = useSelector((state: RootState) => state.user);
+  const {brands}=useSelector((state:RootState)=>state.brand);
+  const {clients}=useSelector((state:RootState)=>state.client);
+
+  console.log({brands});
+
+  const receptions=users.filter(p=>p.isReception===true);
+  const serviceWorkers=users.filter(p=>p.isWorker===true&&p.userRole==="ServiceUser");
+  console.log({receptions});
+  
+  
+
+
+  useEffect(() => { 
+    dispatch(fetchUsers());
+    dispatch(fetchBrands());
+    dispatch(fetchClients());
+  }, [dispatch]);
   return (
     <div className="w-[97%] border border-yellow-300 p-4 rounded-md">
       <form action="" className="flex gap-10 items-center">
@@ -57,10 +84,11 @@ const WorkerCard = () => {
             </label>
             <Select className="w-36 cursor-pointer" sizing={"sm"}>
               <option value="">Müştəri seç</option>
-              <option value="">Socar</option>
-              <option value="">Azpetrol</option>
-              <option value="">Zqan</option>
-              <option value="">Pasha</option>
+              {
+                clients&& clients.map((client)=>(
+                  <option key={client.id} value={client.id}>{client.companyName} </option>
+                ))
+              }
             </Select>
           </div>
 
@@ -70,10 +98,12 @@ const WorkerCard = () => {
             </label>
             <Select className="w-36 cursor-pointer" sizing={"sm"}>
               <option value="">Bütün Brendler</option>
-              <option value="">Man</option>
-              <option value="">Bobcat</option>
-              <option value="">Mercedes</option>
-              <option value="">Daf</option>
+              {
+                brands&& brands.map((brand)=>(
+                  <option key={brand.id} value={brand.id}>{brand.name}</option>
+                ))
+              }
+
             </Select>
           </div>
 
@@ -83,10 +113,13 @@ const WorkerCard = () => {
             </label>
             <Select className="w-36 cursor-pointer" sizing={"sm"}>
               <option value="">İşçi seç</option>
-              <option value="">Mübariz Məmmədov</option>
-              <option value="">Novruz Abbasov</option>
-              <option value="">Evgeniy Denisov</option>
-              <option value="">Muqbil İsmayılov</option>
+              {
+                serviceWorkers.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.firstName} {user.lastName}
+                  </option>
+                ))
+              }
             </Select>
           </div>
 
@@ -100,13 +133,6 @@ const WorkerCard = () => {
 
         <div className="flex flex-col gap-5">
           <div className="flex gap-20">
-            {/* <div className="flex gap-3 items-center">
-              <input type="radio" className="h-2 w-2 cursor-pointer" />
-              <label htmlFor="" className="text-sm">
-                Bütün kartlar
-              </label>
-            </div> */}
-
             <div className="flex gap-3 items-center">
               <TextInput type="radio" sizing={"sm"}  className="cursor-pointer" />
               <label htmlFor="" className="text-sm">
@@ -136,10 +162,13 @@ const WorkerCard = () => {
               </label>
               <Select className="w-36 cursor-pointer" sizing={"sm"}>
                 <option value="">Qəbulçu seç</option>
-                <option value="">İlkin Məmmədov</option>
-                <option value="">Aqil Huseynov</option>
-                <option value="">Xəlil Necefov</option>
-                <option value="">Kərim Məmmədov</option>
+                {
+                  receptions.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.firstName} {user.lastName}
+                    </option>
+                  ))
+                }
               </Select>
             </div>
 

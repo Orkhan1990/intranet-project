@@ -231,7 +231,7 @@ export const rejectPrixodApi=async(id:number,message:string)=>{
 export const getUsersData= async()=>{
   try {
 
-    const response=await axios.get(`${VITE_API_BASE_URL}user/getWorkers`);
+    const response=await axios.get(`${VITE_API_BASE_URL}user/getAllUsers`);
     const data: any = response.data;
     if (!response.status.toString().startsWith("2") || data.success === false) {
       throw new Error(data.message || "İstifadəçi məlumatları alınmadı");
@@ -240,6 +240,24 @@ export const getUsersData= async()=>{
     
   } catch (error:any) {
      console.log(error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  }
+}
+
+export const getReceptionUsersData= async()=>{
+  try {
+    const response=await axios.get(`${VITE_API_BASE_URL}user/getReceptionWorkers`);
+    const data: any = response.data;
+    if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "Qəbul işçiləri məlumatları alınmadı");
+    }
+    return data;
+    
+  }
+    catch (error:any) { 
+      console.log(error);
     throw new Error(
       error.response?.data?.message || error.message || "Xəta baş verdi"
     );
@@ -284,6 +302,24 @@ export const createCardApi=async(cardData:any,totalPriceWorker:any)=>{
       error.response?.data?.message || error.message || "Xəta baş verdi"
     );    
   }
+}
+
+export const getWorkerUsers=async()=>{  
+  try {
+    const response=await axios.get(`${VITE_API_BASE_URL}user/getWorkers`);
+    const data: any = response.data;  
+      if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "İşçi məlumatları alınmadı");
+    } 
+    return data;
+
+  } catch (error:any) {
+
+      console.log(error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );  
+  } 
 }
 
 

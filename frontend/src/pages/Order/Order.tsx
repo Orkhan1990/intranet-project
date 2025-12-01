@@ -1,10 +1,4 @@
 import { useEffect} from "react";
-// import { DeliverType, OrderType, PayType } from "../../enums/projectEnums";
-// import {
-//   ClientInterface,
-//   OrderPartsInterface,
-//   UserInterface,
-// } from "../../types";
 import { Link } from "react-router-dom";
 import { Button } from "flowbite-react";
 import { fetchOrders } from "../../redux-toolkit/features/order/orderSlice";
@@ -15,10 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 
 const Order = () => {
-  // const [orders, setOrders] = useState<AllOrdersInterface[]>([]);
-  // const [error, setError] = useState("");
 
-  // console.log(error);
 
   const { currentUser } = useSelector((state: RootState) => state.auth);
 
@@ -27,49 +18,9 @@ const Order = () => {
 
 
 
-  // interface OrderHistory {
-  //   stage: string;
-  //   confirm: boolean;
-  //   confirmDate: string;
-  //   accept: boolean;
-  //   acceptDate: string;
-  //   acceptMessage: string;
-  // }
-
-  // interface AllOrdersInterface {
-  //   id: number;
-  //   project: string;
-  //   cardNumber: string;
-  //   orderType: OrderType;
-  //   client: ClientInterface;
-  //   manufacturer: string;
-  //   model: string;
-  //   chassisNumber: string;
-  //   engineNumber: string;
-  //   produceYear: string;
-  //   km: string;
-  //   status: string;
-  //   stage: string;
-  //   vehicleNumber: string;
-  //   paymentType: PayType;
-  //   delivering: DeliverType;
-  //   deliveringType: string;
-  //   initialPayment: number;
-  //   orderHistory: OrderHistory[];
-  //   comment: string;
-  //   oil: boolean;
-  //   user: UserInterface;
-  //   orderParts: OrderPartsInterface[];
-  //   createdAt: string;
-  //   confirmWarehouseDate: string | null;
-  //   responsibleStartDate: string | null;
-  //   requestToSupplierDate: string | null;
-  //   respoenseFromSupplierDate: string | null;
-  //   giveOrderDate:string|null //EDIT THIS WORD IN BACKEND
-  // }
+ 
 
   const getStageResult = (result: any) => {
-    // const currentStep=result.orderHistory[result.orderHistory.length-1]?.step
     switch (result) {
       case "created":
         return "Sifariş yaradıldı";
@@ -94,32 +45,7 @@ const Order = () => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   const getAllOrders = async () => {
-  //     try {
-  //       const res = await fetch(
-  //         "http://localhost:3013/api/v1/order/getAllOrders",
-  //         {
-  //           method: "GET",
-  //           credentials: "include", // added this part
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       );
-
-  //       const data = await res.json();
-  //       if (!res.ok || data.success === false) {
-  //         setError(data.message);
-  //       }
-  //       setOrders(data);
-  //     } catch (error: any) {
-  //       setError(error.message);
-  //     }
-  //   };
-
-  //   getAllOrders();
-  // }, []);
+ 
 
   //Change TIME FORMAT
 

@@ -39,6 +39,9 @@ export class User extends AllEntities {
   @Column({ default: false })
   isWorker: boolean;
 
+  @Column({ default: false })
+  isReception: boolean;
+
   @Column({ type: "float", nullable: true })
   percent: number;
 
@@ -78,6 +81,4 @@ export class User extends AllEntities {
   // 🔹 CARDS
   @OneToMany(() => Card, (card) => card.user)
   cards: Card[];
-
-
 }

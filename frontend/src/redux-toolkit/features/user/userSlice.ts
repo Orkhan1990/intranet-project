@@ -9,13 +9,15 @@ import { getUsersData } from "../../../api/allApi";
 
 interface UserState {
   users: UserInterface[];
+
+  // receptionUser: UserInterface[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: UserState = {
   users: [],
-  loading: false,
+ loading: false,
   error: null,
 };
 
