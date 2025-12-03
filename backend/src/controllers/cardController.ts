@@ -11,7 +11,7 @@ import { CardJob } from "../entites/CardJob";
 import { CardWorkerJob } from "../entites/CardWorkerJob";
 import { CardExpense } from "../entites/CardExpense";
 import { User } from "../entites/User";
-import { In } from "typeorm";
+import { Between, In, LessThanOrEqual, MoreThanOrEqual } from "typeorm";
 
 const cardParts = AppDataSource.getRepository(CardPart);
 const cardRepository = AppDataSource.getRepository(Card);
@@ -252,5 +252,88 @@ export const createCard = async (
     next(errorHandler(500, error));
   } finally {
     await queryRunner.release();
+  }
+};
+
+
+export const filterCards = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { filters } = req.body;
+    console.log("Received filters:", filters);
+
+
+         const query = cardRepository
+      .createQueryBuilder("card")
+      .leftJoinAndSelect("card.client", "client")      // Client relation
+      .leftJoinAndSelect("card.brand", "brand")        // Brand relation (əgər varsa)
+      .leftJoinAndSelect("card.user", "user");
+
+      console.log(query);
+      
+
+
+    // // Status filter
+    // if (filters.cardStatus && filters.cardStatus !== "all") {
+    //   query.andWhere("card.isOpen = :isOpen", { isOpen: filters.cardStatus === "open" });
+    // }
+
+    // // Card / model number
+    // if (filters.cardNumber?.trim()) {
+    //   query.andWhere("card.type = :type", { type: filters.cardNumber });
+    // }
+
+    // // Ban number → qostNumber
+    // if (filters.banNumber?.trim()) {
+    //   query.andWhere("card.qostNumber = :qostNumber", { qostNumber: filters.banNumber });
+    // }
+
+    // // Payment type
+    // if (filters.paymentType?.trim()) {
+    //   query.andWhere("card.paymentType = :paymentType", { paymentType: filters.paymentType });
+    // }
+
+    // // Client
+    // if (filters.clientId?.trim()) {
+    //   query.andWhere("card.clientId = :clientId", { clientId: filters.clientId });
+    // }
+
+    // // Worker
+    // if (filters.workerId?.trim()) {
+    //   query.andWhere("card.userId = :userId", { userId: filters.workerId });
+    // }
+
+    // // Car number
+    // if (filters.carNumber?.trim()) {
+    //   query.andWhere("card.carNumber = :carNumber", { carNumber: filters.carNumber });
+    // }
+
+    // // Amount filters (example with workSum)
+    // if (filters.minAmount?.trim()) {
+    //   query.andWhere("card.workSum >= :minAmount", { minAmount: Number(filters.minAmount) });
+    // }
+    // if (filters.maxAmount?.trim()) {
+    //   query.andWhere("card.workSum <= :maxAmount", { maxAmount: Number(filters.maxAmount) });
+    // }
+
+    // // Date filter
+    // if (filters.startDate?.trim() && filters.endDate?.trim()) {
+    //   const start = new Date(filters.startDate);
+    //   const end = new Date(filters.endDate);
+    //   if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+    //     query.andWhere("card.openDate BETWEEN :start AND :end", { start, end });
+    //   }
+    // }
+
+    // const filteredCards = await query.getMany();
+
+    if (!filteredCards || filteredCards.length === 0) {
+      return next(errorHandler(404, "Heç bir kart tapılmadı"));
+    }
+
+    console.log("Filtered cards:", filteredCards);
+    res.status(200).json({ cards: filteredCards });
+  } catch (error) {
+    console.error("FilterCards error:", error);
+    next(errorHandler(500, error));
   }
 };

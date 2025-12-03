@@ -10,7 +10,7 @@ import prixodReducer from '../features/prixod/prixodSlice';
 import userReducer from "../features/user/userSlice";
 import clientReducer from '../features/client/clientSlice';
 import filterReducer from '../features/filters/filterSlice';
-
+import cardReducer from '../features/card/cardSlice';
 
 
 const rootReducer=combineReducers({
@@ -21,7 +21,8 @@ const rootReducer=combineReducers({
   prixod: prixodReducer,
   user:userReducer,
   client:clientReducer,
-  filter:filterReducer
+  filter:filterReducer,
+  card:cardReducer
 })
 
 const persistConfig={

@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { filterTheCardsAPI } from "../../../api/allApi";
 
 interface FilterState {
   cardStatus: "all" | "open" | "closed";
@@ -31,6 +32,15 @@ const initialState: FilterState = {
   legalOrPhysical: "",
     carNumber: "",
 };
+
+
+export const fetchCards = createAsyncThunk(
+  "cards/fetchCards",
+  async (filters:any) => {
+    const response = filterTheCardsAPI(filters);  
+    return response;
+  }
+);
 
 const filterSlice = createSlice({
   name: "filter",

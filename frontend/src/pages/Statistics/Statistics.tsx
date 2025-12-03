@@ -8,6 +8,7 @@ import Expenses from "../../components/Statistics/Expenses";
 import Briqada from "../../components/Statistics/Briqada";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
+import { fetchCards } from "../../redux-toolkit/features/filters/filterSlice";
 
 const Statistics = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -19,6 +20,19 @@ const Statistics = () => {
   const tabs = ["İş kartı", "Gəlir", "Xərc", "Briqada"];
 
     const filters = useSelector((state: RootState) => state.filter);
+    const cards= useSelector((state: RootState) => state.card.cards);
+
+    console.log(
+      {
+        filters,
+        startDate,
+        endDate
+      }
+    );
+
+    console.log({cards});
+    
+    
 
 
      const handleFetch = () => {
