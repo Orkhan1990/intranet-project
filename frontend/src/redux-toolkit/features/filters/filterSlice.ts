@@ -2,12 +2,12 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { filterTheCardsAPI } from "../../../api/allApi";
 
 interface FilterState {
-  cardStatus: "all" | "open" | "closed";
+  cardStatus: "all" | "open" | "closed"| "";
   cardNumber: string;
   banNumber: string;
   paymentType: string;
   clientId: string;
-  brandId: string;
+  manufactured: string;
   workerId: string;
   receptionId: string;
   minAmount: number | "";
@@ -18,12 +18,12 @@ interface FilterState {
 }
 
 const initialState: FilterState = {
-  cardStatus: "all",
+  cardStatus: "",
   cardNumber: "",
   banNumber: "",
   paymentType: "",
   clientId: "",
-  brandId: "",
+  manufactured: "",
   workerId: "",
   receptionId: "",
   minAmount: "",

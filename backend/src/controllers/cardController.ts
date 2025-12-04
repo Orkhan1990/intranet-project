@@ -183,7 +183,7 @@ export const createCard = async (
         const av = Number(j.av || 0);
         const discount = Number(j.discount || 0);
 
-        const price = av * 50* (1 - discount / 100);
+        const price = av * 50 * (1 - discount / 100);
 
         const newJob = new CardJob();
         newJob.code = j.code;
@@ -193,7 +193,6 @@ export const createCard = async (
         newJob.discount = discount;
         newJob.oil = j.oil;
         newJob.cardId = savedCard.id;
-        
 
         const savedJob = await cardJobRepo.save(newJob);
 
@@ -219,11 +218,13 @@ export const createCard = async (
             wj.date = new Date();
 
             // ⭐ DÜZGÜN MAAS DÜSTURU
-            wj.earnedSalary =Number(jw.workerAv) * 50 * (1 - discount / 100) * (user.percent / 100);
+            wj.earnedSalary =
+              Number(jw.workerAv) *
+              50 *
+              (1 - discount / 100) *
+              (user.percent / 100);
 
             await cardWorkerJobRepo.save(wj);
-
-  
           }
         }
       }
@@ -255,85 +256,82 @@ export const createCard = async (
   }
 };
 
-
-export const filterCards = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const filterCards = async (req: Request, res: Response) => {
   try {
-    const { filters } = req.body;
-    console.log("Received filters:", filters);
+    const filters = req.body.filters || {};
 
+    console.log({ filters });
 
-         const query = cardRepository
+    const query = AppDataSource.getRepository(Card)
       .createQueryBuilder("card")
-      .leftJoinAndSelect("card.client", "client")      // Client relation
-      .leftJoinAndSelect("card.brand", "brand")        // Brand relation (əgər varsa)
+      .leftJoinAndSelect("card.client", "client")
       .leftJoinAndSelect("card.user", "user");
 
-      console.log(query);
-      
-
-
-    // // Status filter
-    // if (filters.cardStatus && filters.cardStatus !== "all") {
-    //   query.andWhere("card.isOpen = :isOpen", { isOpen: filters.cardStatus === "open" });
+    // Status filter (support 'all')
+    // if (filters.cardStatus && filters.cardStatus !== 'all') {
+    //   query.andWhere('card.status = :status', { status: filters.cardStatus });
     // }
 
-    // // Card / model number
-    // if (filters.cardNumber?.trim()) {
-    //   query.andWhere("card.type = :type", { type: filters.cardNumber });
-    // }
-
-    // // Ban number → qostNumber
-    // if (filters.banNumber?.trim()) {
-    //   query.andWhere("card.qostNumber = :qostNumber", { qostNumber: filters.banNumber });
-    // }
-
-    // // Payment type
-    // if (filters.paymentType?.trim()) {
-    //   query.andWhere("card.paymentType = :paymentType", { paymentType: filters.paymentType });
-    // }
-
-    // // Client
-    // if (filters.clientId?.trim()) {
-    //   query.andWhere("card.clientId = :clientId", { clientId: filters.clientId });
-    // }
-
-    // // Worker
-    // if (filters.workerId?.trim()) {
-    //   query.andWhere("card.userId = :userId", { userId: filters.workerId });
-    // }
-
-    // // Car number
-    // if (filters.carNumber?.trim()) {
-    //   query.andWhere("card.carNumber = :carNumber", { carNumber: filters.carNumber });
-    // }
-
-    // // Amount filters (example with workSum)
-    // if (filters.minAmount?.trim()) {
-    //   query.andWhere("card.workSum >= :minAmount", { minAmount: Number(filters.minAmount) });
-    // }
-    // if (filters.maxAmount?.trim()) {
-    //   query.andWhere("card.workSum <= :maxAmount", { maxAmount: Number(filters.maxAmount) });
-    // }
-
-    // // Date filter
-    // if (filters.startDate?.trim() && filters.endDate?.trim()) {
-    //   const start = new Date(filters.startDate);
-    //   const end = new Date(filters.endDate);
-    //   if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-    //     query.andWhere("card.openDate BETWEEN :start AND :end", { start, end });
-    //   }
-    // }
-
-    // const filteredCards = await query.getMany();
-
-    if (!filteredCards || filteredCards.length === 0) {
-      return next(errorHandler(404, "Heç bir kart tapılmadı"));
+    // Other filters
+    if (filters.cardNumber) {
+      query.andWhere("card.id = :cardNumber", {
+        cardNumber: filters.cardNumber,
+      });
     }
 
-    console.log("Filtered cards:", filteredCards);
-    res.status(200).json({ cards: filteredCards });
+    if (filters.cardStatus && filters.cardStatus !== "all") {
+      const isOpen = filters.cardStatus === "open";
+      query.andWhere("card.is_open = :isOpen", { isOpen });
+    }
+    if (filters.banNumber) {
+      query.andWhere("card.qostNumber = :banNumber", {
+        banNumber: filters.banNumber,
+      });
+    }
+    if (filters.paymentType) {
+      query.andWhere("card.paymentType = :paymentType", {
+        paymentType: filters.paymentType,
+      });
+    }
+    if (filters.clientId) {
+      query.andWhere("client.id = :clientId", { clientId: filters.clientId });
+    }
+    if (filters.manufactured) {
+      query.andWhere("card.manufactured = :manufactured", {
+        manufactured: filters.manufactured,
+      });
+    }
+    if (filters.receptionId) {
+      query.andWhere("card.user_id = :receptionId", {
+        receptionId: filters.receptionId,
+      });
+    }
+    // if (filters.receptionId) {
+    //   query.andWhere('card.receptionId = :receptionId', { receptionId: filters.receptionId });
+    // }
+    // if (filters.minAmount) {
+    //   query.andWhere('card.amount >= :minAmount', { minAmount: filters.minAmount });
+    // }
+    // if (filters.maxAmount) {
+    //   query.andWhere('card.amount <= :maxAmount', { maxAmount: filters.maxAmount });
+    // }
+    // if (filters.customerType) {
+    //   query.andWhere('card.customerType = :customerType', { customerType: filters.customerType });
+    // }
+    // if (filters.legalOrPhysical) {
+    //   query.andWhere('card.legalOrPhysical = :legalOrPhysical', { legalOrPhysical: filters.legalOrPhysical });
+    // }
+    // if (filters.carNumber) {
+    //   query.andWhere('card.carNumber = :carNumber', { carNumber: filters.carNumber });
+    // }
+
+    const cards = await query.getMany(); // fetch results with joined client and user
+
+    log(cards);
+
+    res.json(cards);
   } catch (error) {
     console.error("FilterCards error:", error);
-    next(errorHandler(500, error));
+    res.status(500).json({ message: "Error filtering cards." });
   }
 };

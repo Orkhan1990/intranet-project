@@ -6,6 +6,7 @@ import { CardJob } from "./CardJob";
 import { CardPart } from "./CardPart";
 import { User } from "./User";
 import { CardExpense } from "./CardExpense";
+import { Brand } from "./Brand";
 
 @Entity({ name: "cards" })
 export class Card extends AllEntities {
@@ -112,4 +113,15 @@ export class Card extends AllEntities {
 
   @OneToMany(() => CardExpense, (e) => e.card)
   expenses: CardExpense[];
+
+  // Brand
+  @ManyToOne(() => Brand, (brand) => brand.cards, {
+    nullable: true,
+    onDelete: "SET NULL",
+  })
+  @JoinColumn({ name: "brandId" })
+  brand: Brand;
+
+  @Column({ name: "brandId", nullable: true })
+  brandId: number;
 }

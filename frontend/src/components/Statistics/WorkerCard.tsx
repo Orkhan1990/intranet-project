@@ -1,4 +1,4 @@
-import { Select, TextInput} from "flowbite-react";
+import { Select, TextInput } from "flowbite-react";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
@@ -10,7 +10,6 @@ import { useEffect } from "react";
 const WorkerCard = () => {
   const dispatch: AppDispatch = useDispatch();
   const { users } = useSelector((state: RootState) => state.user);
-  const { brands } = useSelector((state: RootState) => state.brand);
   const { clients } = useSelector((state: RootState) => state.client);
   const filters = useSelector((state: RootState) => state.filter);
 
@@ -124,16 +123,23 @@ const WorkerCard = () => {
             <Select
               className="w-36 cursor-pointer"
               sizing="sm"
-              value={filters.brandId || ""}
-              onChange={(e) => handleChange("brandId", e.target.value)}
+              value={filters.manufactured || ""}
+              onChange={(e) => handleChange("manufactured", e.target.value)}
             >
               <option value="">Bütün Brendler</option>
-              {brands &&
-                brands.map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </option>
-                ))}
+
+              <option value="man">Man</option>
+              <option value="neoplan">Neoplan</option>
+              <option value="daf">Daf</option>
+              <option value="mercedes">Mercedes</option>
+              <option value="sumitomo">Sumitomo</option>
+              <option value="scania">Scania</option>
+              <option value="Kamaz">Kamaz</option>
+              <option value="ford">Ford</option>
+              <option value="shagman">Shagman</option>
+              <option value="volvo">Volvo</option>
+              <option value="iveco">Iveco</option>
+              <option value="renault">Renault</option>
             </Select>
           </div>
           <div className="flex flex-col gap-1">
