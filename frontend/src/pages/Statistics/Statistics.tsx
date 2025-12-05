@@ -136,8 +136,8 @@ const handleFetch = async () => {
         <th className="p-3 whitespace-nowrap">E/h hissə</th>
         <th className="p-3 whitespace-nowrap">E/h maya</th>
         <th className="p-3 whitespace-nowrap">Əlavə xərclər</th>
-        <th className="p-3 whitespace-nowrap">ƏDV qiymət</th>
         <th className="p-3 whitespace-nowrap">ƏDV-siz</th>
+        <th className="p-3 whitespace-nowrap">ƏDV qiymət</th>
         <th className="p-3 whitespace-nowrap">Ödənişli</th>
         <th className="p-3 whitespace-nowrap">Valyuta</th>
         <th className="p-3 whitespace-nowrap">Təmir/Hesab</th>
@@ -178,8 +178,8 @@ const handleFetch = async () => {
         <td className="p-3">{card.partsTotalPrice ?? 0}</td>
         <td className="p-3">{card.partsSumOwn ?? 0}</td>
         <td className="p-3">{totalExpenses ?? 0}</td>
-        <td className="p-3">{edvPrice}</td>
         <td className="p-3">{countTotalPrice}</td>
+        <td className="p-3">{edvPrice}</td>
         <td className="p-3"></td>
         <td className="p-3">/</td>
         <td className="p-3">/</td>

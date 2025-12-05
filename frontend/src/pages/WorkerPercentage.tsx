@@ -7,6 +7,8 @@ const WorkerPercentage = () => {
   const { users } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
 
+  const workers = users.filter((p) => p.isWorker === true|| p.userRole === "ServiceUser");
+
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch]);
@@ -31,8 +33,8 @@ const WorkerPercentage = () => {
               </tr>
             </thead>
             <tbody>
-              {users && users.length > 0 ? (
-                users.map((user: any, index: number) => (
+              {workers && workers.length > 0 ? (
+                workers.map((user: any, index: number) => (
                   <tr
                     key={index}
                     className="border-b hover:bg-gray-50 transition-colors duration-150"
