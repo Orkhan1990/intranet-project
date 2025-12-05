@@ -8,31 +8,42 @@ import Expenses from "../../components/Statistics/Expenses";
 import Briqada from "../../components/Statistics/Briqada";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
-import { fetchCards } from "../../redux-toolkit/features/filters/filterSlice";
+import { fetchCards, setActiveTab } from "../../redux-toolkit/features/filters/filterSlice";
 
 const Statistics = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
 
   const tabs = ["İş kartı", "Gəlir", "Xərc", "Briqada"];
 
   const filters = useSelector((state: RootState) => state.filter);
   const cards = useSelector((state: RootState) => state.card.cards);
+  const activeTab = useSelector((state: RootState) => state.filter.activeTab);
 
-  console.log({ cards });
 
-  const handleFetch = () => {
-    // Backend-ə göndərmək üçün filters obyektinə startDate və endDate əlavə edirik
-    dispatch(
-      fetchCards({
-        ...filters,
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-      })
-    );
+
+  console.log({ cards,loading });
+
+ 
+
+
+
+const handleFetch = async () => {
+  setLoading(true);
+
+  const currentFilters = {
+    ...filters,
+    startDate: startDate?.toISOString() ?? null,
+    endDate: endDate?.toISOString() ?? null
   };
+
+  // BURDA YALNIZ FETCH ET
+  await dispatch(fetchCards(currentFilters));
+
+  setLoading(false);
+};
 
   return (
     <div className="min-h-screen  ml-20 mt-20">
@@ -83,7 +94,7 @@ const Statistics = () => {
                   className={`cursor-pointer hover:underline whitespace-nowrap px-2 py-1 rounded ${
                     activeTab === tab ? "bg-red-700 text-white underline" : ""
                   }`}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => dispatch(setActiveTab(tab))}
                 >
                   {tab}
                 </span>
@@ -136,47 +147,69 @@ const Statistics = () => {
       </tr>
     </thead>
 
-    <tbody>
-      {cards.map((card: any, index: number) => (
-        <tr
-          key={card.id}
-          className="border-b hover:bg-gray-50 transition"
-        >
-          <td className="p-3">{index + 1}</td>
-          <td className="p-3">{card.id}</td>
-          <td className="p-3">{card.manufactured} {card.model}</td>
-          <td className="p-3">{card.carNumber}</td>
-          <td className="p-3">{card.sassi}</td>
+<tbody>
+  {cards.map((card: any, index: number) => {
+    const totalExpenses = card.expenses?.reduce(
+      (sum: number, exp: any) => sum + (exp.price ?? 0),
+      0
+    );
 
-          <td className="p-3">
-            <div className="flex flex-col">
-              <span>{card.client?.companyName}</span>
-              <span className="text-xs text-gray-500">
-                {card.client?.typeOfStatus}
-              </span>
-            </div>
-          </td>
+   
 
-          <td className="p-3 text-center">/</td>
-          <td className="p-3">{card.workSum}</td>
-          <td className="p-3">{card.workSumOwn}</td>
-          <td className="p-3">{card.avSum}</td>
-
-          <td className="p-3">{card.partsTotalPrice ?? 0}</td>
-          <td className="p-3">{card.partsSumOwn ?? 0}</td>
-
-          <td className="p-3"></td>
-          <td className="p-3"></td>
-          <td className="p-3"></td>
-          <td className="p-3"></td>
-          <td className="p-3"></td>
-          <td className="p-3"></td>
-          <td className="p-3">{card.user?.first_name}</td>
-          <td className="p-3">{card.openDate}</td>
-          <td className="p-3">{card.closeDate}</td>
-        </tr>
-      ))}
-    </tbody>
+  const countTotalPrice=(card.workSum ?? 0) + (card.partsTotalPrice ?? 0) + (totalExpenses ?? 0);
+  const edvPrice=countTotalPrice+ countTotalPrice * 0.18;
+    return (
+      <tr key={card.id} className="border-b hover:bg-gray-50 transition">
+        <td className="p-3">{index + 1}</td>
+        <td className="p-3">{card.id}</td>
+        <td className="p-3">{card.manufactured} {card.model}</td>
+        <td className="p-3">{card.carNumber}</td>
+        <td className="p-3">{card.sassi}</td>
+        <td className="p-3">
+          <div className="flex flex-col">
+            <span>{card.client?.companyName}</span>
+            <span className="text-xs text-gray-500">{card.client?.typeOfStatus}</span>
+          </div>
+        </td>
+        <td className="p-3 text-center">/</td>
+        <td className="p-3">{card.workSum}</td>
+        <td className="p-3">{card.workSumOwn}</td>
+        <td className="p-3">{card.avSum}</td>
+        <td className="p-3">{card.partsTotalPrice ?? 0}</td>
+        <td className="p-3">{card.partsSumOwn ?? 0}</td>
+        <td className="p-3">{totalExpenses ?? 0}</td>
+        <td className="p-3">{edvPrice}</td>
+        <td className="p-3">{countTotalPrice}</td>
+        <td className="p-3"></td>
+        <td className="p-3">/</td>
+        <td className="p-3">/</td>
+        <td className="p-3">{`${card.user?.firstName} ${card.user?.lastName}`}</td>
+        <td className="p-2 text-center">
+          {card.openDate
+            ? new Date(card.openDate).toLocaleString("az-AZ", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "-"}
+        </td>
+        <td className="p-2 text-center">
+          {card.closeDate
+            ? new Date(card.closeDate).toLocaleString("az-AZ", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "-"}
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
   </table>
 </div>
 

@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { filterTheCardsAPI } from "../../../api/allApi";
 
 interface FilterState {
-  cardStatus: "all" | "open" | "closed";
+  cardStatus: "" | "all" | "open" | "closed";
   cardNumber: string;
   banNumber: string;
   paymentType: string;
@@ -15,10 +15,11 @@ interface FilterState {
   customerType: string;
   legalOrPhysical: string;
   carNumber: string;
+  activeTab: string | null;
 }
 
 const initialState: FilterState = {
-  cardStatus: "all",
+  cardStatus: "",
   cardNumber: "",
   banNumber: "",
   paymentType: "",
@@ -30,14 +31,14 @@ const initialState: FilterState = {
   maxAmount: "",
   customerType: "",
   legalOrPhysical: "",
-    carNumber: "",
+  carNumber: "",
+  activeTab: "İş kartı",
 };
-
 
 export const fetchCards = createAsyncThunk(
   "cards/fetchCards",
-  async (filters:any) => {
-    const response = filterTheCardsAPI(filters);  
+  async (filters: any) => {
+    const response = filterTheCardsAPI(filters);
     return response;
   }
 );
@@ -49,9 +50,12 @@ const filterSlice = createSlice({
     setFilter: (state, action: PayloadAction<Partial<FilterState>>) => {
       Object.assign(state, action.payload);
     },
-    resetFilter: () => initialState,
+    setActiveTab: (state, action: PayloadAction<string | null>) => {
+      state.activeTab = action.payload;
+    },
+    resetFilter: () => ({ ...initialState }), // <-- DÜZGÜN HƏLL
   },
 });
 
-export const { setFilter, resetFilter } = filterSlice.actions;
+export const { setFilter, resetFilter,setActiveTab  } = filterSlice.actions;
 export default filterSlice.reducer;

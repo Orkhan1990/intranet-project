@@ -265,7 +265,11 @@ export const filterCards = async (req: Request, res: Response) => {
     const query = AppDataSource.getRepository(Card)
       .createQueryBuilder("card")
       .leftJoinAndSelect("card.client", "client")
-      .leftJoinAndSelect("card.user", "user");
+      .leftJoinAndSelect("card.user", "user")
+      .leftJoinAndSelect("card.cardJobs", "cardJobs")
+      .leftJoinAndSelect("card.cardParts", "cardParts")
+      .leftJoinAndSelect("card.cardProblems", "cardProblems")
+      .leftJoinAndSelect("card.expenses", "cardExpenses");
 
    
 
