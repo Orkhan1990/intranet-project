@@ -267,10 +267,31 @@ export const filterCards = async (req: Request, res: Response) => {
       .leftJoinAndSelect("card.client", "client")
       .leftJoinAndSelect("card.user", "user");
 
-    // Status filter (support 'all')
-    // if (filters.cardStatus && filters.cardStatus !== 'all') {
-    //   query.andWhere('card.status = :status', { status: filters.cardStatus });
-    // }
+   
+
+      if (filters.startDate && filters.startDate.trim() !== "" &&
+    filters.endDate && filters.endDate.trim() !== "") {
+
+  // Hər iki tarix varsa → BETWEEN
+  query.andWhere("card.open_date BETWEEN :start AND :end", {
+    start: filters.startDate.trim(),
+    end: filters.endDate.trim(),
+  });
+
+} else if (filters.startDate && filters.startDate.trim() !== "") {
+
+  // Yalnız start varsa
+  query.andWhere("card.open_date >= :start", {
+    start: filters.startDate.trim(),
+  });
+
+} else if (filters.endDate && filters.endDate.trim() !== "") {
+
+  // Yalnız end varsa
+  query.andWhere("card.open_date <= :end", {
+    end: filters.endDate.trim(),
+  });
+}
 
     // Other filters
     if (filters.cardNumber) {
@@ -283,9 +304,9 @@ export const filterCards = async (req: Request, res: Response) => {
       const isOpen = filters.cardStatus === "open";
       query.andWhere("card.is_open = :isOpen", { isOpen });
     }
-    if (filters.banNumber) {
+    if (filters.banNumber && filters.banNumber.trim() !== "") {
       query.andWhere("card.qostNumber = :banNumber", {
-        banNumber: filters.banNumber,
+        banNumber: filters.banNumber.trim(),
       });
     }
     if (filters.paymentType) {
@@ -306,24 +327,32 @@ export const filterCards = async (req: Request, res: Response) => {
         receptionId: filters.receptionId,
       });
     }
-    // if (filters.receptionId) {
-    //   query.andWhere('card.receptionId = :receptionId', { receptionId: filters.receptionId });
-    // }
+
+    if (filters.legalOrPhysical) {
+      query.andWhere("client.type_of_status = :legalOrPhysical", {
+        legalOrPhysical: filters.legalOrPhysical,
+      });
+    }
+
+    if (filters.customerType) {
+      query.andWhere("client.type = :customerType", {
+        customerType: filters.customerType,
+      });
+    }
+
+    if (filters.carNumber && filters.carNumber.trim() !== "") {
+      query.andWhere("card.car_number = :carNumber", {
+        carNumber: filters.carNumber.trim(),
+      });
+    }
     // if (filters.minAmount) {
     //   query.andWhere('card.amount >= :minAmount', { minAmount: filters.minAmount });
     // }
     // if (filters.maxAmount) {
     //   query.andWhere('card.amount <= :maxAmount', { maxAmount: filters.maxAmount });
     // }
-    // if (filters.customerType) {
-    //   query.andWhere('card.customerType = :customerType', { customerType: filters.customerType });
-    // }
-    // if (filters.legalOrPhysical) {
-    //   query.andWhere('card.legalOrPhysical = :legalOrPhysical', { legalOrPhysical: filters.legalOrPhysical });
-    // }
-    // if (filters.carNumber) {
-    //   query.andWhere('card.carNumber = :carNumber', { carNumber: filters.carNumber });
-    // }
+
+  
 
     const cards = await query.getMany(); // fetch results with joined client and user
 

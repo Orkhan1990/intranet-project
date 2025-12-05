@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { filterTheCardsAPI } from "../../../api/allApi";
 
 interface FilterState {
-  cardStatus: "all" | "open" | "closed"| "";
+  cardStatus: "all" | "open" | "closed";
   cardNumber: string;
   banNumber: string;
   paymentType: string;
@@ -18,7 +18,7 @@ interface FilterState {
 }
 
 const initialState: FilterState = {
-  cardStatus: "",
+  cardStatus: "all",
   cardNumber: "",
   banNumber: "",
   paymentType: "",

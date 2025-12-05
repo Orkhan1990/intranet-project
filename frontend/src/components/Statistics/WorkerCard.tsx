@@ -91,10 +91,11 @@ const WorkerCard = () => {
               onChange={(e) => handleChange("paymentType", e.target.value)}
             >
               <option value="">Seç</option>
-              <option value="transfer">Köçürmə</option>
+              <option value="transfer">Köçürülmə</option>
               <option value="cash">Nağd</option>
-              <option value="guarantee">Qarantiya</option>
+              <option value="warranty">Qarantiya</option>
               <option value="internal">Daxili iş</option>
+              <option value="pos">POS</option>
             </Select>
           </div>
         </div>
@@ -222,9 +223,10 @@ const WorkerCard = () => {
                 onChange={(e) => handleChange("customerType", e.target.value)}
               >
                 <option value="">Seç</option>
-                <option value="ITB">İTB</option>
-                <option value="Customer">Müştəri</option>
-                <option value="Worker">İşçi</option>
+                <option value={"customer"}>Müştəri</option>
+                <option value={"worker"}>Işçi</option>
+                <option value={"boss"}>Təsisçi</option>
+                <option value={"itb"}>İTB</option>
               </Select>
             </div>
             <div className="flex flex-col gap-1">

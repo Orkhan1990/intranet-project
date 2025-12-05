@@ -25,8 +25,8 @@ const NewClient = () => {
     contractDate: "",
     approver: "",
     oneCCode: "",
-    type: "",
-    typeOfStatus: "",
+    type: "customer",
+    typeOfStatus: "physical",
     av: 0,
     partsDiscount: 0,
   };
@@ -280,7 +280,7 @@ const NewClient = () => {
               <div>
                 <Label htmlFor="typeOfStatus" value="FizikiHüquqi" />
                 <Field as={Select} id="typeOfStatus" required name="typeOfStatus" sizing={"sm"}>
-                  <option value={"phisical"}>Fiziki</option>
+                  <option value={"physical"}>Fiziki</option>
                   <option value={"legal"}>Hüquqi</option>
                 </Field>
                
