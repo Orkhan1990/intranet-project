@@ -271,31 +271,28 @@ export const filterCards = async (req: Request, res: Response) => {
       .leftJoinAndSelect("card.cardProblems", "cardProblems")
       .leftJoinAndSelect("card.expenses", "cardExpenses");
 
-   
-
-      if (filters.startDate && filters.startDate.trim() !== "" &&
-    filters.endDate && filters.endDate.trim() !== "") {
-
-  // Hər iki tarix varsa → BETWEEN
-  query.andWhere("card.open_date BETWEEN :start AND :end", {
-    start: filters.startDate.trim(),
-    end: filters.endDate.trim(),
-  });
-
-} else if (filters.startDate && filters.startDate.trim() !== "") {
-
-  // Yalnız start varsa
-  query.andWhere("card.open_date >= :start", {
-    start: filters.startDate.trim(),
-  });
-
-} else if (filters.endDate && filters.endDate.trim() !== "") {
-
-  // Yalnız end varsa
-  query.andWhere("card.open_date <= :end", {
-    end: filters.endDate.trim(),
-  });
-}
+    if (
+      filters.startDate &&
+      filters.startDate.trim() !== "" &&
+      filters.endDate &&
+      filters.endDate.trim() !== ""
+    ) {
+      // Hər iki tarix varsa → BETWEEN
+      query.andWhere("card.open_date BETWEEN :start AND :end", {
+        start: filters.startDate.trim(),
+        end: filters.endDate.trim(),
+      });
+    } else if (filters.startDate && filters.startDate.trim() !== "") {
+      // Yalnız start varsa
+      query.andWhere("card.open_date >= :start", {
+        start: filters.startDate.trim(),
+      });
+    } else if (filters.endDate && filters.endDate.trim() !== "") {
+      // Yalnız end varsa
+      query.andWhere("card.open_date <= :end", {
+        end: filters.endDate.trim(),
+      });
+    }
 
     // Other filters
     if (filters.cardNumber) {
@@ -355,8 +352,6 @@ export const filterCards = async (req: Request, res: Response) => {
     // if (filters.maxAmount) {
     //   query.andWhere('card.amount <= :maxAmount', { maxAmount: filters.maxAmount });
     // }
-
-  
 
     const cards = await query.getMany(); // fetch results with joined client and user
 

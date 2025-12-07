@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Field, Form, Formik } from "formik";
 import { ClientInterface } from "../../types";
+import { useNavigate } from "react-router-dom";
+
 
 const UpdateClient = () => {
   const [error, setError] = useState(false);
@@ -25,6 +27,9 @@ const UpdateClient = () => {
     av: 0,
     partsDiscount: 0,
   });
+
+    const navigate=useNavigate();
+
 
   const { id } = useParams();
 
@@ -80,6 +85,11 @@ const UpdateClient = () => {
       }
       if (res.ok) {
         setSuccess(`${values.companyName} şirkətinin məlumatı yeniləndi`);
+          setTimeout(() => {
+                  setError(false);
+                  navigate("/clientList");
+                  window.scrollTo(0,0); 
+                }, 2000);
         setError(false);
       }
     } catch (error: any) {

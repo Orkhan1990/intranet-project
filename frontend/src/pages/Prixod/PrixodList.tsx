@@ -4,7 +4,6 @@ import { fetchPrixods } from "../../redux-toolkit/features/prixod/prixodSlice";
 import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "flowbite-react";
-import { HiPlus } from "react-icons/hi";
 
 // interface Order {
 //   id: number;
@@ -41,8 +40,8 @@ export const PrixodList = () => {
         </h2>
 
         <Link to="/importPrixod">
-          <Button color="blue" size="sm" className="flex items-center gap-2">
-            <HiPlus className="text-lg" /> Əlavə et
+          <Button color="blue" size="xs" className="flex items-center gap-2">
+             Əlavə et +
           </Button>
         </Link>
       </div>

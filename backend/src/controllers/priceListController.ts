@@ -287,7 +287,6 @@ export const checkPriceList = async (
         );
 
         console.log(part.totalPrice);
-        
 
         if (match) {
           part.partName = match.name;
@@ -330,7 +329,7 @@ export const checkPriceList = async (
             item.priceWithoutPacking = priceWithoutPacking.toFixed(2);
             item.packing = packing.toFixed(2);
             item.priceExw = totalWithPacking.toFixed(2);
-            item.totalPrice = (totalWithPacking*item.count).toFixed(2);
+            item.totalPrice = (totalWithPacking * item.count).toFixed(2);
             await orderPartRepository.save(item);
           }
         }
@@ -355,11 +354,14 @@ export const calculateStandartOrderPrice = async (
   next: NextFunction
 ) => {
   try {
-    const {editableOrderParts} = req.body;
+    const { editableOrderParts } = req.body;
 
     if (!editableOrderParts || !Array.isArray(editableOrderParts)) {
       return next(
-        errorHandler(400, "editableOrderParts is required and must be an array.")
+        errorHandler(
+          400,
+          "editableOrderParts is required and must be an array."
+        )
       );
     }
 
@@ -370,64 +372,74 @@ export const calculateStandartOrderPrice = async (
     });
 
     if (existingParts.length === 0) {
-      return next(errorHandler(404, "No order parts found for the provided IDs."));
+      return next(
+        errorHandler(404, "No order parts found for the provided IDs.")
+      );
     }
 
     // console.log(existingParts);
-    
 
     // Update parts with data from frontend
     const updatedParts = existingParts.map((dbPart) => {
-      const updatedData = editableOrderParts.find(p => p.id === dbPart.id);
+      const updatedData = editableOrderParts.find((p) => p.id === dbPart.id);
 
       if (!updatedData) return dbPart;
 
       // Update fields conditionally
-       dbPart.transportValue = editableOrderParts[0].transportValue;
-       dbPart.taxValue = editableOrderParts[0].taxValue;
-       dbPart.declarationValue=editableOrderParts[0].declarationValue;
-       dbPart.accessoryCostValue=editableOrderParts[0].accessoryCostValue;
-       dbPart.totalPriceManValue=editableOrderParts[0].totalPriceManValue;
-       dbPart.percentageValue=editableOrderParts[0].percentageValue;
-       dbPart.transportManValue=editableOrderParts[0].transportManValue;
-       dbPart.percentage=updatedData.percentage;
+      dbPart.transportValue = editableOrderParts[0].transportValue;
+      dbPart.taxValue = editableOrderParts[0].taxValue;
+      dbPart.declarationValue = editableOrderParts[0].declarationValue;
+      dbPart.accessoryCostValue = editableOrderParts[0].accessoryCostValue;
+      dbPart.totalPriceManValue = editableOrderParts[0].totalPriceManValue;
+      dbPart.percentageValue = editableOrderParts[0].percentageValue;
+      dbPart.transportManValue = editableOrderParts[0].transportManValue;
+      dbPart.percentage = updatedData.percentage;
       // Add more fields as needed
 
+      if (
+        +dbPart.priceExw === 0 ||
+        dbPart.priceExw === "0" ||
+        dbPart.priceExw === null ||
+        dbPart.priceExw === undefined
+      ) {
+        const totalPrice = (dbPart.count * updatedData.priceExw).toString();
+        const totalPriceMan =
+          Number(totalPrice) * editableOrderParts[0].totalPriceManValue;
+        const tax = (
+          (totalPriceMan * editableOrderParts[0].taxValue) /
+          100
+        ).toString();
+        const ddpPrice = (+totalPriceMan + +tax).toString();
+        const profit = ((+ddpPrice * updatedData.percentage) / 100).toString();
 
-      if(+dbPart.priceExw===0||dbPart.priceExw==="0"||dbPart.priceExw===null||dbPart.priceExw===undefined){
-        const totalPrice=(dbPart.count*updatedData.priceExw).toString();
-        const totalPriceMan=Number(totalPrice)*editableOrderParts[0].totalPriceManValue;
-        const tax=((totalPriceMan*editableOrderParts[0].taxValue)/100).toString();
-        const ddpPrice=((+totalPriceMan)+(+tax)).toString();
-        const profit=((+ddpPrice*updatedData.percentage)/100).toString();
-        
+        dbPart.priceExw = updatedData.priceExw;
+        dbPart.totalPrice = totalPrice;
+        dbPart.totalPriceMan = totalPriceMan.toString();
+        dbPart.sipPrice = totalPriceMan.toString();
+        dbPart.tax = tax;
+        dbPart.ddpPrice = ddpPrice;
+        dbPart.unitDdpPrice = (+totalPriceMan + +tax).toString();
+        dbPart.profit = profit;
+        dbPart.sellPriceClientStock = (+ddpPrice + +profit).toString();
+        dbPart.unitSellPrice = (+ddpPrice + +profit).toString();
+      } else {
+        const totalPriceMan =
+          Number(dbPart.totalPrice) * editableOrderParts[0].totalPriceManValue;
+        const tax = (
+          (totalPriceMan * editableOrderParts[0].taxValue) /
+          100
+        ).toString();
+        const ddpPrice = (+totalPriceMan + +tax).toString();
+        const profit = ((+ddpPrice * updatedData.percentage) / 100).toString();
 
-
-        dbPart.priceExw=updatedData.priceExw;
-        dbPart.totalPrice=totalPrice;
-        dbPart.totalPriceMan=(totalPriceMan).toString();
-        dbPart.sipPrice=(totalPriceMan).toString();
-        dbPart.tax=tax;
-        dbPart.ddpPrice=ddpPrice;
-        dbPart.unitDdpPrice=((+totalPriceMan)+(+tax)).toString();
-        dbPart.profit=profit;
-        dbPart.sellPriceClientStock=((+ddpPrice)+(+profit)).toString();
-        dbPart.unitSellPrice=((+ddpPrice)+(+profit)).toString();
-      }else{
-
-        const totalPriceMan=Number(dbPart.totalPrice)*editableOrderParts[0].totalPriceManValue;
-        const tax=((totalPriceMan*editableOrderParts[0].taxValue)/100).toString();
-        const ddpPrice=((+totalPriceMan)+(+tax)).toString();
-        const profit=((+ddpPrice*updatedData.percentage)/100).toString();
-
-        dbPart.totalPriceMan=(totalPriceMan).toString();
-        dbPart.sipPrice=(totalPriceMan).toString();
-        dbPart.tax=tax;
-        dbPart.ddpPrice=ddpPrice;
-        dbPart.unitDdpPrice=((+totalPriceMan)+(+tax)).toString();
-        dbPart.profit=profit;
-        dbPart.sellPriceClientStock=((+ddpPrice)+(+profit)).toString();
-        dbPart.unitSellPrice=((+ddpPrice)+(+profit)).toString();
+        dbPart.totalPriceMan = totalPriceMan.toString();
+        dbPart.sipPrice = totalPriceMan.toString();
+        dbPart.tax = tax;
+        dbPart.ddpPrice = ddpPrice;
+        dbPart.unitDdpPrice = (+totalPriceMan + +tax).toString();
+        dbPart.profit = profit;
+        dbPart.sellPriceClientStock = (+ddpPrice + +profit).toString();
+        dbPart.unitSellPrice = (+ddpPrice + +profit).toString();
       }
 
       return dbPart;
@@ -445,7 +457,3 @@ export const calculateStandartOrderPrice = async (
     return next(errorHandler(500, error.message));
   }
 };
-
-
-
-
