@@ -27,6 +27,7 @@ import WorkerPercentage from "./pages/WorkerPercentage";
 import { ConfirmPrixod } from "./pages/Prixod/ConfirmPrixod";
 import WarehouseListSelected from "./pages/Warehouse/WarehouseListSelected";
 import CardList from "./pages/Card/CardList";
+import UpdateCard from "./pages/Card/UpdateCard";
 
 function App() {
   return (
@@ -137,8 +138,8 @@ function App() {
               </Layout>
             }
           />
-          
-           <Route
+
+          <Route
             path="/cardList"
             element={
               <Layout>
@@ -173,50 +174,55 @@ function App() {
             }
           />
 
-           <Route
+          <Route
             path="/prixodList"
             element={
               <Layout>
-                <PrixodList/>
+                <PrixodList />
               </Layout>
             }
           />
 
-           <Route
+          <Route
             path="/prixod5"
             element={
               <Layout>
-                <ConfirmPrixod/>
+                <ConfirmPrixod />
               </Layout>
             }
           />
 
-            <Route
+          <Route
             path="/editPrixod/:id"
             element={
               <Layout>
-                <EditPrixod/>
+                <EditPrixod />
               </Layout>
             }
           />
 
-            <Route
+          <Route
             path="/workerPercentage"
             element={
               <Layout>
-                <WorkerPercentage/>
+                <WorkerPercentage />
               </Layout>
             }
           />
 
-           <Route
+          <Route
             path="/warehouseSelected"
-            element={
-                <WarehouseListSelected/>
-            }
+            element={<WarehouseListSelected />}
           />
 
-          
+          <Route
+            path="/updateCard/:id"
+            element={
+              <Layout>
+                <UpdateCard />
+              </Layout>
+            }
+          />
         </Route>
         <Route path="*" element={<NoPage />} />
         <Route path="/sign-in" element={<SignIn />} />

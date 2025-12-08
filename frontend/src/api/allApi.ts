@@ -342,3 +342,22 @@ export const filterTheCardsAPI=async(filters:any)=>{
 }
 
 
+export const  fetchCardDetails = async (id:any) => {
+  try {
+      const res = await axios.get(`${VITE_API_BASE_URL}card/getCardDetails/${id}`);
+      const data: any = res.data;
+      if (!res.status.toString().startsWith("2") || data.success === false) {
+        throw new Error(data.message || "Kart məlumatları alınmadı");
+      }
+      return data;
+    } catch (error: any) {
+      console.error("fetchCardDetails error:", error);
+      throw new Error(
+        error.response?.data?.message || error.message || "Xəta baş verdi"
+      );
+    }
+
+  }
+
+
+

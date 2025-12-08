@@ -363,3 +363,30 @@ export const filterCards = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error filtering cards." });
   }
 };
+
+
+export const getCardDetails = async (req: Request, res: Response, next: NextFunction) => {  
+  try {
+    const cardId = Number(req.params.id);
+    const card =  await cardRepository.findOne({
+      where: { id: cardId },
+      relations: [
+        "client",
+        "user",
+        // "cardJobs",
+        // "cardJobs.jobWorkers",
+        // "cardParts",
+        // "cardProblems",
+        // "cardProblems.serviceWorkers",
+        // "expenses"
+      ],
+    }); 
+    if (!card) {
+      next(errorHandler(404, "Kart tapılmadı"));
+      return;
+    }
+    res.json(card);
+  } catch (error) {
+    next(errorHandler(500, error));
+  } 
+};

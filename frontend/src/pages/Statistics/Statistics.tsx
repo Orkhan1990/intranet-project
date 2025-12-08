@@ -12,6 +12,7 @@ import {
   fetchCards,
   setActiveTab,
 } from "../../redux-toolkit/features/filters/filterSlice";
+import { Link } from "react-router-dom";
 
 const Statistics = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -109,7 +110,7 @@ const Statistics = () => {
 
           <Button
             color={"blue"}
-            size={"sm"}
+            size={"xs"}
             className="w-28"
             onClick={handleFetch}
           >
@@ -124,7 +125,7 @@ const Statistics = () => {
       }
     
       {
-        loading && cards.length > 0 && (
+        cards&& cards.length > 0 && (
            <div className="mt-10 overflow-x-auto rounded-lg shadow-md border border-gray-200">
         <table className="w-full text-sm text-left border-collapse">
           <thead className="bg-gray-100 text-gray-700">
@@ -171,9 +172,11 @@ const Statistics = () => {
                   className="border-b hover:bg-gray-50 transition"
                 >
                   <td className="p-3">{index + 1}</td>
-                  <td className="p-3">{card.id}</td>
+                  <td className="p-3"><Link to={`/updateCard/${card.id}`}>{card.id}</Link></td>
                   <td className="p-3">
+                    <Link to={`/updateCard/${card.id}`}>
                     {card.manufactured} {card.model}
+                    </Link>
                   </td>
                   <td className="p-3">{card.carNumber}</td>
                   <td className="p-3">{card.sassi}</td>
