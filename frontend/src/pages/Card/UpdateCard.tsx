@@ -87,7 +87,7 @@ const UpdateCard = () => {
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
   const [expencePrices, setExpencePrices] = useState<number>(0);
-  const [cardData, setCardData] = useState(null);
+  const [cardData, setCardData] = useState<NewCardInterface>({});
 
 
   const { users } = useSelector((state: RootState) => state.user);
@@ -108,8 +108,12 @@ useEffect(() => {
   const loadData = async () => {
     try {
       const data = await fetchCardDetails(id);
-      setCardData(data);
-    } catch (err) {
+      console.log({data});
+      
+setCardData({
+  ...newCardInitialValues,
+  ...data,
+});    } catch (err) {
       console.log("Card load error:", err);
     } finally {
       setLoading(false);
@@ -129,10 +133,20 @@ useEffect(() => {
     });
   };
 
-  const openWarehousePopup = () => {
-    window.scrollTo(0, 0);
-    alert("Birinci kart yarat!!");
-  };
+const openWarehousePopup = () => {
+  const width = window.innerWidth * 0.9;  // ekranın 90%-i
+  const height = window.innerHeight * 0.9; // 90% hündürlük
+  const left = (window.innerWidth - width) / 2;
+  const top = (window.innerHeight - height) / 2;
+
+  const url = `${window.location.origin}/warehouseSelected`;
+
+  window.open(
+    url,
+    "warehousePopup",
+    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+  );
+};
 
   const displayPrice = (value: number) => {
     return Number.isInteger(value) ? value : Number(value.toFixed(2));
@@ -154,35 +168,7 @@ useEffect(() => {
   const totalPriceNds = totalPriceWithoutNds * 0.18;
   const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const [workersRes, clientsRes] = await Promise.all([
-//           fetch("http://localhost:3013/api/v1/user/getWorkers", {
-//             credentials: "include",
-//           }),
-//           fetch("http://localhost:3013/api/v1/client/getClients", {
-//             credentials: "include",
-//           }),
-//         ]);
 
-//         const workersData = await workersRes.json();
-//         const clientsData = await clientsRes.json();
-
-//         if (!workersRes.ok || workersData.success === false)
-//           throw new Error(workersData.message);
-//         if (!clientsRes.ok || clientsData.success === false)
-//           throw new Error(clientsData.message);
-
-//         setClients(clientsData);
-//       } catch (err: any) {
-//         setError(err.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     fetchData();
-//   }, []);
 
   const onSubmit = async (values: NewCardInterface, totalPriceWorker: any) => {
     try {
@@ -226,7 +212,7 @@ useEffect(() => {
       )}
 
       <Formik
-        initialValues={newCardInitialValues}
+        initialValues={cardData || newCardInitialValues}
         enableReinitialize={true}
         onSubmit={onSubmit}
       >
@@ -614,7 +600,7 @@ useEffect(() => {
                   <span>0 AZN</span>
                 </div>
                 <div className="flex flex-col gap-1 mt-5 text-blue-700  w-[100px]">
-                  <div className="hover:underline" onClick={openWarehousePopup}>
+                  <div className="hover:underline cursor-pointer" onClick={openWarehousePopup}>
                     E/h əlavə et (barkod ilə)
                   </div>
                   <div

@@ -364,29 +364,32 @@ export const filterCards = async (req: Request, res: Response) => {
   }
 };
 
-
-export const getCardDetails = async (req: Request, res: Response, next: NextFunction) => {  
+export const getCardDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const cardId = Number(req.params.id);
-    const card =  await cardRepository.findOne({
-      where: { id: cardId },
-      relations: [
-        "client",
-        "user",
-        // "cardJobs",
-        // "cardJobs.jobWorkers",
-        // "cardParts",
-        // "cardProblems",
-        // "cardProblems.serviceWorkers",
-        // "expenses"
-      ],
-    }); 
+    const card =await AppDataSource.getRepository(Card)
+      .createQueryBuilder("card")
+      .leftJoinAndSelect("card.client", "client")
+      .leftJoinAndSelect("card.user", "user")
+      .leftJoinAndSelect("card.cardJobs", "cardJobs")
+      .leftJoinAndSelect("card.cardParts", "cardParts")
+      .leftJoinAndSelect("card.cardProblems", "cardProblems")
+      .leftJoinAndSelect("card.expenses", "cardExpenses")
+      .where("card.id = :id", { id: cardId })
+      .getOne();
+
     if (!card) {
       next(errorHandler(404, "Kart tapılmadı"));
       return;
     }
-    res.json(card);
+
+    log(card);
+    res.status(201).json(card);
   } catch (error) {
     next(errorHandler(500, error));
-  } 
+  }
 };
