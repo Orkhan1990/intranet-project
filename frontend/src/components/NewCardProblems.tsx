@@ -4,13 +4,13 @@ import { TextInput } from "flowbite-react";
 import { NewCardProblemsInterface, UserInterface } from "../types";
 
 interface CardProblemsIterface{
-  workers:UserInterface[],
+  serviceWorkers:UserInterface[],
   values:NewCardProblemsInterface,
   name:string,
   setFieldValue:(name:string,value:string)=>void
 }
 
-const NewCardProblems = ({ workers, name, values, setFieldValue }:CardProblemsIterface) => {
+const NewCardProblems = ({ serviceWorkers, name, values, setFieldValue }:CardProblemsIterface) => {
   return (
     <div>
       <div className="flex gap-2 mt-2">
@@ -33,7 +33,7 @@ const NewCardProblems = ({ workers, name, values, setFieldValue }:CardProblemsIt
                    name={`${name}.serviceWorkers[${index}]`}
                    value={values.serviceWorkers[index]}
                    onChange={(value:any)=>setFieldValue(`${name}.serviceWorkers[${index}]`,value)}
-                   workers={workers}
+                   serviceWorkers={serviceWorkers}
                    push={push}
                    remove={remove}
                    index={index} 

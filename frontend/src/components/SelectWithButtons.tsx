@@ -4,7 +4,7 @@ import { UserInterface } from "../types";
 
 
 interface SelectWithButtonsInterface{
-    workers:UserInterface[],
+    serviceWorkers:UserInterface[],
     name:string,
     value:string,
     onChange:(event:any)=>void,
@@ -13,7 +13,7 @@ interface SelectWithButtonsInterface{
     remove:(index:number)=>void
 }
 
-const SelectWithButtons = ({ workers, name, value, onChange,push,remove,index }:SelectWithButtonsInterface) => {
+const SelectWithButtons = ({ serviceWorkers, name, value, onChange,push,remove,index }:SelectWithButtonsInterface) => {
 
   const handleChange=(event:any)=>{
     onChange(event.target.value)
@@ -29,8 +29,8 @@ const SelectWithButtons = ({ workers, name, value, onChange,push,remove,index }:
         onChange={handleChange}
       >
         <option value="">İsciler</option>
-        {workers &&
-          workers.map((worker, index) => (
+        {serviceWorkers &&
+          serviceWorkers.map((worker, index) => (
             <option value={worker.id} key={index}>
               {worker.firstName + " " + worker.lastName}
             </option>

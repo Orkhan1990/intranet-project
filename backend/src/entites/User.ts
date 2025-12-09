@@ -48,7 +48,7 @@ export class User extends AllEntities {
   @Column({ default: UserRole.ServiceUser, name: "user_role" })
   userRole: UserRole;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   // 🔹 CLIENTS

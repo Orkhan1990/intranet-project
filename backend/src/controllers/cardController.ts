@@ -371,16 +371,41 @@ export const getCardDetails = async (
 ) => {
   try {
     const cardId = Number(req.params.id);
-    const card =await AppDataSource.getRepository(Card)
-      .createQueryBuilder("card")
-      .leftJoinAndSelect("card.client", "client")
-      .leftJoinAndSelect("card.user", "user")
-      .leftJoinAndSelect("card.cardJobs", "cardJobs")
-      .leftJoinAndSelect("card.cardParts", "cardParts")
-      .leftJoinAndSelect("card.cardProblems", "cardProblems")
-      .leftJoinAndSelect("card.expenses", "cardExpenses")
-      .where("card.id = :id", { id: cardId })
-      .getOne();
+
+    
+   const card = await AppDataSource.getRepository(Card)
+  .createQueryBuilder("card")
+  .leftJoinAndSelect("card.client", "client")
+  .leftJoinAndSelect("card.user", "user")
+  .addSelect(["user.id", "user.userName", "user.firstName", "user.lastName"]) // password gəlməyəcək
+  .leftJoinAndSelect("card.cardJobs", "cardJobs")
+  .leftJoinAndSelect("cardJobs.workers", "jobWorkers") // CardWorkerJob-lar
+  .addSelect([
+    "jobWorkers.id", 
+    "jobWorkers.workerAv", 
+    "jobWorkers.salaryPercent", 
+    "jobWorkers.earnedSalary",
+    "jobWorkers.date",
+  ])
+  .leftJoinAndSelect("jobWorkers.user", "workerUser")
+  .addSelect([
+    "workerUser.id", 
+    "workerUser.userName", 
+    "workerUser.firstName", 
+    "workerUser.lastName"
+  ])
+  .leftJoinAndSelect("card.cardProblems", "cardProblems")
+  .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
+  .addSelect([
+    "serviceWorkers.id",
+    "serviceWorkers.userName",
+    "serviceWorkers.firstName",
+    "serviceWorkers.lastName"
+  ])
+  .leftJoinAndSelect("card.expenses", "cardExpenses")
+  .where("card.id = :id", { id: cardId })
+  .getOne();
+
 
     if (!card) {
       next(errorHandler(404, "Kart tapılmadı"));

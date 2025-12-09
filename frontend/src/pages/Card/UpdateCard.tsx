@@ -15,7 +15,6 @@ import NewCardProblems from "../../components/NewCardProblems";
 import NewCardWorkers from "../../components/NewCardWorkers";
 import NewCardAddParts from "../../components/NewCardAddParts";
 import AddCharges from "../../components/AddCharges";
-import {  NewCardInterface } from "../../types";
 import { createCardApi, fetchCardDetails } from "../../api/allApi";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
@@ -31,7 +30,7 @@ const types = [
   "Digər Texnika",
 ];
 
-const newCardInitialValues: NewCardInterface = {
+const newCardInitialValues = {
   clientId: 0,
   type: "tiqac",
   manufactured: "man",
@@ -47,7 +46,7 @@ const newCardInitialValues: NewCardInterface = {
   servisInfo: false,
   comments: "",
   recommendation: "",
-  problems: [{ description: "", serviceWorkers: [""] }],
+  cardProblems: [{ description: "", serviceWorkers: [""] }],
   jobs: [
     {
       code: "",
@@ -80,48 +79,81 @@ const SectionCard = ({
 const UpdateCard = () => {
   const [error, setError] = useState<string | boolean>(false);
   const [loading, setLoading] = useState(true);
-//   const [clients, setClients] = useState<ClientInterface[]>([]);
-//   const [workers, setWorkers] = useState<any[]>([]);
   const [openGedis, setOpenGedis] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
   const [expencePrices, setExpencePrices] = useState<number>(0);
-  const [cardData, setCardData] = useState<NewCardInterface>({});
-
+  const [cardData, setCardData] = useState(null);
 
   const { users } = useSelector((state: RootState) => state.user);
-  const {clients} = useSelector((state: RootState) => state.client);
-    const dispatch = useDispatch<AppDispatch>();
-    const { id } = useParams();
-  
-    const workers = users.filter((p:any) => p.isWorker === true|| p.userRole === "ServiceUser");
-  
-    useEffect(() => {
-      dispatch(fetchUsers());
-      dispatch(fetchClients());
-    }, [dispatch]);
+  const { clients } = useSelector((state: RootState) => state.client);
+  const dispatch = useDispatch<AppDispatch>();
+  const { id } = useParams();
+
+  const workers = users.filter(
+    (p: any) => p.isWorker === true || p.userRole === "ServiceUser"
+  );
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+    dispatch(fetchClients());
+  }, [dispatch]);
 
   console.log(openAmmannWarranty, openBobcatWarranty);
 
-useEffect(() => {
-  const loadData = async () => {
-    try {
-      const data = await fetchCardDetails(id);
-      console.log({data});
-      
-setCardData({
-  ...newCardInitialValues,
-  ...data,
-});    } catch (err) {
-      console.log("Card load error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchCardDetails(id);
+        console.log({ data });
 
-  loadData();
-}, [id]);
+        setCardData({
+          ...newCardInitialValues,
+
+          ...data,
+
+          // PROBLEMLER
+          cardProblems: data.cardProblems?.length
+            ? data.cardProblems.map((p: any) => ({
+                description: p.description || "",
+                serviceWorkers: p.serviceWorkers?.length
+                  ? p.serviceWorkers
+                  : [""],
+              }))
+            : [{ description: "", serviceWorkers: [""] }],
+
+          // JOBS (backend cardJobs → jobs)
+          jobs: data.cardJobs?.length
+            ? data.cardJobs.map((j: any) => ({
+                code: j.code || "",
+                name: j.name || "",
+                av: j.av || 0,
+                price: j.price || 0,
+                discount: j.discount || 0,
+                oil: j.oil || "",
+                jobWorkers: j.jobWorkers?.length
+                  ? j.jobWorkers
+                  : [{ workerAv: "", workerId: 0 }],
+              }))
+            : newCardInitialValues.jobs,
+
+          // EXPENCES (backend expenses/expences qarışıqlığı)
+          expences: data.expences?.length
+            ? data.expences
+            : data.expenses?.length
+              ? data.expenses
+              : [{ description: "", price: 0 }],
+        });
+      } catch (err) {
+        console.log("Card load error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [id]);
 
   const navigate = useNavigate();
   // İşçilik qiymətini yeniləyən funksiya
@@ -133,20 +165,20 @@ setCardData({
     });
   };
 
-const openWarehousePopup = () => {
-  const width = window.innerWidth * 0.9;  // ekranın 90%-i
-  const height = window.innerHeight * 0.9; // 90% hündürlük
-  const left = (window.innerWidth - width) / 2;
-  const top = (window.innerHeight - height) / 2;
+  const openWarehousePopup = () => {
+    const width = window.innerWidth * 0.9; // ekranın 90%-i
+    const height = window.innerHeight * 0.9; // 90% hündürlük
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
 
-  const url = `${window.location.origin}/warehouseSelected`;
+    const url = `${window.location.origin}/warehouseSelected`;
 
-  window.open(
-    url,
-    "warehousePopup",
-    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
-  );
-};
+    window.open(
+      url,
+      "warehousePopup",
+      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+    );
+  };
 
   const displayPrice = (value: number) => {
     return Number.isInteger(value) ? value : Number(value.toFixed(2));
@@ -168,9 +200,7 @@ const openWarehousePopup = () => {
   const totalPriceNds = totalPriceWithoutNds * 0.18;
   const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
-
-
-  const onSubmit = async (values: NewCardInterface, totalPriceWorker: any) => {
+  const onSubmit = async (values: any, totalPriceWorker: any) => {
     try {
       setLoading(true);
       setError(false);
@@ -218,10 +248,11 @@ const openWarehousePopup = () => {
       >
         {({ values, setFieldValue }) => {
           const totalExpencesPrice = values?.expences?.reduce(
-            (sum, item) => sum + Number(item.price || 0),
+            (sum: any, item: any) => sum + Number(item.price || 0),
             0
           );
           setExpencePrices(totalExpencesPrice);
+
           return (
             <Form className="space-y-8">
               {/* Client Section */}
@@ -236,11 +267,12 @@ const openWarehousePopup = () => {
                       className="w-full mt-1"
                     >
                       <option value="">Müştərini seç</option>
-                      {clients&&clients.map((item:any) => (
-                        <option key={item.id} value={item.id}>
-                          {item.companyName}
-                        </option>
-                      ))}
+                      {clients &&
+                        clients.map((item: any) => (
+                          <option key={item.id} value={item.id}>
+                            {item.companyName}
+                          </option>
+                        ))}
                     </Field>
                   </div>
                   <Link
@@ -426,18 +458,18 @@ const openWarehousePopup = () => {
               </SectionCard>
 
               {/* Problems */}
-              <FieldArray name="problems">
+              <FieldArray name="cardProblems">
                 {({ push, remove }) => (
                   <SectionCard title="Problemlər">
-                    {values.problems.map((_, index) => (
+                    {values?.cardProblems.map((_, index) => (
                       <div
                         key={index}
                         className="border p-4 rounded-md bg-gray-50"
                       >
                         <NewCardProblems
-                          workers={workers}
-                          name={`problems[${index}]`}
-                          values={values.problems[index]}
+                          serviceWorkers={workers}
+                          name={`cardProblems[${index}]`}
+                          values={values.cardProblems[index]}
                           setFieldValue={setFieldValue}
                         />
                       </div>
@@ -454,11 +486,11 @@ const openWarehousePopup = () => {
                         Əlavə et +
                       </Button>
                       <Button
-                        onClick={() => remove(values.problems.length - 1)}
+                        onClick={() => remove(values.cardProblems.length - 1)}
                         color="gray"
                         size="xs"
                         type="button"
-                        disabled={values.problems.length <= 1}
+                        disabled={values.cardProblems.length <= 1}
                       >
                         Azalt -
                       </Button>
@@ -600,7 +632,10 @@ const openWarehousePopup = () => {
                   <span>0 AZN</span>
                 </div>
                 <div className="flex flex-col gap-1 mt-5 text-blue-700  w-[100px]">
-                  <div className="hover:underline cursor-pointer" onClick={openWarehousePopup}>
+                  <div
+                    className="hover:underline cursor-pointer"
+                    onClick={openWarehousePopup}
+                  >
                     E/h əlavə et (barkod ilə)
                   </div>
                   <div
