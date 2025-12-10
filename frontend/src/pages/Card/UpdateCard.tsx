@@ -114,14 +114,14 @@ const UpdateCard = () => {
           ...data,
 
           // PROBLEMLER
-          cardProblems: data.cardProblems?.length
-            ? data.cardProblems.map((p: any) => ({
-                description: p.description || "",
-                serviceWorkers: p.serviceWorkers?.length
-                  ? p.serviceWorkers
-                  : [""],
-              }))
-            : [{ description: "", serviceWorkers: [""] }],
+         cardProblems: data.cardProblems?.length
+  ? data.cardProblems.map((p: any) => ({
+      description: p.description || "",
+      serviceWorkers: p.serviceWorkers?.length
+        ? p.serviceWorkers.map((w: any) => w.id)   // <-- ID-lərə çevir
+        : [""],
+    }))
+  : [{ description: "", serviceWorkers: [""] }],
 
           // JOBS (backend cardJobs → jobs)
           jobs: data.cardJobs?.length

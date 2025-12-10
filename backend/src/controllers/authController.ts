@@ -10,7 +10,12 @@ export const signIn=async(req:Request,res:Response,next:NextFunction)=>{
            const{userName,password}=req.body;
            
            const userRepository = AppDataSource.getRepository(User);
-           const existUser=await userRepository.findOneBy({userName});
+           const existUser = await userRepository
+            .createQueryBuilder("user")
+            .addSelect("user.password")
+            .where("user.userName = :userName", { userName })
+            .getOne();
+            
            if(!existUser){
             next(errorHandler(401,"Belə bir istifadəçi yoxdur!"))
            }
