@@ -33,7 +33,7 @@ const NewCardWorkersName = ({
     console.log(newAv);
     console.log();
 
-    const currentAv = Number(values.jobWorkers[index].workerAv);
+    const currentAv = Number(values.workers[index].workerAv);
 
     const newSum = jobWorkersAvSum - currentAv + Number(newAv);
 

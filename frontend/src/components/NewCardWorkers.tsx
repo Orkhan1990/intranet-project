@@ -24,6 +24,9 @@ const NewCardWorkers = ({
     jobWorkerPrice(price);
   }, [price, values.av, values.discount]);
 
+  console.log({values});
+  
+
   return (
     <tbody>
       <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">

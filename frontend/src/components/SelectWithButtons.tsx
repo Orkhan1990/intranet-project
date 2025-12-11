@@ -22,12 +22,12 @@ const SelectWithButtons = ({
   index,
 }: SelectWithButtonsInterface) => {
 
-  const handleChange = (event: any) => {
-    onChange(event); // <--- DÜZGÜN FORM
-  };
+ const handleChange = (event: any) => {
+  onChange(event.target.value); 
+};
 
-   ;
-   
+     console.log({serviceWorkers});
+     
   return (
     <div className="flex gap-2">
       {index > 0 && (

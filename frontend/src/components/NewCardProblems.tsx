@@ -11,6 +11,8 @@ interface CardProblemsIterface{
 }
 
 const NewCardProblems = ({ serviceWorkers, name, values, setFieldValue }:CardProblemsIterface) => {
+  console.log({values},"salam");
+  
   return (
     <div>
       <div className="flex gap-2 mt-2">

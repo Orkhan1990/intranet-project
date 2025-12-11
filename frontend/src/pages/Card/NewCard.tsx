@@ -15,8 +15,12 @@ import NewCardProblems from "../../components/NewCardProblems";
 import NewCardWorkers from "../../components/NewCardWorkers";
 import NewCardAddParts from "../../components/NewCardAddParts";
 import AddCharges from "../../components/AddCharges";
-import { ClientInterface, NewCardInterface } from "../../types";
+import { NewCardInterface } from "../../types";
 import { createCardApi } from "../../api/allApi";
+import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
+import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
 
 const types = [
   "Tiqac",
@@ -43,8 +47,8 @@ const newCardInitialValues: NewCardInterface = {
   servisInfo: false,
   comments: "",
   recommendation: "",
-  problems: [{ description: "", serviceWorkers: [""] }],
-  jobs: [
+  cardProblems: [{ description: "", serviceWorkers: [""] }],
+  cardJobs: [
     {
       code: "",
       name: "",
@@ -52,7 +56,7 @@ const newCardInitialValues: NewCardInterface = {
       price: 0,
       discount: 0,
       oil: "",
-      jobWorkers: [{ workerAv: "", workerId: 0 }],
+      workers: [{ workerAv: "", workerId: 0 }],
     },
   ],
   expences: [{ description: "", price: "" }],
@@ -75,14 +79,30 @@ const SectionCard = ({
 
 const NewCard = () => {
   const [error, setError] = useState<string | boolean>(false);
-  const [loading, setLoading] = useState(true);
-  const [clients, setClients] = useState<ClientInterface[]>([]);
-  const [workers, setWorkers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [openGedis, setOpenGedis] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
   const [expencePrices, setExpencePrices] = useState<number>(0);
+
+  const { users } = useSelector((state: RootState) => state.user);
+  const { clients } = useSelector((state: RootState) => state.client);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const workers = users.filter(
+    (p: any) => p.isWorker === true || p.userRole === "ServiceUser"
+  );
+
+  useEffect(() => {
+    const load = async () => {
+      await dispatch(fetchUsers());
+      await dispatch(fetchClients());
+      setLoading(false); // <<< BURADA loading dayandırılır
+    };
+
+    load();
+  }, [dispatch]);
 
   console.log(openAmmannWarranty, openBobcatWarranty);
 
@@ -120,37 +140,6 @@ const NewCard = () => {
   const totalPriceWithoutNds = totalPriceWorker + totalExpencesPrice;
   const totalPriceNds = totalPriceWithoutNds * 0.18;
   const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [workersRes, clientsRes] = await Promise.all([
-          fetch("http://localhost:3013/api/v1/user/getWorkers", {
-            credentials: "include",
-          }),
-          fetch("http://localhost:3013/api/v1/client/getClients", {
-            credentials: "include",
-          }),
-        ]);
-
-        const workersData = await workersRes.json();
-        const clientsData = await clientsRes.json();
-
-        if (!workersRes.ok || workersData.success === false)
-          throw new Error(workersData.message);
-        if (!clientsRes.ok || clientsData.success === false)
-          throw new Error(clientsData.message);
-
-        setWorkers(workersData);
-        setClients(clientsData);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   const onSubmit = async (values: NewCardInterface, totalPriceWorker: any) => {
     try {
@@ -404,18 +393,18 @@ const NewCard = () => {
               </SectionCard>
 
               {/* Problems */}
-              <FieldArray name="problems">
+              <FieldArray name="cardProblems">
                 {({ push, remove }) => (
                   <SectionCard title="Problemlər">
-                    {values.problems.map((_, index) => (
+                    {values.cardProblems.map((_, index) => (
                       <div
                         key={index}
                         className="border p-4 rounded-md bg-gray-50"
                       >
                         <NewCardProblems
-                          workers={workers}
-                          name={`problems[${index}]`}
-                          values={values.problems[index]}
+                          serviceWorkers={workers}
+                          name={`cardProblems[${index}]`}
+                          values={values.cardProblems[index]}
                           setFieldValue={setFieldValue}
                         />
                       </div>
@@ -432,11 +421,11 @@ const NewCard = () => {
                         Əlavə et +
                       </Button>
                       <Button
-                        onClick={() => remove(values.problems.length - 1)}
+                        onClick={() => remove(values.cardProblems.length - 1)}
                         color="gray"
                         size="xs"
                         type="button"
-                        disabled={values.problems.length <= 1}
+                        disabled={values.cardProblems.length <= 1}
                       >
                         Azalt -
                       </Button>
@@ -446,7 +435,7 @@ const NewCard = () => {
               </FieldArray>
 
               {/* Jobs */}
-              <FieldArray name="jobs">
+              <FieldArray name="cardJobs">
                 {({ push, remove }) => (
                   <SectionCard title="İşçilik">
                     <div className="overflow-x-auto">
@@ -462,12 +451,12 @@ const NewCard = () => {
                             <th className="text-center p-2">İşçilər</th>
                           </tr>
                         </thead>
-                        {values.jobs.map((_, index) => (
+                        {values.cardJobs.map((_, index) => (
                           <NewCardWorkers
                             key={index}
                             workers={workers}
-                            name={`jobs[${index}]`}
-                            values={values.jobs[index]}
+                            name={`cardJobs[${index}]`}
+                            values={values.cardJobs[index]}
                             jobWorkerPrice={(price) =>
                               handlePriceUpdate(index, price)
                             }
@@ -496,7 +485,7 @@ const NewCard = () => {
                               price: 0,
                               discount: 0,
                               oil: "",
-                              jobWorkers: [{ workerAv: "", workerId: "" }],
+                              workers: [{ workerAv: "", workerId: "" }],
                             });
 
                             // Yeni sıfır qiymət əlavə olunur
@@ -510,9 +499,9 @@ const NewCard = () => {
                           color="gray"
                           size="xs"
                           type="button"
-                          disabled={values.jobs.length <= 1}
+                          disabled={values.cardJobs.length <= 1}
                           onClick={() => {
-                            const index = values.jobs.length - 1;
+                            const index = values.cardJobs.length - 1;
                             remove(index);
                             handleRemoveJob(index); // TOTAL-dan qiyməti silir
                           }}

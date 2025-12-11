@@ -67,6 +67,8 @@ export const createCard = async (
 
   try {
     const { cardData } = req.body;
+    console.log(req.body);
+    
     const userId = req.userId;
 
     // log(cardData);
@@ -74,7 +76,7 @@ export const createCard = async (
     // =============================
     // 1) AV TOPLAMI
     // =============================
-    const avSum = cardData.jobs.reduce(
+    const avSum = cardData.cardJobs.reduce(
       (sum: number, job: any) => sum + Number(job.av || 0), //bu duzdur
       0
     );
@@ -82,8 +84,8 @@ export const createCard = async (
     // =============================
     // 2) WORKER-ID-LƏRİ YIĞIRIQ
     // =============================
-    const workerIds = cardData.jobs.flatMap((j: any) =>
-      j.jobWorkers.map((jw: any) => Number(jw.workerId))
+    const workerIds = cardData.cardJobs.flatMap((j: any) =>
+      j.workers.map((jw: any) => Number(jw.workerId))
     );
 
     const uniqueWorkerIds = [...new Set(workerIds)];
@@ -100,19 +102,19 @@ export const createCard = async (
     // 3) ÜMUMİ ENDİRİMLİ MƏBLƏĞ HESABLANMASI
     // =============================
 
-    const workSum = cardData.jobs.reduce((sum: number, j: any) => {
+    const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
       const av = Number(j.av || 0);
       const globalDiscount = Number(j.discount || 0);
       const price = av * 50 * (1 - globalDiscount / 100);
       return sum + price;
     }, 0);
 
-    const workSumOwn = cardData.jobs.reduce((sum: number, j: any) => {
+    const workSumOwn = cardData.cardJobs.reduce((sum: number, j: any) => {
       const av = Number(j.av || 0);
       const globalDiscount = Number(j.discount || 0);
       // const price = av * 50 * (1 - globalDiscount / 100);
       let workerTotalSumOwn = 0;
-      for (const jw of j.jobWorkers) {
+      for (const jw of j.workers) {
         const avWorker = Number(jw.workerAv || 0);
         const workerId = Number(jw.workerId);
         const workerPercent = workerMap.get(workerId) || 0;
@@ -155,8 +157,8 @@ export const createCard = async (
     // =============================
     // 5) PROBLEMLƏR (CardProblem)
     // =============================
-    if (Array.isArray(cardData.problems)) {
-      for (const p of cardData.problems) {
+    if (Array.isArray(cardData.cardProblems)) {
+      for (const p of cardData.cardProblems) {
         const prob = new CardProblem();
         prob.description = p.description;
         prob.cardId = savedCard.id;
@@ -178,8 +180,8 @@ export const createCard = async (
     // =============================
     // 6) JOBLAR + WORKERJOB + WORKER SALARY
     // =============================
-    if (Array.isArray(cardData.jobs)) {
-      for (const j of cardData.jobs) {
+    if (Array.isArray(cardData.cardJobs)) {
+      for (const j of cardData.cardJobs) {
         const av = Number(j.av || 0);
         const discount = Number(j.discount || 0);
 
@@ -199,8 +201,8 @@ export const createCard = async (
         // ==============================
         // İşçilər
         // ==============================
-        if (Array.isArray(j.jobWorkers)) {
-          for (const jw of j.jobWorkers) {
+        if (Array.isArray(j.workers)) {
+          for (const jw of j.workers) {
             const workerId = Number(jw.workerId);
             const user = await userRepository.findOneBy({ id: workerId });
 

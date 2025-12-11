@@ -140,7 +140,7 @@ const UpdateCard = () => {
 
                 workers: j.workers?.length
                   ? j.workers.map((w: any) => ({
-                      workerAv: w.workerAv || "",
+                      workerAv:Number(w.workerAv)  || "",
                       workerId: w.user?.id || "", // <-- DÜZGÜN YER
                     }))
                   : [{ workerAv: "", workerId: "" }],

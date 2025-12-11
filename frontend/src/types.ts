@@ -56,7 +56,7 @@ export interface NewCardJobsInterface {
   price: number;
   discount: number;
   oil: string;
-  jobWorkers: JobWorkersInterface[];
+  workers: JobWorkersInterface[];
 }
 
 export interface NewCardExpencesInterface {
@@ -80,8 +80,8 @@ export interface NewCardInterface {
   servisInfo: boolean;
   comments: string;
   recommendation: string;
-  problems: NewCardProblemsInterface[];
-  jobs: NewCardJobsInterface[];
+  cardProblems: NewCardProblemsInterface[];
+  cardJobs: NewCardJobsInterface[];
   expences: NewCardExpencesInterface[];
 }
 
