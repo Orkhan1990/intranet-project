@@ -1,10 +1,10 @@
 import SelectWithButtons from "../components/SelectWithButtons";
 import { Field,FieldArray } from "formik";
 import { TextInput } from "flowbite-react";
-import { NewCardProblemsInterface, UserInterface } from "../types";
+import { NewCardProblemsInterface } from "../types";
 
 interface CardProblemsIterface{
-  serviceWorkers:UserInterface[],
+  serviceWorkers:any,
   values:NewCardProblemsInterface,
   name:string,
   setFieldValue:(name:string,value:string)=>void

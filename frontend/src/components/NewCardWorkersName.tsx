@@ -17,12 +17,13 @@ const NewCardWorkersName = ({
   index,
   push,
   remove,
-  values
+  values,
 }: WorkersNameInterface) => {
+  console.log({ values });
 
   const { setFieldValue } = useFormikContext();
 
-  const jobWorkersAvSum = values.jobWorkers.reduce((sum: any, worker: any) => {
+  const jobWorkersAvSum = values.workers.reduce((sum: any, worker: any) => {
     return sum + (Number(worker.workerAv) || 0);
   }, 0);
 
@@ -30,11 +31,11 @@ const NewCardWorkersName = ({
   const handleAvChange = (e: any) => {
     const newAv = e.target.value;
     console.log(newAv);
-    console.log()
-    
+    console.log();
+
     const currentAv = Number(values.jobWorkers[index].workerAv);
 
-    const newSum = jobWorkersAvSum - currentAv +(Number(newAv));
+    const newSum = jobWorkersAvSum - currentAv + Number(newAv);
 
     if (newSum > values.av) {
       alert("İşçilərin AV cəmi əsas AV-dan çox ola bilməz!");
@@ -56,10 +57,10 @@ const NewCardWorkersName = ({
         </Button>
 
         <div className="flex gap-2 w-[200px]">
-          <TextInput
+          <Field
+            as={TextInput}
             type="text"
             className="w-[70px]"
-            value={values.jobWorkers[index].workerAv}
             name={`${name}.workerAv`}
             onChange={handleAvChange}
             sizing="sm"

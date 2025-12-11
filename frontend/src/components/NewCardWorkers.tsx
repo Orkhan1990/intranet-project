@@ -3,12 +3,12 @@ import { FaArrowAltCircleUp } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import NewCardWorkersName from "./NewCardWorkersName";
 import { Field, FieldArray } from "formik";
-import { NewCardJobsInterface, UserInterface } from "../types";
+import { UserInterface } from "../types";
 import { useEffect } from "react";
 
 interface CardWorkersInterface {
   workers: UserInterface[];
-  values: NewCardJobsInterface;
+  values: any;
   name: string;
   jobWorkerPrice: (price: any) => void;
 }
@@ -19,13 +19,10 @@ const NewCardWorkers = ({
   name,
   jobWorkerPrice,
 }: CardWorkersInterface) => {
-
-
-
   const price = (values.av || 0) * 50 * (1 - (values.discount || 0) / 100);
   useEffect(() => {
     jobWorkerPrice(price);
-  }, [price,values.av, values.discount]);
+  }, [price, values.av, values.discount]);
 
   return (
     <tbody>
@@ -47,7 +44,6 @@ const NewCardWorkers = ({
               className="w-[250px]"
               name={`${name}.name`}
               sizing="sm"
-
             />
             <Link to="">
               <FaArrowAltCircleUp className="text-2xl text-green-600" />
@@ -61,7 +57,6 @@ const NewCardWorkers = ({
             className="w-[60px]"
             name={`${name}.av`}
             sizing="sm"
-
           />
         </td>
         <td className="px-1">
@@ -93,18 +88,18 @@ const NewCardWorkers = ({
           />
         </td>
         <td className="px-6 py-4">
-          <FieldArray name={`${name}.jobWorkers`}>
+          <FieldArray name={`${name}.workers`}>
             {({ push, remove }) => (
               <div className="flex flex-col gap-2">
-                {values.jobWorkers.map((_, index: number) => (
+                {values.workers.map((_: any, index: number) => (
                   <NewCardWorkersName
-                  key={index}
-                    workers={workers}
-                    name={`${name}.jobWorkers[${index}]`}
+                    key={index}
+                    workers={workers} // backend-dən gələn user list
+                    name={`${name}.workers[${index}]`}
                     index={index}
                     push={push}
                     remove={remove}
-                    values={values}
+                    values={values} // indi tək worker obyektidir
                   />
                 ))}
               </div>

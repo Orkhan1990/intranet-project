@@ -29,7 +29,7 @@ export const addToCard = async (
 ) => {
   try {
     const { id, selectedCount } = req.body;
-    console.log(id, selectedCount);
+    // console.log(id, selectedCount);
 
     const part = await sparePartsRepository.findOneBy({ id });
 
@@ -69,7 +69,7 @@ export const createCard = async (
     const { cardData } = req.body;
     const userId = req.userId;
 
-    log(cardData);
+    // log(cardData);
 
     // =============================
     // 1) AV TOPLAMI
@@ -260,7 +260,7 @@ export const filterCards = async (req: Request, res: Response) => {
   try {
     const filters = req.body.filters || {};
 
-    console.log({ filters });
+    // console.log({ filters });
 
     const query = AppDataSource.getRepository(Card)
       .createQueryBuilder("card")
@@ -355,7 +355,7 @@ export const filterCards = async (req: Request, res: Response) => {
 
     const cards = await query.getMany(); // fetch results with joined client and user
 
-    log(cards);
+    // log(cards);
 
     res.json(cards);
   } catch (error) {
@@ -372,49 +372,207 @@ export const getCardDetails = async (
   try {
     const cardId = Number(req.params.id);
 
-    
-   const card = await AppDataSource.getRepository(Card)
-  .createQueryBuilder("card")
-  .leftJoinAndSelect("card.client", "client")
-  .leftJoinAndSelect("card.user", "user")
-  .addSelect(["user.id", "user.userName", "user.firstName", "user.lastName"]) // password gəlməyəcək
-  .leftJoinAndSelect("card.cardJobs", "cardJobs")
-  .leftJoinAndSelect("cardJobs.workers", "jobWorkers") // CardWorkerJob-lar
-  .addSelect([
-    "jobWorkers.id", 
-    "jobWorkers.workerAv", 
-    "jobWorkers.salaryPercent", 
-    "jobWorkers.earnedSalary",
-    "jobWorkers.date",
-  ])
-  .leftJoinAndSelect("jobWorkers.user", "workerUser")
-  .addSelect([
-    "workerUser.id", 
-    "workerUser.userName", 
-    "workerUser.firstName", 
-    "workerUser.lastName"
-  ])
-  .leftJoinAndSelect("card.cardProblems", "cardProblems")
-  .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
-  .addSelect([
-    "serviceWorkers.id",
-    "serviceWorkers.userName",
-    "serviceWorkers.firstName",
-    "serviceWorkers.lastName"
-  ])
-  .leftJoinAndSelect("card.expenses", "cardExpenses")
-  .where("card.id = :id", { id: cardId })
-  .getOne();
-
+    const card = await AppDataSource.getRepository(Card)
+      .createQueryBuilder("card")
+      .leftJoinAndSelect("card.client", "client")
+      .leftJoinAndSelect("card.user", "user")
+      .addSelect([
+        "user.id",
+        "user.userName",
+        "user.firstName",
+        "user.lastName",
+      ]) // password gəlməyəcək
+      .leftJoinAndSelect("card.cardJobs", "cardJobs")
+      .leftJoinAndSelect("cardJobs.workers", "jobWorkers") // CardWorkerJob-lar
+      .addSelect([
+        "jobWorkers.id",
+        "jobWorkers.workerAv",
+        "jobWorkers.salaryPercent",
+        "jobWorkers.earnedSalary",
+        "jobWorkers.date",
+      ])
+      .leftJoinAndSelect("jobWorkers.user", "workerUser")
+      .addSelect([
+        "workerUser.id",
+        "workerUser.userName",
+        "workerUser.firstName",
+        "workerUser.lastName",
+      ])
+      .leftJoinAndSelect("card.cardProblems", "cardProblems")
+      .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
+      .addSelect([
+        "serviceWorkers.id",
+        "serviceWorkers.userName",
+        "serviceWorkers.firstName",
+        "serviceWorkers.lastName",
+      ])
+      .leftJoinAndSelect("card.expenses", "cardExpenses")
+      .where("card.id = :id", { id: cardId })
+      .getOne();
 
     if (!card) {
       next(errorHandler(404, "Kart tapılmadı"));
       return;
     }
 
-    log(card);
+    // log(card);
     res.status(201).json(card);
   } catch (error) {
     next(errorHandler(500, error));
+  }
+};
+
+export const updateCard = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const queryRunner = AppDataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
+
+  try {
+    const cardId = Number(req.params.id);
+    const { cardData } = req.body;
+    const userId = req.userId;
+
+    // 1️⃣ Mövcud kartı tap
+    const existingCard = await cardRepository.findOneBy({ id: cardId });
+    if (!existingCard) {
+      return next(errorHandler(404, "Kart tapılmadı"));
+    }
+
+    // 2️⃣ Kartın əsas sahələrini update et
+    existingCard.clientId = Number(cardData.clientId);
+    existingCard.type = cardData.type;
+    existingCard.manufactured = cardData.manufactured;
+    existingCard.model = cardData.model;
+    existingCard.sassi = cardData.sassi;
+    existingCard.carNumber = cardData.carNumber;
+    existingCard.produceDate = cardData.produceDate;
+    existingCard.km = cardData.km;
+    existingCard.qostNumber = cardData.qostNumber;
+    existingCard.paymentType = cardData.paymentType;
+    existingCard.nds = cardData.nds;
+    existingCard.repairAgain = cardData.repairAgain;
+    existingCard.servisInfo = cardData.servisInfo;
+    existingCard.comments = cardData.comments;
+    existingCard.recommendation = cardData.recommendation;
+
+    const updatedCard = await cardRepository.save(existingCard);
+
+    // 3️⃣ Mövcud cardProblems, cardJobs, jobWorkers, expences sil
+    await queryRunner.manager.delete(CardProblem, { cardId });
+
+    const existingJobs = await cardJobRepo.find({ where: { cardId } });
+    const existingJobIds = existingJobs.map((j) => j.id);
+
+    if (existingJobIds.length > 0) {
+      await queryRunner.manager.delete(CardWorkerJob, {
+        cardJobId: In(existingJobIds),
+      });
+    }
+
+    await queryRunner.manager.delete(CardJob, { cardId });
+    await queryRunner.manager.delete(CardExpense, { cardId });
+
+    // 4️⃣ Yeni cardProblems əlavə et
+    if (Array.isArray(cardData.cardProblems)) {
+      for (const p of cardData.cardProblems) {
+        const newProblem = new CardProblem();
+        newProblem.description = p.description;
+        newProblem.cardId = cardId;
+
+        const savedProblem = await cardProblemRepository.save(newProblem);
+
+        if (Array.isArray(p.serviceWorkers)) {
+          for (const workerId of p.serviceWorkers) {
+            await queryRunner.manager
+              .createQueryBuilder()
+              .relation(CardProblem, "serviceWorkers")
+              .of(savedProblem.id)
+              .add(workerId);
+          }
+        }
+      }
+    }
+
+    // 5️⃣ Yeni cardJobs və jobWorkers əlavə et
+    if (Array.isArray(cardData.cardJobs)) {
+      // İşçilərin faizi üçün map
+      const workerIds = cardData.cardJobs.flatMap((j: any) =>
+        j.workers.map((w: any) => Number(w.workerId))
+      );
+      const uniqueWorkerIds = [...new Set(workerIds)];
+      const workers = await userRepository.find({
+        where: { id: In(uniqueWorkerIds) },
+      });
+      const workerMap = new Map();
+      workers.forEach((w) => workerMap.set(w.id, w.percent));
+
+      for (const j of cardData.cardJobs) {
+        const av = Number(j.av || 0);
+        const discount = Number(j.discount || 0);
+        const price = av * 50 * (1 - discount / 100);
+
+        const newJob = queryRunner.manager.create(CardJob, {
+          code: j.code,
+          name: j.name,
+          av,
+          price,
+          discount,
+          oil: j.oil,
+          cardId,
+        });
+
+        const savedJob = await queryRunner.manager.save(newJob);
+
+        if (Array.isArray(j.workers)) {
+          for (const jw of j.workers) {
+            const workerId = Number(jw.workerId);
+            const user = workers.find((w) => w.id === workerId);
+
+            if (!user) continue;
+
+            const newCardWorkerJob = new CardWorkerJob();
+            newCardWorkerJob.workerAv = Number(jw.workerAv);
+            newCardWorkerJob.user = user;
+            newCardWorkerJob.cardJobId = savedJob.id;
+            newCardWorkerJob.salaryPercent = user.percent;
+            newCardWorkerJob.earnedSalary =
+              Number(jw.workerAv) *
+              50 *
+              (1 - discount / 100) *
+              (user.percent / 100);
+            newCardWorkerJob.date = new Date();
+
+            await cardWorkerJobRepo.save(newCardWorkerJob);
+          }
+        }
+      }
+    }
+
+    // 6️⃣ Xərcləri əlavə et
+    if (Array.isArray(cardData.expences)) {
+      for (const e of cardData.expences) {
+        const newCardExpense = new CardExpense();
+        newCardExpense.description = e.description;
+        newCardExpense.price = Number(e.price);
+        newCardExpense.cardId = cardId;
+
+        await cardExpenseRespoisitory.save(newCardExpense);
+      }
+    }
+
+    res.status(200).json({
+      message: "Kart yeniləndi",
+      card: updatedCard,
+    });
+  } catch (error) {
+    await queryRunner.rollbackTransaction();
+    console.log(error);
+    next(errorHandler(500, error));
+  } finally {
+    await queryRunner.release();
   }
 };
