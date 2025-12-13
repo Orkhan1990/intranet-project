@@ -610,17 +610,21 @@ for (const j of cardData.cardJobs) {
 }
 
 
-    // // 6️⃣ Xərcləri əlavə et
-    // if (Array.isArray(cardData.expences)) {
-    //   for (const e of cardData.expences) {
-    //     const newCardExpense = new CardExpense();
-    //     newCardExpense.description = e.description;
-    //     newCardExpense.price = Number(e.price);
-    //     newCardExpense.cardId = cardId;
+    // 1️⃣ Köhnə expenses-ləri götür və sil
+await cardExpenseRespoisitory.delete({ cardId });
 
-    //     await cardExpenseRespoisitory.save(newCardExpense);
-    //   }
-    // }
+// 2️⃣ Yeni expenses əlavə et
+if (Array.isArray(cardData.expences)) {
+  for (const e of cardData.expences) {
+    const newExp = new CardExpense();
+    newExp.description = e.description;
+    newExp.price = Number(e.price);
+    newExp.cardId = cardId;
+
+    await cardExpenseRespoisitory.save(newExp);
+  }
+}
+
 
     res.status(200).json({
       message: "Kart yeniləndi",
