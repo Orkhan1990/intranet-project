@@ -79,7 +79,7 @@ const UpdateCard = () => {
         price: 0,
         discount: 0,
         oil: "",
-        jobWorkers: [{ workerAv: "", workerId: 0 }],
+        workers: [{ workerAv: "", workerId: 0 }],
       },
     ],
     expences: [{ description: "", price: "" }],
