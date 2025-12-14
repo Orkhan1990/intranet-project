@@ -8,6 +8,9 @@ export class CardPart extends AllEntities {
   @Column({ name: "part_name" })
   partName: string;
 
+  @Column()
+  code: string;
+
   @Column({ type: "float", nullable: true })
   discount: number;
 

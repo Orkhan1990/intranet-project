@@ -264,9 +264,9 @@ export const getReceptionUsersData= async()=>{
   }
 }
 
-export const addToCard=async(id:string,selectedCount:number)=>{
+export const addToCard=async(id:string,selectedCount:number,cardId:any)=>{
   try {
-    const response=await axios.post(`${VITE_API_BASE_URL}card/addToCard`,{id,selectedCount},{  
+    const response=await axios.post(`${VITE_API_BASE_URL}card/addToCard`,{id,selectedCount,cardId},{  
       withCredentials: true
     });
 

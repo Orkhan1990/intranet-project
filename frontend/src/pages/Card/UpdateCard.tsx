@@ -53,6 +53,7 @@ const UpdateCard = () => {
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
   const [expencePrices, setExpencePrices] = useState<number>(0);
+  const [cardPartsPrice, setCardPartsPrice] = useState<number>(0);
   const [cardData, setCardData] = useState(null);
   const [initialValues, setInitialValues] = useState({
     clientId: 0,
@@ -83,7 +84,14 @@ const UpdateCard = () => {
       },
     ],
     expences: [{ description: "", price: "" }],
-    spareParts: [],
+    cardParts: [{
+      code: "",
+      partName: "",
+      count: 0,
+      soldPrice: 0,
+      discount: 0,
+      totalPrice: 0
+    }],
   });
 
   const { users } = useSelector((state: RootState) => state.user);
@@ -107,11 +115,14 @@ const UpdateCard = () => {
 
   console.log(openAmmannWarranty, openBobcatWarranty, setInitialValues);
 
+  console.log({cardData});
+  
+
   useEffect(() => {
     const loadData = async () => {
       try {
         const data = await fetchCardDetails(id);
-        console.log({ data });
+        // console.log({ data });
 
         setCardData({
           ...initialValues,
@@ -146,6 +157,7 @@ const UpdateCard = () => {
                   : [{ workerAv: "", workerId: "" }],
               }))
             : initialValues.cardJobs,
+          
 
           // EXPENCES (backend expenses/expences qarışıqlığı)
           expences: data.expences?.length
@@ -153,6 +165,17 @@ const UpdateCard = () => {
             : data.expenses?.length
               ? data.expenses
               : [{ description: "", price: 0 }],
+
+              cardParts: data.cardParts?.length
+              ? data.cardParts
+              : [{
+                code: "",
+                partName: "",
+                count: 0,
+                soldPrice: 0,
+                discount: 0,
+                totalPrice: 0
+              }],
         });
       } catch (err) {
         console.log("Card load error:", err);
@@ -174,13 +197,17 @@ const UpdateCard = () => {
     });
   };
 
-  const openWarehousePopup = () => {
+  const  handlecardPartsPriceUpdate = (price: number) => {
+    setCardPartsPrice(price);
+  };
+
+  const openWarehousePopup = (id:any) => {
     const width = window.innerWidth * 0.9; // ekranın 90%-i
     const height = window.innerHeight * 0.9; // 90% hündürlük
     const left = (window.innerWidth - width) / 2;
     const top = (window.innerHeight - height) / 2;
 
-    const url = `${window.location.origin}/warehouseSelected`;
+    const url = `${window.location.origin}/warehouseSelected/${id}`;
 
     window.open(
       url,
@@ -205,7 +232,8 @@ const UpdateCard = () => {
 
   const totalPriceWorker = jobPrices.reduce((a, b) => a + b, 0);
   const totalExpencesPrice = expencePrices;
-  const totalPriceWithoutNds = totalPriceWorker + totalExpencesPrice;
+  // const totalCardPartsPrice = ;
+  const totalPriceWithoutNds = totalPriceWorker + totalExpencesPrice+cardPartsPrice;
   const totalPriceNds = totalPriceWithoutNds * 0.18;
   const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
@@ -635,22 +663,23 @@ const UpdateCard = () => {
               </FieldArray>
 
               {/* Parts */}
+              
               <SectionCard title="Ehtiyyat hissələri">
-                <NewCardAddParts />
+                <NewCardAddParts values={values}  cardPartsPrice={(price:any)=>handlecardPartsPriceUpdate(price)}/>
                 <div className="flex gap-3 font-semibold mt-5 items-center justify-center">
                   <span>Cəmi:</span>
-                  <span>0 AZN</span>
+                  <span>{cardPartsPrice} AZN</span>
                 </div>
                 <div className="flex flex-col gap-1 mt-5 text-blue-700  w-[100px]">
                   <div
                     className="hover:underline cursor-pointer"
-                    onClick={openWarehousePopup}
+                    // onClick={openWarehousePopup}
                   >
                     E/h əlavə et (barkod ilə)
                   </div>
                   <div
                     className="hover:underline cursor-pointer"
-                    onClick={openWarehousePopup}
+                    onClick={()=>openWarehousePopup(id)}
                     color={"blue"}
                   >
                     E/h əlavə et{" "}

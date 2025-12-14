@@ -5,6 +5,7 @@ import { FcOk } from "react-icons/fc";
 import { FaXmark } from "react-icons/fa6";
 import { Button } from "flowbite-react";
 import { addToCard } from "../../api/allApi";
+import { useParams } from "react-router-dom";
 
 interface SparePartInterface {
   id: string;
@@ -28,10 +29,10 @@ const WarehouseListSelected = () => {
   const [selectedId, setSelectedId] = useState<string>("");
   const [selectedCount, setSelectedCount] = useState<number>(1);
 
-  console.log(selectedId,error);
-    console.log(selectedCount);
+  const { id } = useParams();
 
-  
+  console.log(selectedId, error);
+  console.log(selectedCount);
 
   const [queryData, setQueryData] = useState({
     code: "",
@@ -86,7 +87,9 @@ const WarehouseListSelected = () => {
         ? data.name.toLowerCase().includes(queryData.name.toLowerCase())
         : true) &&
       (queryData.liquidity
-        ? data.liquidity.toLowerCase().includes(queryData.liquidity.toLowerCase())
+        ? data.liquidity
+            .toLowerCase()
+            .includes(queryData.liquidity.toLowerCase())
         : true) &&
       (queryData.barcode ? data.barcode.includes(queryData.barcode) : true)
     );
@@ -103,44 +106,44 @@ const WarehouseListSelected = () => {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
-const handleAddToCart = async () => {
-  try {
-    if (!selectedId) {
-      alert("Zəhmət olmasa məhsulu seçin!");
-      return;
+  const handleAddToCart = async (cardId: any) => {
+    try {
+      if (!selectedId) {
+        alert("Zəhmət olmasa məhsulu seçin!");
+        return;
+      }
+
+      if (!selectedCount || selectedCount < 1) {
+        alert("Say minimum 1 olmalıdır!");
+        return;
+      }
+
+      const selectedItem = sparePartData.find((item) => item.id === selectedId);
+      if (!selectedItem) {
+        alert("Seçilmiş məhsul tapılmadı!");
+        return;
+      }
+
+      if (selectedCount > selectedItem.count) {
+        alert(`Anbarda yalnız ${selectedItem.count} ədəd mövcuddur!`);
+        return;
+      }
+
+      // Backend-ə istək göndəririk
+      const res = await addToCard(selectedId, selectedCount, cardId);
+
+      if (res.success) {
+        window.close();
+        alert("Məhsul karta əlavə olundu ✅");
+        console.log("Backend cavabı:", res);
+      } else {
+        alert(`Xəta: ${res.message || "Əlavə etmək mümkün olmadı"}`);
+      }
+    } catch (err: any) {
+      console.error("Add to card error:", err);
+      alert("Əlavə edərkən xəta baş verdi!");
     }
-
-    if (!selectedCount || selectedCount < 1) {
-      alert("Say minimum 1 olmalıdır!");
-      return;
-    }
-
-    const selectedItem = sparePartData.find((item) => item.id === selectedId);
-    if (!selectedItem) {
-      alert("Seçilmiş məhsul tapılmadı!");
-      return;
-    }
-
-    if (selectedCount > selectedItem.count) {
-      alert(`Anbarda yalnız ${selectedItem.count} ədəd mövcuddur!`);
-      return;
-    }
-
-    // Backend-ə istək göndəririk
-    const res = await addToCard(selectedId, selectedCount);
-
-    if (res.success) {
-      alert("Məhsul karta əlavə olundu ✅");
-      console.log("Backend cavabı:", res);
-    } else {
-      alert(`Xəta: ${res.message || "Əlavə etmək mümkün olmadı"}`);
-    }
-  } catch (err: any) {
-    console.error("Add to card error:", err);
-    alert("Əlavə edərkən xəta baş verdi!");
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen px-4 sm:px-8 py-6 bg-gray-50 dark:bg-gray-900">
@@ -238,7 +241,9 @@ const handleAddToCart = async () => {
                       max={item.count}
                       value={selectedId === item.id ? selectedCount : 1}
                       onChange={(e) =>
-                        setSelectedCount(Math.min(item.count, Number(e.target.value)))
+                        setSelectedCount(
+                          Math.min(item.count, Number(e.target.value))
+                        )
                       }
                       className="w-12 text-center border rounded-md px-1 py-1 text-xs"
                       disabled={selectedId !== item.id}
@@ -253,7 +258,11 @@ const handleAddToCart = async () => {
                   <td className="px-4 py-3 text-center">{item.price}</td>
                   <td className="px-4 py-3 text-center">{item.sellPrice}</td>
                   <td className="px-4 py-3 text-center">
-                    {item.barcode ? <FcOk className="mx-auto" /> : <FaXmark className="text-red-500 mx-auto" />}
+                    {item.barcode ? (
+                      <FcOk className="mx-auto" />
+                    ) : (
+                      <FaXmark className="text-red-500 mx-auto" />
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <select className="text-xs rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800">
@@ -276,7 +285,9 @@ const handleAddToCart = async () => {
                       Çap et
                     </Button>
                   </td>
-                  <td className="px-4 py-3">{getCreatedDate(item.createdAt)}</td>
+                  <td className="px-4 py-3">
+                    {getCreatedDate(item.createdAt)}
+                  </td>
                 </tr>
               ))
             ) : (
@@ -291,7 +302,7 @@ const handleAddToCart = async () => {
       </div>
 
       <div className="mt-4 flex justify-center">
-        <Button color="green" onClick={handleAddToCart}>
+        <Button color="green" onClick={() => handleAddToCart(id)}>
           Seçilmiş məhsulu əlavə et
         </Button>
       </div>

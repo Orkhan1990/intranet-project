@@ -211,7 +211,7 @@ function App() {
           />
 
           <Route
-            path="/warehouseSelected"
+            path="/warehouseSelected/:id"
             element={<WarehouseListSelected />}
           />
 

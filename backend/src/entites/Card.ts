@@ -97,7 +97,7 @@ export class Card extends AllEntities {
   @OneToMany(() => CardJob, (cardJob) => cardJob.card, { cascade: true })
   cardJobs: CardJob[];
 
-  @OneToMany(() => CardPart, (cardPart) => cardPart.card, { cascade: true })
+  @OneToMany(() => CardPart, (cardPart) => cardPart.card, { cascade: true,eager:true })
   cardParts: CardPart[];
 
   // User (creator / owner)

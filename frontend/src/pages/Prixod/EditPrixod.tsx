@@ -597,7 +597,8 @@ const EditPrixod = () => {
                             Ehtiyat hissələri və Zəmanət <br /> Departament
                             rəhbərinin təsdiqi
                           </>
-                        ) : (
+                        ) : hist.level==="updated"?("Mədaxilin məlumatı yeniləndi"):
+                        (
                           "Mədaxil yaradıldı"
                         )}
                       </td>
