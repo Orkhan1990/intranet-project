@@ -28,9 +28,11 @@ export const addToCard = async (
   next: NextFunction
 ) => {
   try {
-    const { cardId, partId, selectedCount } = req.body;
+    const { cardId, id, selectedCount } = req.body;
 
-    const part = await sparePartsRepository.findOneBy({ id: partId });
+    console.log(cardId, id, selectedCount);
+
+    const part = await sparePartsRepository.findOneBy({ id: id });
 
     if (!part) {
       return next(errorHandler(404, "Məhsul anbarda mövcud deyil!"));
@@ -48,18 +50,20 @@ export const addToCard = async (
     newCardPart.partName = part.name;
     newCardPart.soldPrice = part.sellPrice;
     newCardPart.code = part.code;
+    newCardPart.sparePart = part;
 
     await cardPartsRepository.save(newCardPart);
 
     // Anbardakı sayı yenilə və ya sil
-    if (selectedCount === part.count) {
-      await sparePartsRepository.delete({ id: partId });
-    } else {
-      part.count -= selectedCount;
-      await sparePartsRepository.save(part);
-    }
 
-    res.status(201).json({ message: "Məhsul karta əlavə olundu" });
+    part.count -= selectedCount;
+    await sparePartsRepository.save(part);
+
+    console.log("buracan gelir");
+
+    res
+      .status(201)
+      .json({ success: true, message: "Məhsul karta əlavə olundu" });
   } catch (error) {
     next(errorHandler(500, error));
   }
@@ -442,7 +446,7 @@ export const getCardDetails = async (
       return;
     }
 
-    log(card);
+    // log(card);
     res.status(201).json(card);
   } catch (error) {
     next(errorHandler(500, error));

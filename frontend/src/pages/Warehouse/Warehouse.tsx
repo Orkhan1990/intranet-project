@@ -38,7 +38,9 @@ const Warehouse = () => {
 
   console.log(error);
 
-  const filteredData = sparePartData.filter((data) => {
+  const zeroCountParts = sparePartData.filter((part) => part.count > 0);
+
+  const filteredData = zeroCountParts.filter((data) => {
     return (
       (queryData.code
         ? data.code.toLowerCase().includes(queryData.code.toLowerCase())

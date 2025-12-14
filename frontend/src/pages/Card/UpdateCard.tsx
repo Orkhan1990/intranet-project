@@ -47,7 +47,7 @@ const SectionCard = ({
 
 const UpdateCard = () => {
   const [error, setError] = useState<string | boolean>(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [openGedis, setOpenGedis] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
@@ -121,14 +121,14 @@ const UpdateCard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
+
+
+        
         const data = await fetchCardDetails(id);
-        // console.log({ data });
 
         setCardData({
           ...initialValues,
-
           ...data,
-
           // PROBLEMLER
           cardProblems: data.cardProblems?.length
             ? data.cardProblems.map((p: any) => ({

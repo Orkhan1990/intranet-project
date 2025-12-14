@@ -26,12 +26,12 @@ const numbers = Array.from({ length: 18 }, (_, i) => i + 1);
 const WarehouseListSelected = () => {
   const [error, setError] = useState("");
   const [sparePartData, setSparePartData] = useState<SparePartInterface[]>([]);
-  const [selectedId, setSelectedId] = useState<string>("");
+  const [selectedPartId, setSelectedPartId] = useState<string>("");
   const [selectedCount, setSelectedCount] = useState<number>(1);
 
   const { id } = useParams();
 
-  console.log(selectedId, error);
+  console.log(selectedPartId, error);
   console.log(selectedCount);
 
   const [queryData, setQueryData] = useState({
@@ -72,7 +72,10 @@ const WarehouseListSelected = () => {
     setQueryData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const filteredData = sparePartData.filter((data) => {
+    const zeroCountParts = sparePartData.filter((part) => part.count > 0);
+
+
+  const filteredData = zeroCountParts.filter((data) => {
     return (
       (queryData.code
         ? data.code.toLowerCase().includes(queryData.code.toLowerCase())
@@ -108,7 +111,7 @@ const WarehouseListSelected = () => {
 
   const handleAddToCart = async (cardId: any) => {
     try {
-      if (!selectedId) {
+      if (!selectedPartId) {
         alert("Zəhmət olmasa məhsulu seçin!");
         return;
       }
@@ -118,7 +121,7 @@ const WarehouseListSelected = () => {
         return;
       }
 
-      const selectedItem = sparePartData.find((item) => item.id === selectedId);
+      const selectedItem = sparePartData.find((item) => item.id === selectedPartId);
       if (!selectedItem) {
         alert("Seçilmiş məhsul tapılmadı!");
         return;
@@ -130,7 +133,7 @@ const WarehouseListSelected = () => {
       }
 
       // Backend-ə istək göndəririk
-      const res = await addToCard(selectedId, selectedCount, cardId);
+      const res = await addToCard(selectedPartId, selectedCount, cardId);
 
       if (res.success) {
         window.close();
@@ -227,9 +230,9 @@ const WarehouseListSelected = () => {
                       type="radio"
                       name="selectedProduct"
                       className="w-4 h-4"
-                      checked={selectedId === item.id}
+                      checked={selectedPartId === item.id}
                       onChange={() => {
-                        setSelectedId(item.id);
+                        setSelectedPartId(item.id);
                         setSelectedCount(1);
                       }}
                     />
@@ -239,14 +242,14 @@ const WarehouseListSelected = () => {
                       type="number"
                       min={1}
                       max={item.count}
-                      value={selectedId === item.id ? selectedCount : 1}
+                      value={selectedPartId === item.id ? selectedCount : 1}
                       onChange={(e) =>
                         setSelectedCount(
                           Math.min(item.count, Number(e.target.value))
                         )
                       }
                       className="w-12 text-center border rounded-md px-1 py-1 text-xs"
-                      disabled={selectedId !== item.id}
+                      disabled={selectedPartId !== item.id}
                     />
                   </td>
                   <td className="px-4 py-3">{item.origCode}</td>
