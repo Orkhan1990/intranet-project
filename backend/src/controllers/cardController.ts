@@ -30,7 +30,7 @@ export const addToCard = async (
   try {
     const { cardId, id, selectedCount } = req.body;
 
-    console.log(cardId, id, selectedCount);
+    // console.log(cardId, id, selectedCount);
 
     const part = await sparePartsRepository.findOneBy({ id: id });
 
@@ -59,7 +59,7 @@ export const addToCard = async (
     part.count -= selectedCount;
     await sparePartsRepository.save(part);
 
-    console.log("buracan gelir");
+    // console.log("buracan gelir");
 
     res
       .status(201)
@@ -467,6 +467,9 @@ export const updateCard = async (
     const { cardData } = req.body;
     const userId = req.userId;
 
+    console.log(cardData);
+    
+
     // 1️⃣ Mövcud kartı tap
     const existingCard = await cardRepository.findOneBy({ id: cardId });
     if (!existingCard) {
@@ -645,6 +648,35 @@ export const updateCard = async (
       }
     }
 
+    //Yeni ehtiyyat hisselerini silinir və yenileri elave edilir
+
+    await cardPartsRepository.delete({ cardId });
+
+// ==========================
+// 2️⃣ Yeni cardParts əlavə et
+// ==========================
+if (Array.isArray(cardData.cardParts)) {
+  for (const p of cardData.cardParts) {
+    const newPart = new CardPart();
+
+    newPart.cardId = cardId;
+    newPart.partName = p.partName;
+    newPart.code = p.code;
+    newPart.count = Number(p.count);
+    newPart.soldPrice = Number(p.soldPrice);
+    newPart.discount = Number(p.discount || 0);
+    newPart.date = p.date ? new Date(p.date) : new Date();
+
+    if (p.sparePart?.id) {
+      newPart.sparePart = await sparePartsRepository.findOneBy({
+        id: p.sparePart.id,
+      });
+    }
+
+    await cardPartsRepository.save(newPart);
+  }
+}
+
     res.status(200).json({
       message: "Kart yeniləndi",
       card: updatedCard,
@@ -655,5 +687,42 @@ export const updateCard = async (
     next(errorHandler(500, error));
   } finally {
     await queryRunner.release();
+  }
+};
+
+
+export const returnPart = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { cardId, partId } = req.body;
+    const userId = req.userId;  
+    // 1️⃣ Mövcud kartı tap
+    const existingCard = await cardRepository.findOneBy({ id: cardId });
+    if (!existingCard) {
+      return next(errorHandler(404, "Kart tapılmadı"));
+    }
+    const part = await cardPartsRepository.findOneBy({ id: partId });
+    if (!part) {
+      return next(errorHandler(404, "Ehtiyyat hissəsi tapılmadı"));
+    }
+    // Anbara qaytar
+    const sparePart = await sparePartsRepository.findOneBy({ id: part.sparePart.id });
+    if (!sparePart) {
+      return next(errorHandler(404, "Ehtiyyat hissəsi anbarda tapılmadı"));
+    } 
+    sparePart.count += part.count;
+    await sparePartsRepository.save(sparePart);
+    // Kartdan sil
+    await cardPartsRepository.delete({ id: partId });
+    res.status(200).json({
+      success: true,
+      message: "Ehtiyyat hissəsi anbara qaytarıldı və kartdan silindi",
+    });
+  } catch (error) {
+    console.log(error);
+    next(errorHandler(500, error));
   }
 };

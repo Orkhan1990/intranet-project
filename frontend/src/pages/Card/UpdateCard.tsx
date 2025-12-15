@@ -48,6 +48,7 @@ const SectionCard = ({
 const UpdateCard = () => {
   const [error, setError] = useState<string | boolean>(false);
   const [loading, setLoading] = useState(false);
+  const [refreshPage, setRefreshPage] = useState(false);
   const [openGedis, setOpenGedis] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
@@ -118,13 +119,10 @@ const UpdateCard = () => {
   console.log({cardData});
   
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-
-
-        
-        const data = await fetchCardDetails(id);
+  const reloadCard = async () => {
+  try {
+    setLoading(true);
+         const data = await fetchCardDetails(id);
 
         setCardData({
           ...initialValues,
@@ -177,15 +175,102 @@ const UpdateCard = () => {
                 totalPrice: 0
               }],
         });
-      } catch (err) {
-        console.log("Card load error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  } catch (err) {
+    console.log("Card reload error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
-    loadData();
-  }, [id]);
+useEffect(() => {
+  const handleMessage = (event: MessageEvent) => {
+    if (event.origin !== window.location.origin) return;
+
+    if (event.data?.type === "CARD_PART_ADDED") {
+      // KARTI YENİDƏN YÜKLƏ
+      reloadCard();
+    }
+  };
+
+  window.addEventListener("message", handleMessage);
+
+  return () => {
+    window.removeEventListener("message", handleMessage);
+  };
+}, []);
+
+useEffect(() => {
+  reloadCard();
+}, [id,refreshPage]);
+
+  // useEffect(() => {
+  //   const loadData = async () => {
+  //     try {
+
+
+        
+  //       const data = await fetchCardDetails(id);
+
+  //       setCardData({
+  //         ...initialValues,
+  //         ...data,
+  //         // PROBLEMLER
+  //         cardProblems: data.cardProblems?.length
+  //           ? data.cardProblems.map((p: any) => ({
+  //               description: p.description || "",
+  //               serviceWorkers: p.serviceWorkers?.length
+  //                 ? p.serviceWorkers.map((w: any) => w.id) // <-- ID-lərə çevir
+  //                 : [""],
+  //             }))
+  //           : [{ description: "", serviceWorkers: [""] }],
+
+  //         // JOBS (backend cardJobs → jobs)
+  //         cardJobs: data.cardJobs?.length
+  //           ? data.cardJobs.map((j: any) => ({
+  //               code: j.code || "",
+  //               name: j.name || "",
+  //               av: j.av || 0,
+  //               price: j.price || 0,
+  //               discount: j.discount || 0,
+  //               oil: j.oil || "",
+
+  //               workers: j.workers?.length
+  //                 ? j.workers.map((w: any) => ({
+  //                     workerAv: Number(w.workerAv) || "",
+  //                     workerId: w.user?.id || "", // <-- DÜZGÜN YER
+  //                   }))
+  //                 : [{ workerAv: "", workerId: "" }],
+  //             }))
+  //           : initialValues.cardJobs,
+          
+
+  //         // EXPENCES (backend expenses/expences qarışıqlığı)
+  //         expences: data.expences?.length
+  //           ? data.expences
+  //           : data.expenses?.length
+  //             ? data.expenses
+  //             : [{ description: "", price: 0 }],
+
+  //             cardParts: data.cardParts?.length
+  //             ? data.cardParts
+  //             : [{
+  //               code: "",
+  //               partName: "",
+  //               count: 0,
+  //               soldPrice: 0,
+  //               discount: 0,
+  //               totalPrice: 0
+  //             }],
+  //       });
+  //     } catch (err) {
+  //       console.log("Card load error:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   loadData();
+  // }, [id]);
 
   const navigate = useNavigate();
   // İşçilik qiymətini yeniləyən funksiya
@@ -665,7 +750,7 @@ const UpdateCard = () => {
               {/* Parts */}
               
               <SectionCard title="Ehtiyyat hissələri">
-                <NewCardAddParts values={values}  cardPartsPrice={(price:any)=>handlecardPartsPriceUpdate(price)}/>
+                <NewCardAddParts values={values}  cardPartsPrice={(price:any)=>handlecardPartsPriceUpdate(price)}  cardId={id} setRefreshPage={setRefreshPage}/>
                 <div className="flex gap-3 font-semibold mt-5 items-center justify-center">
                   <span>Cəmi:</span>
                   <span>{cardPartsPrice} AZN</span>

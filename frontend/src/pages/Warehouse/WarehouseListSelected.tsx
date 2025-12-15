@@ -72,8 +72,7 @@ const WarehouseListSelected = () => {
     setQueryData((prev) => ({ ...prev, [id]: value }));
   };
 
-    const zeroCountParts = sparePartData.filter((part) => part.count > 0);
-
+  const zeroCountParts = sparePartData.filter((part) => part.count > 0);
 
   const filteredData = zeroCountParts.filter((data) => {
     return (
@@ -121,7 +120,9 @@ const WarehouseListSelected = () => {
         return;
       }
 
-      const selectedItem = sparePartData.find((item) => item.id === selectedPartId);
+      const selectedItem = sparePartData.find(
+        (item) => item.id === selectedPartId
+      );
       if (!selectedItem) {
         alert("Seçilmiş məhsul tapılmadı!");
         return;
@@ -136,9 +137,17 @@ const WarehouseListSelected = () => {
       const res = await addToCard(selectedPartId, selectedCount, cardId);
 
       if (res.success) {
+        if (window.opener) {
+          window.opener.postMessage(
+            {
+              type: "CARD_PART_ADDED",
+              cardId: cardId,
+            },
+            window.location.origin
+          );
+        }
+
         window.close();
-        alert("Məhsul karta əlavə olundu ✅");
-        console.log("Backend cavabı:", res);
       } else {
         alert(`Xəta: ${res.message || "Əlavə etmək mümkün olmadı"}`);
       }
