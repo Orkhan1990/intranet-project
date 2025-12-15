@@ -60,6 +60,14 @@ const newCardInitialValues: NewCardInterface = {
     },
   ],
   expences: [{ description: "", price: "" }],
+   cardParts: [{
+      code: "",
+      partName: "",
+      count: 0,
+      soldPrice: 0,
+      discount: 0,
+      totalPrice: 0
+    }],
 };
 
 const SectionCard = ({

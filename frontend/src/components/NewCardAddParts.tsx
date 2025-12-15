@@ -6,7 +6,7 @@ import { returnPart } from "../api/allApi";
 
 interface NewCardAddPartsProps {
   values?: any;
-  cardPartsPrice: (price: any) => void;
+  cardPartsPrice?: (price: any) => void;
   cardId?: string;
   setRefreshPage?: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -26,9 +26,9 @@ const NewCardAddParts = ({
       0
     ) || 0;
 
-  useEffect(() => {
-    cardPartsPrice(price);
-  }, [price, values.cardParts]);
+useEffect(() => {
+  cardPartsPrice?.(price);
+}, [price, values?.cardParts]);
 
   const returnPartToWareHouse = async (partId: any, cardId: any) => {
     try {
