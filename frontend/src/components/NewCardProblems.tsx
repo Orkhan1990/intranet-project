@@ -21,6 +21,7 @@ const NewCardProblems = ({ serviceWorkers, name, values, setFieldValue }:CardPro
           type="text"
           name={`${name}.description`}
           className="w-full"
+          sizing="sm"
         />
         <div className="flex flex-col">
 

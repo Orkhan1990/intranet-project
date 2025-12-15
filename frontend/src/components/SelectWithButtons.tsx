@@ -31,7 +31,7 @@ const SelectWithButtons = ({
   return (
     <div className="flex gap-2">
       {index > 0 && (
-        <Button color={"blue"} onClick={() => remove(index)}>
+        <Button color={"blue"} onClick={() => remove(index)} size={"xs"}>
           -
         </Button>
       )}
@@ -42,6 +42,7 @@ const SelectWithButtons = ({
         value={value}
         className="w-[250px]"
         onChange={handleChange}
+        sizing="sm"
       >
         <option value="">İsciler</option>
         {serviceWorkers?.map((worker, i) => (
@@ -51,7 +52,7 @@ const SelectWithButtons = ({
         ))}
       </Field>
 
-      <Button color={"blue"} onClick={() => push("")}>
+      <Button color={"blue"} onClick={() => push("")} size={"xs"}>
         +
       </Button>
     </div>

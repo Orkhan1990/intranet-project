@@ -387,6 +387,7 @@ useEffect(() => {
                       id="clientId"
                       name="clientId"
                       className="w-full mt-1"
+                      sizing="sm"
                     >
                       <option value="">Müştərini seç</option>
                       {clients &&
@@ -459,7 +460,7 @@ useEffect(() => {
                       <label className="block mb-1 font-medium">
                         Texnikanın növü
                       </label>
-                      <Field as={Select} name="type" className="w-full">
+                      <Field as={Select} name="type" className="w-full" sizing="sm">
                         {types.map((t, i) => (
                           <option key={i}>{t}</option>
                         ))}
@@ -471,7 +472,7 @@ useEffect(() => {
                       <label className="block mb-1 font-medium">
                         İstehsalçı
                       </label>
-                      <Field as={Select} name="manufactured" className="w-full">
+                      <Field as={Select} name="manufactured" className="w-full" sizing="sm">
                         <option value="man">MAN</option>
                         <option value="mercedes">Mercedes</option>
                         <option value="daf">DAF</option>
@@ -483,7 +484,7 @@ useEffect(() => {
                     {/* Model */}
                     <div>
                       <label className="block mb-1 font-medium">Model</label>
-                      <Field as={TextInput} name="model" placeholder="Model" />
+                      <Field as={TextInput} name="model" placeholder="Model" sizing="sm"/>
                     </div>
 
                     {/* Şassi */}
@@ -495,6 +496,7 @@ useEffect(() => {
                         as={TextInput}
                         name="sassi"
                         placeholder="Şassi nömrəsi"
+                        sizing="sm"
                       />
                     </div>
 
@@ -507,6 +509,7 @@ useEffect(() => {
                         as={TextInput}
                         name="carNumber"
                         placeholder="Maşın nömrəsi"
+                        sizing="sm"
                       />
                     </div>
 
@@ -515,7 +518,7 @@ useEffect(() => {
                       <label className="block mb-1 font-medium">
                         Buraxılış ili
                       </label>
-                      <Field as={Select} name="produceDate">
+                      <Field as={Select} name="produceDate" sizing="sm">
                         {[2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
                           <option key={y}>{y}</option>
                         ))}
@@ -531,6 +534,7 @@ useEffect(() => {
                         as={TextInput}
                         name="km"
                         placeholder="Km/Motosaat"
+                        sizing="sm"
                       />
                     </div>
 
@@ -543,6 +547,7 @@ useEffect(() => {
                         as={TextInput}
                         name="qostNumber"
                         placeholder="Dövlət nömrəsi"
+                        sizing="sm"
                       />
                     </div>
 
@@ -551,7 +556,7 @@ useEffect(() => {
                       <label className="block mb-1 font-medium">
                         Ödəniş tipi
                       </label>
-                      <Field as={Select} name="paymentType">
+                      <Field as={Select} name="paymentType" sizing="sm">
                         <option value="transfer">Köçürülmə</option>
                         <option value="cash">Nağd</option>
                         <option value="warranty">Qarantiya</option>
@@ -564,15 +569,15 @@ useEffect(() => {
                   {/* Checkboxes */}
                   <div className="flex flex-wrap gap-6 mt-6">
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="nds" /> ƏDV (18%)
+                      <Field type="checkbox" name="nds" sizing="sm"/> ƏDV (18%)
                     </label>
 
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="repairAgain" /> Təkrar təmir
+                      <Field type="checkbox" name="repairAgain" sizing="sm"/> Təkrar təmir
                     </label>
 
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="servisInfo" /> Servis
+                      <Field type="checkbox" name="servisInfo" sizing="sm"/> Servis
                       məlumatı
                     </label>
                   </div>
