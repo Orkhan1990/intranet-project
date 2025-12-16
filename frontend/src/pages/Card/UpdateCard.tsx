@@ -85,14 +85,16 @@ const UpdateCard = () => {
       },
     ],
     expences: [{ description: "", price: "" }],
-    cardParts: [{
-      code: "",
-      partName: "",
-      count: 0,
-      soldPrice: 0,
-      discount: 0,
-      totalPrice: 0
-    }],
+    cardParts: [
+      {
+        code: "",
+        partName: "",
+        count: 0,
+        soldPrice: 0,
+        discount: 0,
+        totalPrice: 0,
+      },
+    ],
   });
 
   const { users } = useSelector((state: RootState) => state.user);
@@ -116,99 +118,97 @@ const UpdateCard = () => {
 
   console.log(openAmmannWarranty, openBobcatWarranty, setInitialValues);
 
-  console.log({cardData});
-  
+  console.log({ cardData });
 
   const reloadCard = async () => {
-  try {
-    setLoading(true);
-         const data = await fetchCardDetails(id);
+    try {
+      setLoading(true);
+      const data = await fetchCardDetails(id);
 
-        setCardData({
-          ...initialValues,
-          ...data,
-          // PROBLEMLER
-          cardProblems: data.cardProblems?.length
-            ? data.cardProblems.map((p: any) => ({
-                description: p.description || "",
-                serviceWorkers: p.serviceWorkers?.length
-                  ? p.serviceWorkers.map((w: any) => w.id) // <-- ID-lərə çevir
-                  : [""],
-              }))
-            : [{ description: "", serviceWorkers: [""] }],
+      setCardData({
+        ...initialValues,
+        ...data,
+        // PROBLEMLER
+        cardProblems: data.cardProblems?.length
+          ? data.cardProblems.map((p: any) => ({
+              description: p.description || "",
+              serviceWorkers: p.serviceWorkers?.length
+                ? p.serviceWorkers.map((w: any) => w.id) // <-- ID-lərə çevir
+                : [""],
+            }))
+          : [{ description: "", serviceWorkers: [""] }],
 
-          // JOBS (backend cardJobs → jobs)
-          cardJobs: data.cardJobs?.length
-            ? data.cardJobs.map((j: any) => ({
-                code: j.code || "",
-                name: j.name || "",
-                av: j.av || 0,
-                price: j.price || 0,
-                discount: j.discount || 0,
-                oil: j.oil || "",
+        // JOBS (backend cardJobs → jobs)
+        cardJobs: data.cardJobs?.length
+          ? data.cardJobs.map((j: any) => ({
+              code: j.code || "",
+              name: j.name || "",
+              av: j.av || 0,
+              price: j.price || 0,
+              discount: j.discount || 0,
+              oil: j.oil || "",
 
-                workers: j.workers?.length
-                  ? j.workers.map((w: any) => ({
-                      workerAv: Number(w.workerAv) || "",
-                      workerId: w.user?.id || "", // <-- DÜZGÜN YER
-                    }))
-                  : [{ workerAv: "", workerId: "" }],
-              }))
-            : initialValues.cardJobs,
-          
+              workers: j.workers?.length
+                ? j.workers.map((w: any) => ({
+                    workerAv: Number(w.workerAv) || "",
+                    workerId: w.user?.id || "", // <-- DÜZGÜN YER
+                  }))
+                : [{ workerAv: "", workerId: "" }],
+            }))
+          : initialValues.cardJobs,
 
-          // EXPENCES (backend expenses/expences qarışıqlığı)
-          expences: data.expences?.length
-            ? data.expences
-            : data.expenses?.length
-              ? data.expenses
-              : [{ description: "", price: 0 }],
+        // EXPENCES (backend expenses/expences qarışıqlığı)
+        expences: data.expences?.length
+          ? data.expences
+          : data.expenses?.length
+            ? data.expenses
+            : [{ description: "", price: 0 }],
 
-              cardParts: data.cardParts?.length
-              ? data.cardParts
-              : [{
+        cardParts: data.cardParts?.length
+          ? data.cardParts
+          : [
+              {
                 code: "",
                 partName: "",
                 count: 0,
                 soldPrice: 0,
                 discount: 0,
-                totalPrice: 0
-              }],
-        });
-  } catch (err) {
-    console.log("Card reload error:", err);
-  } finally {
-    setLoading(false);
-  }
-};
-
-useEffect(() => {
-  const handleMessage = (event: MessageEvent) => {
-    if (event.origin !== window.location.origin) return;
-
-    if (event.data?.type === "CARD_PART_ADDED") {
-      // KARTI YENİDƏN YÜKLƏ
-      reloadCard();
+                totalPrice: 0,
+              },
+            ],
+      });
+    } catch (err) {
+      console.log("Card reload error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  window.addEventListener("message", handleMessage);
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
 
-  return () => {
-    window.removeEventListener("message", handleMessage);
-  };
-}, []);
+      if (event.data?.type === "CARD_PART_ADDED") {
+        // KARTI YENİDƏN YÜKLƏ
+        reloadCard();
+      }
+    };
 
-useEffect(() => {
-  reloadCard();
-}, [id,refreshPage]);
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
+  useEffect(() => {
+    reloadCard();
+  }, [id, refreshPage]);
 
   // useEffect(() => {
   //   const loadData = async () => {
   //     try {
 
-
-        
   //       const data = await fetchCardDetails(id);
 
   //       setCardData({
@@ -242,7 +242,6 @@ useEffect(() => {
   //                 : [{ workerAv: "", workerId: "" }],
   //             }))
   //           : initialValues.cardJobs,
-          
 
   //         // EXPENCES (backend expenses/expences qarışıqlığı)
   //         expences: data.expences?.length
@@ -282,11 +281,11 @@ useEffect(() => {
     });
   };
 
-  const  handlecardPartsPriceUpdate = (price: number) => {
+  const handlecardPartsPriceUpdate = (price: number) => {
     setCardPartsPrice(price);
   };
 
-  const openWarehousePopup = (id:any) => {
+  const openWarehousePopup = (id: any) => {
     const width = window.innerWidth * 0.9; // ekranın 90%-i
     const height = window.innerHeight * 0.9; // 90% hündürlük
     const left = (window.innerWidth - width) / 2;
@@ -318,7 +317,8 @@ useEffect(() => {
   const totalPriceWorker = jobPrices.reduce((a, b) => a + b, 0);
   const totalExpencesPrice = expencePrices;
   // const totalCardPartsPrice = ;
-  const totalPriceWithoutNds = totalPriceWorker + totalExpencesPrice+cardPartsPrice;
+  const totalPriceWithoutNds =
+    totalPriceWorker + totalExpencesPrice + cardPartsPrice;
   const totalPriceNds = totalPriceWithoutNds * 0.18;
   const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
@@ -460,7 +460,12 @@ useEffect(() => {
                       <label className="block mb-1 font-medium">
                         Texnikanın növü
                       </label>
-                      <Field as={Select} name="type" className="w-full" sizing="sm">
+                      <Field
+                        as={Select}
+                        name="type"
+                        className="w-full"
+                        sizing="sm"
+                      >
                         {types.map((t, i) => (
                           <option key={i}>{t}</option>
                         ))}
@@ -472,7 +477,12 @@ useEffect(() => {
                       <label className="block mb-1 font-medium">
                         İstehsalçı
                       </label>
-                      <Field as={Select} name="manufactured" className="w-full" sizing="sm">
+                      <Field
+                        as={Select}
+                        name="manufactured"
+                        className="w-full"
+                        sizing="sm"
+                      >
                         <option value="man">MAN</option>
                         <option value="mercedes">Mercedes</option>
                         <option value="daf">DAF</option>
@@ -484,7 +494,12 @@ useEffect(() => {
                     {/* Model */}
                     <div>
                       <label className="block mb-1 font-medium">Model</label>
-                      <Field as={TextInput} name="model" placeholder="Model" sizing="sm"/>
+                      <Field
+                        as={TextInput}
+                        name="model"
+                        placeholder="Model"
+                        sizing="sm"
+                      />
                     </div>
 
                     {/* Şassi */}
@@ -569,16 +584,17 @@ useEffect(() => {
                   {/* Checkboxes */}
                   <div className="flex flex-wrap gap-6 mt-6">
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="nds" sizing="sm"/> ƏDV (18%)
+                      <Field type="checkbox" name="nds" sizing="sm" /> ƏDV (18%)
                     </label>
 
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="repairAgain" sizing="sm"/> Təkrar təmir
+                      <Field type="checkbox" name="repairAgain" sizing="sm" />{" "}
+                      Təkrar təmir
                     </label>
 
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="servisInfo" sizing="sm"/> Servis
-                      məlumatı
+                      <Field type="checkbox" name="servisInfo" sizing="sm" />{" "}
+                      Servis məlumatı
                     </label>
                   </div>
                 </div>
@@ -703,6 +719,13 @@ useEffect(() => {
                         </Button>
                       </div>
                     </div>
+              
+                       <Link to={`/printPageOne/${id}`} className="flex justify-end mt-4">
+                      <Button color="purple" size="xs">
+                       <FiPrinter className="mr-2" /> Çap et
+                      </Button>
+                      </Link>
+                   
                   </SectionCard>
                 )}
               </FieldArray>
@@ -753,9 +776,16 @@ useEffect(() => {
               </FieldArray>
 
               {/* Parts */}
-              
+
               <SectionCard title="Ehtiyyat hissələri">
-                <NewCardAddParts values={values}  cardPartsPrice={(price:any)=>handlecardPartsPriceUpdate(price)}  cardId={id} setRefreshPage={setRefreshPage}/>
+                <NewCardAddParts
+                  values={values}
+                  cardPartsPrice={(price: any) =>
+                    handlecardPartsPriceUpdate(price)
+                  }
+                  cardId={id}
+                  setRefreshPage={setRefreshPage}
+                />
                 <div className="flex gap-3 font-semibold mt-5 items-center justify-center">
                   <span>Cəmi:</span>
                   <span>{cardPartsPrice} AZN</span>
@@ -769,7 +799,7 @@ useEffect(() => {
                   </div>
                   <div
                     className="hover:underline cursor-pointer"
-                    onClick={()=>openWarehousePopup(id)}
+                    onClick={() => openWarehousePopup(id)}
                     color={"blue"}
                   >
                     E/h əlavə et{" "}

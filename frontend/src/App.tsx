@@ -28,6 +28,7 @@ import { ConfirmPrixod } from "./pages/Prixod/ConfirmPrixod";
 import WarehouseListSelected from "./pages/Warehouse/WarehouseListSelected";
 import CardList from "./pages/Card/CardList";
 import UpdateCard from "./pages/Card/UpdateCard";
+import PrintPageOne from "./pages/Print/PrintPageOne";
 
 function App() {
   return (
@@ -189,6 +190,13 @@ function App() {
               <Layout>
                 <ConfirmPrixod />
               </Layout>
+            }
+          />
+
+           <Route
+            path="/printPageOne/:id"
+            element={
+             <PrintPageOne />
             }
           />
 
