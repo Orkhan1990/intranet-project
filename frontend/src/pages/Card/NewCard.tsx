@@ -5,6 +5,7 @@ import {
   Button,
   Textarea,
   Spinner,
+  Table,
 } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,7 +14,7 @@ import { FiPrinter } from "react-icons/fi";
 import { Formik, Form, Field, FieldArray } from "formik";
 import NewCardProblems from "../../components/NewCardProblems";
 import NewCardWorkers from "../../components/NewCardWorkers";
-import NewCardAddParts from "../../components/NewCardAddParts";
+// import NewCardAddParts from "../../components/NewCardAddParts";
 import AddCharges from "../../components/AddCharges";
 import { NewCardInterface } from "../../types";
 import { createCardApi } from "../../api/allApi";
@@ -209,6 +210,7 @@ const NewCard = () => {
                       id="clientId"
                       name="clientId"
                       className="w-full mt-1"
+                      sizing="sm"
                     >
                       <option value="">Müştərini seç</option>
                       {clients.map((item) => (
@@ -280,7 +282,7 @@ const NewCard = () => {
                       <label className="block mb-1 font-medium">
                         Texnikanın növü
                       </label>
-                      <Field as={Select} name="type" className="w-full">
+                      <Field as={Select} name="type" className="w-full" sizing="sm">
                         {types.map((t, i) => (
                           <option key={i}>{t}</option>
                         ))}
@@ -292,7 +294,7 @@ const NewCard = () => {
                       <label className="block mb-1 font-medium">
                         İstehsalçı
                       </label>
-                      <Field as={Select} name="manufactured" className="w-full">
+                      <Field as={Select} name="manufactured" className="w-full" sizing="sm">
                         <option value="man">MAN</option>
                         <option value="mercedes">Mercedes</option>
                         <option value="daf">DAF</option>
@@ -304,7 +306,7 @@ const NewCard = () => {
                     {/* Model */}
                     <div>
                       <label className="block mb-1 font-medium">Model</label>
-                      <Field as={TextInput} name="model" placeholder="Model" />
+                      <Field as={TextInput} name="model" placeholder="Model" sizing="sm"/>
                     </div>
 
                     {/* Şassi */}
@@ -316,6 +318,7 @@ const NewCard = () => {
                         as={TextInput}
                         name="sassi"
                         placeholder="Şassi nömrəsi"
+                        sizing="sm"
                       />
                     </div>
 
@@ -328,6 +331,7 @@ const NewCard = () => {
                         as={TextInput}
                         name="carNumber"
                         placeholder="Maşın nömrəsi"
+                        sizing="sm"
                       />
                     </div>
 
@@ -336,8 +340,8 @@ const NewCard = () => {
                       <label className="block mb-1 font-medium">
                         Buraxılış ili
                       </label>
-                      <Field as={Select} name="produceDate">
-                        {[2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
+                      <Field as={Select} name="produceDate" sizing="sm">
+                        {[2025,2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
                           <option key={y}>{y}</option>
                         ))}
                       </Field>
@@ -352,6 +356,7 @@ const NewCard = () => {
                         as={TextInput}
                         name="km"
                         placeholder="Km/Motosaat"
+                        sizing="sm"
                       />
                     </div>
 
@@ -364,6 +369,7 @@ const NewCard = () => {
                         as={TextInput}
                         name="qostNumber"
                         placeholder="Dövlət nömrəsi"
+                        sizing="sm"
                       />
                     </div>
 
@@ -372,7 +378,7 @@ const NewCard = () => {
                       <label className="block mb-1 font-medium">
                         Ödəniş tipi
                       </label>
-                      <Field as={Select} name="paymentType">
+                      <Field as={Select} name="paymentType" sizing="sm">
                         <option value="transfer">Köçürülmə</option>
                         <option value="cash">Nağd</option>
                         <option value="warranty">Qarantiya</option>
@@ -385,15 +391,15 @@ const NewCard = () => {
                   {/* Checkboxes */}
                   <div className="flex flex-wrap gap-6 mt-6">
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="nds" /> ƏDV (18%)
+                      <Field type="checkbox" name="nds" sizing="sm"/> ƏDV (18%)
                     </label>
 
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="repairAgain" /> Təkrar təmir
+                      <Field type="checkbox" name="repairAgain" sizing="sm"/> Təkrar təmir
                     </label>
 
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="servisInfo" /> Servis
+                      <Field type="checkbox" name="servisInfo" sizing="sm"/> Servis
                       məlumatı
                     </label>
                   </div>
@@ -569,7 +575,21 @@ const NewCard = () => {
 
               {/* Parts */}
               <SectionCard title="Ehtiyyat hissələri">
-                <NewCardAddParts />
+                {/* <NewCardAddParts /> */}
+
+                <Table className="min-w-[700px] md:min-w-full">
+                        <Table.Head className="bg-gray-100 dark:bg-gray-800 sticky top-0">
+                          <Table.HeadCell className="px-2 py-1">#</Table.HeadCell>
+                          <Table.HeadCell>E/h Kod</Table.HeadCell>
+                          <Table.HeadCell>Ehtiyyat hissə</Table.HeadCell>
+                          <Table.HeadCell>Say</Table.HeadCell>
+                          <Table.HeadCell>Qiymət</Table.HeadCell>
+                          <Table.HeadCell>Endirim %</Table.HeadCell>
+                          <Table.HeadCell>Toplam</Table.HeadCell>
+                          <Table.HeadCell>Tarix</Table.HeadCell>
+                          <Table.HeadCell></Table.HeadCell>
+                        </Table.Head>
+                        </Table>
                 <div className="flex gap-3 font-semibold mt-5 items-center justify-center">
                   <span>Cəmi:</span>
                   <span>0 AZN</span>

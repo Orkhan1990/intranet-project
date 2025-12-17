@@ -64,7 +64,7 @@ const PrintPageOne = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-2 gap-y-1 mb-3">
         <p>
           <b>Tarix</b> <span>(açılma-baglama)</span>:{" "}
-          {cardDetails && formatDate(cardDetails.openDate)}
+          {cardDetails && formatDate(cardDetails.openDate)} -
           {cardDetails?.closeDate ? ` - ${formatDate(cardDetails.closeDate)}` : ""}
         </p>
         <p>

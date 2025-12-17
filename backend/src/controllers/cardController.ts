@@ -133,7 +133,7 @@ export const createCard = async (
         const workerPercent = workerMap.get(workerId) || 0;
 
         const price =
-          50 * avWorker * (1 - globalDiscount / 100) * (workerPercent / 100);
+          50 * avWorker  * (workerPercent / 100);
         // ⭐ DÜZGÜN MAAS DÜSTURU
         workerTotalSumOwn += price;
       }
@@ -198,7 +198,7 @@ export const createCard = async (
         const av = Number(j.av || 0);
         const discount = Number(j.discount || 0);
 
-        const price = av * 50 * (1 - discount / 100);
+        const price = av * 50 ;
 
         const newJob = new CardJob();
         newJob.code = j.code;
@@ -235,9 +235,7 @@ export const createCard = async (
             // ⭐ DÜZGÜN MAAS DÜSTURU
             wj.earnedSalary =
               Number(jw.workerAv) *
-              50 *
-              (1 - discount / 100) *
-              (user.percent / 100);
+              50 *(user.percent / 100);
 
             await cardWorkerJobRepo.save(wj);
           }
