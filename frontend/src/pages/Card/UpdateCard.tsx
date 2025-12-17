@@ -63,7 +63,7 @@ const UpdateCard = () => {
     model: "",
     sassi: "",
     carNumber: "",
-    produceDate: "2024",
+    produceDate: "2025",
     km: "",
     qostNumber: "",
     paymentType: "transfer",
@@ -534,7 +534,7 @@ const UpdateCard = () => {
                         Buraxılış ili
                       </label>
                       <Field as={Select} name="produceDate" sizing="sm">
-                        {[2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
+                        {[2025, 2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
                           <option key={y}>{y}</option>
                         ))}
                       </Field>
@@ -671,17 +671,27 @@ const UpdateCard = () => {
                             }
                           />
                         ))}
+
+                        <tbody>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                            <td>
+                              <div className=" flex text-sm font-semibold">
+                                Cəmi:
+                                <span className="text-blue-700 flex justify-center">
+                                  {displayPrice(totalPriceWorker)} AZN
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
                       </table>
                     </div>
 
                     <div className="flex justify-between items-center mt-4">
-                      <div className="text-sm font-semibold">
-                        Cəmi:
-                        <span className="text-blue-700">
-                          {displayPrice(totalPriceWorker)} AZN
-                        </span>
-                      </div>
-
                       <div className="flex gap-2">
                         <Button
                           color="blue"
@@ -719,13 +729,15 @@ const UpdateCard = () => {
                         </Button>
                       </div>
                     </div>
-              
-                       <Link to={`/printPageOne/${id}`} className="flex justify-end mt-4">
-                      <Button color="purple" size="xs">
-                       <FiPrinter className="mr-2" /> Çap et
+
+                    <Link
+                      to={`/printPageOne/${id}`}
+                      className="flex justify-end mt-4"
+                    >
+                      <Button color="warning" size="xs">
+                        <FiPrinter className="mr-2" /> Çap et
                       </Button>
-                      </Link>
-                   
+                    </Link>
                   </SectionCard>
                 )}
               </FieldArray>
@@ -805,6 +817,14 @@ const UpdateCard = () => {
                     E/h əlavə et{" "}
                   </div>
                 </div>
+                <div className="flex justify-end">
+                  <Link to={`/printPageSecond/${id}`}>
+                  <Button color="warning" size="xs">
+                  <FiPrinter className="mr-2" /> Çap et
+                </Button>
+                </Link>
+
+                </div>
               </SectionCard>
 
               {/* Comments */}
@@ -845,11 +865,8 @@ const UpdateCard = () => {
                 <Button type="submit" color="blue" size="xs">
                   Yadda Saxla
                 </Button>
-                <Button color="gray" size="xs">
-                  Kartı Bağla
-                </Button>
                 <Button color="purple" size="xs">
-                  <FiPrinter className="mr-2" /> Çap et
+                  Kartı Bağla
                 </Button>
               </div>
             </Form>

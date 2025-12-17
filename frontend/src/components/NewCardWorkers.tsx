@@ -19,10 +19,13 @@ const NewCardWorkers = ({
   name,
   jobWorkerPrice,
 }: CardWorkersInterface) => {
-  const price = (values.av || 0) * 50 * (1 - (values.discount || 0) / 100);
+  const discountPrice = (values.av || 0) * 50 * (1 - (values.discount || 0) / 100);
   useEffect(() => {
-    jobWorkerPrice(price);
-  }, [price, values.av, values.discount]);
+    jobWorkerPrice(discountPrice);
+  }, [discountPrice, values.av, values.discount]);
+
+
+  const price =(values.av || 0) * 50 ;
 
   console.log({values});
   

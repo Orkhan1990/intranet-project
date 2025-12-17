@@ -9,6 +9,8 @@ export class CardProblem extends AllEntities {
   @Column()
   description: string;
 
+ 
+
   @ManyToOne(() => Card, (card) => card.cardProblems, { onDelete: "CASCADE" })
   @JoinColumn({ name: "card_id" })
   card: Card;
@@ -16,7 +18,7 @@ export class CardProblem extends AllEntities {
   @Column({ name: "card_id" })
   cardId: number;
 
-  @ManyToMany(() => User, (user) => user.cardProblems)
+  @ManyToMany(() => User, (user) => user.cardProblems,{nullable:true})
   @JoinTable({
     name: "card_problem_workers",
     joinColumn: { name: "problem_id", referencedColumnName: "id" },

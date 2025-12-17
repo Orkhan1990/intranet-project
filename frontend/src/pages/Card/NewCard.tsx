@@ -10,7 +10,6 @@ import {
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
-import { FiPrinter } from "react-icons/fi";
 import { Formik, Form, Field, FieldArray } from "formik";
 import NewCardProblems from "../../components/NewCardProblems";
 import NewCardWorkers from "../../components/NewCardWorkers";
@@ -39,7 +38,7 @@ const newCardInitialValues: NewCardInterface = {
   model: "",
   sassi: "",
   carNumber: "",
-  produceDate: "2024",
+  produceDate: "2025",
   km: "",
   qostNumber: "",
   paymentType: "transfer",
@@ -476,16 +475,32 @@ const NewCard = () => {
                             }
                           />
                         ))}
+                         <tbody>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                            <td>
+                              <div className=" flex text-sm font-semibold">
+                                Cəmi:
+                                <span className="text-blue-700 flex justify-center">
+                                  {displayPrice(totalPriceWorker)} AZN
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
                       </table>
                     </div>
 
                     <div className="flex justify-between items-center mt-4">
-                      <div className="text-sm font-semibold">
+                      {/* <div className="text-sm font-semibold">
                         Cəmi:
                         <span className="text-blue-700">
                           {displayPrice(totalPriceWorker)} AZN
                         </span>
-                      </div>
+                      </div> */}
                       <div className="flex gap-2">
                         <Button
                           color="blue"
@@ -646,12 +661,10 @@ const NewCard = () => {
                 <Button type="submit" color="blue" size="xs">
                   Yadda Saxla
                 </Button>
-                <Button color="gray" size="xs">
+                <Button color="purple" size="xs">
                   Kartı Bağla
                 </Button>
-                <Button color="purple" size="xs">
-                  <FiPrinter className="mr-2" /> Çap et
-                </Button>
+             
               </div>
             </Form>
           );

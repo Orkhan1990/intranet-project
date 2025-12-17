@@ -171,24 +171,33 @@ export const createCard = async (
     // 5) PROBLEMLƏR (CardProblem)
     // =============================
     if (Array.isArray(cardData.cardProblems)) {
-      for (const p of cardData.cardProblems) {
-        const prob = new CardProblem();
-        prob.description = p.description;
-        prob.cardId = savedCard.id;
+  for (const p of cardData.cardProblems) {
+    const prob = new CardProblem();
+    prob.description = p.description;
+    prob.cardId = savedCard.id;
 
-        const savedProblem = await cardProblemRepository.save(prob);
+    const savedProblem = await cardProblemRepository.save(prob);
 
-        if (Array.isArray(p.serviceWorkers)) {
-          for (const workerId of p.serviceWorkers) {
-            await cardProblemRepository.manager
-              .createQueryBuilder()
-              .relation(CardProblem, "serviceWorkers")
-              .of(savedProblem.id) // <-- Burda .id vermək daha doğrudur
-              .add(workerId);
-          }
-        }
-      }
+   if (Array.isArray(p.serviceWorkers)) {
+  for (let workerId of p.serviceWorkers) {
+
+    // NaN gəlibsə null et
+    if (!Number.isFinite(workerId)) {
+      workerId = null;
     }
+
+    // null-dursa add etmə
+    if (workerId === null) continue;
+
+    await cardProblemRepository.manager
+      .createQueryBuilder()
+      .relation(CardProblem, "serviceWorkers")
+      .of(savedProblem.id)
+      .add(workerId);
+  }
+}
+  }
+}
 
     // =============================
     // 6) JOBLAR + WORKERJOB + WORKER SALARY
@@ -493,67 +502,74 @@ export const updateCard = async (
 
     const updatedCard = await cardRepository.save(existingCard);
 
-    // ==========================
-    // 1️⃣ Köhnə problemləri tap
-    // ==========================
-    const oldProblems = await cardProblemRepository.find({
-      where: { cardId },
-      relations: ["serviceWorkers"],
-    });
+   
 
     // ==========================
     // 2️⃣ Join table əlaqələrini sil
     // ==========================
-    for (const problem of oldProblems) {
-      if (problem.serviceWorkers?.length) {
-        await cardProblemRepository
-          .createQueryBuilder()
-          .relation(CardProblem, "serviceWorkers")
-          .of(problem.id)
-          .remove(problem.serviceWorkers.map((w) => w.id));
-      }
-    }
+ // ==========================
+// 1️⃣ Köhnə problemləri götür
+// ==========================
+const oldProblems = await cardProblemRepository.find({
+  where: { cardId },
+  relations: ["serviceWorkers"],
+});
+
+// ==========================
+// 2️⃣ Köhnə worker relation-ları sil
+// ==========================
+for (const problem of oldProblems) {
+  if (problem.serviceWorkers?.length) {
+    await cardProblemRepository
+      .createQueryBuilder()
+      .relation(CardProblem, "serviceWorkers")
+      .of(problem.id)
+      .remove(problem.serviceWorkers.map(w => w.id));
+  }
+}
+
+// ==========================
+// 3️⃣ Köhnə CardProblem-ləri sil
+// ==========================
+await cardProblemRepository.delete({ cardId });
+
+// ==========================
+// 4️⃣ Yeni CardProblem-ləri yarat
+// ==========================
+if (Array.isArray(cardData.cardProblems)) {
+  for (const p of cardData.cardProblems) {
+
+    const problem = cardProblemRepository.create({
+      description: p.description,
+      cardId: cardId,
+    });
+
+    const savedProblem = await cardProblemRepository.save(problem);
 
     // ==========================
-    // 3️⃣ CardProblem-ləri sil
+    // 5️⃣ Service workers əlavə et
     // ==========================
-    await cardProblemRepository.delete({ cardId });
+   if (Array.isArray(p.serviceWorkers)) {
+  const workerIds = [
+    ...new Set(
+      p.serviceWorkers
+        .map(Number)
+        .filter((id:any) => Number.isInteger(id) && id > 0),
+    ),
+  ];
 
-    // ==========================
-    // 4️⃣ Yeni problemləri yarat
-    // ==========================
-    if (Array.isArray(cardData.cardProblems)) {
-      for (const p of cardData.cardProblems) {
-        const problem = cardProblemRepository.create({
-          description: p.description,
-          cardId: cardId,
-        });
+  if (workerIds.length > 0) {
+    await cardProblemRepository
+      .createQueryBuilder()
+      .relation(CardProblem, "serviceWorkers")
+      .of(savedProblem.id)
+      .add(workerIds);
+  }
+}
 
-        const savedProblem = await cardProblemRepository.save(problem);
+  }
+}
 
-        // ==========================
-        // 5️⃣ Service workers əlavə et
-        // ==========================
-        if (Array.isArray(p.serviceWorkers)) {
-          // 🔴 boş, NaN, təkrarları təmizlə
-          const workerIds = [
-            ...new Set(
-              p.serviceWorkers
-                .map((id: any) => Number(id))
-                .filter((id: any) => !isNaN(id))
-            ),
-          ];
-
-          if (workerIds.length > 0) {
-            await cardProblemRepository
-              .createQueryBuilder()
-              .relation(CardProblem, "serviceWorkers")
-              .of(savedProblem.id)
-              .add(workerIds);
-          }
-        }
-      }
-    }
 
     // ==========================
     // 1️⃣ Köhnə CardJob-ları tap
