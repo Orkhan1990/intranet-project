@@ -394,6 +394,9 @@ export const getCardDetails = async (
   try {
     const cardId = Number(req.params.id);
 
+    console.log(cardId);
+    
+
     const card = await cardRepository.findOne({
       where: { id: cardId },
       relations: [

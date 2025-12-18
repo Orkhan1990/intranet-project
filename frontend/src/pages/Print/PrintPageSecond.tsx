@@ -2,16 +2,31 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchCardDetails } from "../../api/allApi";
 
-export const PrintPageSecond = () => {
+const PrintPageSecond = () => {
   const [cardDetails, setCardDetails] = useState<any>(null);
+
   const { id } = useParams();
 
   useEffect(() => {
-    fetchCardDetails(id).then((res) => setCardDetails(res));
+    if (!id) return;
+
+    const getData = async () => {
+      try {
+        const data = await fetchCardDetails(id);
+        setCardDetails(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    getData();
   }, [id]);
 
+  console.log(id);
+
+  console.log(cardDetails);
   const formatDate = (dateStr: string) => {
-    if (!dateStr) return "-";
+    if (!dateStr) return "";
     const date = new Date(dateStr);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -35,7 +50,6 @@ export const PrintPageSecond = () => {
         return type || "-";
     }
   };
-
   const formatPrice = (value: number) => {
     const fixed = Number(value.toFixed(2));
     return Number.isInteger(fixed) ? fixed : fixed.toString();
@@ -56,27 +70,31 @@ export const PrintPageSecond = () => {
   const grandTotal = total + vat;
 
   return (
-    <div className="bg-white text-black p-4 print:p-2 max-w-full text-sm print:text-xs">
+    <div className="bg-white text-black  print:p-2 max-w-full text-sm print:text-xs">
       {/* LOGO */}
-      <div className="text-center mb-4 mt-4 print:mt-0">
+      <div className="mb-4 mt-4 print:flex print:justify-end">
         <img
           src="../images/man.jpg"
           alt="MAN"
-          className="mx-auto h-14 print:h-12"
+          className="h-14 mx-auto print:mx-0 print:h-12"
         />
       </div>
 
-      {/* HEADER */}
-      <div className="flex flex-col sm:flex-row justify-between items-start border-b border-gray-300 pb-2 mb-3 print:mb-2">
-        <p>
+      <div className="bg-gray-200 pl-5 pb-3 pt-3 gap-[800px] flex  md:flex-row print:gap-1 print:p-0 print:justify-between mb-4 print:mb-2 rounded">
+        {/* Solda iş kartı */}
+        <p className=" mb-2 md:mb-0">
           <b>İş kartı №:</b> {cardDetails?.id || "-"}
         </p>
-        <p>
-          <b>Qəbulçu:</b>{" "}
-          {cardDetails
-            ? `${cardDetails.user?.firstName} ${cardDetails.user?.lastName}`
-            : "-"}
-        </p>
+
+        {/* Ortada Qəbulçu */}
+        <div >
+          <p>
+            <b>Qəbulçu:</b>{" "}
+            {cardDetails
+              ? `${cardDetails?.user?.firstName} ${cardDetails?.user?.lastName}`
+              : "-"}
+          </p>
+        </div>
       </div>
 
       {/* CAR INFO */}
@@ -84,8 +102,8 @@ export const PrintPageSecond = () => {
         <p>
           <b>Tarix:</b>{" "}
           {cardDetails
-            ? `${formatDate(cardDetails.openDate)}${
-                cardDetails.closeDate
+            ? `${formatDate(cardDetails?.openDate)}${
+                cardDetails?.closeDate
                   ? ` - ${formatDate(cardDetails.closeDate)}`
                   : ""
               }`
@@ -136,7 +154,7 @@ export const PrintPageSecond = () => {
         <table className="w-full border-collapse">
           <tbody>
             {cardDetails?.cardProblems?.length ? (
-              cardDetails.cardProblems.map((problem: any, i: number) => (
+              cardDetails?.cardProblems.map((problem: any, i: number) => (
                 <tr key={i} className="border-b border-gray-300">
                   <td className="pl-1 py-1">{problem.description}</td>
                 </tr>
@@ -245,8 +263,8 @@ export const PrintPageSecond = () => {
             <span className="font-semibold">Qəbulçu</span>
             <span className="mt-4">______________________</span>
             <span>
-              {cardDetails.user
-                ? `${cardDetails.user?.firstName} ${cardDetails.user?.lastName}`
+              {cardDetails?.user?.firstName
+                ? `${cardDetails.user.firstName} ${cardDetails.user.lastName}`
                 : "-"}
             </span>
           </div>
@@ -272,3 +290,5 @@ export const PrintPageSecond = () => {
     </div>
   );
 };
+
+export default PrintPageSecond;

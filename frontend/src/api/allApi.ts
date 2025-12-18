@@ -343,6 +343,9 @@ export const filterTheCardsAPI=async(filters:any)=>{
 
 
 export const  fetchCardDetails = async (id:any) => {
+
+  console.log({id},"necesen?????");
+  
   try {
       const res = await axios.get(`${VITE_API_BASE_URL}card/getCardDetails/${id}`);
       const data: any = res.data;
