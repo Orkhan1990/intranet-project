@@ -26,9 +26,9 @@ const NewCardAddParts = ({
       0
     ) || 0;
 
-useEffect(() => {
-  cardPartsPrice?.(price);
-}, [price, values?.cardParts]);
+  useEffect(() => {
+    cardPartsPrice?.(price);
+  }, [price, values?.cardParts]);
 
   const returnPartToWareHouse = async (partId: any, cardId: any) => {
     try {
@@ -42,6 +42,13 @@ useEffect(() => {
     } catch (error) {
       console.error("Error returning part to warehouse:", error);
     }
+  };
+
+  const formatPrice = (value: number) => {
+    const truncated = Math.floor(value * 100) / 100; // 2 onluqla kəs
+    return Number.isInteger(truncated)
+      ? truncated.toString()
+      : truncated.toFixed(2);
   };
 
   return (
@@ -109,10 +116,13 @@ useEffect(() => {
                           type="text"
                           readOnly
                           value={
-                            part.soldPrice * part.count -
-                            part.soldPrice *
-                              part.count *
-                              (part.discount / 100 || 0)
+                            part.soldPrice && part.count
+                              ? formatPrice(
+                                  part.soldPrice *
+                                    part.count *
+                                    (1 - (part.discount ?? 0) / 100)
+                                )
+                              : "0"
                           }
                           className="w-full border rounded px-2 py-1 text-sm bg-gray-100 dark:bg-gray-700 dark:text-white text-center"
                         />
