@@ -328,7 +328,7 @@ const PrintPageSecond = () => {
         İşə şərh
       </div>
       <div className="mt-2 mb-6 pl-5">
-        {cardDetails?.comment ? cardDetails.comment : "Məlumat yoxdur"}
+        {cardDetails?.comments ? cardDetails.comments : "Məlumat yoxdur"}
       </div>
 
         <div className="bg-gray-200 font-semibold py-2 pl-6 border-t-[1px] border-black mt-5">

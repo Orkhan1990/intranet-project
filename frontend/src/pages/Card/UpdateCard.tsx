@@ -817,13 +817,15 @@ const UpdateCard = () => {
                     E/h əlavə et{" "}
                   </div>
                 </div>
-                <div className="flex justify-end">
+                <div className="flex gap-2 justify-end">
                   <Link to={`/printPageSecond/${id}`}>
                   <Button color="warning" size="xs">
                   <FiPrinter className="mr-2" /> Çap et
                 </Button>
                 </Link>
-
+                   <Link to={`/agreement/${id}`}>
+                   <Button color="blue" size="xs">Razılaşma aktı</Button>
+                   </Link>
                 </div>
               </SectionCard>
 
@@ -861,7 +863,7 @@ const UpdateCard = () => {
               </div>
 
               {/* Footer Actions */}
-              <div className="sticky bottom-0 bg-white border-t shadow-inner flex flex-wrap justify-end gap-3 p-4">
+              <div className="bottom-0 bg-white border-t shadow-inner flex flex-wrap justify-end gap-3 p-4">
                 <Button type="submit" color="blue" size="xs">
                   Yadda Saxla
                 </Button>
