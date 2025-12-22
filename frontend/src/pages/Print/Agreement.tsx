@@ -28,7 +28,7 @@ const Agreement = () => {
         getData();
       }, [id]);
     
-      console.log(id);
+      console.log({cardDetails});
     
       console.log(cardDetails);
       const formatDate = (dateStr: string) => {
@@ -46,21 +46,51 @@ const Agreement = () => {
       
       console.log({contractDate});
 
-      const combinedRows = [
-  ...(cardDetails?.cardJob || []).map((item: any) => ({
-    ...item,
-    rowType: "job",
+    const mergedTableData = [
+  ...(cardDetails?.cardJobs || []).map((job: any) => ({
+    type: "job",
+    id: job.id,
+    code: job.code,
+    name: job.name,
+    quantity: "",          // iş saatı
+    price: job.price,
+    discount: job.discount,
+    date: job.createdAt,
+    av: job.av,            // iş saatı üçün əlavə dəyər
   })),
-  ...(cardDetails?.cardParts || []).map((item: any) => ({
-    ...item,
-    rowType: "part",
+
+  ...(cardDetails?.cardParts || []).map((part: any) => ({
+    type: "part",
+    id: part.id,
+    code: part.code,
+    name: part.partName,
+    quantity: part.count,       // hissə sayı
+    price: part.soldPrice,
+    discount: part.discount,
+    date: part.date,
   })),
 ];
 
-console.log({combinedRows});
+
+console.log({mergedTableData});
 
       
+const totalAmount = mergedTableData.reduce((sum: number, item: any) => {
+  // JOB
+  if (item.type === "job") {
+    return sum + item.av * 50 ;
+  }
 
+  // PART
+  return (
+    sum +
+    item.price *
+      (item.quantity || 1) 
+  );
+}, 0);
+
+const vat = totalAmount * 0.18;
+const finalTotal = totalAmount + vat;
       
 
   return (
@@ -104,8 +134,9 @@ console.log({combinedRows});
             </Table.HeadCell>
           </Table.Head>
 
-          <Table.Body className="divide-y divide-black">
-            {cardDetails&&cardDetails.map((item, i) => (
+          <Table.Body className="divide-y divide-black text-black">
+            
+            {mergedTableData&&mergedTableData.map((item:any, i:any) => (
               <Table.Row key={i}>
                 <Table.Cell className="border border-black text-center">
                   {i + 1}
@@ -114,13 +145,13 @@ console.log({combinedRows});
                   {item.name}
                 </Table.Cell>
                 <Table.Cell className="border border-black text-center">
-                  {item.qty}
+                  {item.quantity}
                 </Table.Cell>
                 <Table.Cell className="border border-black text-center">
-                  {item.price}
+                  {(item.quantity)===""?(""):(item.price)}
                 </Table.Cell>
                 <Table.Cell className="border border-black text-center">
-                  {item.total}
+                  {(item.quantity)===""?(item.av*50):(item.price*(item.quantity||1))}
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -133,8 +164,8 @@ console.log({combinedRows});
               >
                 Cəmi:
               </Table.Cell>
-              <Table.Cell className="border border-black text-center">
-                24.56
+              <Table.Cell className="border border-black text-center font-semibold">
+                {parseFloat(totalAmount.toFixed(2))} AZN
               </Table.Cell>
             </Table.Row>
 
@@ -145,8 +176,8 @@ console.log({combinedRows});
               >
                 ƏDV - 18%:
               </Table.Cell>
-              <Table.Cell className="border border-black text-center">
-                4.42
+              <Table.Cell className="border border-black text-center font-semibold">
+                {parseFloat(vat.toFixed(2))} AZN
               </Table.Cell>
             </Table.Row>
 
@@ -158,7 +189,7 @@ console.log({combinedRows});
                 YEKUN:
               </Table.Cell>
               <Table.Cell className="border border-black text-center font-bold">
-                28.98
+                {parseFloat(finalTotal.toFixed(2))} AZN
               </Table.Cell>
             </Table.Row>
           </Table.Body>
