@@ -11,7 +11,9 @@ import { CardJob } from "../entites/CardJob";
 import { CardWorkerJob } from "../entites/CardWorkerJob";
 import { CardExpense } from "../entites/CardExpense";
 import { User } from "../entites/User";
-import { Between, In, LessThanOrEqual, MoreThanOrEqual } from "typeorm";
+import { In} from "typeorm";
+import { Account } from "../entites/Account";
+import { Repair } from "../entites/Repair";
 
 const cardPartsRepository = AppDataSource.getRepository(CardPart);
 const cardRepository = AppDataSource.getRepository(Card);
@@ -21,6 +23,8 @@ const cardJobRepo = AppDataSource.getRepository(CardJob);
 const cardWorkerJobRepo = AppDataSource.getRepository(CardWorkerJob);
 const cardProblemRepository = AppDataSource.getRepository(CardProblem);
 const cardExpenseRespoisitory = AppDataSource.getRepository(CardExpense);
+const accountRepository = AppDataSource.getRepository(Account);
+const repairRepository = AppDataSource.getRepository(Repair);
 
 export const addToCard = async (
   req: Request,
@@ -737,6 +741,78 @@ export const returnPart = async (
     res.status(200).json({
       success: true,
       message: "Ehtiyyat hissəsi anbara qaytarıldı və kartdan silindi",
+    });
+  } catch (error) {
+    console.log(error);
+    next(errorHandler(500, error));
+  }
+};
+
+export const createAccountForCard = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { cardId } = req.body;
+    const userId = req.userId;
+    // 1️⃣ Mövcud kartı tap
+    const existingCard = await cardRepository.findOneBy({ id: cardId });
+    if (!existingCard) {
+      return next(errorHandler(404, "Kart tapılmadı"));
+    }
+    // 2️⃣ Hesab aktı yaradılması loqikasını buraya əlavə et
+    // Məsələn:
+    const newAccount = new Account();
+    newAccount.accountID =cardId===0?1:cardId+250; // Nümunə ID    
+    newAccount.date = new Date();
+    newAccount.sendWith = null;
+    newAccount.sendWithDate = null;
+    newAccount.accountReceive = null;
+    newAccount.vhfNum = null;
+    newAccount.vhfDate = null;
+    newAccount.otk = null;
+    newAccount.card = existingCard; // Kartla əlaqələndir
+
+    const savedAccount = await accountRepository.save(newAccount);
+
+    res.status(201).json({
+      success: true,
+      message: "Hesab aktı yaradıldı",
+      account: savedAccount,
+    });
+  } catch (error) {
+    console.log(error);
+    next(errorHandler(500, error));
+  } 
+};
+
+export const createRepairForCard= async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { cardId } = req.body;
+    const userId = req.userId;
+    // 1️⃣ Mövcud kartı tap
+    const existingCard = await cardRepository.findOneBy({ id: cardId });
+    if (!existingCard) {  
+      return next(errorHandler(404, "Kart tapılmadı"));
+    }
+    // 2️⃣ Təmir aktı yaradılması loqikasını buraya əlavə et
+    // Məsələn:
+    const newRepair = new Repair();
+    newRepair.repairId =cardId===0?1:cardId+500; // Nümunə ID    
+    newRepair.date = new Date();
+    newRepair.otk = null;
+    newRepair.card = existingCard; // Kartla əlaqələndir
+    const savedRepair = await repairRepository.save(newRepair);
+
+    res.status(201).json({
+      success: true,
+      message: "Təmir aktı yaradıldı",
+      repair: savedRepair,
     });
   } catch (error) {
     console.log(error);

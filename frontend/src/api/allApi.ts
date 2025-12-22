@@ -403,3 +403,47 @@ export const  fetchCardDetails = async (id:any) => {
 
 
 
+  export const createAccountForCardApi=async(cardId:any)=>{
+    try {
+      const response=await axios.post(`${VITE_API_BASE_URL}card/createAccountForCard`,{
+        cardId
+      },{
+        withCredentials: true
+      });
+      const data: any = response.data;  
+        if (!response.status.toString().startsWith("2") || data.success === false) {
+        throw new Error(data.message || "Hesab yaradılmadı");
+      }
+      return data;
+      
+    } catch (error:any) {
+       console.log(error);
+      throw new Error(
+        error.response?.data?.message || error.message || "Xəta baş verdi"
+      );    
+    }
+  }
+
+  export const createRepairForCardApi=async(cardId:any)=>{
+    try {
+      const response=await axios.post(`${VITE_API_BASE_URL}card/createRepairForCard`,{ 
+        cardId
+      },{
+        withCredentials: true
+      });
+      const data: any = response.data;
+        if (!response.status.toString().startsWith("2") || data.success === false) {
+        throw new Error(data.message || "Təmir aktı yaradılmadı");
+      }
+      return data;
+
+    } catch (error:any) {
+       console.log(error);
+      throw new Error(
+        error.response?.data?.message || error.message || "Xəta baş verdi"
+      );    
+    }
+  }
+
+
+

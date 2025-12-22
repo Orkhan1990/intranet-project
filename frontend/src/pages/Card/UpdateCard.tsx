@@ -15,7 +15,7 @@ import NewCardProblems from "../../components/NewCardProblems";
 import NewCardWorkers from "../../components/NewCardWorkers";
 import NewCardAddParts from "../../components/NewCardAddParts";
 import AddCharges from "../../components/AddCharges";
-import { fetchCardDetails, updateCardApi } from "../../api/allApi";
+import { createAccountForCardApi, createRepairForCardApi, fetchCardDetails, updateCardApi } from "../../api/allApi";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
@@ -270,6 +270,31 @@ const UpdateCard = () => {
 
   //   loadData();
   // }, [id]);
+
+
+  const createAccountForCard = async (cardId:any) => {
+       const data=await createAccountForCardApi(cardId);
+
+        console.log({data});
+        if(data.success){
+          alert("Hesab aktı uğurla yaradıldı");
+          reloadCard();
+        }else{  
+          alert("Hesab aktı yaradılarkən xəta baş verdi: " + data.message);
+        }   
+  }
+
+  const createRepair = async (cardId:any) => {  
+        const data=await createRepairForCardApi(cardId);
+        console.log({data});
+        if(data.success){
+          alert("Təmir aktı uğurla yaradıldı");
+          reloadCard();
+        }else{
+          alert("Təmir aktı yaradılarkən xəta baş verdi: " + data.message);
+        }
+  }
+
 
   const navigate = useNavigate();
   // İşçilik qiymətini yeniləyən funksiya
@@ -817,15 +842,23 @@ const UpdateCard = () => {
                     E/h əlavə et{" "}
                   </div>
                 </div>
-                <div className="flex gap-2 justify-end">
-                  <Link to={`/printPageSecond/${id}`}>
-                  <Button color="warning" size="xs">
-                  <FiPrinter className="mr-2" /> Çap et
-                </Button>
-                </Link>
-                   <Link to={`/agreement/${id}`}>
-                   <Button color="blue" size="xs">Razılaşma aktı</Button>
-                   </Link>
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-2">
+                    <Button color={"blue"} size={"xs"} onClick={()=>createAccountForCard(id)}>Hesab Aktı Yarat</Button>
+                    <Button color={"blue"} size={"xs"} onClick={()=>createRepair(id)}>Təmir Aktı Yarat</Button>
+                  </div>
+                  <div className="flex gap-2 ">
+                    <Link to={`/printPageSecond/${id}`}>
+                      <Button color="warning" size="xs">
+                        <FiPrinter className="mr-2" /> Çap et
+                      </Button>
+                    </Link>
+                    <Link to={`/agreement/${id}`}>
+                      <Button color="blue" size="xs">
+                        Razılaşma aktı
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </SectionCard>
 

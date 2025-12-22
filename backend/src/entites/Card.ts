@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Client } from "./Client";
 import { CardProblem } from "./CardProblem";
@@ -7,6 +7,8 @@ import { CardPart } from "./CardPart";
 import { User } from "./User";
 import { CardExpense } from "./CardExpense";
 import { Brand } from "./Brand";
+import { Account } from "./Account";
+import { Repair } from "./Repair";
 
 @Entity({ name: "cards" })
 export class Card extends AllEntities {
@@ -124,4 +126,13 @@ export class Card extends AllEntities {
 
   @Column({ name: "brandId", nullable: true })
   brandId: number;
+
+  @OneToOne(() => Account, account => account.card)
+@JoinColumn()
+account: Account;
+
+@OneToOne(() => Repair, repair => repair.card)
+@JoinColumn()
+repair: Repair;
+
 }
