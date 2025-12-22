@@ -89,8 +89,28 @@ const totalAmount = mergedTableData.reduce((sum: number, item: any) => {
   );
 }, 0);
 
-const vat = totalAmount * 0.18;
-const finalTotal = totalAmount + vat;
+
+const totalAmountWithDiscount = mergedTableData.reduce((sum: number, item: any) => {
+  // JOB
+  if (item.type === "job") {
+    return sum + item.av * 50 * (1 - item.discount / 100);
+  }
+
+  // PART
+  return (
+    sum +
+    item.price *
+      (item.quantity || 1) *
+      (1 - (item.discount || 0) / 100)
+  );
+}, 0);
+
+const totalDiscount= totalAmount - totalAmountWithDiscount;
+
+const finalAmountAfterDiscount= totalAmount - totalDiscount;
+
+const vat = finalAmountAfterDiscount * 0.18;
+const finalTotal = finalAmountAfterDiscount + vat;
       
 
   return (
@@ -114,7 +134,7 @@ const finalTotal = totalAmount + vat;
       </p>
 
       {/* CƏDVƏL */}
-      <div className="border border-black">
+      <div className="border border-black w-6/12 print:w-full">
         <Table>
           <Table.Head>
             <Table.HeadCell className="border border-black w-12 text-center">
@@ -155,11 +175,21 @@ const finalTotal = totalAmount + vat;
                 </Table.Cell>
               </Table.Row>
             ))}
-
-            {/* CƏM */}
-            <Table.Row>
+            
+              <Table.Row>
+                 <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
               <Table.Cell
-                colSpan={4}
                 className="border border-black text-right font-semibold"
               >
                 Cəmi:
@@ -170,8 +200,103 @@ const finalTotal = totalAmount + vat;
             </Table.Row>
 
             <Table.Row>
+
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
               <Table.Cell
-                colSpan={4}
+                className="border border-black text-right font-semibold"
+              >
+                Güzəşt:
+              </Table.Cell>
+              <Table.Cell className="border border-black text-center font-semibold">
+                {parseFloat(totalDiscount.toFixed(2))} AZN
+              </Table.Cell>
+            </Table.Row>
+
+            {/* CƏM */}
+          
+             <Table.Row>
+              <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+              <Table.Cell className="border border-black text-center font-semibold">
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+            </Table.Row>
+            
+
+            <Table.Row>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell> <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+              <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+              <Table.Cell className="border border-black text-center font-semibold">
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+            </Table.Row>
+
+
+             <Table.Row>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+              <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+                Cəmi:
+              </Table.Cell>
+              <Table.Cell className="border border-black text-center font-semibold">
+                {parseFloat((totalAmount-totalDiscount).toFixed(2))} AZN
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+            </Table.Row>
+
+            <Table.Row>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+              <Table.Cell
                 className="border border-black text-right font-semibold"
               >
                 ƏDV - 18%:
@@ -179,11 +304,22 @@ const finalTotal = totalAmount + vat;
               <Table.Cell className="border border-black text-center font-semibold">
                 {parseFloat(vat.toFixed(2))} AZN
               </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
             </Table.Row>
 
             <Table.Row>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
               <Table.Cell
-                colSpan={4}
                 className="border border-black text-right font-bold"
               >
                 YEKUN:
@@ -191,13 +327,22 @@ const finalTotal = totalAmount + vat;
               <Table.Cell className="border border-black text-center font-bold">
                 {parseFloat(finalTotal.toFixed(2))} AZN
               </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
+               <Table.Cell
+                className="border border-black text-right font-semibold"
+              >
+              </Table.Cell>
             </Table.Row>
+            
           </Table.Body>
         </Table>
       </div>
 
       {/* İMZALAR */}
-      <div className="flex justify-between mt-20">
+      <div className="flex justify-between mt-5">
         <div className="w-1/3">
           <p className="font-semibold mb-10">ALICI:</p>
           <div className="border-t border-black w-full mb-2"></div>
