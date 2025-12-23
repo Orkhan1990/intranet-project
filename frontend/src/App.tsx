@@ -31,6 +31,7 @@ import UpdateCard from "./pages/Card/UpdateCard";
 import PrintPageOne from "./pages/Print/PrintPageOne";
 import PrintPageSecond from "./pages/Print/PrintPageSecond";
 import Agreement from "./pages/Print/Agreement";
+import Account from "./pages/Print/Account";
 
 function App() {
   return (
@@ -206,6 +207,13 @@ function App() {
             path="/agreement/:id"
             element={
              <Agreement/>
+            }
+          />
+
+           <Route
+            path="/account/:id"
+            element={
+             <Account/>
             }
           />
 

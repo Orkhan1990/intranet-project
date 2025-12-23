@@ -755,28 +755,54 @@ export const createAccountForCard = async (
 ) => {
   try {
     const { cardId } = req.body;
-    const userId = req.userId;
-    // 1️⃣ Mövcud kartı tap
+
     const existingCard = await cardRepository.findOneBy({ id: cardId });
     if (!existingCard) {
       return next(errorHandler(404, "Kart tapılmadı"));
     }
-    // 2️⃣ Hesab aktı yaradılması loqikasını buraya əlavə et
-    // Məsələn:
-    const newAccount = new Account();
-    newAccount.accountID =cardId===0?1:cardId+250; // Nümunə ID    
-    newAccount.date = new Date();
-    newAccount.sendWith = null;
-    newAccount.sendWithDate = null;
-    newAccount.accountReceive = null;
-    newAccount.vhfNum = null;
-    newAccount.vhfDate = null;
-    newAccount.otk = null;
-    newAccount.card = existingCard; // Kartla əlaqələndir
+
+    // 🔴 1. ƏVVƏL YOXLAMA
+    const existingAccount = await accountRepository.findOne({
+      where: { card: { id: cardId } },
+      relations: ["card"],
+    });
+
+    log( existingAccount.accountID);
+
+   if (
+  existingAccount &&
+  existingAccount.accountID !== null &&
+  existingAccount.accountID !== undefined &&
+  existingAccount.accountID !== 0
+) {
+  return res.status(200).json({
+    isExist: true,
+    message: "Bu kart üçün artıq hesab aktı mövcuddur",
+    account: existingAccount,
+  });
+}
+
+
+    // 🟢 2. ACCOUNT ID GENERASİYASI (250-dən başlasın)
+    const lastAccount = await accountRepository
+      .createQueryBuilder("account")
+      .orderBy("account.accountID", "DESC")
+      .getOne();
+
+    const nextAccountID = lastAccount
+      ? lastAccount.accountID + 1
+      : 250;
+
+    // 🟢 3. YENİ ACCOUNT
+    const newAccount = accountRepository.create({
+      accountID: nextAccountID,
+      date: new Date(),
+      card: existingCard,
+    });
 
     const savedAccount = await accountRepository.save(newAccount);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Hesab aktı yaradıldı",
       account: savedAccount,
@@ -784,8 +810,10 @@ export const createAccountForCard = async (
   } catch (error) {
     console.log(error);
     next(errorHandler(500, error));
-  } 
+  }
 };
+
+
 
 export const createRepairForCard= async (
   req: CustomRequest,
@@ -796,14 +824,14 @@ export const createRepairForCard= async (
     const { cardId } = req.body;
     const userId = req.userId;
     // 1️⃣ Mövcud kartı tap
-    const existingCard = await cardRepository.findOneBy({ id: cardId });
+    const existingCard = await cardRepository.findOneBy({ id: Number(cardId) });
     if (!existingCard) {  
       return next(errorHandler(404, "Kart tapılmadı"));
     }
     // 2️⃣ Təmir aktı yaradılması loqikasını buraya əlavə et
     // Məsələn:
     const newRepair = new Repair();
-    newRepair.repairId =cardId===0?1:cardId+500; // Nümunə ID    
+    newRepair.repairId =cardId===0?1:cardId+304; // Nümunə ID    
     newRepair.date = new Date();
     newRepair.otk = null;
     newRepair.card = existingCard; // Kartla əlaqələndir
