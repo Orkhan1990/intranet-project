@@ -291,11 +291,11 @@ const UpdateCard = () => {
   const createRepair = async (cardId: any) => {
     const data = await createRepairForCardApi(cardId);
     console.log({ data });
-    if (data.success) {
+    if (data.isExist) {
+      navigate(`/repair/${cardId}`);
+    } else {
       alert("Təmir aktı uğurla yaradıldı");
       reloadCard();
-    } else {
-      alert("Təmir aktı yaradılarkən xəta baş verdi: " + data.message);
     }
   };
 

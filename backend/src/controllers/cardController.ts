@@ -14,7 +14,8 @@ import { User } from "../entites/User";
 import { In } from "typeorm";
 import { Account } from "../entites/Account";
 import { Repair } from "../entites/Repair";
-import { AccountSequence } from "../entites/AccountCounter";
+import { AccountSequence } from "../entites/AccountSequence";
+import { RepairSequence } from '../entites/RepairSequence';
 
 const cardPartsRepository = AppDataSource.getRepository(CardPart);
 const cardRepository = AppDataSource.getRepository(Card);
@@ -27,6 +28,7 @@ const cardExpenseRespoisitory = AppDataSource.getRepository(CardExpense);
 const accountRepository = AppDataSource.getRepository(Account);
 const repairRepository = AppDataSource.getRepository(Repair);
 const accountSequenceRepository = AppDataSource.getRepository(AccountSequence);
+const repairSequenceRepository = AppDataSource.getRepository(RepairSequence);
 
 export const addToCard = async (
   req: Request,
@@ -409,48 +411,13 @@ export const getCardDetails = async (
         "cardProblems",
         "cardProblems.serviceWorkers",
         "expenses",
-        "cardParts", // <- artıq burada var
+        "cardParts",
+        "repair",
+        "account"
+       // <- artıq burada var
       ],
     });
 
-    // const card = await AppDataSource.getRepository(Card)
-    //   .createQueryBuilder("card")
-    //   .leftJoinAndSelect("card.client", "client")
-    //   .leftJoinAndSelect("card.user", "user")
-    //   .addSelect([
-    //     "user.id",
-    //     "user.userName",
-    //     "user.firstName",
-    //     "user.lastName",
-    //   ]) // password gəlməyəcək
-    //   .leftJoinAndSelect("card.cardJobs", "cardJobs")
-    //   .leftJoinAndSelect("cardJobs.workers", "jobWorkers") // CardWorkerJob-lar
-    //   .addSelect([
-    //     "jobWorkers.id",
-    //     "jobWorkers.workerAv",
-    //     "jobWorkers.salaryPercent",
-    //     "jobWorkers.earnedSalary",
-    //     "jobWorkers.date",
-    //   ])
-    //   .leftJoinAndSelect("jobWorkers.user", "workerUser")
-    //   .addSelect([
-    //     "workerUser.id",
-    //     "workerUser.userName",
-    //     "workerUser.firstName",
-    //     "workerUser.lastName",
-    //   ])
-    //   .leftJoinAndSelect("card.cardProblems", "cardProblems")
-    //   .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
-    //   .addSelect([
-    //     "serviceWorkers.id",
-    //     "serviceWorkers.userName",
-    //     "serviceWorkers.firstName",
-    //     "serviceWorkers.lastName",
-    //   ])
-    //   .leftJoinAndSelect("card.expenses", "cardExpenses")
-    //   .leftJoinAndSelect("card.cardParts", "cardParts")
-    //   .where("card.id = :id", { id: cardId })
-    //   .getOne();
 
     if (!card) {
       next(errorHandler(404, "Kart tapılmadı"));
@@ -818,23 +785,56 @@ export const createRepairForCard = async (
     const { cardId } = req.body;
     const userId = req.userId;
     // 1️⃣ Mövcud kartı tap
-    const existingCard = await cardRepository.findOneBy({ id: Number(cardId) });
-    if (!existingCard) {
+    const card = await cardRepository.findOneBy({ id: cardId });
+    if (!card) {
       return next(errorHandler(404, "Kart tapılmadı"));
     }
-    // 2️⃣ Təmir aktı yaradılması loqikasını buraya əlavə et
-    // Məsələn:
-    const newRepair = new Repair();
-    newRepair.repairId = cardId === 0 ? 1 : cardId + 304; // Nümunə ID
-    newRepair.date = new Date();
-    newRepair.otk = null;
-    newRepair.card = existingCard; // Kartla əlaqələndir
-    const savedRepair = await repairRepository.save(newRepair);
 
-    res.status(201).json({
+     let repair = await repairRepository.findOne({
+      where: { card: { id: cardId } },
+      relations: ["card"],
+    });
+
+      // 2️⃣ Account VAR və doludursa → STOP
+    if (
+      repair &&
+      repair.repairId !== null &&
+      repair.repairId !== undefined &&
+      repair.repairId !== 0
+    ) {
+      return res.status(200).json({
+        isExist: true,
+        message: "Bu kart üçün artıq təmir aktı mövcuddur",
+        repair,
+      });
+    }
+
+       const sequence = await repairSequenceRepository.findOneBy({ id: 1 });
+    if (!sequence) {
+      return next(errorHandler(500, "Repair sequence tapılmadı"));
+    }
+
+    const nextAccountID = sequence.currentValue + 1;
+
+     // 4️⃣ Account YOXDUR → CREATE
+    if (!repair) {
+      repair = new Repair();
+      repair.card = card;
+    }
+
+    // 5️⃣ Account VAR amma boşdur → UPDATE
+    repair.repairId = nextAccountID;
+    repair.date = new Date();
+
+    await repairRepository.save(repair);
+     // 6️⃣ Sequence artır
+    sequence.currentValue = nextAccountID;
+    await accountSequenceRepository.save(sequence);
+
+    return res.status(201).json({
       success: true,
       message: "Təmir aktı yaradıldı",
-      repair: savedRepair,
+      repair,
     });
   } catch (error) {
     console.log(error);

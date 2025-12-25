@@ -32,6 +32,7 @@ import PrintPageOne from "./pages/Print/PrintPageOne";
 import PrintPageSecond from "./pages/Print/PrintPageSecond";
 import Agreement from "./pages/Print/Agreement";
 import Account from "./pages/Print/Account";
+import Repair from "./pages/Print/Repair";
 
 function App() {
   return (
@@ -214,6 +215,13 @@ function App() {
             path="/account/:id"
             element={
              <Account/>
+            }
+          />
+
+           <Route
+            path="/repair/:id"
+            element={
+             <Repair/>
             }
           />
 

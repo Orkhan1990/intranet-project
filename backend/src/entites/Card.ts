@@ -127,12 +127,10 @@ export class Card extends AllEntities {
   @Column({ name: "brandId", nullable: true })
   brandId: number;
 
-  @OneToOne(() => Account, account => account.card)
-@JoinColumn()
+  @OneToOne(() => Account, account => account.card,{eager:true})
 account: Account;
 
-@OneToOne(() => Repair, repair => repair.card)
-@JoinColumn()
+@OneToOne(() => Repair, repair => repair.card,{eager:true})
 repair: Repair;
 
 }

@@ -6,7 +6,7 @@ import { Card } from "./Card";
 export class Repair extends AllEntities {
 
   @Column({ name: "repair_id" })
-  repairId: string;
+  repairId: number;
 
   @Column({ type: "timestamp", name: "date" })
   date: Date;
