@@ -10,6 +10,7 @@ interface SelectWithButtonsInterface {
   index: number;
   push: (value: string) => void;
   remove: (index: number) => void;
+  cardData: any;
 }
 
 const SelectWithButtons = ({
@@ -20,29 +21,35 @@ const SelectWithButtons = ({
   push,
   remove,
   index,
+  cardData,
 }: SelectWithButtonsInterface) => {
+  const handleChange = (event: any) => {
+    onChange(event.target.value);
+  };
 
- const handleChange = (event: any) => {
-  onChange(event.target.value); 
-};
+  console.log({ serviceWorkers });
 
-     console.log({serviceWorkers});
-     
   return (
     <div className="flex gap-2">
       {index > 0 && (
-        <Button color={"blue"} onClick={() => remove(index)} size={"xs"}>
+        <Button
+          color={"blue"}
+          onClick={() => remove(index)}
+          size={"xs"}
+          disabled={cardData&&cardData?.isOpen}
+        >
           -
         </Button>
       )}
 
       <Field
         as={Select}
-        name={name}   
+        name={name}
         value={value}
         className="w-[250px]"
         onChange={handleChange}
         sizing="sm"
+        disabled={cardData&&cardData?.isOpen}
       >
         <option value="">İsciler</option>
         {serviceWorkers?.map((worker, i) => (
@@ -52,7 +59,12 @@ const SelectWithButtons = ({
         ))}
       </Field>
 
-      <Button color={"blue"} onClick={() => push("")} size={"xs"}>
+      <Button
+        color={"blue"}
+        onClick={() => push("")}
+        size={"xs"}
+        disabled={cardData&&cardData?.isOpen}
+      >
         +
       </Button>
     </div>
@@ -60,4 +72,3 @@ const SelectWithButtons = ({
 };
 
 export default SelectWithButtons;
-

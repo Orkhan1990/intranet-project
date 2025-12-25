@@ -171,6 +171,7 @@ export const createCard = async (
     newCard.avSum = avSum;
     newCard.openDate = new Date();
     newCard.userId = userId;
+    
 
     const savedCard = await cardRepository.save(newCard);
 
@@ -841,3 +842,31 @@ export const createRepairForCard = async (
     next(errorHandler(500, error));
   }
 };
+
+
+export const closeCard=async( req: CustomRequest,
+  res: Response,
+  next: NextFunction)=>{
+    try {
+      const { cardId } = req.body;
+    const userId = req.userId;
+    // 1️⃣ Mövcud kartı tap
+    const card = await cardRepository.findOneBy({ id: cardId });
+    if (!card) {
+      return next(errorHandler(404, "Kart tapılmadı"));
+    }
+
+    card.isOpen=false;
+    card.closeDate=new Date();
+
+    await cardRepository.save(card);
+
+
+    res.status(201).json({success:true,message:"Kart uğurla bağlandı",card})
+
+      
+    } catch (error) {
+       console.log(error);
+    next(errorHandler(500, error));
+    }
+  }

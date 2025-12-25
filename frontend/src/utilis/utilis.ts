@@ -24,4 +24,27 @@ export const  yearWithSuffix=(year: string) =>{
 
   return `-${suffix}`;
 }
+
+
+const months = [
+  "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
+  "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"
+];
+
+export const formatAzDate=(dateString: string) =>{
+  const date = new Date(dateString);
+
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+
+  return `${day} ${month} ${year}-ci il`;
+}
+
     
+export const getYear=(dateString:any)=>{
+    const date = new Date(dateString);
+      const year = date.getFullYear();
+     return year;
+
+}

@@ -93,6 +93,34 @@ export interface NewCardInterface {
     }],
 }
 
+export interface UpdateCardInterface {
+  clientId: number;
+  type: string;
+  manufactured: string;
+  model: string;
+  sassi: string;
+  carNumber: string;
+  produceDate: string;
+  km: string;
+  qostNumber: string;
+  paymentType: string;
+  nds: boolean;
+  repairAgain: boolean;
+  servisInfo: boolean;
+  comments: string;
+  isOpen:boolean;
+  openDate: string | null;
+  closeDate: string | null;
+  recommendation: string;
+  cardProblems: {
+    description: string;
+    serviceWorkers: any[];
+  }[];
+  cardJobs: any[];
+  expences: any[];
+  cardParts: any[];
+}
+
 export interface PartsInterface {
   kod: string;
   origKod: string;

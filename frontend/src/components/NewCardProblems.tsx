@@ -7,10 +7,11 @@ interface CardProblemsIterface{
   serviceWorkers:any,
   values:NewCardProblemsInterface,
   name:string,
-  setFieldValue:(name:string,value:string)=>void
+  setFieldValue:(name:string,value:string)=>void,
+  cardData?:any
 }
 
-const NewCardProblems = ({ serviceWorkers, name, values, setFieldValue }:CardProblemsIterface) => {
+const NewCardProblems = ({ serviceWorkers, name, values, setFieldValue,cardData }:CardProblemsIterface) => {
   console.log({values},"salam");
   
   return (
@@ -22,6 +23,8 @@ const NewCardProblems = ({ serviceWorkers, name, values, setFieldValue }:CardPro
           name={`${name}.description`}
           className="w-full"
           sizing="sm"
+          disabled={cardData&&cardData?.isOpen}
+
         />
         <div className="flex flex-col">
 
@@ -40,6 +43,7 @@ const NewCardProblems = ({ serviceWorkers, name, values, setFieldValue }:CardPro
                    push={push}
                    remove={remove}
                    index={index} 
+                   cardData={cardData}
                   
                   />
                 </div>

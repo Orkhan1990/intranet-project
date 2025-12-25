@@ -16,6 +16,7 @@ import NewCardWorkers from "../../components/NewCardWorkers";
 import NewCardAddParts from "../../components/NewCardAddParts";
 import AddCharges from "../../components/AddCharges";
 import {
+  closeCardApi,
   createAccountForCardApi,
   createRepairForCardApi,
   fetchCardDetails,
@@ -25,6 +26,7 @@ import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
+import { UpdateCardInterface } from "../../types";
 
 const types = [
   "Tiqac",
@@ -60,7 +62,7 @@ const UpdateCard = () => {
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
   const [expencePrices, setExpencePrices] = useState<number>(0);
   const [cardPartsPrice, setCardPartsPrice] = useState<number>(0);
-  const [cardData, setCardData] = useState(null);
+  const [cardData, setCardData] = useState<UpdateCardInterface | null>(null);
   const [initialValues, setInitialValues] = useState({
     clientId: 0,
     type: "tiqac",
@@ -76,6 +78,8 @@ const UpdateCard = () => {
     repairAgain: false,
     servisInfo: false,
     comments: "",
+    openDate: "",
+    closeDate: "",
     recommendation: "",
     cardProblems: [{ description: "", serviceWorkers: [""] }],
     cardJobs: [
@@ -188,6 +192,9 @@ const UpdateCard = () => {
       setLoading(false);
     }
   };
+
+  console.log(cardData?.isOpen);
+  
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -374,6 +381,19 @@ const UpdateCard = () => {
       </div>
     );
 
+  const closeCard = async (cardId: any) => {
+    try {
+      const data = await closeCardApi(cardId);
+
+      if (data.success) {
+        navigate("/statistics");
+      }
+      console.log(data);
+    } catch (error: any) {
+      setError(error.message || "Kart bağlanarkən xəta baş verdi");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-3 md:px-8 space-y-8">
       <div className="text-center">
@@ -416,6 +436,7 @@ const UpdateCard = () => {
                       name="clientId"
                       className="w-full mt-1"
                       sizing="sm"
+                      disabled={cardData?.isOpen}
                     >
                       <option value="">Müştərini seç</option>
                       {clients &&
@@ -442,6 +463,7 @@ const UpdateCard = () => {
                     <input
                       type="checkbox"
                       onChange={(e) => setOpenGedis(e.target.checked)}
+                      disabled={cardData?.isOpen}
                     />
                     Gediş
                   </label>
@@ -449,6 +471,7 @@ const UpdateCard = () => {
                     <input
                       type="checkbox"
                       onChange={(e) => setOpenBobcatWarranty(e.target.checked)}
+                      disabled={cardData?.isOpen}
                     />
                     Bobcat zəmanət
                   </label>
@@ -456,6 +479,7 @@ const UpdateCard = () => {
                     <input
                       type="checkbox"
                       onChange={(e) => setOpenAmmannWarranty(e.target.checked)}
+                      disabled={cardData?.isOpen}
                     />
                     AMMANN zəmanət
                   </label>
@@ -483,6 +507,19 @@ const UpdateCard = () => {
               <SectionCard title="Texniki Məlumat">
                 <div className="p-5 border rounded-xl bg-white shadow-sm">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                      <label className="block mb-1 font-medium">
+                        Katın nömrəsi
+                      </label>
+                      <Field
+                        as={TextInput}
+                        name="id"
+                        placeholder="Şassi nömrəsi"
+                        sizing="sm"
+                        disabled={cardData?.isOpen}
+                      />
+                    </div>
+
                     {/* Texnikanın növü */}
                     <div>
                       <label className="block mb-1 font-medium">
@@ -493,6 +530,7 @@ const UpdateCard = () => {
                         name="type"
                         className="w-full"
                         sizing="sm"
+                        disabled={cardData?.isOpen}
                       >
                         {types.map((t, i) => (
                           <option key={i}>{t}</option>
@@ -510,6 +548,7 @@ const UpdateCard = () => {
                         name="manufactured"
                         className="w-full"
                         sizing="sm"
+                        disabled={cardData?.isOpen}
                       >
                         <option value="man">MAN</option>
                         <option value="mercedes">Mercedes</option>
@@ -540,6 +579,7 @@ const UpdateCard = () => {
                         name="sassi"
                         placeholder="Şassi nömrəsi"
                         sizing="sm"
+                        disabled={cardData?.isOpen}
                       />
                     </div>
 
@@ -553,6 +593,7 @@ const UpdateCard = () => {
                         name="carNumber"
                         placeholder="Maşın nömrəsi"
                         sizing="sm"
+                        disabled={cardData?.isOpen}
                       />
                     </div>
 
@@ -561,7 +602,12 @@ const UpdateCard = () => {
                       <label className="block mb-1 font-medium">
                         Buraxılış ili
                       </label>
-                      <Field as={Select} name="produceDate" sizing="sm">
+                      <Field
+                        as={Select}
+                        name="produceDate"
+                        sizing="sm"
+                        disabled={cardData?.isOpen}
+                      >
                         {[2025, 2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
                           <option key={y}>{y}</option>
                         ))}
@@ -578,6 +624,7 @@ const UpdateCard = () => {
                         name="km"
                         placeholder="Km/Motosaat"
                         sizing="sm"
+                        disabled={cardData?.isOpen}
                       />
                     </div>
 
@@ -591,6 +638,7 @@ const UpdateCard = () => {
                         name="qostNumber"
                         placeholder="Dövlət nömrəsi"
                         sizing="sm"
+                        disabled={cardData?.isOpen}
                       />
                     </div>
 
@@ -599,7 +647,12 @@ const UpdateCard = () => {
                       <label className="block mb-1 font-medium">
                         Ödəniş tipi
                       </label>
-                      <Field as={Select} name="paymentType" sizing="sm">
+                      <Field
+                        as={Select}
+                        name="paymentType"
+                        sizing="sm"
+                        disabled={cardData?.isOpen}
+                      >
                         <option value="transfer">Köçürülmə</option>
                         <option value="cash">Nağd</option>
                         <option value="warranty">Qarantiya</option>
@@ -612,16 +665,32 @@ const UpdateCard = () => {
                   {/* Checkboxes */}
                   <div className="flex flex-wrap gap-6 mt-6">
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="nds" sizing="sm" /> ƏDV (18%)
+                      <Field
+                        type="checkbox"
+                        name="nds"
+                        sizing="sm"
+                        disabled={cardData?.isOpen}
+                      />{" "}
+                      ƏDV (18%)
                     </label>
 
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="repairAgain" sizing="sm" />{" "}
+                      <Field
+                        type="checkbox"
+                        name="repairAgain"
+                        sizing="sm"
+                        disabled={cardData?.isOpen}
+                      />{" "}
                       Təkrar təmir
                     </label>
 
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="servisInfo" sizing="sm" />{" "}
+                      <Field
+                        type="checkbox"
+                        name="servisInfo"
+                        sizing="sm"
+                        disabled={cardData?.isOpen}
+                      />{" "}
                       Servis məlumatı
                     </label>
                   </div>
@@ -642,6 +711,7 @@ const UpdateCard = () => {
                           name={`cardProblems[${index}]`}
                           values={values.cardProblems[index]}
                           setFieldValue={setFieldValue}
+                          cardData={cardData}
                         />
                       </div>
                     ))}
@@ -653,6 +723,7 @@ const UpdateCard = () => {
                         color="blue"
                         size="xs"
                         type="button"
+                        disabled={!cardData?.isOpen}
                       >
                         Əlavə et +
                       </Button>
@@ -661,7 +732,9 @@ const UpdateCard = () => {
                         color="gray"
                         size="xs"
                         type="button"
-                        disabled={values.cardProblems.length <= 1}
+                        disabled={
+                          values.cardProblems.length <= 1 || !cardData?.isOpen
+                        }
                       >
                         Azalt -
                       </Button>
@@ -697,6 +770,7 @@ const UpdateCard = () => {
                             jobWorkerPrice={(price) =>
                               handlePriceUpdate(index, price)
                             }
+                            cardData={cardData}
                           />
                         ))}
 
@@ -725,6 +799,7 @@ const UpdateCard = () => {
                           color="blue"
                           size="xs"
                           type="button"
+                          disabled={!cardData?.isOpen}
                           onClick={() => {
                             push({
                               code: "",
@@ -746,7 +821,9 @@ const UpdateCard = () => {
                           color="gray"
                           size="xs"
                           type="button"
-                          disabled={values.cardJobs.length <= 1}
+                          disabled={
+                            values.cardJobs.length <= 1 || !cardData?.isOpen
+                          }
                           onClick={() => {
                             const index = values.cardJobs.length - 1;
                             remove(index);
@@ -779,6 +856,7 @@ const UpdateCard = () => {
                         key={index}
                         name={`expences[${index}]`}
                         values={item}
+                        cardData={cardData}
                         expenceUpdatePrice={(price) =>
                           setFieldValue(`expences.${index}.price`, price)
                         }
@@ -795,6 +873,7 @@ const UpdateCard = () => {
                         <Button
                           color="blue"
                           size="xs"
+                          disabled={!cardData?.isOpen}
                           onClick={() => push({ description: "", price: 0 })}
                         >
                           Əlavə et +
@@ -804,7 +883,9 @@ const UpdateCard = () => {
                         <Button
                           color="gray"
                           size="xs"
-                          disabled={values.expences.length <= 1}
+                          disabled={
+                            values.expences.length <= 1 || !cardData?.isOpen
+                          }
                           onClick={() => remove(values.expences.length - 1)}
                         >
                           Azalt -
@@ -825,44 +906,54 @@ const UpdateCard = () => {
                   }
                   cardId={id}
                   setRefreshPage={setRefreshPage}
+                  cardData={cardData}
                 />
                 <div className="flex gap-3 font-semibold mt-5 items-center justify-center">
                   <span>Cəmi:</span>
                   <span>{cardPartsPrice} AZN</span>
                 </div>
-                <div className="flex flex-col gap-1 mt-5 text-blue-700  w-[100px]">
-                  <div
-                    className="hover:underline cursor-pointer"
-                    // onClick={openWarehousePopup}
-                  >
-                    E/h əlavə et (barkod ilə)
+
+                {cardData?.isOpen && (
+                  <div className="flex flex-col gap-1 mt-5 text-blue-700  w-[100px]">
+                    <div
+                      className="hover:underline cursor-pointer"
+                      // onClick={openWarehousePopup}
+                    >
+                      E/h əlavə et (barkod ilə)
+                    </div>
+                    <div
+                      className="hover:underline cursor-pointer"
+                      onClick={() => openWarehousePopup(id)}
+                      color={"blue"}
+                    >
+                      E/h əlavə et{" "}
+                    </div>
                   </div>
-                  <div
-                    className="hover:underline cursor-pointer"
-                    onClick={() => openWarehousePopup(id)}
-                    color={"blue"}
-                  >
-                    E/h əlavə et{" "}
-                  </div>
-                </div>
+                )}
+
                 <div className="flex items-center justify-between">
+                  {!cardData?.isOpen ? (
+                    <div className="flex gap-2">
+                      <Button
+                        color={"blue"}
+                        size={"xs"}
+                        onClick={() => createAccountForCard(id)}
+                      >
+                        Hesab Aktı Yarat
+                      </Button>
+                      <Button
+                        color={"blue"}
+                        size={"xs"}
+                        onClick={() => createRepair(id)}
+                      >
+                        Təmir Aktı Yarat
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2"></div>
+                  )}
+
                   <div className="flex gap-2">
-                    <Button
-                      color={"blue"}
-                      size={"xs"}
-                      onClick={() => createAccountForCard(id)}
-                    >
-                      Hesab Aktı Yarat
-                    </Button>
-                    <Button
-                      color={"blue"}
-                      size={"xs"}
-                      onClick={() => createRepair(id)}
-                    >
-                      Təmir Aktı Yarat
-                    </Button>
-                  </div>
-                  <div className="flex gap-2 ">
                     <Link to={`/printPageSecond/${id}`}>
                       <Button color="warning" size="xs">
                         <FiPrinter className="mr-2" /> Çap et
@@ -884,6 +975,7 @@ const UpdateCard = () => {
                   rows={4}
                   name="comments"
                   placeholder="Şərh yazın..."
+                  disabled={!cardData?.isOpen}
                 />
               </SectionCard>
 
@@ -894,6 +986,7 @@ const UpdateCard = () => {
                   rows={4}
                   name="recommendation"
                   placeholder="Məsləhət yazın..."
+                  disabled={!cardData?.isOpen}
                 />
               </SectionCard>
 
@@ -912,10 +1005,20 @@ const UpdateCard = () => {
 
               {/* Footer Actions */}
               <div className="bottom-0 bg-white border-t shadow-inner flex flex-wrap justify-end gap-3 p-4">
-                <Button type="submit" color="blue" size="xs">
+                <Button
+                  type="submit"
+                  color="blue"
+                  size="xs"
+                  disabled={!cardData?.isOpen}
+                >
                   Yadda Saxla
                 </Button>
-                <Button color="purple" size="xs">
+                <Button
+                  color="purple"
+                  size="xs"
+                  onClick={() => closeCard(id)}
+                  disabled={!cardData?.isOpen}
+                >
                   Kartı Bağla
                 </Button>
               </div>

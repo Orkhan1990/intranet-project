@@ -9,6 +9,7 @@ interface NewCardAddPartsProps {
   cardPartsPrice?: (price: any) => void;
   cardId?: string;
   setRefreshPage?: React.Dispatch<React.SetStateAction<boolean>>;
+  cardData:any
 }
 
 const NewCardAddParts = ({
@@ -16,6 +17,7 @@ const NewCardAddParts = ({
   cardPartsPrice,
   cardId,
   setRefreshPage,
+  cardData
 }: NewCardAddPartsProps) => {
   const price =
     values.cardParts?.reduce(
@@ -79,6 +81,7 @@ const NewCardAddParts = ({
                         <Field
                           name={`cardParts.${index}.code`}
                           className="w-full border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                          disabled={!cardData?.isOpen}
                         />
                       </Table.Cell>
 
@@ -86,6 +89,7 @@ const NewCardAddParts = ({
                         <Field
                           name={`cardParts.${index}.partName`}
                           className="w-full border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                          disabled={!cardData?.isOpen}
                         />
                       </Table.Cell>
 
@@ -93,6 +97,7 @@ const NewCardAddParts = ({
                         <Field
                           name={`cardParts.${index}.count`}
                           className="w-full border rounded px-2 py-1 text-sm text-center dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                          disabled={!cardData?.isOpen}
                         />
                       </Table.Cell>
 
@@ -100,6 +105,7 @@ const NewCardAddParts = ({
                         <Field
                           name={`cardParts.${index}.soldPrice`}
                           className="w-full border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                          disabled={!cardData?.isOpen}
                         />
                       </Table.Cell>
 
@@ -108,6 +114,7 @@ const NewCardAddParts = ({
                           name={`cardParts.${index}.discount`}
                           value={part.discount || 0}
                           className="w-full border rounded px-2 py-1 text-sm text-center dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                          disabled={!cardData?.isOpen}
                         />
                       </Table.Cell>
 
@@ -138,6 +145,7 @@ const NewCardAddParts = ({
                           color={"warning"}
                           size={"xs"}
                           onClick={() => returnPartToWareHouse(part.id, cardId)}
+                          disabled={!cardData?.isOpen}
                         >
                           <FaMinus />
                         </Button>

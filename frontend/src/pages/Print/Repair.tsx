@@ -1,6 +1,34 @@
 // import { Table } from "flowbite-react";
 
+import { useEffect, useState } from "react";
+import { fetchCardDetails } from "../../api/allApi";
+import { useParams } from "react-router-dom";
+import { formatAzDate, getYear } from "../../utilis/utilis";
+
 const Repair = () => {
+    const [cardDetails, setCardDetails] = useState<any>(null);
+   
+     const { id } = useParams();
+   
+     useEffect(() => {
+       if (!id) return;
+   
+       const getData = async () => {
+         try {
+           const data = await fetchCardDetails(id);
+           setCardDetails(data);
+         } catch (err) {
+           console.error(err);
+         }
+       };
+   
+       getData();
+     }, [id]);
+
+     const date=formatAzDate(cardDetails?.closeDate)||""
+
+     
+
   return (
     <div className="bg-gray-200 min-h-screen  print:bg-white print:p-0 font-[Times_New_Roman]">
 
@@ -11,8 +39,8 @@ const Repair = () => {
         <div className="flex justify-between">
 
           {/* LEFT */}
-          <div className="w-1/2 text-[13px] leading-5">
-            <p className="font-bold">Improtex Trucks & Buses</p>
+          <div className="w-1/2 text-[13px] leading-5 font-bold">
+            <p>Improtex Trucks & Buses</p>
             <p>MAN Truck & Bus AG-nin Azərbaycanda Rəsmi İdxalçısı</p>
 
             <div className="mt-6">
@@ -26,8 +54,8 @@ const Repair = () => {
               <p className="text-[11px] text-right">(İmza, Soyad)</p>
                </div>
             </div>
+                      <p className="mt-10">Bakı şəhəri</p>
 
-            <p className="mt-6">Bakı şəhəri</p>
           </div>
 
           {/* RIGHT */}
@@ -35,25 +63,30 @@ const Repair = () => {
             <img
               src="../../../public/images/man.jpg"
               alt="MAN"
-              className="mx-auto h-[40mm] mb-2"
+              className="mx-auto h-[20mm] mb-2"
             />
 
             <p className="font-bold">"Təsdiq edirəm"</p>
             <p>NORM ASC</p>
-            <p>Baş icraçı direktor Henning Sasse</p>
+            <p>{cardDetails?.client.approver}</p>
 
-            <div className="mt-8 border-b w-[60mm] mx-auto"></div>
+            <div className="mt-8 border-b border-black w-[60mm] mx-auto"></div>
+             <p className="mt-10 font-bold">
+          {date}
+        </p>
           </div>
         </div>
 
+        <div className="flex justify-between  w-1/2 ">
+          
+        </div>
+
         {/* DATE */}
-        <p className="text-center mt-6 font-bold">
-          25 Dekabr 2025-ci il
-        </p>
+      
 
         {/* TITLE */}
         <h1 className="text-center font-bold text-[16px] mt-4">
-          Təmir aktı № 25863/2025
+          Təmir aktı № {cardDetails?.repair?.repairId}/{getYear(cardDetails?.closeDate)}
         </h1>
 
         {/* INFO */}

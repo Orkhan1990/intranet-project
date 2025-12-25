@@ -9,6 +9,7 @@ interface WorkersNameInterface {
   push: (v: any) => void;
   remove: (index: number) => void;
   values: any;
+  cardData:any
 }
 
 const NewCardWorkersName = ({
@@ -18,6 +19,7 @@ const NewCardWorkersName = ({
   push,
   remove,
   values,
+  cardData
 }: WorkersNameInterface) => {
   console.log({ values });
 
@@ -52,6 +54,7 @@ const NewCardWorkersName = ({
           color="blue"
           size="xs"
           onClick={() => index > 0 && remove(index)}
+          disabled={cardData&&!cardData?.isOpen}
         >
           -
         </Button>
@@ -64,6 +67,7 @@ const NewCardWorkersName = ({
             name={`${name}.workerAv`}
             onChange={handleAvChange}
             sizing="sm"
+            disabled={cardData&&!cardData?.isOpen}
           />
 
           <Field
@@ -71,6 +75,7 @@ const NewCardWorkersName = ({
             className="w-[250px]"
             name={`${name}.workerId`}
             sizing="sm"
+            disabled={cardData&&!cardData?.isOpen}
           >
             <option value="">İşçilər</option>
             {workers &&
@@ -86,7 +91,7 @@ const NewCardWorkersName = ({
           color="blue"
           size="xs"
           onClick={() => push({ workerAv: "", workerId: "" })}
-          disabled={jobWorkersAvSum >= values.av}
+          disabled={jobWorkersAvSum >= values.av||(cardData&&!cardData?.isOpen)}
         >
           +
         </Button>
