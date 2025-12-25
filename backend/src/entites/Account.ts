@@ -5,7 +5,7 @@ import { Card } from "./Card";
 @Entity({ name: "accounts" })
 export class Account extends AllEntities {
 
- @Column({
+  @Column({
   name: "account_id",
   type: "int",
 })

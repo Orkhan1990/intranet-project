@@ -11,9 +11,10 @@ import { CardJob } from "../entites/CardJob";
 import { CardWorkerJob } from "../entites/CardWorkerJob";
 import { CardExpense } from "../entites/CardExpense";
 import { User } from "../entites/User";
-import { In} from "typeorm";
+import { In } from "typeorm";
 import { Account } from "../entites/Account";
 import { Repair } from "../entites/Repair";
+import { AccountSequence } from "../entites/AccountCounter";
 
 const cardPartsRepository = AppDataSource.getRepository(CardPart);
 const cardRepository = AppDataSource.getRepository(Card);
@@ -25,6 +26,7 @@ const cardProblemRepository = AppDataSource.getRepository(CardProblem);
 const cardExpenseRespoisitory = AppDataSource.getRepository(CardExpense);
 const accountRepository = AppDataSource.getRepository(Account);
 const repairRepository = AppDataSource.getRepository(Repair);
+const accountSequenceRepository = AppDataSource.getRepository(AccountSequence);
 
 export const addToCard = async (
   req: Request,
@@ -136,8 +138,7 @@ export const createCard = async (
         const workerId = Number(jw.workerId);
         const workerPercent = workerMap.get(workerId) || 0;
 
-        const price =
-          50 * avWorker  * (workerPercent / 100);
+        const price = 50 * avWorker * (workerPercent / 100);
         // ⭐ DÜZGÜN MAAS DÜSTURU
         workerTotalSumOwn += price;
       }
@@ -175,33 +176,32 @@ export const createCard = async (
     // 5) PROBLEMLƏR (CardProblem)
     // =============================
     if (Array.isArray(cardData.cardProblems)) {
-  for (const p of cardData.cardProblems) {
-    const prob = new CardProblem();
-    prob.description = p.description;
-    prob.cardId = savedCard.id;
+      for (const p of cardData.cardProblems) {
+        const prob = new CardProblem();
+        prob.description = p.description;
+        prob.cardId = savedCard.id;
 
-    const savedProblem = await cardProblemRepository.save(prob);
+        const savedProblem = await cardProblemRepository.save(prob);
 
-   if (Array.isArray(p.serviceWorkers)) {
-  for (let workerId of p.serviceWorkers) {
+        if (Array.isArray(p.serviceWorkers)) {
+          for (let workerId of p.serviceWorkers) {
+            // NaN gəlibsə null et
+            if (!Number.isFinite(workerId)) {
+              workerId = null;
+            }
 
-    // NaN gəlibsə null et
-    if (!Number.isFinite(workerId)) {
-      workerId = null;
+            // null-dursa add etmə
+            if (workerId === null) continue;
+
+            await cardProblemRepository.manager
+              .createQueryBuilder()
+              .relation(CardProblem, "serviceWorkers")
+              .of(savedProblem.id)
+              .add(workerId);
+          }
+        }
+      }
     }
-
-    // null-dursa add etmə
-    if (workerId === null) continue;
-
-    await cardProblemRepository.manager
-      .createQueryBuilder()
-      .relation(CardProblem, "serviceWorkers")
-      .of(savedProblem.id)
-      .add(workerId);
-  }
-}
-  }
-}
 
     // =============================
     // 6) JOBLAR + WORKERJOB + WORKER SALARY
@@ -211,7 +211,7 @@ export const createCard = async (
         const av = Number(j.av || 0);
         const discount = Number(j.discount || 0);
 
-        const price = av * 50 ;
+        const price = av * 50;
 
         const newJob = new CardJob();
         newJob.code = j.code;
@@ -246,9 +246,7 @@ export const createCard = async (
             wj.date = new Date();
 
             // ⭐ DÜZGÜN MAAS DÜSTURU
-            wj.earnedSalary =
-              Number(jw.workerAv) *
-              50 *(user.percent / 100);
+            wj.earnedSalary = Number(jw.workerAv) * 50 * (user.percent / 100);
 
             await cardWorkerJobRepo.save(wj);
           }
@@ -399,7 +397,6 @@ export const getCardDetails = async (
     const cardId = Number(req.params.id);
 
     console.log(cardId);
-    
 
     const card = await cardRepository.findOne({
       where: { id: cardId },
@@ -482,7 +479,6 @@ export const updateCard = async (
     const userId = req.userId;
 
     console.log(cardData);
-    
 
     // 1️⃣ Mövcud kartı tap
     const existingCard = await cardRepository.findOneBy({ id: cardId });
@@ -509,74 +505,69 @@ export const updateCard = async (
 
     const updatedCard = await cardRepository.save(existingCard);
 
-   
-
     // ==========================
     // 2️⃣ Join table əlaqələrini sil
     // ==========================
- // ==========================
-// 1️⃣ Köhnə problemləri götür
-// ==========================
-const oldProblems = await cardProblemRepository.find({
-  where: { cardId },
-  relations: ["serviceWorkers"],
-});
-
-// ==========================
-// 2️⃣ Köhnə worker relation-ları sil
-// ==========================
-for (const problem of oldProblems) {
-  if (problem.serviceWorkers?.length) {
-    await cardProblemRepository
-      .createQueryBuilder()
-      .relation(CardProblem, "serviceWorkers")
-      .of(problem.id)
-      .remove(problem.serviceWorkers.map(w => w.id));
-  }
-}
-
-// ==========================
-// 3️⃣ Köhnə CardProblem-ləri sil
-// ==========================
-await cardProblemRepository.delete({ cardId });
-
-// ==========================
-// 4️⃣ Yeni CardProblem-ləri yarat
-// ==========================
-if (Array.isArray(cardData.cardProblems)) {
-  for (const p of cardData.cardProblems) {
-
-    const problem = cardProblemRepository.create({
-      description: p.description,
-      cardId: cardId,
+    // ==========================
+    // 1️⃣ Köhnə problemləri götür
+    // ==========================
+    const oldProblems = await cardProblemRepository.find({
+      where: { cardId },
+      relations: ["serviceWorkers"],
     });
 
-    const savedProblem = await cardProblemRepository.save(problem);
+    // ==========================
+    // 2️⃣ Köhnə worker relation-ları sil
+    // ==========================
+    for (const problem of oldProblems) {
+      if (problem.serviceWorkers?.length) {
+        await cardProblemRepository
+          .createQueryBuilder()
+          .relation(CardProblem, "serviceWorkers")
+          .of(problem.id)
+          .remove(problem.serviceWorkers.map((w) => w.id));
+      }
+    }
 
     // ==========================
-    // 5️⃣ Service workers əlavə et
+    // 3️⃣ Köhnə CardProblem-ləri sil
     // ==========================
-   if (Array.isArray(p.serviceWorkers)) {
-  const workerIds = [
-    ...new Set(
-      p.serviceWorkers
-        .map(Number)
-        .filter((id:any) => Number.isInteger(id) && id > 0),
-    ),
-  ];
+    await cardProblemRepository.delete({ cardId });
 
-  if (workerIds.length > 0) {
-    await cardProblemRepository
-      .createQueryBuilder()
-      .relation(CardProblem, "serviceWorkers")
-      .of(savedProblem.id)
-      .add(workerIds);
-  }
-}
+    // ==========================
+    // 4️⃣ Yeni CardProblem-ləri yarat
+    // ==========================
+    if (Array.isArray(cardData.cardProblems)) {
+      for (const p of cardData.cardProblems) {
+        const problem = cardProblemRepository.create({
+          description: p.description,
+          cardId: cardId,
+        });
 
-  }
-}
+        const savedProblem = await cardProblemRepository.save(problem);
 
+        // ==========================
+        // 5️⃣ Service workers əlavə et
+        // ==========================
+        if (Array.isArray(p.serviceWorkers)) {
+          const workerIds = [
+            ...new Set(
+              p.serviceWorkers
+                .map(Number)
+                .filter((id: any) => Number.isInteger(id) && id > 0)
+            ),
+          ];
+
+          if (workerIds.length > 0) {
+            await cardProblemRepository
+              .createQueryBuilder()
+              .relation(CardProblem, "serviceWorkers")
+              .of(savedProblem.id)
+              .add(workerIds);
+          }
+        }
+      }
+    }
 
     // ==========================
     // 1️⃣ Köhnə CardJob-ları tap
@@ -673,30 +664,30 @@ if (Array.isArray(cardData.cardProblems)) {
 
     await cardPartsRepository.delete({ cardId });
 
-// ==========================
-// 2️⃣ Yeni cardParts əlavə et
-// ==========================
-if (Array.isArray(cardData.cardParts)) {
-  for (const p of cardData.cardParts) {
-    const newPart = new CardPart();
+    // ==========================
+    // 2️⃣ Yeni cardParts əlavə et
+    // ==========================
+    if (Array.isArray(cardData.cardParts)) {
+      for (const p of cardData.cardParts) {
+        const newPart = new CardPart();
 
-    newPart.cardId = cardId;
-    newPart.partName = p.partName;
-    newPart.code = p.code;
-    newPart.count = Number(p.count);
-    newPart.soldPrice = Number(p.soldPrice);
-    newPart.discount = Number(p.discount || 0);
-    newPart.date = p.date ? new Date(p.date) : new Date();
+        newPart.cardId = cardId;
+        newPart.partName = p.partName;
+        newPart.code = p.code;
+        newPart.count = Number(p.count);
+        newPart.soldPrice = Number(p.soldPrice);
+        newPart.discount = Number(p.discount || 0);
+        newPart.date = p.date ? new Date(p.date) : new Date();
 
-    if (p.sparePart?.id) {
-      newPart.sparePart = await sparePartsRepository.findOneBy({
-        id: p.sparePart.id,
-      });
+        if (p.sparePart?.id) {
+          newPart.sparePart = await sparePartsRepository.findOneBy({
+            id: p.sparePart.id,
+          });
+        }
+
+        await cardPartsRepository.save(newPart);
+      }
     }
-
-    await cardPartsRepository.save(newPart);
-  }
-}
 
     res.status(200).json({
       message: "Kart yeniləndi",
@@ -711,7 +702,6 @@ if (Array.isArray(cardData.cardParts)) {
   }
 };
 
-
 export const returnPart = async (
   req: CustomRequest,
   res: Response,
@@ -719,7 +709,7 @@ export const returnPart = async (
 ) => {
   try {
     const { cardId, partId } = req.body;
-    const userId = req.userId;  
+    const userId = req.userId;
     // 1️⃣ Mövcud kartı tap
     const existingCard = await cardRepository.findOneBy({ id: cardId });
     if (!existingCard) {
@@ -730,10 +720,12 @@ export const returnPart = async (
       return next(errorHandler(404, "Ehtiyyat hissəsi tapılmadı"));
     }
     // Anbara qaytar
-    const sparePart = await sparePartsRepository.findOneBy({ id: part.sparePart.id });
+    const sparePart = await sparePartsRepository.findOneBy({
+      id: part.sparePart.id,
+    });
     if (!sparePart) {
       return next(errorHandler(404, "Ehtiyyat hissəsi anbarda tapılmadı"));
-    } 
+    }
     sparePart.count += part.count;
     await sparePartsRepository.save(sparePart);
     // Kartdan sil
@@ -756,66 +748,57 @@ export const createAccountForCard = async (
   try {
     const { cardId } = req.body;
 
-    const existingCard = await cardRepository.findOneBy({ id: cardId });
-    if (!existingCard) {
+    const card = await cardRepository.findOneBy({ id: cardId });
+    if (!card) {
       return next(errorHandler(404, "Kart tapılmadı"));
     }
 
-    // 🔴 1. ƏVVƏL YOXLAMA
+    // 🔹 1. ƏVVƏL YOXLAMA (ONE TO ONE!)
     const existingAccount = await accountRepository.findOne({
       where: { card: { id: cardId } },
-      relations: ["card"],
     });
 
-    log( existingAccount.accountID);
+    if (existingAccount && Number(existingAccount.accountID) !== 0) {
+      return res.status(200).json({
+        isExist: true,
+        message: "Bu kart üçün artıq hesab aktı mövcuddur",
+        account: existingAccount,
+      });
+    }
 
-   if (
-  existingAccount &&
-  existingAccount.accountID !== null &&
-  existingAccount.accountID !== undefined &&
-  existingAccount.accountID !== 0
-) {
-  return res.status(200).json({
-    isExist: true,
-    message: "Bu kart üçün artıq hesab aktı mövcuddur",
-    account: existingAccount,
-  });
-}
+    // 🔹 2. SEQUENCE
+    const sequence = await accountSequenceRepository.findOneBy({ id: 1 });
+    if (!sequence) {
+      return next(errorHandler(500, "Account sequence tapılmadı"));
+    }
 
+    const nextAccountID = sequence.currentValue + 1;
 
-    // 🟢 2. ACCOUNT ID GENERASİYASI (250-dən başlasın)
-    const lastAccount = await accountRepository
-      .createQueryBuilder("account")
-      .orderBy("account.accountID", "DESC")
-      .getOne();
+    // 🔹 3. ACCOUNT CREATE
+    const account = new Account();
+    account.accountID = nextAccountID;
+    account.date = new Date();
+    account.card = card;
 
-    const nextAccountID = lastAccount
-      ? lastAccount.accountID + 1
-      : 250;
+    await accountRepository.save(account);
 
-    // 🟢 3. YENİ ACCOUNT
-    const newAccount = accountRepository.create({
-      accountID: nextAccountID,
-      date: new Date(),
-      card: existingCard,
-    });
-
-    const savedAccount = await accountRepository.save(newAccount);
+    // 🔹 4. SEQUENCE UPDATE
+    sequence.currentValue = nextAccountID;
+    await accountSequenceRepository.save(sequence);
 
     return res.status(201).json({
       success: true,
       message: "Hesab aktı yaradıldı",
-      account: savedAccount,
+      account,
     });
   } catch (error) {
-    console.log(error);
-    next(errorHandler(500, error));
+    console.error(error);
+    next(errorHandler(500, "Hesab aktı yaradılarkən xəta baş verdi"));
   }
 };
 
 
-
-export const createRepairForCard= async (
+export const createRepairForCard = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
@@ -825,13 +808,13 @@ export const createRepairForCard= async (
     const userId = req.userId;
     // 1️⃣ Mövcud kartı tap
     const existingCard = await cardRepository.findOneBy({ id: Number(cardId) });
-    if (!existingCard) {  
+    if (!existingCard) {
       return next(errorHandler(404, "Kart tapılmadı"));
     }
     // 2️⃣ Təmir aktı yaradılması loqikasını buraya əlavə et
     // Məsələn:
     const newRepair = new Repair();
-    newRepair.repairId =cardId===0?1:cardId+304; // Nümunə ID    
+    newRepair.repairId = cardId === 0 ? 1 : cardId + 304; // Nümunə ID
     newRepair.date = new Date();
     newRepair.otk = null;
     newRepair.card = existingCard; // Kartla əlaqələndir
