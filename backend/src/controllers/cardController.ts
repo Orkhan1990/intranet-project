@@ -753,20 +753,27 @@ export const createAccountForCard = async (
       return next(errorHandler(404, "Kart tapılmadı"));
     }
 
-    // 🔹 1. ƏVVƏL YOXLAMA (ONE TO ONE!)
-    const existingAccount = await accountRepository.findOne({
+    // 1️⃣ Card üçün account varmı?
+    let account = await accountRepository.findOne({
       where: { card: { id: cardId } },
+      relations: ["card"],
     });
 
-    if (existingAccount && Number(existingAccount.accountID) !== 0) {
+    // 2️⃣ Account VAR və doludursa → STOP
+    if (
+      account &&
+      account.accountID !== null &&
+      account.accountID !== undefined &&
+      account.accountID !== 0
+    ) {
       return res.status(200).json({
         isExist: true,
         message: "Bu kart üçün artıq hesab aktı mövcuddur",
-        account: existingAccount,
+        account,
       });
     }
 
-    // 🔹 2. SEQUENCE
+    // 3️⃣ Sequence oxu
     const sequence = await accountSequenceRepository.findOneBy({ id: 1 });
     if (!sequence) {
       return next(errorHandler(500, "Account sequence tapılmadı"));
@@ -774,15 +781,19 @@ export const createAccountForCard = async (
 
     const nextAccountID = sequence.currentValue + 1;
 
-    // 🔹 3. ACCOUNT CREATE
-    const account = new Account();
+    // 4️⃣ Account YOXDUR → CREATE
+    if (!account) {
+      account = new Account();
+      account.card = card;
+    }
+
+    // 5️⃣ Account VAR amma boşdur → UPDATE
     account.accountID = nextAccountID;
     account.date = new Date();
-    account.card = card;
 
     await accountRepository.save(account);
 
-    // 🔹 4. SEQUENCE UPDATE
+    // 6️⃣ Sequence artır
     sequence.currentValue = nextAccountID;
     await accountSequenceRepository.save(sequence);
 
