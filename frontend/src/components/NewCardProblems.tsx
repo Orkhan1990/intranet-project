@@ -23,7 +23,7 @@ const NewCardProblems = ({ serviceWorkers, name, values, setFieldValue,cardData 
           name={`${name}.description`}
           className="w-full"
           sizing="sm"
-          disabled={cardData&&cardData?.isOpen}
+          disabled={cardData&&!cardData?.isOpen}
 
         />
         <div className="flex flex-col">

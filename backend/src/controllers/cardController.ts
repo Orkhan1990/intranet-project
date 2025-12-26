@@ -170,6 +170,7 @@ export const createCard = async (
     newCard.workSumOwn = workSumOwn;
     newCard.avSum = avSum;
     newCard.openDate = new Date();
+    newCard.isOpen=true;
     newCard.userId = userId;
     
 

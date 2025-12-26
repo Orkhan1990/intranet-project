@@ -36,7 +36,7 @@ const SelectWithButtons = ({
           color={"blue"}
           onClick={() => remove(index)}
           size={"xs"}
-          disabled={cardData&&cardData?.isOpen}
+          disabled={cardData&&!cardData?.isOpen}
         >
           -
         </Button>
@@ -49,7 +49,7 @@ const SelectWithButtons = ({
         className="w-[250px]"
         onChange={handleChange}
         sizing="sm"
-        disabled={cardData&&cardData?.isOpen}
+        disabled={cardData&&!cardData?.isOpen}
       >
         <option value="">İsciler</option>
         {serviceWorkers?.map((worker, i) => (
@@ -63,7 +63,7 @@ const SelectWithButtons = ({
         color={"blue"}
         onClick={() => push("")}
         size={"xs"}
-        disabled={cardData&&cardData?.isOpen}
+        disabled={cardData&&!cardData?.isOpen}
       >
         +
       </Button>

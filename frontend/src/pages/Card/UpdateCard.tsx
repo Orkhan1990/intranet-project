@@ -289,6 +289,7 @@ const UpdateCard = () => {
     console.log({ data });
     if (data.isExist) {
       navigate(`/account/${cardId}`);
+      window.scrollTo(0,0)
     } else {
       alert("Hesab aktı uğurla yaradıldı");
       reloadCard();
@@ -300,6 +301,7 @@ const UpdateCard = () => {
     console.log({ data });
     if (data.isExist) {
       navigate(`/repair/${cardId}`);
+      window.scrollTo(0,0)
     } else {
       alert("Təmir aktı uğurla yaradıldı");
       reloadCard();
@@ -436,7 +438,7 @@ const UpdateCard = () => {
                       name="clientId"
                       className="w-full mt-1"
                       sizing="sm"
-                      disabled={cardData?.isOpen}
+                      disabled={!cardData?.isOpen}
                     >
                       <option value="">Müştərini seç</option>
                       {clients &&
@@ -463,7 +465,7 @@ const UpdateCard = () => {
                     <input
                       type="checkbox"
                       onChange={(e) => setOpenGedis(e.target.checked)}
-                      disabled={cardData?.isOpen}
+                      disabled={!cardData?.isOpen}
                     />
                     Gediş
                   </label>
@@ -471,7 +473,7 @@ const UpdateCard = () => {
                     <input
                       type="checkbox"
                       onChange={(e) => setOpenBobcatWarranty(e.target.checked)}
-                      disabled={cardData?.isOpen}
+                      disabled={!cardData?.isOpen}
                     />
                     Bobcat zəmanət
                   </label>
@@ -479,7 +481,7 @@ const UpdateCard = () => {
                     <input
                       type="checkbox"
                       onChange={(e) => setOpenAmmannWarranty(e.target.checked)}
-                      disabled={cardData?.isOpen}
+                      disabled={!cardData?.isOpen}
                     />
                     AMMANN zəmanət
                   </label>
@@ -516,7 +518,7 @@ const UpdateCard = () => {
                         name="id"
                         placeholder="Şassi nömrəsi"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       />
                     </div>
 
@@ -530,7 +532,7 @@ const UpdateCard = () => {
                         name="type"
                         className="w-full"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       >
                         {types.map((t, i) => (
                           <option key={i}>{t}</option>
@@ -548,7 +550,7 @@ const UpdateCard = () => {
                         name="manufactured"
                         className="w-full"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       >
                         <option value="man">MAN</option>
                         <option value="mercedes">Mercedes</option>
@@ -579,7 +581,7 @@ const UpdateCard = () => {
                         name="sassi"
                         placeholder="Şassi nömrəsi"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       />
                     </div>
 
@@ -593,7 +595,7 @@ const UpdateCard = () => {
                         name="carNumber"
                         placeholder="Maşın nömrəsi"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       />
                     </div>
 
@@ -606,7 +608,7 @@ const UpdateCard = () => {
                         as={Select}
                         name="produceDate"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       >
                         {[2025, 2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
                           <option key={y}>{y}</option>
@@ -624,7 +626,7 @@ const UpdateCard = () => {
                         name="km"
                         placeholder="Km/Motosaat"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       />
                     </div>
 
@@ -638,7 +640,7 @@ const UpdateCard = () => {
                         name="qostNumber"
                         placeholder="Dövlət nömrəsi"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       />
                     </div>
 
@@ -651,7 +653,7 @@ const UpdateCard = () => {
                         as={Select}
                         name="paymentType"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       >
                         <option value="transfer">Köçürülmə</option>
                         <option value="cash">Nağd</option>
@@ -669,7 +671,7 @@ const UpdateCard = () => {
                         type="checkbox"
                         name="nds"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       />{" "}
                       ƏDV (18%)
                     </label>
@@ -679,7 +681,7 @@ const UpdateCard = () => {
                         type="checkbox"
                         name="repairAgain"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       />{" "}
                       Təkrar təmir
                     </label>
@@ -689,7 +691,7 @@ const UpdateCard = () => {
                         type="checkbox"
                         name="servisInfo"
                         sizing="sm"
-                        disabled={cardData?.isOpen}
+                        disabled={!cardData?.isOpen}
                       />{" "}
                       Servis məlumatı
                     </label>
