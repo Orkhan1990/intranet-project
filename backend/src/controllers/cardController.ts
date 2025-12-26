@@ -816,7 +816,13 @@ export const createRepairForCard = async (
       return next(errorHandler(500, "Repair sequence tapılmadı"));
     }
 
+    console.log(sequence,"sequence");
+    
+
     const nextAccountID = sequence.currentValue + 1;
+
+    console.log(nextAccountID,"nextAccountID");
+    
 
      // 4️⃣ Account YOXDUR → CREATE
     if (!repair) {
@@ -831,7 +837,9 @@ export const createRepairForCard = async (
     await repairRepository.save(repair);
      // 6️⃣ Sequence artır
     sequence.currentValue = nextAccountID;
-    await accountSequenceRepository.save(sequence);
+    console.log(sequence,"second Sequence");
+    
+    await repairSequenceRepository.save(sequence);
 
     return res.status(201).json({
       success: true,

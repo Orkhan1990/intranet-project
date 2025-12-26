@@ -119,6 +119,8 @@ export interface UpdateCardInterface {
   cardJobs: any[];
   expences: any[];
   cardParts: any[];
+  account:any;
+  repair:any
 }
 
 export interface PartsInterface {

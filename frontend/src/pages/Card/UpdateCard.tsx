@@ -194,6 +194,9 @@ const UpdateCard = () => {
   };
 
   console.log(cardData?.isOpen);
+  const hasRepairAct = cardData?.repair?.repairId > 349;
+
+
   
 
   useEffect(() => {
@@ -940,6 +943,7 @@ const UpdateCard = () => {
                         color={"blue"}
                         size={"xs"}
                         onClick={() => createAccountForCard(id)}
+                        disabled={!hasRepairAct}
                       >
                         Hesab Aktı Yarat
                       </Button>

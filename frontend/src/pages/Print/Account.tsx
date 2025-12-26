@@ -57,22 +57,18 @@ const Account = () => {
     0
   );
 
+  // console.log({ totalJobsPrice: parseFloat(totalJobsPrice.toFixed(2)) });
 
-console.log({ totalJobsPrice: parseFloat(totalJobsPrice.toFixed(2)) });  
+  const totalPartsPrice =
+    cardDetails?.cardParts?.reduce((sum: any, item: any) => {
+      const quantity = Number(item?.count) || 1;
+      const price = Number(item?.soldPrice) || 0;
+      const discount = Number(item?.discount) || 0;
 
-  const totalPartsPrice = cardDetails?.cardParts?.reduce(
-  (sum:any, item:any) => {
-    const quantity = Number(item?.count) || 1;
-    const price = Number(item?.soldPrice) || 0;
-    const discount = Number(item?.discount) || 0;
+      const itemTotal = quantity * (price * (1 - discount / 100));
 
-    const itemTotal =
-      quantity * (price * (1 - discount / 100));
-
-    return sum + itemTotal;
-  },
-  0
-) || 0;
+      return sum + itemTotal;
+    }, 0) || 0;
 
   return (
     <div className=" min-h-screen py-6 print:bg-white print:py-0 w-2/3 print:w-full">
@@ -160,6 +156,7 @@ console.log({ totalJobsPrice: parseFloat(totalJobsPrice.toFixed(2)) });
               <td className="border border-black p-1 text-center"></td>
               <td className="border border-black p-1 text-center">
                 {/* {parseFloat(totalPartsPrice.toFixed(2))} */}
+                <strong>{parseFloat((totalPartsPrice??0).toFixed(2))}</strong>
               </td>
             </tr>
             <tr>
@@ -170,32 +167,48 @@ console.log({ totalJobsPrice: parseFloat(totalJobsPrice.toFixed(2)) });
               <td className="border border-black p-1 text-center"></td>
               <td className="border border-black p-1 text-center">
                 {/* {parseFloat(totalJobsPrice.toFixed(2))} */}
+                <strong> {parseFloat((totalJobsPrice ?? 0).toFixed(2))}</strong>
               </td>
             </tr>
+
+           
           </tbody>
         </table>
 
         {/* TOTALS */}
-        <div className="w-[300px] ml-auto mt-3 space-y-1 text-sm">
-          <div className="flex justify-between">
+        <div className="w-[300px] ml-auto mt-3 space-y-1 text-sm font-semibold">
+          <div className="flex gap-2">
             <span>CƏMİ:</span>
-            <span>{""}</span>
+            <span>
+              {parseFloat((totalJobsPrice + totalPartsPrice).toFixed(2))} AZN
+            </span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex gap-2">
             <span>ƏDV 18%:</span>
-            <span>{""}</span>
+            <span>
+              {parseFloat(
+                ((totalJobsPrice + totalPartsPrice) * 0.18).toFixed(2))} AZN
+            </span>
           </div>
-          <div className="flex justify-between font-bold">
+          <div className="flex gap-2 ">
             <span>Yekun:</span>
-            <span>{""}</span>
+            <span>
+              {parseFloat(
+                (
+                  totalJobsPrice +
+                  totalPartsPrice +
+                  (totalJobsPrice + totalPartsPrice) * 0.18
+                ).toFixed(2)
+              )} AZN
+            </span>
           </div>
         </div>
 
         {/* FOOTER */}
         <div className="mt-10 text-sm">
           <p>
-            Servis müqaviləsinə əsasən ödəniş 7 iş günü ərzində həyata
-            keçirilməlidir
+            Servis müqaviləsinə əsasən ödəniş <strong>7 iş günü</strong> ərzində həyata
+            keçirilməlidir.
           </p>
 
           <div className="mt-6">
