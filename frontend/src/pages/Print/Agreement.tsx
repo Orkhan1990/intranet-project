@@ -44,7 +44,7 @@ const Agreement = () => {
       const date =formatDate(cardDetails?.openDate);
       const contractDate =cardDetails?.client?.contractDate;
       
-      console.log({contractDate});
+      // console.log({contractDate});
 
     const mergedTableData = [
   ...(cardDetails?.cardJobs || []).map((job: any) => ({
@@ -57,6 +57,12 @@ const Agreement = () => {
     discount: job.discount,
     date: job.createdAt,
     av: job.av,            // iş saatı üçün əlavə dəyər
+  })),
+
+
+  ...(cardDetails?.expenses||[]).map((expense:any)=>({
+    name:expense.description,
+    price:expense.price
   })),
 
   ...(cardDetails?.cardParts || []).map((part: any) => ({

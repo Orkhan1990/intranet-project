@@ -57,6 +57,16 @@ const Account = () => {
     0
   );
 
+  const totalEpencesPrice=cardDetails?.expenses?.reduce(
+     (sum: any, item: any) => {
+      const price = Number(item?.price) || 0;
+      return sum + price;
+    },
+    0
+  )
+
+  const totalPriceeee=totalJobsPrice+totalEpencesPrice
+
   // console.log({ totalJobsPrice: parseFloat(totalJobsPrice.toFixed(2)) });
 
   const totalPartsPrice =
@@ -167,7 +177,7 @@ const Account = () => {
               <td className="border border-black p-1 text-center"></td>
               <td className="border border-black p-1 text-center">
                 {/* {parseFloat(totalJobsPrice.toFixed(2))} */}
-                <strong> {parseFloat((totalJobsPrice ?? 0).toFixed(2))}</strong>
+                <strong> {parseFloat((totalPriceeee ?? 0).toFixed(2))}</strong>
               </td>
             </tr>
 
@@ -180,14 +190,14 @@ const Account = () => {
           <div className="flex gap-2">
             <span>CƏMİ:</span>
             <span>
-              {parseFloat((totalJobsPrice + totalPartsPrice).toFixed(2))} AZN
+              {parseFloat((totalPriceeee + totalPartsPrice).toFixed(2))} AZN
             </span>
           </div>
           <div className="flex gap-2">
             <span>ƏDV 18%:</span>
             <span>
               {parseFloat(
-                ((totalJobsPrice + totalPartsPrice) * 0.18).toFixed(2))} AZN
+                ((totalPriceeee + totalPartsPrice) * 0.18).toFixed(2))} AZN
             </span>
           </div>
           <div className="flex gap-2 ">
@@ -195,9 +205,9 @@ const Account = () => {
             <span>
               {parseFloat(
                 (
-                  totalJobsPrice +
+                  totalPriceeee +
                   totalPartsPrice +
-                  (totalJobsPrice + totalPartsPrice) * 0.18
+                  (totalPriceeee + totalPartsPrice) * 0.18
                 ).toFixed(2)
               )} AZN
             </span>

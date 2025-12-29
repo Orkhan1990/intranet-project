@@ -25,30 +25,36 @@ const Repair = () => {
     getData();
   }, [id]);
 
-  const mergedTableData = [
-    ...(cardDetails?.cardParts || []).map((part: any) => ({
-      type: "part",
-      id: part.id,
-      code: part.code,
-      name: part.partName,
-      quantity: part.count, // hissə sayı
-      price: part.soldPrice,
-      discount: part.discount,
-      date: part.date,
-    })),
-    ...(cardDetails?.cardJobs || []).map((job: any) => ({
-      type: "job",
-      id: job.id,
-      code: "",
-      name: job.name,
-      quantity: "", // iş saatı
-      price: job.price,
-      discount: job.discount,
-      date: job.createdAt,
-      av: job.av, // iş saatı üçün əlavə dəyər
-    })),
-  ];
+    const mergedTableData = [
+  ...(cardDetails?.cardJobs || []).map((job: any) => ({
+    type: "job",
+    id: job.id,
+    code: "",
+    name: job.name,
+    quantity: "",          // iş saatı
+    price: job.price,
+    discount: job.discount,
+    date: job.createdAt,
+    av: job.av,            // iş saatı üçün əlavə dəyər
+  })),
 
+
+  ...(cardDetails?.expenses||[]).map((expense:any)=>({
+    name:expense.description,
+    price:expense.price
+  })),
+
+  ...(cardDetails?.cardParts || []).map((part: any) => ({
+    type: "part",
+    id: part.id,
+    code: part.code,
+    name: part.partName,
+    quantity: part.count,       // hissə sayı
+    price: part.soldPrice,
+    discount: part.discount,
+    date: part.date,
+  })),
+];
   const totalAmount = mergedTableData.reduce((sum: number, item: any) => {
     // JOB
     if (item.type === "job") {
@@ -141,7 +147,7 @@ const Repair = () => {
         <p className="mt-6 text-[13px]">
           <strong>{cardDetails?.carNumber}</strong> DQN texnikada{" "}
           <strong>{formatAzDate(cardDetails?.openDate)}</strong> tarixində görülmüş işin dəyəri
-          (iş kartı № <strong>{cardDetails?.id}</strong>)
+          (<strong>İş kartı № {cardDetails?.id}</strong>)
         </p>
 
         {/* TABLE */}
