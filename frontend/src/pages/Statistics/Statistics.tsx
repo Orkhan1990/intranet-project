@@ -201,14 +201,14 @@ const Statistics = () => {
                       </div>
                     </td>
                     <td className="p-3 text-center">/</td>
-                    <td className="p-3">{card.workSum}</td>
-                    <td className="p-3">{card.workSumOwn}</td>
-                    <td className="p-3">{card.avSum}</td>
-                    <td className="p-3">{totalPartsPrice ?? 0}</td>
-                    <td className="p-3">{totalPartsOwnPrice ?? 0}</td>
-                    <td className="p-3">{totalExpenses ?? 0}</td>
-                    <td className="p-3">{countTotalPrice}</td>
-                    <td className="p-3">{edvPrice}</td>
+                    <td className="p-3">{parseFloat((card.workSum).toFixed(2))}</td>
+                    <td className="p-3">{parseFloat((card.workSumOwn).toFixed(2))}</td>
+                    <td className="p-3">{parseFloat((card.avSum).toFixed(2))}</td>
+                    <td className="p-3">{parseFloat(totalPartsPrice.toFixed(2)) ?? 0}</td>
+                    <td className="p-3">{parseFloat(totalPartsOwnPrice.toFixed(2)) ?? 0}</td>
+                    <td className="p-3">{parseFloat(totalExpenses.toFixed(2)) ?? 0}</td>
+                    <td className="p-3">{parseFloat(countTotalPrice.toFixed(2))}</td>
+                    <td className="p-3">{parseFloat(edvPrice.toFixed(2))}</td>
                     <td className="p-3"></td>
                     <td className="p-3">/</td>
                     <td className="p-3">

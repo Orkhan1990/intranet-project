@@ -21,6 +21,7 @@ import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
+// import { updateJobPricesByClientType } from "../../utilis/utilis";
 
 const types = [
   "Tiqac",
@@ -60,14 +61,16 @@ const newCardInitialValues: NewCardInterface = {
     },
   ],
   expences: [{ description: "", price: "" }],
-   cardParts: [{
+  cardParts: [
+    {
       code: "",
       partName: "",
       count: 0,
       soldPrice: 0,
       discount: 0,
-      totalPrice: 0
-    }],
+      totalPrice: 0,
+    },
+  ],
 };
 
 const SectionCard = ({
@@ -93,9 +96,9 @@ const NewCard = () => {
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
   const [expencePrices, setExpencePrices] = useState<number>(0);
-
   const { users } = useSelector((state: RootState) => state.user);
   const { clients } = useSelector((state: RootState) => state.client);
+  const [clientType,setClientType]=useState("")
   const dispatch = useDispatch<AppDispatch>();
 
   const workers = users.filter(
@@ -112,7 +115,11 @@ const NewCard = () => {
     load();
   }, [dispatch]);
 
-  console.log(openAmmannWarranty, openBobcatWarranty);
+
+  console.log(openBobcatWarranty,openAmmannWarranty);
+  // console.log({clientType});
+  
+  
 
   const navigate = useNavigate();
   // İşçilik qiymətini yeniləyən funksiya
@@ -210,6 +217,19 @@ const NewCard = () => {
                       name="clientId"
                       className="w-full mt-1"
                       sizing="sm"
+                      onChange={(e: any) => {
+                        const clientId = e.target.value;
+                        setFieldValue("clientId", clientId);
+
+                        // seçilmiş client tapılır
+                        const selectedClient = clients.find(
+                          (c) => c.id === Number(clientId)
+                        );
+                        if (selectedClient) {
+                                setClientType(selectedClient.type);
+                                    console.log("Seçilmiş client növü:", selectedClient.type);
+                        }
+                      }}
                     >
                       <option value="">Müştərini seç</option>
                       {clients.map((item) => (
@@ -281,7 +301,12 @@ const NewCard = () => {
                       <label className="block mb-1 font-medium">
                         Texnikanın növü
                       </label>
-                      <Field as={Select} name="type" className="w-full" sizing="sm">
+                      <Field
+                        as={Select}
+                        name="type"
+                        className="w-full"
+                        sizing="sm"
+                      >
                         {types.map((t, i) => (
                           <option key={i}>{t}</option>
                         ))}
@@ -293,7 +318,12 @@ const NewCard = () => {
                       <label className="block mb-1 font-medium">
                         İstehsalçı
                       </label>
-                      <Field as={Select} name="manufactured" className="w-full" sizing="sm">
+                      <Field
+                        as={Select}
+                        name="manufactured"
+                        className="w-full"
+                        sizing="sm"
+                      >
                         <option value="man">MAN</option>
                         <option value="mercedes">Mercedes</option>
                         <option value="daf">DAF</option>
@@ -305,7 +335,12 @@ const NewCard = () => {
                     {/* Model */}
                     <div>
                       <label className="block mb-1 font-medium">Model</label>
-                      <Field as={TextInput} name="model" placeholder="Model" sizing="sm"/>
+                      <Field
+                        as={TextInput}
+                        name="model"
+                        placeholder="Model"
+                        sizing="sm"
+                      />
                     </div>
 
                     {/* Şassi */}
@@ -340,7 +375,7 @@ const NewCard = () => {
                         Buraxılış ili
                       </label>
                       <Field as={Select} name="produceDate" sizing="sm">
-                        {[2025,2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
+                        {[2025, 2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
                           <option key={y}>{y}</option>
                         ))}
                       </Field>
@@ -390,16 +425,17 @@ const NewCard = () => {
                   {/* Checkboxes */}
                   <div className="flex flex-wrap gap-6 mt-6">
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="nds" sizing="sm"/> ƏDV (18%)
+                      <Field type="checkbox" name="nds" sizing="sm" /> ƏDV (18%)
                     </label>
 
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="repairAgain" sizing="sm"/> Təkrar təmir
+                      <Field type="checkbox" name="repairAgain" sizing="sm" />{" "}
+                      Təkrar təmir
                     </label>
 
                     <label className="flex items-center gap-2">
-                      <Field type="checkbox" name="servisInfo" sizing="sm"/> Servis
-                      məlumatı
+                      <Field type="checkbox" name="servisInfo" sizing="sm" />{" "}
+                      Servis məlumatı
                     </label>
                   </div>
                 </div>
@@ -473,9 +509,10 @@ const NewCard = () => {
                             jobWorkerPrice={(price) =>
                               handlePriceUpdate(index, price)
                             }
+                            clientType={clientType}
                           />
                         ))}
-                         <tbody>
+                        <tbody>
                           <tr>
                             <td></td>
                             <td></td>
@@ -593,18 +630,18 @@ const NewCard = () => {
                 {/* <NewCardAddParts /> */}
 
                 <Table className="min-w-[700px] md:min-w-full">
-                        <Table.Head className="bg-gray-100 dark:bg-gray-800 sticky top-0">
-                          <Table.HeadCell className="px-2 py-1">#</Table.HeadCell>
-                          <Table.HeadCell>E/h Kod</Table.HeadCell>
-                          <Table.HeadCell>Ehtiyyat hissə</Table.HeadCell>
-                          <Table.HeadCell>Say</Table.HeadCell>
-                          <Table.HeadCell>Qiymət</Table.HeadCell>
-                          <Table.HeadCell>Endirim %</Table.HeadCell>
-                          <Table.HeadCell>Toplam</Table.HeadCell>
-                          <Table.HeadCell>Tarix</Table.HeadCell>
-                          <Table.HeadCell></Table.HeadCell>
-                        </Table.Head>
-                        </Table>
+                  <Table.Head className="bg-gray-100 dark:bg-gray-800 sticky top-0">
+                    <Table.HeadCell className="px-2 py-1">#</Table.HeadCell>
+                    <Table.HeadCell>E/h Kod</Table.HeadCell>
+                    <Table.HeadCell>Ehtiyyat hissə</Table.HeadCell>
+                    <Table.HeadCell>Say</Table.HeadCell>
+                    <Table.HeadCell>Qiymət</Table.HeadCell>
+                    <Table.HeadCell>Endirim %</Table.HeadCell>
+                    <Table.HeadCell>Toplam</Table.HeadCell>
+                    <Table.HeadCell>Tarix</Table.HeadCell>
+                    <Table.HeadCell></Table.HeadCell>
+                  </Table.Head>
+                </Table>
                 <div className="flex gap-3 font-semibold mt-5 items-center justify-center">
                   <span>Cəmi:</span>
                   <span>0 AZN</span>
@@ -664,7 +701,6 @@ const NewCard = () => {
                 <Button color="purple" size="xs">
                   Kartı Bağla
                 </Button>
-             
               </div>
             </Form>
           );

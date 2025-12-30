@@ -48,3 +48,27 @@ export const getYear=(dateString:any)=>{
      return year;
 
 }
+
+
+export const  updateJobPricesByClientType = (type: string, values: any, setFieldValue: any) => {
+  const updatedJobs = values.cardJobs.map((job:any) => {
+    let newPrice = job.price;
+
+    switch(type) {
+      case "itb":
+        newPrice = job.price * 0.9; // nümunə: ITB 10% endirim
+        break;
+      case "boss":
+        newPrice = job.price * 1.1; // nümunə: Boss 10% əlavə
+        break;
+      case "worker":
+      case "customer":
+      default:
+        newPrice = job.price;
+    }
+
+    return {...job, price: newPrice};
+  });
+
+  setFieldValue("cardJobs", updatedJobs);
+};

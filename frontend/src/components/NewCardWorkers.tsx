@@ -11,7 +11,8 @@ interface CardWorkersInterface {
   values: any;
   name: string;
   jobWorkerPrice: (price: any) => void;
-  cardData?:any
+  cardData?:any;
+  clientType:any;
 }
 
 const NewCardWorkers = ({
@@ -19,8 +20,21 @@ const NewCardWorkers = ({
   values,
   name,
   jobWorkerPrice,
-  cardData
+  cardData,clientType
 }: CardWorkersInterface) => {
+
+
+    let countPrice=0
+    switch (clientType) {
+      case "itb":
+
+        countPrice=
+        return
+    
+      default:
+        break;
+    }
+
   const discountPrice = (values.av || 0) * 50 * (1 - (values.discount || 0) / 100);
   useEffect(() => {
     jobWorkerPrice(discountPrice);
