@@ -118,120 +118,132 @@ const Statistics = () => {
           </Button>
         </form>
       </div>
-      {
-        loading && cards.length === 0 && (
-          <p className="text-center mt-10 text-gray-500 italic">Yüklənir...</p>
-        )
-      }
-    
-      {
-        cards&& cards.length > 0 && (
-           <div className="mt-10 overflow-x-auto rounded-lg shadow-md border border-gray-200">
-        <table className="w-full text-sm text-left border-collapse">
-          <thead className="bg-gray-100 text-gray-700">
-            <tr>
-              <th className="p-3 whitespace-nowrap">#</th>
-              <th className="p-3 whitespace-nowrap">Kart №</th>
-              <th className="p-3 whitespace-nowrap">Maşın</th>
-              <th className="p-3 whitespace-nowrap">DQN</th>
-              <th className="p-3 whitespace-nowrap">Şassi</th>
-              <th className="p-3 whitespace-nowrap">Müştəri</th>
-              <th className="p-3 whitespace-nowrap">1C Data</th>
-              <th className="p-3 whitespace-nowrap">İşçilik</th>
-              <th className="p-3 whitespace-nowrap">İşçiyə</th>
-              <th className="p-3 whitespace-nowrap">AV</th>
-              <th className="p-3 whitespace-nowrap">E/h hissə</th>
-              <th className="p-3 whitespace-nowrap">E/h maya</th>
-              <th className="p-3 whitespace-nowrap">Əlavə xərclər</th>
-              <th className="p-3 whitespace-nowrap">ƏDV-siz</th>
-              <th className="p-3 whitespace-nowrap">ƏDV qiymət</th>
-              <th className="p-3 whitespace-nowrap">Ödənişli</th>
-              <th className="p-3 whitespace-nowrap">Valyuta</th>
-              <th className="p-3 whitespace-nowrap">Təmir/Hesab</th>
-              <th className="p-3 whitespace-nowrap">Açdı</th>
-              <th className="p-3 whitespace-nowrap">Açılma</th>
-              <th className="p-3 whitespace-nowrap">Bağlanma</th>
-            </tr>
-          </thead>
+      {loading && cards.length === 0 && (
+        <p className="text-center mt-10 text-gray-500 italic">Yüklənir...</p>
+      )}
 
-          <tbody>
-            {cards.map((card: any, index: number) => {
-              const totalExpenses = card.expenses?.reduce(
-                (sum: number, exp: any) => sum + (exp.price ?? 0),
-                0
-              );
+      {cards && cards.length > 0 && (
+        <div className="mt-10 overflow-x-auto rounded-lg shadow-md border border-gray-200">
+          <table className="w-full text-sm text-left border-collapse">
+            <thead className="bg-gray-100 text-gray-700">
+              <tr>
+                <th className="p-3 whitespace-nowrap">#</th>
+                <th className="p-3 whitespace-nowrap">Kart №</th>
+                <th className="p-3 whitespace-nowrap">Maşın</th>
+                <th className="p-3 whitespace-nowrap">DQN</th>
+                <th className="p-3 whitespace-nowrap">Şassi</th>
+                <th className="p-3 whitespace-nowrap">Müştəri</th>
+                <th className="p-3 whitespace-nowrap">1C Data</th>
+                <th className="p-3 whitespace-nowrap">İşçilik</th>
+                <th className="p-3 whitespace-nowrap">İşçiyə</th>
+                <th className="p-3 whitespace-nowrap">AV</th>
+                <th className="p-3 whitespace-nowrap">E/h hissə</th>
+                <th className="p-3 whitespace-nowrap">E/h maya</th>
+                <th className="p-3 whitespace-nowrap">Əlavə xərclər</th>
+                <th className="p-3 whitespace-nowrap">ƏDV-siz</th>
+                <th className="p-3 whitespace-nowrap">ƏDV qiymət</th>
+                <th className="p-3 whitespace-nowrap">Ödənişli</th>
+                <th className="p-3 whitespace-nowrap">Valyuta</th>
+                <th className="p-3 whitespace-nowrap">Təmir/Hesab</th>
+                <th className="p-3 whitespace-nowrap">Açdı</th>
+                <th className="p-3 whitespace-nowrap">Açılma</th>
+                <th className="p-3 whitespace-nowrap">Bağlanma</th>
+              </tr>
+            </thead>
 
-              const countTotalPrice =
-                (card.workSum ?? 0) +
-                (card.partsTotalPrice ?? 0) +
-                (totalExpenses ?? 0);
-              const edvPrice = countTotalPrice + countTotalPrice * 0.18;
-              return (
-                <tr
-                  key={card.id}
-                  className="border-b hover:bg-gray-50 transition"
-                >
-                  <td className="p-3">{index + 1}</td>
-                  <td className="p-3"><Link to={`/updateCard/${card.id}`}>{card.id}</Link></td>
-                  <td className="p-3">
-                    <Link to={`/updateCard/${card.id}`}>
-                    {card.manufactured} {card.model}
-                    </Link>
-                  </td>
-                  <td className="p-3">{card.carNumber}</td>
-                  <td className="p-3">{card.sassi}</td>
-                  <td className="p-3">
-                    <div className="flex flex-col">
-                      <span>{card.client?.companyName}</span>
-                      <span className="text-xs text-gray-500">
-                        {card.client?.typeOfStatus}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-3 text-center">/</td>
-                  <td className="p-3">{card.workSum}</td>
-                  <td className="p-3">{card.workSumOwn}</td>
-                  <td className="p-3">{card.avSum}</td>
-                  <td className="p-3">{card.partsTotalPrice ?? 0}</td>
-                  <td className="p-3">{card.partsSumOwn ?? 0}</td>
-                  <td className="p-3">{totalExpenses ?? 0}</td>
-                  <td className="p-3">{countTotalPrice}</td>
-                  <td className="p-3">{edvPrice}</td>
-                  <td className="p-3"></td>
-                  <td className="p-3">/</td>
-                  <td className="p-3">/</td>
-                  <td className="p-3">{`${card.user?.firstName} ${card.user?.lastName}`}</td>
-                  <td className="p-2 text-center">
-                    {card.openDate
-                      ? new Date(card.openDate).toLocaleString("az-AZ", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                      : "-"}
-                  </td>
-                  <td className="p-2 text-center">
-                    {card.closeDate
-                      ? new Date(card.closeDate).toLocaleString("az-AZ", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                      : "-"}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-        )
-      }
-    
+            <tbody>
+              {cards?.map((card: any, index: number) => {
+                const totalExpenses = card?.expenses?.reduce(
+                  (sum: number, exp: any) => sum + (exp.price ?? 0),
+                  0
+                );
+
+                const countTotalPrice =
+                  (card?.workSum ?? 0) +
+                  (card?.partsTotalPrice ?? 0) +
+                  (totalExpenses ?? 0);
+                const edvPrice = countTotalPrice + countTotalPrice * 0.18;
+
+                const totalPartsPrice =
+                  card?.cardParts?.reduce((sum: number, part: any) => {
+                    const price = (part.soldPrice ?? 0) * (part.count ?? 0);
+                    const discount = part.discount ?? part.dicount ?? 0;
+                    return sum + price * (1 - discount / 100);
+                  }, 0) ?? 0;
+
+                  const totalPartsOwnPrice=  card?.cardParts?.reduce((sum: number, part: any) => {
+                    const price = (part.netPrice ?? 0) * (part.count ?? 0);
+                    return sum + price 
+                  }, 0) ?? 0;
+
+                return (
+                  <tr
+                    key={card.id}
+                    className="border-b hover:bg-gray-50 transition"
+                  >
+                    <td className="p-3">{index + 1}</td>
+                    <td className="p-3">
+                      <Link to={`/updateCard/${card.id}`}>{card.id}</Link>
+                    </td>
+                    <td className="p-3">
+                      <Link to={`/updateCard/${card.id}`}>
+                        {card.manufactured} {card.model}
+                      </Link>
+                    </td>
+                    <td className="p-3">{card.carNumber}</td>
+                    <td className="p-3">{card.sassi}</td>
+                    <td className="p-3">
+                      <div className="flex flex-col">
+                        <span>{card.client?.companyName}</span>
+                        <span className="text-xs text-gray-500">
+                          {card.client?.typeOfStatus}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-center">/</td>
+                    <td className="p-3">{card.workSum}</td>
+                    <td className="p-3">{card.workSumOwn}</td>
+                    <td className="p-3">{card.avSum}</td>
+                    <td className="p-3">{totalPartsPrice ?? 0}</td>
+                    <td className="p-3">{totalPartsOwnPrice ?? 0}</td>
+                    <td className="p-3">{totalExpenses ?? 0}</td>
+                    <td className="p-3">{countTotalPrice}</td>
+                    <td className="p-3">{edvPrice}</td>
+                    <td className="p-3"></td>
+                    <td className="p-3">/</td>
+                    <td className="p-3">
+                      {card?.repair?.repairId}/{card?.account?.accountID}
+                    </td>
+                    <td className="p-3">{`${card?.user?.firstName} ${card?.user?.lastName}`}</td>
+                    <td className="p-2 text-center">
+                      {card.openDate
+                        ? new Date(card.openDate).toLocaleString("az-AZ", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "-"}
+                    </td>
+                    <td className="p-2 text-center">
+                      {card.closeDate
+                        ? new Date(card.closeDate).toLocaleString("az-AZ", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "-"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

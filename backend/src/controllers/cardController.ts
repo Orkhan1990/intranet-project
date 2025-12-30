@@ -15,7 +15,7 @@ import { In } from "typeorm";
 import { Account } from "../entites/Account";
 import { Repair } from "../entites/Repair";
 import { AccountSequence } from "../entites/AccountSequence";
-import { RepairSequence } from '../entites/RepairSequence';
+import { RepairSequence } from "../entites/RepairSequence";
 
 const cardPartsRepository = AppDataSource.getRepository(CardPart);
 const cardRepository = AppDataSource.getRepository(Card);
@@ -57,6 +57,7 @@ export const addToCard = async (
     newCardPart.date = new Date();
     newCardPart.partName = part.name;
     newCardPart.soldPrice = part.sellPrice;
+    newCardPart.netPrice=part.price;
     newCardPart.code = part.code;
     newCardPart.sparePart = part;
 
@@ -68,6 +69,24 @@ export const addToCard = async (
     await sparePartsRepository.save(part);
 
     // console.log("buracan gelir");
+
+    const existingCard = await cardRepository.findOne({
+      where: { id: cardId },
+      relations: ["cardParts"],
+    });
+
+    if (!existingCard) {
+      return next(errorHandler(400, "Kart mövcud deyil"));
+    }
+
+    const totalSell = existingCard?.cardParts?.reduce(
+      (sum: any, p: any) => sum + p.soldPrice * p.count * (1 - p.discount),
+      0
+    );
+
+    existingCard.partsTotalPrice = totalSell;
+
+    await cardRepository.save(existingCard);
 
     res
       .status(201)
@@ -170,9 +189,8 @@ export const createCard = async (
     newCard.workSumOwn = workSumOwn;
     newCard.avSum = avSum;
     newCard.openDate = new Date();
-    newCard.isOpen=true;
+    newCard.isOpen = true;
     newCard.userId = userId;
-    
 
     const savedCard = await cardRepository.save(newCard);
 
@@ -295,9 +313,14 @@ export const filterCards = async (req: Request, res: Response) => {
       .leftJoinAndSelect("card.client", "client")
       .leftJoinAndSelect("card.user", "user")
       .leftJoinAndSelect("card.cardJobs", "cardJobs")
+      .leftJoinAndSelect("cardJobs.workers", "jobWorkers")
+      .leftJoinAndSelect("jobWorkers.user", "workerUser")
       .leftJoinAndSelect("card.cardParts", "cardParts")
       .leftJoinAndSelect("card.cardProblems", "cardProblems")
-      .leftJoinAndSelect("card.expenses", "cardExpenses");
+      .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
+      .leftJoinAndSelect("card.expenses", "cardExpenses")
+      .leftJoinAndSelect("card.account", "account") // ✅
+      .leftJoinAndSelect("card.repair", "repair"); // ✅
 
     if (
       filters.startDate &&
@@ -415,11 +438,10 @@ export const getCardDetails = async (
         "expenses",
         "cardParts",
         "repair",
-        "account"
-       // <- artıq burada var
+        "account",
+        // <- artıq burada var
       ],
     });
-
 
     if (!card) {
       next(errorHandler(404, "Kart tapılmadı"));
@@ -777,7 +799,6 @@ export const createAccountForCard = async (
   }
 };
 
-
 export const createRepairForCard = async (
   req: CustomRequest,
   res: Response,
@@ -792,12 +813,12 @@ export const createRepairForCard = async (
       return next(errorHandler(404, "Kart tapılmadı"));
     }
 
-     let repair = await repairRepository.findOne({
+    let repair = await repairRepository.findOne({
       where: { card: { id: cardId } },
       relations: ["card"],
     });
 
-      // 2️⃣ Account VAR və doludursa → STOP
+    // 2️⃣ Account VAR və doludursa → STOP
     if (
       repair &&
       repair.repairId !== null &&
@@ -811,20 +832,18 @@ export const createRepairForCard = async (
       });
     }
 
-       const sequence = await repairSequenceRepository.findOneBy({ id: 1 });
+    const sequence = await repairSequenceRepository.findOneBy({ id: 1 });
     if (!sequence) {
       return next(errorHandler(500, "Repair sequence tapılmadı"));
     }
 
-    console.log(sequence,"sequence");
-    
+    console.log(sequence, "sequence");
 
     const nextAccountID = sequence.currentValue + 1;
 
-    console.log(nextAccountID,"nextAccountID");
-    
+    console.log(nextAccountID, "nextAccountID");
 
-     // 4️⃣ Account YOXDUR → CREATE
+    // 4️⃣ Account YOXDUR → CREATE
     if (!repair) {
       repair = new Repair();
       repair.card = card;
@@ -835,10 +854,10 @@ export const createRepairForCard = async (
     repair.date = new Date();
 
     await repairRepository.save(repair);
-     // 6️⃣ Sequence artır
+    // 6️⃣ Sequence artır
     sequence.currentValue = nextAccountID;
-    console.log(sequence,"second Sequence");
-    
+    console.log(sequence, "second Sequence");
+
     await repairSequenceRepository.save(sequence);
 
     return res.status(201).json({
@@ -852,12 +871,13 @@ export const createRepairForCard = async (
   }
 };
 
-
-export const closeCard=async( req: CustomRequest,
+export const closeCard = async (
+  req: CustomRequest,
   res: Response,
-  next: NextFunction)=>{
-    try {
-      const { cardId } = req.body;
+  next: NextFunction
+) => {
+  try {
+    const { cardId } = req.body;
     const userId = req.userId;
     // 1️⃣ Mövcud kartı tap
     const card = await cardRepository.findOneBy({ id: cardId });
@@ -865,17 +885,16 @@ export const closeCard=async( req: CustomRequest,
       return next(errorHandler(404, "Kart tapılmadı"));
     }
 
-    card.isOpen=false;
-    card.closeDate=new Date();
+    card.isOpen = false;
+    card.closeDate = new Date();
 
     await cardRepository.save(card);
 
-
-    res.status(201).json({success:true,message:"Kart uğurla bağlandı",card})
-
-      
-    } catch (error) {
-       console.log(error);
+    res
+      .status(201)
+      .json({ success: true, message: "Kart uğurla bağlandı", card });
+  } catch (error) {
+    console.log(error);
     next(errorHandler(500, error));
-    }
   }
+};
