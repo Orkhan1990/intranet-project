@@ -776,6 +776,8 @@ const UpdateCard = () => {
                               handlePriceUpdate(index, price)
                             }
                             cardData={cardData}
+                            paymentType={values.paymentType}
+
                           />
                         ))}
 

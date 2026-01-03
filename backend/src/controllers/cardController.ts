@@ -142,6 +142,7 @@ export const createCard = async (
     // 3) ÜMUMİ ENDİRİMLİ MƏBLƏĞ HESABLANMASI
     // =============================
 
+  
     const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
       const av = Number(j.av || 0);
       const globalDiscount = Number(j.discount || 0);
@@ -185,7 +186,7 @@ export const createCard = async (
     newCard.servisInfo = cardData.servisInfo;
     newCard.comments = cardData.comments;
     newCard.recommendation = cardData.recommendation;
-    newCard.workSum = workSum;
+    newCard.workSum = cardData.paymentType==="internal"?workSumOwn:workSum;
     newCard.workSumOwn = workSumOwn;
     newCard.avSum = avSum;
     newCard.openDate = new Date();
@@ -232,17 +233,21 @@ export const createCard = async (
       for (const j of cardData.cardJobs) {
         const av = Number(j.av || 0);
         const discount = Number(j.discount || 0);
-
+      
+        // let price=0;
+        // if(cardData.paymentType==="internal"){
+        //      price=av*50*
+        // }
         const price = av * 50;
 
         const newJob = new CardJob();
         newJob.code = j.code;
         newJob.name = j.name;
         newJob.av = av;
-        newJob.price = price;
         newJob.discount = discount;
         newJob.oil = j.oil;
         newJob.cardId = savedCard.id;
+        // newJob.price=cardData.paymentType==="internal"?workSumOwn:price
 
         const savedJob = await cardJobRepo.save(newJob);
 
@@ -253,10 +258,16 @@ export const createCard = async (
           for (const jw of j.workers) {
             const workerId = Number(jw.workerId);
             const user = await userRepository.findOneBy({ id: workerId });
-
             if (!user) {
               next(errorHandler(404, "İşçi tapılmadı"));
               return;
+            }
+            if(cardData.paymentType==="internal"){
+                savedJob.price=Number(jw.workerAv)*50*(user.percent/100)*(1-savedJob.discount/100);
+                await cardJobRepo.save(savedJob);
+            }else{
+              savedJob.price=Number(jw.workerAv)*50*(1-savedJob.discount/100);
+              await cardJobRepo.save(savedJob);
             }
 
             // WorkerJob CREATE

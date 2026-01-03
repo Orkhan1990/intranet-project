@@ -4,15 +4,18 @@ import { Link } from "react-router-dom";
 import NewCardWorkersName from "./NewCardWorkersName";
 import { Field, FieldArray } from "formik";
 import { UserInterface } from "../types";
-import { useEffect } from "react";
+import { useEffect, useState} from "react";
+import { fetchUsers } from "../redux-toolkit/features/user/userSlice";
+import { RootState, AppDispatch } from "../redux-toolkit/store/store";
+import { useDispatch, useSelector } from "react-redux";
 
 interface CardWorkersInterface {
   workers: UserInterface[];
   values: any;
   name: string;
   jobWorkerPrice: (price: any) => void;
-  cardData?:any;
-  clientType:any;
+  cardData?: any;
+  paymentType:any
 }
 
 const NewCardWorkers = ({
@@ -20,31 +23,118 @@ const NewCardWorkers = ({
   values,
   name,
   jobWorkerPrice,
-  cardData,clientType
+  cardData,
+  paymentType
 }: CardWorkersInterface) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const [totalPrice, setTotalPrice] = useState(0);
 
 
-    let countPrice=0
-    switch (clientType) {
-      case "itb":
+  const { users } = useSelector((state: RootState) => state.user);
 
-        countPrice=
-        return
-    
-      default:
-        break;
-    }
-
-  const discountPrice = (values.av || 0) * 50 * (1 - (values.discount || 0) / 100);
   useEffect(() => {
-    jobWorkerPrice(discountPrice);
-  }, [discountPrice, values.av, values.discount]);
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
 
-  const price =(values.av || 0) * 50 ;
+useEffect(() => {
+  const av = Number(values.av || 0);
+  const discount = Number(values.discount || 0);
 
-  console.log({values});
-  
+  const basePrice = av * 50 ;
+
+  let calculatedTotal = 0;
+
+  if (paymentType === "internal") {
+    // 🔁 daxili ödəniş → işçi faizlərinə görə bölünür
+    values.workers.forEach((w: any) => {
+      if (!w.workerId) return;
+
+      const worker = users.find(
+        (u) => u.id === Number(w.workerId)
+      );
+      if (!worker) return;
+
+      const percent = Number(worker.percent || 0) / 100;
+
+      calculatedTotal += w.workerAv * 50 * (1 - discount / 100) * percent;
+    });
+  } else {
+    // 🔹 normal ödəniş → tam qiymət
+    calculatedTotal = basePrice;
+  }
+
+  const finalPrice = Number(calculatedTotal.toFixed(2));
+
+  setTotalPrice(finalPrice);
+  jobWorkerPrice(finalPrice*(1 - discount / 100));
+
+}, [
+  values.av,
+  values.discount,
+  values.workers,
+  paymentType,
+  users, // 🔴 vacib!
+]);
+
+
+
+
+  // 🔁 BİR İŞ – BİR NEÇƏ İŞÇİ
+//   values.workers.forEach((w: any) => {
+//     const av = Number(w.workerAv || 0);
+
+//     if (!av || !w.workerId) return;
+
+//     const worker = users.find((u) => u.id === Number(w.workerId));
+//     if (!worker) return;
+
+//     const percent = Number(worker.percent || 0);
+
+//     switch (clientType) {
+//       case "itb":
+//         countPrice+= values.av * 50 *((1 - (values.discount || 0) / 100))*(percent / 100);
+//         return;
+//       case "customer":
+//         countPrice+=(values.av || 0) * 50 * (1 - (values.discount || 0) / 100)
+//         return;
+//         case "worker":
+//         countPrice+= values.av * 50 *((1 - (values.discount || 0) / 100))*(percent / 100);
+//         return;
+
+//         case "boss":
+//                 countPrice+= values.av * 50 *((1 - (values.discount || 0) / 100))*(percent / 100);
+//        return;
+
+//       default:
+//         break;
+// }})
+
+  //   if (clientType === "itb") {
+  //     // 🔥 ITB – FAİZLƏ
+  //   } else {
+  //     // 🔹 Digər client
+  //     countPrice += av * 50;
+  //   }
+  // });
+  // switch (clientType) {
+  //   case "itb":
+
+  //     countPrice=(values.av || 0) * 50 * (1 - (values.discount || 0) / 100)*
+  //     return
+
+  //   default:
+  //     break;
+  // }
+
+  // const discountPrice = (values.av || 0) * 50 * (1 - (values.discount || 0) / 100);
+  // useEffect(() => {
+  //   jobWorkerPrice(countPrice);
+  // }, [countPrice, values.av, values.discount]);
+
+  // const price = (values.av || 0) * 50;
+
+  console.log({ values });
 
   return (
     <tbody>
@@ -56,7 +146,7 @@ const NewCardWorkers = ({
             className="w-[150px] text-xs"
             sizing="sm"
             name={`${name}.code`}
-            disabled={cardData&&!cardData?.isOpen}
+            disabled={cardData && !cardData?.isOpen}
           />
         </td>
         <td className="px-1">
@@ -67,7 +157,7 @@ const NewCardWorkers = ({
               className="w-[250px]"
               name={`${name}.name`}
               sizing="sm"
-              disabled={cardData&&!cardData?.isOpen}
+              disabled={cardData && !cardData?.isOpen}
             />
             <Link to="">
               <FaArrowAltCircleUp className="text-2xl text-green-600" />
@@ -81,7 +171,7 @@ const NewCardWorkers = ({
             className="w-[60px]"
             name={`${name}.av`}
             sizing="sm"
-            disabled={cardData&&!cardData?.isOpen}
+            disabled={cardData && !cardData?.isOpen}
           />
         </td>
         <td className="px-1">
@@ -89,9 +179,9 @@ const NewCardWorkers = ({
             type="text"
             className="w-[100px]"
             readOnly
-            value={price}
+            value={totalPrice}
             sizing="sm"
-            disabled={cardData&&!cardData?.isOpen}
+            disabled={cardData && !cardData?.isOpen}
           />
         </td>
         <td className="px-6">
@@ -101,7 +191,7 @@ const NewCardWorkers = ({
             className="w-[70px]"
             name={`${name}.discount`}
             sizing="sm"
-            disabled={cardData&&!cardData?.isOpen}
+            disabled={cardData && !cardData?.isOpen}
           />
         </td>
         <td className="px-1">
@@ -111,7 +201,7 @@ const NewCardWorkers = ({
             className="w-[70px]"
             name={`${name}.oil`}
             sizing="sm"
-            disabled={cardData&&!cardData?.isOpen}
+            disabled={cardData && !cardData?.isOpen}
           />
         </td>
         <td className="px-6 py-4">

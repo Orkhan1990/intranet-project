@@ -9,7 +9,7 @@ interface WorkersNameInterface {
   push: (v: any) => void;
   remove: (index: number) => void;
   values: any;
-  cardData:any
+  cardData:any;
 }
 
 const NewCardWorkersName = ({
@@ -19,7 +19,8 @@ const NewCardWorkersName = ({
   push,
   remove,
   values,
-  cardData
+  cardData,
+  
 }: WorkersNameInterface) => {
   console.log({ values });
 
@@ -46,6 +47,8 @@ const NewCardWorkersName = ({
 
     setFieldValue(`${name}.workerAv`, newAv);
   };
+
+
 
   return (
     <div className="flex flex-col gap-2">

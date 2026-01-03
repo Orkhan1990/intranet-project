@@ -98,7 +98,6 @@ const NewCard = () => {
   const [expencePrices, setExpencePrices] = useState<number>(0);
   const { users } = useSelector((state: RootState) => state.user);
   const { clients } = useSelector((state: RootState) => state.client);
-  const [clientType,setClientType]=useState("")
   const dispatch = useDispatch<AppDispatch>();
 
   const workers = users.filter(
@@ -217,19 +216,6 @@ const NewCard = () => {
                       name="clientId"
                       className="w-full mt-1"
                       sizing="sm"
-                      onChange={(e: any) => {
-                        const clientId = e.target.value;
-                        setFieldValue("clientId", clientId);
-
-                        // seçilmiş client tapılır
-                        const selectedClient = clients.find(
-                          (c) => c.id === Number(clientId)
-                        );
-                        if (selectedClient) {
-                                setClientType(selectedClient.type);
-                                    console.log("Seçilmiş client növü:", selectedClient.type);
-                        }
-                      }}
                     >
                       <option value="">Müştərini seç</option>
                       {clients.map((item) => (
@@ -509,7 +495,7 @@ const NewCard = () => {
                             jobWorkerPrice={(price) =>
                               handlePriceUpdate(index, price)
                             }
-                            clientType={clientType}
+                            paymentType={values.paymentType}
                           />
                         ))}
                         <tbody>
