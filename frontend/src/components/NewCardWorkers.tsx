@@ -41,7 +41,7 @@ useEffect(() => {
   const av = Number(values.av || 0);
   const discount = Number(values.discount || 0);
 
-  const basePrice = av * 50 ;
+  const basePrice = av * 50*(1 - discount / 100) ;
 
   let calculatedTotal = 0;
 
@@ -61,13 +61,13 @@ useEffect(() => {
     });
   } else {
     // 🔹 normal ödəniş → tam qiymət
-    calculatedTotal = basePrice;
+    calculatedTotal= basePrice;
   }
 
   const finalPrice = Number(calculatedTotal.toFixed(2));
 
   setTotalPrice(finalPrice);
-  jobWorkerPrice(finalPrice*(1 - discount / 100));
+  jobWorkerPrice(finalPrice);
 
 }, [
   values.av,

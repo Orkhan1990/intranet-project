@@ -57,7 +57,7 @@ export const addToCard = async (
     newCardPart.date = new Date();
     newCardPart.partName = part.name;
     newCardPart.soldPrice = part.sellPrice;
-    newCardPart.netPrice=part.price;
+    newCardPart.netPrice = part.price;
     newCardPart.code = part.code;
     newCardPart.sparePart = part;
 
@@ -142,7 +142,6 @@ export const createCard = async (
     // 3) ÜMUMİ ENDİRİMLİ MƏBLƏĞ HESABLANMASI
     // =============================
 
-  
     const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
       const av = Number(j.av || 0);
       const globalDiscount = Number(j.discount || 0);
@@ -186,7 +185,8 @@ export const createCard = async (
     newCard.servisInfo = cardData.servisInfo;
     newCard.comments = cardData.comments;
     newCard.recommendation = cardData.recommendation;
-    newCard.workSum = cardData.paymentType==="internal"?workSumOwn:workSum;
+    newCard.workSum =
+      cardData.paymentType === "internal" ? workSumOwn : workSum;
     newCard.workSumOwn = workSumOwn;
     newCard.avSum = avSum;
     newCard.openDate = new Date();
@@ -229,16 +229,15 @@ export const createCard = async (
     // =============================
     // 6) JOBLAR + WORKERJOB + WORKER SALARY
     // =============================
+    // =============================
+    // 6) JOBLAR + WORKERJOB + WORKER SALARY
+    // =============================
     if (Array.isArray(cardData.cardJobs)) {
       for (const j of cardData.cardJobs) {
         const av = Number(j.av || 0);
         const discount = Number(j.discount || 0);
-      
-        // let price=0;
-        // if(cardData.paymentType==="internal"){
-        //      price=av*50*
-        // }
-        const price = av * 50;
+
+        let jobPrice = 0; // ⭐ TOPLAM JOB PRICE
 
         const newJob = new CardJob();
         newJob.code = j.code;
@@ -247,7 +246,6 @@ export const createCard = async (
         newJob.discount = discount;
         newJob.oil = j.oil;
         newJob.cardId = savedCard.id;
-        // newJob.price=cardData.paymentType==="internal"?workSumOwn:price
 
         const savedJob = await cardJobRepo.save(newJob);
 
@@ -257,33 +255,47 @@ export const createCard = async (
         if (Array.isArray(j.workers)) {
           for (const jw of j.workers) {
             const workerId = Number(jw.workerId);
+            const workerAv = Number(jw.workerAv || 0);
+
             const user = await userRepository.findOneBy({ id: workerId });
             if (!user) {
               next(errorHandler(404, "İşçi tapılmadı"));
               return;
             }
-            if(cardData.paymentType==="internal"){
-                savedJob.price=Number(jw.workerAv)*50*(user.percent/100)*(1-savedJob.discount/100);
-                await cardJobRepo.save(savedJob);
-            }else{
-              savedJob.price=Number(jw.workerAv)*50*(1-savedJob.discount/100);
-              await cardJobRepo.save(savedJob);
+
+            const percent = Number(user.percent || 0);
+
+            // ⭐ İşçinin maaşı (HƏMİŞƏ BU)
+            const earnedSalary = workerAv * 50 * (percent / 100);
+
+            // INTERNAL → job price maaşların cəmi
+            if (cardData.paymentType === "internal") {
+              jobPrice += earnedSalary;
             }
 
-            // WorkerJob CREATE
+            // WorkerJob
             const wj = new CardWorkerJob();
-            wj.workerAv = Number(jw.workerAv);
+            wj.workerAv = workerAv;
             wj.user = user;
             wj.cardJobId = savedJob.id;
-            wj.salaryPercent = user.percent;
+            wj.salaryPercent = percent;
+            wj.earnedSalary = earnedSalary;
             wj.date = new Date();
-
-            // ⭐ DÜZGÜN MAAS DÜSTURU
-            wj.earnedSalary = Number(jw.workerAv) * 50 * (user.percent / 100);
 
             await cardWorkerJobRepo.save(wj);
           }
         }
+
+        // NORMAL PAYMENT → job.av əsas götürülür
+        if (cardData.paymentType !== "internal") {
+          jobPrice = av * 50;
+        }
+
+        // 🔻 Discount SONA QALIR (HAMISI ÜÇÜN)
+        jobPrice = jobPrice * (1 - discount / 100);
+
+        savedJob.price = Number(jobPrice.toFixed(2));
+        await cardJobRepo.save(savedJob);
       }
     }
 
@@ -480,7 +492,63 @@ export const updateCard = async (
     const { cardData } = req.body;
     const userId = req.userId;
 
-    console.log(cardData);
+    // 1) AV TOPLAMI
+    // =============================
+    const avSum = cardData.cardJobs.reduce(
+      (sum: number, job: any) => sum + Number(job.av || 0), //bu duzdur
+      0
+    );
+
+    // =============================
+    // 2) WORKER-ID-LƏRİ YIĞIRIQ
+    // =============================
+    const workerIds = cardData.cardJobs.flatMap((j: any) =>
+      j.workers.map((jw: any) => Number(jw.workerId))
+    );
+
+    const uniqueWorkerIds = [...new Set(workerIds)];
+
+    // İŞÇİ FAİZLƏRİNİ GƏTİRİRİK
+    const workers = await userRepository.find({
+      where: { id: In(uniqueWorkerIds) },
+    });
+
+    const workerMap = new Map();
+    workers.forEach((w) => workerMap.set(w.id, w.percent));
+
+    // =============================
+    // 3) ÜMUMİ ENDİRİMLİ MƏBLƏĞ HESABLANMASI
+    // =============================
+  let workSum = 0;
+    let workSumOwn = 0;
+
+    for (const j of cardData.cardJobs) {
+      const av = Number(j.av || 0);
+      const discount = Number(j.discount || 0);
+
+      let jobPrice = 0;
+
+      // 🔥 INTERNAL
+      if (cardData.paymentType === "internal") {
+        for (const jw of j.workers || []) {
+          const workerId = Number(jw.workerId);
+          const workerAv = Number(jw.workerAv || 0);
+          const workerPercent = workerMap.get(workerId) || 0;
+
+          jobPrice += workerAv * 50 * (workerPercent / 100);
+        }
+
+        // ⭐ discount SONDAN
+        jobPrice = jobPrice * (1 - discount / 100);
+        workSumOwn += jobPrice;
+      }
+      // 🔹 NORMAL
+      else {
+        jobPrice = av * 50 * (1 - discount / 100);
+      }
+
+      workSum += jobPrice;
+    }
 
     // 1️⃣ Mövcud kartı tap
     const existingCard = await cardRepository.findOneBy({ id: cardId });
@@ -504,6 +572,9 @@ export const updateCard = async (
     existingCard.servisInfo = cardData.servisInfo;
     existingCard.comments = cardData.comments;
     existingCard.recommendation = cardData.recommendation;
+    existingCard.workSum =
+      cardData.paymentType === "internal" ? workSumOwn : workSum;
+    existingCard.workSumOwn=workSumOwn;
 
     const updatedCard = await cardRepository.save(existingCard);
 
@@ -602,7 +673,26 @@ export const updateCard = async (
       const av = Number(j.av || 0);
       const discount = Number(j.discount || 0);
 
-      const price = av * 50 * (1 - discount / 100);
+      let jobPrice = 0;
+
+      // 🔥 INTERNAL PAYMENT
+      if (cardData.paymentType === "internal") {
+        for (const jw of j.workers || []) {
+          const workerId = Number(jw.workerId);
+          const workerAv = Number(jw.workerAv || 0);
+
+          const workerPercent = workerMap.get(workerId) || 0;
+
+          jobPrice += workerAv * 50 * (workerPercent / 100);
+        }
+
+        // discount sonda
+        jobPrice = jobPrice * (1 - discount / 100);
+      }
+      // 🔹 EXTERNAL / NORMAL
+      else {
+        jobPrice = av * 50 * (1 - discount / 100);
+      }
 
       const newJob = cardJobRepo.create({
         code: j.code,
@@ -610,34 +700,30 @@ export const updateCard = async (
         av,
         discount,
         oil: j.oil,
-        price,
+        price: Number(jobPrice.toFixed(2)),
         cardId,
       });
 
       const savedJob = await cardJobRepo.save(newJob);
 
       // ==========================
-      // 5️⃣ Job işçiləri
+      // İşçilər (salary HƏMİŞƏ EYNİ)
       // ==========================
       if (Array.isArray(j.workers)) {
         for (const jw of j.workers) {
-          if (!jw.workerId) continue;
-
           const worker = await userRepository.findOneBy({
             id: Number(jw.workerId),
           });
-
           if (!worker) continue;
 
           const workerAv = Number(jw.workerAv || 0);
 
-          const earnedSalary =
-            workerAv * 50 * (1 - discount / 100) * (worker.percent / 100);
+          const earnedSalary = workerAv * 50 * (worker.percent / 100);
 
           const newWorkerJob = new CardWorkerJob();
           newWorkerJob.cardJobId = savedJob.id;
           newWorkerJob.workerAv = workerAv;
-          newWorkerJob.workerId = jw.workerId;
+          newWorkerJob.workerId = worker.id;
           newWorkerJob.salaryPercent = worker.percent;
           newWorkerJob.earnedSalary = earnedSalary;
           newWorkerJob.date = new Date();
