@@ -491,6 +491,8 @@ export const updateCard = async (
     const cardId = Number(req.params.id);
     const { cardData } = req.body;
     const userId = req.userId;
+    console.log(cardData);
+    
 
     // 1) AV TOPLAMI
     // =============================
@@ -519,36 +521,32 @@ export const updateCard = async (
     // =============================
     // 3) ÜMUMİ ENDİRİMLİ MƏBLƏĞ HESABLANMASI
     // =============================
-  let workSum = 0;
-    let workSumOwn = 0;
-
-    for (const j of cardData.cardJobs) {
+  
+     const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
       const av = Number(j.av || 0);
-      const discount = Number(j.discount || 0);
+      const globalDiscount = Number(j.discount || 0);
+      const price = av * 50 * (1 - globalDiscount / 100);
+      return sum + price;
+    }, 0);
 
-      let jobPrice = 0;
 
-      // 🔥 INTERNAL
-      if (cardData.paymentType === "internal") {
-        for (const jw of j.workers || []) {
-          const workerId = Number(jw.workerId);
-          const workerAv = Number(jw.workerAv || 0);
-          const workerPercent = workerMap.get(workerId) || 0;
+     const workSumOwn = cardData.cardJobs.reduce((sum: number, j: any) => {
+      // const av = Number(j.av || 0);
+      // const globalDiscount = Number(j.discount || 0);
+      // const price = av * 50 * (1 - globalDiscount / 100);
+      let workerTotalSumOwn = 0;
+      for (const jw of j.workers) {
+        const avWorker = Number(jw.workerAv || 0);
+        const workerId = Number(jw.workerId);
+        const workerPercent = workerMap.get(workerId) || 0;
 
-          jobPrice += workerAv * 50 * (workerPercent / 100);
-        }
-
-        // ⭐ discount SONDAN
-        jobPrice = jobPrice * (1 - discount / 100);
-        workSumOwn += jobPrice;
+        const price = 50 * avWorker * (workerPercent / 100);
+        // ⭐ DÜZGÜN MAAS DÜSTURU
+        workerTotalSumOwn += price;
       }
-      // 🔹 NORMAL
-      else {
-        jobPrice = av * 50 * (1 - discount / 100);
-      }
-
-      workSum += jobPrice;
-    }
+      return sum + workerTotalSumOwn;
+    }, 0);
+  
 
     // 1️⃣ Mövcud kartı tap
     const existingCard = await cardRepository.findOneBy({ id: cardId });
@@ -574,7 +572,7 @@ export const updateCard = async (
     existingCard.recommendation = cardData.recommendation;
     existingCard.workSum =
       cardData.paymentType === "internal" ? workSumOwn : workSum;
-    existingCard.workSumOwn=workSumOwn;
+    existingCard.workSumOwn = workSumOwn;
 
     const updatedCard = await cardRepository.save(existingCard);
 

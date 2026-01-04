@@ -57,7 +57,7 @@ useEffect(() => {
 
       const percent = Number(worker.percent || 0) / 100;
 
-      calculatedTotal += w.workerAv * 50 * (1 - discount / 100) * percent;
+      calculatedTotal += w.workerAv * 50  * percent;
     });
   } else {
     // 🔹 normal ödəniş → tam qiymət
@@ -67,7 +67,7 @@ useEffect(() => {
   const finalPrice = Number(calculatedTotal.toFixed(2));
 
   setTotalPrice(finalPrice);
-  jobWorkerPrice(finalPrice);
+  jobWorkerPrice(finalPrice *(1 - discount / 100));
 
 }, [
   values.av,

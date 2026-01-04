@@ -84,7 +84,8 @@ console.log({mergedTableData});
 const totalAmount = mergedTableData.reduce((sum: number, item: any) => {
   // JOB
   if (item.type === "job") {
-    return sum + item.av * 50 ;
+   
+    return sum + (cardDetails.paymentType==="internal"? (item.price/(1-item.discount/100)):(item.av*50));
   }
 
   // PART
@@ -99,7 +100,7 @@ const totalAmount = mergedTableData.reduce((sum: number, item: any) => {
 const totalAmountWithDiscount = mergedTableData.reduce((sum: number, item: any) => {
   // JOB
   if (item.type === "job") {
-    return sum + item.av * 50 * (1 - item.discount / 100);
+    return sum + item.price * (1 - item.discount / 100);
   }
 
   // PART
@@ -177,7 +178,7 @@ const finalTotal = finalAmountAfterDiscount + vat;
                   {(item.quantity)===""?(""):(item.price)}
                 </Table.Cell>
                 <Table.Cell className="border border-black text-center">
-                  {(item.quantity)===""?(item.av*50):(item.price*(item.quantity||1))}
+                  {(item.quantity)===""?parseFloat((item.price / (1 - item.discount / 100)).toFixed((2))):(parseFloat((item.price*(item.quantity||1)).toFixed(2)))}
                 </Table.Cell>
               </Table.Row>
             ))}
