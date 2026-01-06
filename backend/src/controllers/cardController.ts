@@ -142,12 +142,7 @@ export const createCard = async (
     // 3) ÜMUMİ ENDİRİMLİ MƏBLƏĞ HESABLANMASI
     // =============================
 
-    const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
-      const av = Number(j.av || 0);
-      const globalDiscount = Number(j.discount || 0);
-      const price = av * 50 * (1 - globalDiscount / 100);
-      return sum + price;
-    }, 0);
+   
 
     const workSumOwn = cardData.cardJobs.reduce((sum: number, j: any) => {
       const av = Number(j.av || 0);
@@ -164,6 +159,28 @@ export const createCard = async (
         workerTotalSumOwn += price;
       }
       return sum + workerTotalSumOwn;
+    }, 0);
+
+     const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
+      const av = Number(j.av || 0);
+      const globalDiscount = Number(j.discount || 0);
+      if(cardData.paymentType==="internal"){
+         let workerTotalSumOwn = 0;
+      for (const jw of j.workers) {
+        const avWorker = Number(jw.workerAv || 0);
+        const workerId = Number(jw.workerId);
+        const workerPercent = workerMap.get(workerId) || 0;
+
+        const price = 50 * avWorker * (workerPercent / 100)*(1-globalDiscount/100);
+        // ⭐ DÜZGÜN MAAS DÜSTURU
+        workerTotalSumOwn += price;
+      }
+      return sum + workerTotalSumOwn;
+      }else{
+         const price = av * 50 * (1 - globalDiscount / 100);
+      return sum + price;
+      }
+    
     }, 0);
 
     // =============================
@@ -185,8 +202,7 @@ export const createCard = async (
     newCard.servisInfo = cardData.servisInfo;
     newCard.comments = cardData.comments;
     newCard.recommendation = cardData.recommendation;
-    newCard.workSum =
-      cardData.paymentType === "internal" ? workSumOwn : workSum;
+    newCard.workSum =workSum;
     newCard.workSumOwn = workSumOwn;
     newCard.avSum = avSum;
     newCard.openDate = new Date();
@@ -525,8 +541,23 @@ export const updateCard = async (
      const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
       const av = Number(j.av || 0);
       const globalDiscount = Number(j.discount || 0);
-      const price = av * 50 * (1 - globalDiscount / 100);
+      if(cardData.paymentType==="internal"){
+         let workerTotalSumOwn = 0;
+      for (const jw of j.workers) {
+        const avWorker = Number(jw.workerAv || 0);
+        const workerId = Number(jw.workerId);
+        const workerPercent = workerMap.get(workerId) || 0;
+
+        const price = 50 * avWorker * (workerPercent / 100)*(1-globalDiscount/100);
+        // ⭐ DÜZGÜN MAAS DÜSTURU
+        workerTotalSumOwn += price;
+      }
+      return sum + workerTotalSumOwn;
+      }else{
+         const price = av * 50 * (1 - globalDiscount / 100);
       return sum + price;
+      }
+    
     }, 0);
 
 
@@ -570,8 +601,7 @@ export const updateCard = async (
     existingCard.servisInfo = cardData.servisInfo;
     existingCard.comments = cardData.comments;
     existingCard.recommendation = cardData.recommendation;
-    existingCard.workSum =
-      cardData.paymentType === "internal" ? workSumOwn : workSum;
+    existingCard.workSum = workSum;
     existingCard.workSumOwn = workSumOwn;
 
     const updatedCard = await cardRepository.save(existingCard);

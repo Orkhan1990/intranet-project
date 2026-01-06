@@ -41,7 +41,7 @@ useEffect(() => {
   const av = Number(values.av || 0);
   const discount = Number(values.discount || 0);
 
-  const basePrice = av * 50*(1 - discount / 100) ;
+  const basePrice = av * 50;
 
   let calculatedTotal = 0;
 
