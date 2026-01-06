@@ -196,9 +196,6 @@ const UpdateCard = () => {
   console.log(cardData?.isOpen);
   const hasRepairAct = cardData?.repair?.repairId > 349;
 
-
-  
-
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
@@ -292,7 +289,7 @@ const UpdateCard = () => {
     console.log({ data });
     if (data.isExist) {
       navigate(`/account/${cardId}`);
-      window.scrollTo(0,0)
+      window.scrollTo(0, 0);
     } else {
       alert("Hesab aktı uğurla yaradıldı");
       reloadCard();
@@ -304,7 +301,7 @@ const UpdateCard = () => {
     console.log({ data });
     if (data.isExist) {
       navigate(`/repair/${cardId}`);
-      window.scrollTo(0,0)
+      window.scrollTo(0, 0);
     } else {
       alert("Təmir aktı uğurla yaradıldı");
       reloadCard();
@@ -571,6 +568,7 @@ const UpdateCard = () => {
                         name="model"
                         placeholder="Model"
                         sizing="sm"
+                        disabled={!cardData?.isOpen}
                       />
                     </div>
 
@@ -777,7 +775,6 @@ const UpdateCard = () => {
                             }
                             cardData={cardData}
                             paymentType={values.paymentType}
-
                           />
                         ))}
 
