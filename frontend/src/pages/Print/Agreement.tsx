@@ -97,20 +97,23 @@ const totalAmount = mergedTableData.reduce((sum: number, item: any) => {
 }, 0);
 
 
-const totalAmountWithDiscount = mergedTableData.reduce((sum: number, item: any) => {
-  // JOB
-  if (item.type === "job") {
-    return sum + item.price * (1 - item.discount / 100);
-  }
+const totalAmountWithDiscount = mergedTableData.reduce(
+  (sum: number, item: any) => {
 
-  // PART
-  return (
-    sum +
-    item.price *
+    // JOB → artıq discountlu gəlir
+    if (item.type === "job") {
+      return sum + item.price;
+    }
+
+    // PART → burada discount tətbiq olunur
+    return sum +
+      item.price *
       (item.quantity || 1) *
-      (1 - (item.discount || 0) / 100)
-  );
-}, 0);
+      (1 - (item.discount || 0) / 100);
+
+  },
+  0
+);
 
 const totalDiscount= totalAmount - totalAmountWithDiscount;
 
