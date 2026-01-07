@@ -25,52 +25,61 @@ const Repair = () => {
     getData();
   }, [id]);
 
-    const mergedTableData = [
-  ...(cardDetails?.cardJobs || []).map((job: any) => ({
-    type: "job",
-    id: job.id,
-    code: "",
-    name: job.name,
-    quantity: "",          // iş saatı
-    price: job.price,
-    discount: job.discount,
-    date: job.createdAt,
-    av: job.av,            // iş saatı üçün əlavə dəyər
-  })),
+  const mergedTableData = [
+    ...(cardDetails?.cardJobs || []).map((job: any) => ({
+      type: "job",
+      id: job.id,
+      code: "",
+      name: job.name,
+      quantity: "", // iş saatı
+      price: job.price,
+      discount: job.discount,
+      date: job.createdAt,
+      av: job.av, // iş saatı üçün əlavə dəyər
+    })),
 
+    ...(cardDetails?.expenses || []).map((expense: any) => ({
+      name: expense.description,
+      price: expense.price,
+    })),
 
-  ...(cardDetails?.expenses||[]).map((expense:any)=>({
-    name:expense.description,
-    price:expense.price
-  })),
+    ...(cardDetails?.cardParts || []).map((part: any) => ({
+      type: "part",
+      id: part.id,
+      code: part.code,
+      name: part.partName,
+      quantity: part.count, // hissə sayı
+      price: part.soldPrice,
+      discount: part.discount,
+      date: part.date,
+    })),
+  ];
+  // const totalAmount = mergedTableData.reduce((sum: number, item: any) => {
+  //   // JOB
+  //   if (item.type === "job") {
+  //     return (
+  //       sum +
+  //       (cardDetails.paymentType === "internal"
+  //         ? item.price / (1 - item.discount / 100)
+  //         : item.av * 50)
+  //     );
+  //   }
 
-  ...(cardDetails?.cardParts || []).map((part: any) => ({
-    type: "part",
-    id: part.id,
-    code: part.code,
-    name: part.partName,
-    quantity: part.count,       // hissə sayı
-    price: part.soldPrice,
-    discount: part.discount,
-    date: part.date,
-  })),
-];
-  const totalAmount = mergedTableData.reduce((sum: number, item: any) => {
-    // JOB
-    if (item.type === "job") {
-      return sum + item.av * 50;
-    }
-
-    // PART
-    return sum + item.price * (item.quantity || 1);
-  }, 0);
+  //   // PART
+  //   return sum + item.price * (item.quantity || 1);
+  // }, 0);
 
   const totalAmountWithDiscount = mergedTableData.reduce(
     (sum: number, item: any) => {
       // JOB
-      if (item.type === "job") {
-        return sum + item.av * 50 * (1 - item.discount / 100);
-      }
+        if (item.type === "job") {
+      return (
+        sum +
+        (cardDetails.paymentType === "internal"
+          ? (item.price / (1 - item.discount / 100)*(1 - item.discount / 100))
+          : (item.av * 50)*(1 - item.discount / 100))
+      );
+    }
 
       // PART
       return (
@@ -81,9 +90,9 @@ const Repair = () => {
     0
   );
 
-  const totalDiscount = totalAmount - totalAmountWithDiscount;
+  // const totalDiscount = totalAmount - totalAmountWithDiscount;
 
-  const finalAmountAfterDiscount = totalAmount - totalDiscount;
+  const finalAmountAfterDiscount = totalAmountWithDiscount;
 
   const vat = finalAmountAfterDiscount * 0.18;
   const finalTotal = finalAmountAfterDiscount + vat;
@@ -146,8 +155,8 @@ const Repair = () => {
         {/* INFO */}
         <p className="mt-6 text-[13px]">
           <strong>{cardDetails?.carNumber}</strong> DQN texnikada{" "}
-          <strong>{formatAzDate(cardDetails?.openDate)}</strong> tarixində görülmüş işin dəyəri
-          (<strong>İş kartı № {cardDetails?.id}</strong>)
+          <strong>{formatAzDate(cardDetails?.openDate)}</strong> tarixində
+          görülmüş işin dəyəri (<strong>İş kartı № {cardDetails?.id}</strong>)
         </p>
 
         {/* TABLE */}
@@ -170,12 +179,12 @@ const Repair = () => {
           <tbody>
             {mergedTableData &&
               mergedTableData.map((item: any, i: number) => {
-                const quantity = Number(item?.quantity) || 1;
+                // const quantity = Number(item?.quantity) || 1;
                 const price = Number(item?.price) || 0;
                 const discount = Number(item?.discount) || 0;
 
                 const discountedPrice = price * (1 - discount / 100);
-                const total = quantity * (price * (1 - discount / 100));
+                // const total = quantity * (price * (1 - discount / 100));
                 return (
                   <tr key={i}>
                     <td className="border border-black text-center">{i + 1}</td>
@@ -187,27 +196,42 @@ const Repair = () => {
                       {item?.quantity ? item.quantity : ""}
                     </td>
                     <td className="border border-black text-center">
-                      {item?.quantity===""?((item.av*50)*(1-item?.discount/100)):(parseFloat(discountedPrice.toFixed(2)))}
+                      {item?.quantity === ""
+                        ? ""
+                        : parseFloat(discountedPrice.toFixed(2))}
                     </td>
                     <td className="border border-black text-center">
-                      {item?.quantity===""?((item.av*50)*(1-item?.discount/100)):(parseFloat(total.toFixed(2)))}
+                      {item.quantity === ""
+                        ? parseFloat(
+                            (item.price / (1 - item.discount / 100)* (1 - item.discount / 100||1)).toFixed(2)
+                          )
+                        : parseFloat(
+                            (item.price * (1 - item.discount / 100||1)*(item.quantity || 1)).toFixed(2)
+                          )}
                     </td>
                   </tr>
                 );
               })}
 
             <tr className="font-bold">
-              <td colSpan={5} className="border border-black text-right pr-2 font-bold">
+              <td
+                colSpan={5}
+                className="border border-black text-right pr-2 font-bold"
+              >
                 Cəmi
               </td>
-              <td className="border border-black text-center">{parseFloat(finalAmountAfterDiscount.toFixed(2))}</td>
+              <td className="border border-black text-center">
+                {parseFloat(finalAmountAfterDiscount.toFixed(2))}
+              </td>
             </tr>
 
             <tr className="font-bold">
               <td colSpan={5} className="border border-black text-right pr-2 ">
                 ƏDV
               </td>
-              <td className="border border-black text-center">{parseFloat(vat.toFixed(2))}</td>
+              <td className="border border-black text-center">
+                {parseFloat(vat.toFixed(2))}
+              </td>
             </tr>
 
             <tr>
