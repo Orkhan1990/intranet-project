@@ -418,3 +418,15 @@ export interface EditPrixodInterface {
   spareParts: SparePartInterface[];
   prixodHist: PrixodHistInterface[];
 }
+
+
+export interface ClientCar {
+  model: string;
+  type: string;
+  manufactured: string;
+  km: number;
+  carNumber: string;
+  produceDate: string;
+  sassi:string;
+  qostNumber:string;
+}

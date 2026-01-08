@@ -4,6 +4,12 @@ import { AppDataSource } from "../database";
 import { Client } from "../entites/Client";
 import { User } from "../entites/User";
 import { CustomRequest } from "../middleware/verifyToken";
+import { Card } from "../entites/Card";
+
+
+const clientRepository = AppDataSource.getRepository(Client);
+const userRepository = AppDataSource.getRepository(User);
+const cardRepository=AppDataSource.getRepository(Card);
 
 export const createClient = async (
   req: CustomRequest,
@@ -29,11 +35,12 @@ export const createClient = async (
       partsDiscount,
     } = req.body;
     const userId = req.userId;
-    console.log(req.body);
+    // console.log(req.body);
     //  console.log(req.userId);
 
-    const clientRepository = AppDataSource.getRepository(Client);
-    const userRepository = AppDataSource.getRepository(User);
+
+
+
     const existClient = await clientRepository.findOneBy({ companyName });
     const user = await userRepository.findOneBy({ id: userId });
 
@@ -193,3 +200,40 @@ export const updateClient=async(req:Request,res:Response,next:NextFunction)=>{
     next(errorHandler(401,error))
   }
 }
+
+
+export const getClientCars = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const clientId = Number(req.params.id);
+
+    console.log(req.params.id);
+    
+
+    if (!clientId) {
+      return next(errorHandler(400, "clientId tapılmadı"));
+    }
+
+    const cars = await cardRepository.find({
+      where: { clientId },
+      select: [
+        "id",
+        "model",
+        "type",
+        "manufactured",
+        "km",
+        "carNumber",
+        "produceDate",
+        "sassi",
+         "qostNumber",
+      ],
+    });
+
+    return res.status(200).json(cars);
+  } catch (error) {
+    next(errorHandler(500, error));
+  }
+};

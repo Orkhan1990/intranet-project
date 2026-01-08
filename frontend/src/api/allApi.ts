@@ -504,3 +504,17 @@ export const closeCardApi = async (cardId: any) => {
     );
   }
 };
+
+
+export const fetchClientCars = async (clientId: number) => {
+  try {
+    const response = await axios.get(`${VITE_API_BASE_URL}client/getClientCars/${clientId}`);
+    // Məsələn backend belə göndərir: { data: [{ id, model, type, manufactured, km, carNumber, produceDate }] }
+    return response.data;
+  } catch (error: any) {
+    console.log(error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  }
+};

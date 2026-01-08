@@ -217,71 +217,7 @@ const UpdateCard = () => {
     reloadCard();
   }, [id, refreshPage]);
 
-  // useEffect(() => {
-  //   const loadData = async () => {
-  //     try {
-
-  //       const data = await fetchCardDetails(id);
-
-  //       setCardData({
-  //         ...initialValues,
-  //         ...data,
-  //         // PROBLEMLER
-  //         cardProblems: data.cardProblems?.length
-  //           ? data.cardProblems.map((p: any) => ({
-  //               description: p.description || "",
-  //               serviceWorkers: p.serviceWorkers?.length
-  //                 ? p.serviceWorkers.map((w: any) => w.id) // <-- ID-lərə çevir
-  //                 : [""],
-  //             }))
-  //           : [{ description: "", serviceWorkers: [""] }],
-
-  //         // JOBS (backend cardJobs → jobs)
-  //         cardJobs: data.cardJobs?.length
-  //           ? data.cardJobs.map((j: any) => ({
-  //               code: j.code || "",
-  //               name: j.name || "",
-  //               av: j.av || 0,
-  //               price: j.price || 0,
-  //               discount: j.discount || 0,
-  //               oil: j.oil || "",
-
-  //               workers: j.workers?.length
-  //                 ? j.workers.map((w: any) => ({
-  //                     workerAv: Number(w.workerAv) || "",
-  //                     workerId: w.user?.id || "", // <-- DÜZGÜN YER
-  //                   }))
-  //                 : [{ workerAv: "", workerId: "" }],
-  //             }))
-  //           : initialValues.cardJobs,
-
-  //         // EXPENCES (backend expenses/expences qarışıqlığı)
-  //         expences: data.expences?.length
-  //           ? data.expences
-  //           : data.expenses?.length
-  //             ? data.expenses
-  //             : [{ description: "", price: 0 }],
-
-  //             cardParts: data.cardParts?.length
-  //             ? data.cardParts
-  //             : [{
-  //               code: "",
-  //               partName: "",
-  //               count: 0,
-  //               soldPrice: 0,
-  //               discount: 0,
-  //               totalPrice: 0
-  //             }],
-  //       });
-  //     } catch (err) {
-  //       console.log("Card load error:", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   loadData();
-  // }, [id]);
+ 
 
   const createAccountForCard = async (cardId: any) => {
     const data = await createAccountForCardApi(cardId);
@@ -353,7 +289,6 @@ const UpdateCard = () => {
 
   const totalPriceWorker = jobPrices.reduce((a, b) => a + b, 0);
   const totalExpencesPrice = expencePrices;
-  // const totalCardPartsPrice = ;
   const totalPriceWithoutNds =
     totalPriceWorker + totalExpencesPrice + cardPartsPrice;
   const totalPriceNds = totalPriceWithoutNds * 0.18;
@@ -508,7 +443,7 @@ const UpdateCard = () => {
               {/* Machine Info */}
               <SectionCard title="Texniki Məlumat">
                 <div className="p-5 border rounded-xl bg-white shadow-sm">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="flex flex-col gap-4">
                     <div>
                       <label className="block mb-1 font-medium">
                         Katın nömrəsi
@@ -519,6 +454,7 @@ const UpdateCard = () => {
                         placeholder="Şassi nömrəsi"
                         sizing="sm"
                         disabled={!cardData?.isOpen}
+                        className="w-1/3"
                       />
                     </div>
 
@@ -530,7 +466,7 @@ const UpdateCard = () => {
                       <Field
                         as={Select}
                         name="type"
-                        className="w-full"
+                        className="w-1/3"
                         sizing="sm"
                         disabled={!cardData?.isOpen}
                       >
@@ -541,8 +477,9 @@ const UpdateCard = () => {
                     </div>
 
                     {/* İstehsalçı */}
-                    <div>
-                      <label className="block mb-1 font-medium">
+                     <div className="flex justify-between  items-center">
+                      <div className="w-1/3">
+                          <label className="block mb-1 font-medium">
                         İstehsalçı
                       </label>
                       <Field
@@ -558,6 +495,23 @@ const UpdateCard = () => {
                         <option value="ford">Ford</option>
                         <option value="volvo">Volvo</option>
                       </Field>
+                      </div>
+
+                <div className="mt-7 w-1/6">
+                           <label className="block mb-1 font-medium">
+                      </label>
+                      <Field
+                        as={Select}
+                        name="manufactured"
+                        className="w-full"
+                        sizing="sm"
+                        disabled={!cardData?.isOpen}
+                      >
+                        <option value=""></option>
+                 
+                      </Field>
+                      </div>
+                    
                     </div>
 
                     {/* Model */}
@@ -569,6 +523,7 @@ const UpdateCard = () => {
                         placeholder="Model"
                         sizing="sm"
                         disabled={!cardData?.isOpen}
+                        className="w-1/3"
                       />
                     </div>
 
@@ -583,6 +538,7 @@ const UpdateCard = () => {
                         placeholder="Şassi nömrəsi"
                         sizing="sm"
                         disabled={!cardData?.isOpen}
+                        className="w-1/3"
                       />
                     </div>
 
@@ -597,6 +553,7 @@ const UpdateCard = () => {
                         placeholder="Maşın nömrəsi"
                         sizing="sm"
                         disabled={!cardData?.isOpen}
+                        className="w-1/3"
                       />
                     </div>
 
@@ -610,6 +567,7 @@ const UpdateCard = () => {
                         name="produceDate"
                         sizing="sm"
                         disabled={!cardData?.isOpen}
+                        className="w-1/3"
                       >
                         {[2025, 2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
                           <option key={y}>{y}</option>
@@ -628,6 +586,7 @@ const UpdateCard = () => {
                         placeholder="Km/Motosaat"
                         sizing="sm"
                         disabled={!cardData?.isOpen}
+                        className="w-1/3"
                       />
                     </div>
 
@@ -642,6 +601,7 @@ const UpdateCard = () => {
                         placeholder="Dövlət nömrəsi"
                         sizing="sm"
                         disabled={!cardData?.isOpen}
+                        className="w-1/3"
                       />
                     </div>
 
@@ -655,6 +615,7 @@ const UpdateCard = () => {
                         name="paymentType"
                         sizing="sm"
                         disabled={!cardData?.isOpen}
+                        className="w-1/3"
                       >
                         <option value="transfer">Köçürülmə</option>
                         <option value="cash">Nağd</option>

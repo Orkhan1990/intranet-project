@@ -15,8 +15,8 @@ import NewCardProblems from "../../components/NewCardProblems";
 import NewCardWorkers from "../../components/NewCardWorkers";
 // import NewCardAddParts from "../../components/NewCardAddParts";
 import AddCharges from "../../components/AddCharges";
-import { NewCardInterface } from "../../types";
-import { createCardApi } from "../../api/allApi";
+import { ClientCar, NewCardInterface } from "../../types";
+import { createCardApi, fetchClientCars } from "../../api/allApi";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
@@ -96,7 +96,8 @@ const NewCard = () => {
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
   const [expencePrices, setExpencePrices] = useState<number>(0);
-  const { users } = useSelector((state: RootState) => state.user);
+  const [clientCars, setClientCars] = useState<ClientCar[] | null>(null);  
+   const { users } = useSelector((state: RootState) => state.user);
   const { clients } = useSelector((state: RootState) => state.client);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -114,11 +115,8 @@ const NewCard = () => {
     load();
   }, [dispatch]);
 
-
-  console.log(openBobcatWarranty,openAmmannWarranty);
+  console.log(openBobcatWarranty, openAmmannWarranty, clientCars);
   // console.log({clientType});
-  
-  
 
   const navigate = useNavigate();
   // İşçilik qiymətini yeniləyən funksiya
@@ -216,6 +214,17 @@ const NewCard = () => {
                       name="clientId"
                       className="w-full mt-1"
                       sizing="sm"
+                      onChange={async (e: any) => {
+                        const clientId = e.target.value;
+                        setFieldValue("clientId", clientId);
+
+                        // 1. Müştərinin maşınlarını gətir
+                        const clientCars:any = await fetchClientCars(clientId);
+                        setClientCars(clientCars); // useState ilə saxlayırıq
+
+                        // 2. Əvvəlki maşın seçimi sıfırlansın
+                        setFieldValue("sassi", "");
+                      }}
                     >
                       <option value="">Müştərini seç</option>
                       {clients.map((item) => (
@@ -281,7 +290,7 @@ const NewCard = () => {
               {/* Machine Info */}
               <SectionCard title="Texniki Məlumat">
                 <div className="p-5 border rounded-xl bg-white shadow-sm">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="flex flex-col gap-3">
                     {/* Texnikanın növü */}
                     <div>
                       <label className="block mb-1 font-medium">
@@ -290,8 +299,8 @@ const NewCard = () => {
                       <Field
                         as={Select}
                         name="type"
-                        className="w-full"
                         sizing="sm"
+                        className="w-1/3"
                       >
                         {types.map((t, i) => (
                           <option key={i}>{t}</option>
@@ -300,22 +309,56 @@ const NewCard = () => {
                     </div>
 
                     {/* İstehsalçı */}
-                    <div>
-                      <label className="block mb-1 font-medium">
-                        İstehsalçı
-                      </label>
-                      <Field
-                        as={Select}
-                        name="manufactured"
-                        className="w-full"
-                        sizing="sm"
-                      >
-                        <option value="man">MAN</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="daf">DAF</option>
-                        <option value="ford">Ford</option>
-                        <option value="volvo">Volvo</option>
-                      </Field>
+                    <div className="flex justify-between  items-center">
+                      <div className="w-1/3">
+                        <label className="block mb-1 font-medium">
+                          İstehsalçı
+                        </label>
+                        <Field as={Select} name="manufactured" sizing="sm">
+                          <option value="man">MAN</option>
+                          <option value="mercedes">Mercedes</option>
+                          <option value="daf">DAF</option>
+                          <option value="ford">Ford</option>
+                          <option value="volvo">Volvo</option>
+                        </Field>
+                      </div>
+                      <div className="mt-7 w-1/6">
+                        <Field
+                          as={Select}
+                          name="manufactured"
+                          sizing="sm"
+                          onChange={(e: any) => {
+                            const selectedSassi = e.target.value;
+                            setFieldValue("sassi", selectedSassi);
+
+                            // 1. seçilmiş maşın datalarını tap
+                            const carData = clientCars?.find(
+                              (c) => c.sassi === selectedSassi
+                            );
+                            if (carData) {
+                              // 2. Formik inputlarını avtomatik doldur
+                              setFieldValue("model", carData.model??"");
+                              setFieldValue("type", carData.type);
+                              setFieldValue(
+                                "manufactured",
+                                carData.manufactured
+                              );
+                              setFieldValue("carNumber", carData.carNumber);
+                              setFieldValue("produceDate", carData.produceDate);
+                              setFieldValue("qostNumber", carData.qostNumber);
+                              
+                            }
+                          }}
+                        >
+                          <option value=""></option>
+                          {clientCars?.map((car,index) => (
+                            
+                            <option key={index} value={car.sassi}>
+                              {car.sassi}
+                            </option>
+                          ))}
+                        </Field>
+                      </div>
                     </div>
 
                     {/* Model */}
@@ -326,6 +369,7 @@ const NewCard = () => {
                         name="model"
                         placeholder="Model"
                         sizing="sm"
+                        className="w-1/3"
                       />
                     </div>
 
@@ -339,6 +383,7 @@ const NewCard = () => {
                         name="sassi"
                         placeholder="Şassi nömrəsi"
                         sizing="sm"
+                        className="w-1/3"
                       />
                     </div>
 
@@ -352,6 +397,7 @@ const NewCard = () => {
                         name="carNumber"
                         placeholder="Maşın nömrəsi"
                         sizing="sm"
+                        className="w-1/3"
                       />
                     </div>
 
@@ -360,7 +406,12 @@ const NewCard = () => {
                       <label className="block mb-1 font-medium">
                         Buraxılış ili
                       </label>
-                      <Field as={Select} name="produceDate" sizing="sm">
+                      <Field
+                        as={Select}
+                        name="produceDate"
+                        sizing="sm"
+                        className="w-1/3"
+                      >
                         {[2025, 2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
                           <option key={y}>{y}</option>
                         ))}
@@ -377,6 +428,7 @@ const NewCard = () => {
                         name="km"
                         placeholder="Km/Motosaat"
                         sizing="sm"
+                        className="w-1/3"
                       />
                     </div>
 

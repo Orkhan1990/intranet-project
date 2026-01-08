@@ -1,5 +1,5 @@
 import { Button } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // required
 import WorkerCard from "../../components/Statistics/WorkerCard";
@@ -25,6 +25,25 @@ const Statistics = () => {
   const filters = useSelector((state: RootState) => state.filter);
   const cards = useSelector((state: RootState) => state.card.cards);
   const activeTab = useSelector((state: RootState) => state.filter.activeTab);
+
+
+useEffect(() => {
+  const autoFetch = async () => {
+    setLoading(true);
+
+    const currentFilters = {
+      ...filters,
+      startDate: startDate?.toISOString() ?? null,
+      endDate: endDate?.toISOString() ?? null,
+    };
+
+    await dispatch(fetchCards(currentFilters));
+    setLoading(false);
+  };
+
+  autoFetch();
+}, []); // ⬅️ SADECE MOUNT OLANDA
+
 
   console.log({ cards, loading });
 
