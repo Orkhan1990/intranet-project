@@ -20,13 +20,15 @@ import {
   createAccountForCardApi,
   createRepairForCardApi,
   fetchCardDetails,
+  fetchClientCars,
   updateCardApi,
 } from "../../api/allApi";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
-import { UpdateCardInterface } from "../../types";
+import { ClientCar, UpdateCardInterface } from "../../types";
+import { fetchCards } from "../../redux-toolkit/features/filters/filterSlice";
 
 const types = [
   "Tiqac",
@@ -63,6 +65,11 @@ const UpdateCard = () => {
   const [expencePrices, setExpencePrices] = useState<number>(0);
   const [cardPartsPrice, setCardPartsPrice] = useState<number>(0);
   const [cardData, setCardData] = useState<UpdateCardInterface | null>(null);
+  const [clientCars, setClientCars] = useState<ClientCar[] | null>(null);
+
+    const navigate = useNavigate();
+
+
   const [initialValues, setInitialValues] = useState({
     clientId: 0,
     type: "tiqac",
@@ -217,8 +224,6 @@ const UpdateCard = () => {
     reloadCard();
   }, [id, refreshPage]);
 
- 
-
   const createAccountForCard = async (cardId: any) => {
     const data = await createAccountForCardApi(cardId);
 
@@ -244,7 +249,6 @@ const UpdateCard = () => {
     }
   };
 
-  const navigate = useNavigate();
   // İşçilik qiymətini yeniləyən funksiya
   const handlePriceUpdate = (index: number, price: number) => {
     setJobPrices((prev) => {
@@ -294,22 +298,27 @@ const UpdateCard = () => {
   const totalPriceNds = totalPriceWithoutNds * 0.18;
   const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
-  const onSubmit = async (values: any, totalPriceWorker: any) => {
-    try {
-      setLoading(true);
-      setError(false);
-      const response = await updateCardApi(id, values, totalPriceWorker);
-      if (response.success === false) {
-        setError(response.message);
-      } else {
-        navigate("/statistics");
-        window.scrollTo(0, 0);
-      }
-      console.log("Card created:", response);
-    } catch (err: any) {
-      setError(err.message || "Kart yaradılarkən xəta baş verdi");
+ const onSubmit = async (values: any, totalPriceWorker: any) => {
+  try {
+    setLoading(true);
+    setError(false);
+
+    const response = await updateCardApi(id, values, totalPriceWorker);
+
+    if (response.success === false) {
+      setError(response.message);
+    } else {
+      // 🔥 STATISTIC DATA YENİDƏN GƏLSİN
+      await dispatch(fetchCards({} as any));
+
+      navigate("/statistics");
     }
-  };
+  } catch (err: any) {
+    setError(err.message || "Kart yenilənərkən xəta baş verdi");
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading)
     return (
@@ -374,6 +383,17 @@ const UpdateCard = () => {
                       className="w-full mt-1"
                       sizing="sm"
                       disabled={!cardData?.isOpen}
+                      onChange={async (e: any) => {
+                        const clientId = e.target.value;
+                        setFieldValue("clientId", clientId);
+
+                        // 1. Müştərinin maşınlarını gətir
+                        const clientCars: any = await fetchClientCars(clientId);
+                        setClientCars(clientCars); // useState ilə saxlayırıq
+
+                        // 2. Əvvəlki maşın seçimi sıfırlansın
+                        setFieldValue("sassi", "");
+                      }}
                     >
                       <option value="">Müştərini seç</option>
                       {clients &&
@@ -477,41 +497,54 @@ const UpdateCard = () => {
                     </div>
 
                     {/* İstehsalçı */}
-                     <div className="flex justify-between  items-center">
+                    <div className="flex justify-between  items-center">
                       <div className="w-1/3">
-                          <label className="block mb-1 font-medium">
-                        İstehsalçı
-                      </label>
-                      <Field
-                        as={Select}
-                        name="manufactured"
-                        className="w-full"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                      >
-                        <option value="man">MAN</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="daf">DAF</option>
-                        <option value="ford">Ford</option>
-                        <option value="volvo">Volvo</option>
-                      </Field>
+                        <label className="block mb-1 font-medium">
+                          İstehsalçı
+                        </label>
+                        <Field as={Select} name="manufactured" sizing="sm">
+                          <option value="man">MAN</option>
+                          <option value="mercedes">Mercedes</option>
+                          <option value="daf">DAF</option>
+                          <option value="ford">Ford</option>
+                          <option value="volvo">Volvo</option>
+                        </Field>
                       </div>
+                      <div className="mt-7 w-1/6">
+                        <Field
+                          as={Select}
+                          name="sassi"
+                          sizing="sm"
+                          onChange={(e: any) => {
+                            const selectedSassi = e.target.value;
+                            setFieldValue("sassi", selectedSassi);
 
-                <div className="mt-7 w-1/6">
-                           <label className="block mb-1 font-medium">
-                      </label>
-                      <Field
-                        as={Select}
-                        name="manufactured"
-                        className="w-full"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                      >
-                        <option value=""></option>
-                 
-                      </Field>
+                            // 1. seçilmiş maşın datalarını tap
+                            const carData = clientCars?.find(
+                              (c) => c.sassi === selectedSassi
+                            );
+                            if (carData) {
+                              // 2. Formik inputlarını avtomatik doldur
+                              setFieldValue("model", carData.model ?? "");
+                              setFieldValue("type", carData.type);
+                              setFieldValue(
+                                "manufactured",
+                                carData.manufactured
+                              );
+                              setFieldValue("carNumber", carData.carNumber);
+                              setFieldValue("produceDate", carData.produceDate);
+                              setFieldValue("qostNumber", carData.qostNumber);
+                            }
+                          }}
+                        >
+                          <option value=""></option>
+                          {clientCars?.map((car, index) => (
+                            <option key={index} value={car.sassi}>
+                              {car.sassi}
+                            </option>
+                          ))}
+                        </Field>
                       </div>
-                    
                     </div>
 
                     {/* Model */}

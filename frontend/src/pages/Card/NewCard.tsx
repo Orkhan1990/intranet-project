@@ -325,7 +325,7 @@ const NewCard = () => {
                       <div className="mt-7 w-1/6">
                         <Field
                           as={Select}
-                          name="manufactured"
+                          name="sassi"
                           sizing="sm"
                           onChange={(e: any) => {
                             const selectedSassi = e.target.value;
@@ -442,6 +442,7 @@ const NewCard = () => {
                         name="qostNumber"
                         placeholder="Dövlət nömrəsi"
                         sizing="sm"
+                         className="w-1/3"
                       />
                     </div>
 
@@ -450,7 +451,7 @@ const NewCard = () => {
                       <label className="block mb-1 font-medium">
                         Ödəniş tipi
                       </label>
-                      <Field as={Select} name="paymentType" sizing="sm">
+                      <Field as={Select} name="paymentType" sizing="sm"  className="w-1/3">
                         <option value="transfer">Köçürülmə</option>
                         <option value="cash">Nağd</option>
                         <option value="warranty">Qarantiya</option>

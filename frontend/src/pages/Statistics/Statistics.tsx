@@ -12,7 +12,7 @@ import {
   fetchCards,
   setActiveTab,
 } from "../../redux-toolkit/features/filters/filterSlice";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Statistics = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -26,6 +26,11 @@ const Statistics = () => {
   const cards = useSelector((state: RootState) => state.card.cards);
   const activeTab = useSelector((state: RootState) => state.filter.activeTab);
 
+const location = useLocation();
+
+useEffect(() => {
+  dispatch(fetchCards(filters));
+}, [location.pathname]);
 
 useEffect(() => {
   const autoFetch = async () => {
