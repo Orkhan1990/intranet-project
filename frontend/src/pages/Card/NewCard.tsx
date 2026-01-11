@@ -270,19 +270,39 @@ const NewCard = () => {
                 </div>
 
                 {openGedis && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    {[
-                      "Hara",
-                      "Maşınla",
-                      "Məsafə (Km)",
-                      "İşçilər getdi (sürücü ilə birlikdə)",
-                      "İş saatları (səyahət daxil olmaqla)",
-                    ].map((label, i) => (
-                      <div key={i}>
-                        <Label value={label} />
-                        <TextInput className="mt-1" />
-                      </div>
-                    ))}
+                  <div className="flex flex-col gap-5 mt-4">
+                   
+                   <div className="flex gap-2 items-center">
+                    <label htmlFor="">Hara</label>
+                    <TextInput sizing="sm"/>
+                   </div>
+
+                     <div className="flex gap-2 items-center">
+                    <label htmlFor="">Maşın</label>
+                    <Select sizing="sm">
+                      <option value="mitsubishi">Mitsubishi L200</option>
+                      <option value="man">Man TGL 12.240</option>
+                    </Select>
+                   </div>
+
+                     <div className="flex gap-2 items-center">
+                    <label htmlFor="">Məsafə</label>
+                    <TextInput sizing="sm"/>
+                    <span>km</span>
+                   </div>
+
+                    <div className="flex gap-2 items-center">
+                    <label htmlFor="">İşçi sayı</label>
+                    <TextInput sizing="sm"/>
+                    <span>(sürücü ilə birlikdə)</span>
+                   </div>
+
+                   <div className="flex gap-2 items-center">
+                    <label htmlFor="">İş saatları</label>
+                    <TextInput sizing="sm"/>
+                    <span>(səyahət daxil olmaqla)</span>
+                   </div>
+
                   </div>
                 )}
               </SectionCard>
