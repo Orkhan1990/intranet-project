@@ -21,6 +21,8 @@ import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
+import { AUTO_JOBS } from "../../utilis/autojobs";
+import { AUTO_EXPENSES } from "../../utilis/autoExpenses";
 // import { updateJobPricesByClientType } from "../../utilis/utilis";
 
 const types = [
@@ -96,8 +98,8 @@ const NewCard = () => {
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
   const [expencePrices, setExpencePrices] = useState<number>(0);
-  const [clientCars, setClientCars] = useState<ClientCar[] | null>(null);  
-   const { users } = useSelector((state: RootState) => state.user);
+  const [clientCars, setClientCars] = useState<ClientCar[] | null>(null);
+  const { users } = useSelector((state: RootState) => state.user);
   const { clients } = useSelector((state: RootState) => state.client);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -219,7 +221,7 @@ const NewCard = () => {
                         setFieldValue("clientId", clientId);
 
                         // 1. Müştərinin maşınlarını gətir
-                        const clientCars:any = await fetchClientCars(clientId);
+                        const clientCars: any = await fetchClientCars(clientId);
                         setClientCars(clientCars); // useState ilə saxlayırıq
 
                         // 2. Əvvəlki maşın seçimi sıfırlansın
@@ -249,7 +251,10 @@ const NewCard = () => {
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      onChange={(e) => setOpenGedis(e.target.checked)}
+                      checked={openGedis}
+                      onChange={(e) => {
+                        setOpenGedis(e.target.checked);
+                      }}
                     />
                     Gediş
                   </label>
@@ -271,38 +276,86 @@ const NewCard = () => {
 
                 {openGedis && (
                   <div className="flex flex-col gap-5 mt-4">
-                   
-                   <div className="flex gap-2 items-center">
-                    <label htmlFor="">Hara</label>
-                    <TextInput sizing="sm"/>
-                   </div>
-
-                     <div className="flex gap-2 items-center">
-                    <label htmlFor="">Maşın</label>
-                    <Select sizing="sm">
-                      <option value="mitsubishi">Mitsubishi L200</option>
-                      <option value="man">Man TGL 12.240</option>
-                    </Select>
-                   </div>
-
-                     <div className="flex gap-2 items-center">
-                    <label htmlFor="">Məsafə</label>
-                    <TextInput sizing="sm"/>
-                    <span>km</span>
-                   </div>
+                    <div className="flex gap-2 items-center">
+                      <label htmlFor="">Hara</label>
+                      <TextInput sizing="sm" />
+                    </div>
 
                     <div className="flex gap-2 items-center">
-                    <label htmlFor="">İşçi sayı</label>
-                    <TextInput sizing="sm"/>
-                    <span>(sürücü ilə birlikdə)</span>
-                   </div>
+                      <label htmlFor="">Maşın</label>
+                      <Select sizing="sm">
+                        <option value="mitsubishi">Mitsubishi L200</option>
+                        <option value="man">Man TGL 12.240</option>
+                      </Select>
+                    </div>
 
-                   <div className="flex gap-2 items-center">
-                    <label htmlFor="">İş saatları</label>
-                    <TextInput sizing="sm"/>
-                    <span>(səyahət daxil olmaqla)</span>
-                   </div>
+                    <div className="flex gap-2 items-center">
+                      <label htmlFor="">Məsafə</label>
+                      <TextInput
+                        sizing="sm"
+                        onChange={(e) => {
+                          if (openGedis) {
+                            // GEDİŞ JOB əlavə et
+                            setFieldValue("cardJobs", [
+                              {
+                                ...AUTO_JOBS.GEDIS,
+                                price: 0,
+                                oil: "",
+                                workers: [{ workerAv: "", workerId: 0 }],
+                              },
+                              // ...values.cardJobs,
+                            ]);
 
+                            // MUTEXESSIS XƏRC əlavə et
+                            setFieldValue("expences", [
+                              AUTO_EXPENSES.MUTEXESSIS,
+                              // ...values.expences,
+                            ]);
+                          } else {
+                            // GEDİŞ-i sil
+                            setFieldValue(
+                              "cardJobs",
+                              values.cardJobs.filter(
+                                (j: any) => j.code !== "GEDIS"
+                              )
+                            );
+
+                            // MUTEXESSIS-i sil
+                            setFieldValue(
+                              "expences",
+                              values.expences.filter(
+                                (e: any) =>
+                                  e.description !== "Mütəxəssis çıxışı"
+                              )
+                            );
+                          }
+
+                          const km = Number(e.target.value || 0);
+
+                          // const jobIndex = values.cardJobs.findIndex(
+                          //   (j: any) => j.code === "GEDIS"
+                          // );
+
+                          // if (jobIndex !== -1) {
+                            setFieldValue(`cardJobs.[0].av`, parseFloat((km * 0.014).toFixed(3)));
+                            setFieldValue(`cardJobs.[0].price`, parseFloat(((km * 0.014 * 72)/50).toFixed(3)));
+                          // }
+                        }}
+                      />
+                      <span>km</span>
+                    </div>
+
+                    <div className="flex gap-2 items-center">
+                      <label htmlFor="">İşçi sayı</label>
+                      <TextInput sizing="sm" />
+                      <span>(sürücü ilə birlikdə)</span>
+                    </div>
+
+                    <div className="flex gap-2 items-center">
+                      <label htmlFor="">İş saatları</label>
+                      <TextInput sizing="sm" />
+                      <span>(səyahət daxil olmaqla)</span>
+                    </div>
                   </div>
                 )}
               </SectionCard>
@@ -357,7 +410,7 @@ const NewCard = () => {
                             );
                             if (carData) {
                               // 2. Formik inputlarını avtomatik doldur
-                              setFieldValue("model", carData.model??"");
+                              setFieldValue("model", carData.model ?? "");
                               setFieldValue("type", carData.type);
                               setFieldValue(
                                 "manufactured",
@@ -366,13 +419,11 @@ const NewCard = () => {
                               setFieldValue("carNumber", carData.carNumber);
                               setFieldValue("produceDate", carData.produceDate);
                               setFieldValue("qostNumber", carData.qostNumber);
-                              
                             }
                           }}
                         >
                           <option value=""></option>
-                          {clientCars?.map((car,index) => (
-                            
+                          {clientCars?.map((car, index) => (
                             <option key={index} value={car.sassi}>
                               {car.sassi}
                             </option>
@@ -462,7 +513,7 @@ const NewCard = () => {
                         name="qostNumber"
                         placeholder="Dövlət nömrəsi"
                         sizing="sm"
-                         className="w-1/3"
+                        className="w-1/3"
                       />
                     </div>
 
@@ -471,7 +522,12 @@ const NewCard = () => {
                       <label className="block mb-1 font-medium">
                         Ödəniş tipi
                       </label>
-                      <Field as={Select} name="paymentType" sizing="sm"  className="w-1/3">
+                      <Field
+                        as={Select}
+                        name="paymentType"
+                        sizing="sm"
+                        className="w-1/3"
+                      >
                         <option value="transfer">Köçürülmə</option>
                         <option value="cash">Nağd</option>
                         <option value="warranty">Qarantiya</option>
@@ -569,6 +625,7 @@ const NewCard = () => {
                               handlePriceUpdate(index, price)
                             }
                             paymentType={values.paymentType}
+                            openGedis={openGedis}
                           />
                         ))}
                         <tbody>
