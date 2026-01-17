@@ -58,7 +58,6 @@ const UpdateCard = () => {
   const [error, setError] = useState<string | boolean>(false);
   const [loading, setLoading] = useState(false);
   const [refreshPage, setRefreshPage] = useState(false);
-  const [openGedis, setOpenGedis] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
@@ -67,8 +66,7 @@ const UpdateCard = () => {
   const [cardData, setCardData] = useState<UpdateCardInterface | null>(null);
   const [clientCars, setClientCars] = useState<ClientCar[] | null>(null);
 
-    const navigate = useNavigate();
-
+  const navigate = useNavigate();
 
   const [initialValues, setInitialValues] = useState({
     clientId: 0,
@@ -88,6 +86,12 @@ const UpdateCard = () => {
     openDate: "",
     closeDate: "",
     recommendation: "",
+    isWayOut: false,
+    wayOutDirection: "",
+    wayOutWorkers: 0,
+    wayOutCar: 0,
+    wayOutDistance: 0,
+    wayOutWorkTime: 0,
     cardProblems: [{ description: "", serviceWorkers: [""] }],
     cardJobs: [
       {
@@ -298,27 +302,27 @@ const UpdateCard = () => {
   const totalPriceNds = totalPriceWithoutNds * 0.18;
   const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
- const onSubmit = async (values: any, totalPriceWorker: any) => {
-  try {
-    setLoading(true);
-    setError(false);
+  const onSubmit = async (values: any, totalPriceWorker: any) => {
+    try {
+      setLoading(true);
+      setError(false);
 
-    const response = await updateCardApi(id, values, totalPriceWorker);
+      const response = await updateCardApi(id, values, totalPriceWorker);
 
-    if (response.success === false) {
-      setError(response.message);
-    } else {
-      // 🔥 STATISTIC DATA YENİDƏN GƏLSİN
-      await dispatch(fetchCards({} as any));
+      if (response.success === false) {
+        setError(response.message);
+      } else {
+        // 🔥 STATISTIC DATA YENİDƏN GƏLSİN
+        await dispatch(fetchCards({} as any));
 
-      navigate("/statistics");
+        navigate("/statistics");
+      }
+    } catch (err: any) {
+      setError(err.message || "Kart yenilənərkən xəta baş verdi");
+    } finally {
+      setLoading(false);
     }
-  } catch (err: any) {
-    setError(err.message || "Kart yenilənərkən xəta baş verdi");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   if (loading)
     return (
@@ -417,9 +421,10 @@ const UpdateCard = () => {
               <SectionCard title="Gediş və Zəmanət">
                 <div className="flex flex-wrap gap-5 text-sm">
                   <label className="flex items-center gap-2">
-                    <input
+                    <Field
+                      name="isWayOut"
+                      as="input"
                       type="checkbox"
-                      onChange={(e) => setOpenGedis(e.target.checked)}
                       disabled={!cardData?.isOpen}
                     />
                     Gediş
@@ -442,40 +447,38 @@ const UpdateCard = () => {
                   </label>
                 </div>
 
-                {openGedis && (
+                {values.isWayOut && (
                   <div className="flex flex-col gap-5 mt-4">
-                   
-                   <div className="flex gap-2 items-center w-full">
-                    <label htmlFor="">Hara</label>
-                    <TextInput sizing="sm" />
-                   </div>
-
-                     <div className="flex gap-2 items-center">
-                    <label htmlFor="">Maşın</label>
-                    <Select sizing="sm">
-                      <option value="mitsubishi">Mitsubishi L200</option>
-                      <option value="man">Man TGL 12.240</option>
-                    </Select>
-                   </div>
-
-                     <div className="flex gap-2 items-center">
-                    <label htmlFor="">Məsafə</label>
-                    <TextInput sizing="sm"/>
-                    <span>km</span>
-                   </div>
+                    <div className="flex gap-2 items-center w-full">
+                      <label htmlFor="">Hara</label>
+                      <Field as={TextInput} name="wayOutDirection" sizing="sm" />
+                    </div>
 
                     <div className="flex gap-2 items-center">
-                    <label htmlFor="">İşçi sayı</label>
-                    <TextInput sizing="sm"/>
-                    <span>(sürücü ilə birlikdə)</span>
-                   </div>
+                      <label htmlFor="">Maşın</label>
+                      <Field as={Select} name="wayOutCar" sizing="sm">
+                        <option value="mitsubishi">Mitsubishi L200</option>
+                        <option value="man">Man TGL 12.240</option>
+                      </Field>
+                    </div>
 
-                   <div className="flex gap-2 items-center">
-                    <label htmlFor="">İş saatları</label>
-                    <TextInput sizing="sm"/>
-                    <span>(səyahət daxil olmaqla)</span>
-                   </div>
+                    <div className="flex gap-2 items-center">
+                      <label htmlFor="">Məsafə</label>
+                      <Field as={TextInput} name="wayOutDistance" sizing="sm" />
+                      <span>km</span>
+                    </div>
 
+                    <div className="flex gap-2 items-center">
+                      <label htmlFor="">İşçi sayı</label>
+                      <Field as={TextInput} name="wayOutWorkers" sizing="sm" />
+                      <span>(sürücü ilə birlikdə)</span>
+                    </div>
+
+                    <div className="flex gap-2 items-center">
+                      <label htmlFor="">İş saatları</label>
+                      <Field as={TextInput} name="wayOutWorkTime" sizing="sm" />
+                      <span>(səyahət daxil olmaqla)</span>
+                    </div>
                   </div>
                 )}
               </SectionCard>

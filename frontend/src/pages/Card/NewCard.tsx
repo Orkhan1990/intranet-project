@@ -21,8 +21,9 @@ import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
-import { AUTO_EXPENSES } from "../../utilis/autoExpenses";
-import { AUTO_JOBS } from "../../utilis/autoJobs";
+import WayOutAutoLogic from "../../components/Card/WayOutAutoLogic";
+// import { AUTO_EXPENSES } from "../../utilis/autoExpenses";
+// import { AUTO_JOBS } from "../../utilis/autoJobs";
 // import { updateJobPricesByClientType } from "../../utilis/utilis";
 
 const types = [
@@ -123,6 +124,9 @@ const NewCard = () => {
     load();
   }, [dispatch]);
 
+
+  
+
   console.log(openBobcatWarranty, openAmmannWarranty, clientCars);
   // console.log({clientType});
 
@@ -209,7 +213,13 @@ const NewCard = () => {
             0
           );
           setExpencePrices(totalExpencesPrice);
+           
+
+
           return (
+            <>
+            <WayOutAutoLogic />
+          
             <Form className="space-y-8">
               {/* Client Section */}
               <SectionCard title="Müştəri Məlumatları">
@@ -288,8 +298,9 @@ const NewCard = () => {
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">Maşın</label>
                       <Field as={Select} name="wayOutCar" sizing="sm">
-                        <option value="mitsubishi">Mitsubishi L200</option>
-                        <option value="man">Man TGL 12.240</option>
+                        <option value="">Maşın seç</option>
+                        <option value="1">Mitsubishi L200</option>
+                        <option value="2">Man TGL 12.240</option>
                       </Field>
                     </div>
 
@@ -298,54 +309,6 @@ const NewCard = () => {
                       <Field as={TextInput}
                         name="wayOutDistance"
                         sizing="sm"
-                        onChange={(e:any) => {
-                          if (values.isWayOut) {
-                            // GEDİŞ JOB əlavə et
-                            setFieldValue("cardJobs", [
-                              {
-                                ...AUTO_JOBS.GEDIS,
-                                price: 0,
-                                oil: "",
-                                workers: [{ workerAv: "", workerId: 0 }],
-                              },
-                              // ...values.cardJobs,
-                            ]);
-
-                            // MUTEXESSIS XƏRC əlavə et
-                            setFieldValue("expences", [
-                              AUTO_EXPENSES.MUTEXESSIS,
-                              // ...values.expences,
-                            ]);
-                          } else {
-                            // GEDİŞ-i sil
-                            setFieldValue(
-                              "cardJobs",
-                              values.cardJobs.filter(
-                                (j: any) => j.code !== "GEDIS"
-                              )
-                            );
-
-                            // MUTEXESSIS-i sil
-                            setFieldValue(
-                              "expences",
-                              values.expences.filter(
-                                (e: any) =>
-                                  e.description !== "Mütəxəssis çıxışı"
-                              )
-                            );
-                          }
-
-                          const km = Number(e.target.value || 0);
-
-                          // const jobIndex = values.cardJobs.findIndex(
-                          //   (j: any) => j.code === "GEDIS"
-                          // );
-
-                          // if (jobIndex !== -1) {
-                            setFieldValue(`cardJobs.[0].av`, parseFloat((km * 0.014).toFixed(3)));
-                            setFieldValue(`cardJobs.[0].price`, parseFloat(((km * 0.014 * 72)/50).toFixed(3)));
-                          // }
-                        }}
                       />
                       <span>km</span>
                     </div>
@@ -630,6 +593,7 @@ const NewCard = () => {
                               handlePriceUpdate(index, price)
                             }
                             paymentType={values.paymentType}
+                            allValues={values}
                           />
                         ))}
                         <tbody>
@@ -823,6 +787,7 @@ const NewCard = () => {
                 </Button>
               </div>
             </Form>
+              </>
           );
         }}
       </Formik>

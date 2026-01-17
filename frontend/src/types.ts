@@ -118,6 +118,12 @@ export interface UpdateCardInterface {
   openDate: string | null;
   closeDate: string | null;
   recommendation: string;
+  isWayOut: boolean;
+  wayOutDirection: string;
+  wayOutWorkers: number;
+  wayOutCar: number;
+  wayOutDistance: number;
+  wayOutWorkTime: number;
   cardProblems: {
     description: string;
     serviceWorkers: any[];
