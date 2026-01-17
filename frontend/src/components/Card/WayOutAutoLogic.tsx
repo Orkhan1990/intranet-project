@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useFormikContext } from "formik";
 import { NewCardInterface } from "../../types";
-
-// const WAY_OUT_JOB_CODE = "WAY_OUT_SERVICE";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux-toolkit/store/store";
 
 const WayOutAutoLogic = () => {
-  const { values, setFieldValue } =
-    useFormikContext<NewCardInterface>();
+  const { values, setFieldValue } = useFormikContext<NewCardInterface>();
+  const { users } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     if (!values.isWayOut) return;
@@ -14,12 +14,8 @@ const WayOutAutoLogic = () => {
     const distance = Number(values.wayOutDistance || 0);
     if (distance <= 0) return;
 
-    /** JOB */
-    // const hasJob = values.cardJobs.some(
-    //   (j) => j.code === WAY_OUT_JOB_CODE
-    // );
-
-    if (distance > 0) {
+    // ✅ Default job yarat, əgər yoxdur
+    if (!values.cardJobs[0]) {
       setFieldValue("cardJobs", [
         {
           code: "",
@@ -28,29 +24,53 @@ const WayOutAutoLogic = () => {
           price: 0,
           discount: 0,
           oil: "",
-          workers: [{ workerAv: "", workerId: 0 }],
+          workers: [{ workerAv: 0, workerId: 0 }],
         },
       ]);
     }
 
-    /** EXPENCE */
-    const hasExpence = values.expences.some(
-      (e) => e.description === "Mütəxəssis çıxışı"
-    );
-
-    if (!hasExpence) {
-      setFieldValue("expences", [
-        {
-          description: "Mütəxəssis çıxışı",
-          price: "",
-        },
-      ]);
+    // ✅ Default worker yarat, əgər boşdursa
+    if (!values.cardJobs[0].workers || values.cardJobs[0].workers.length === 0) {
+      setFieldValue("cardJobs[0].workers", [{ workerAv: 0, workerId: 0 }]);
     }
 
-   setFieldValue("cardJobs[0].av",+values.wayOutCar===1 ? parseFloat((distance *0.014).toFixed(3)) :parseFloat(((distance *0.028)).toFixed(3))); // 30 km/h
-   setFieldValue("cardJobs[0].price", +values.wayOutCar===1 ?parseFloat((distance * 1).toFixed(2)):parseFloat((distance * 2).toFixed(2))); // get to + back from location
-   setFieldValue("expences[0].price", parseFloat((+values.wayOutWorkTime*(+values.wayOutWorkers)*2).toFixed(2))); // work time * workers * 2 (go + back)
-  }, [values.isWayOut, values.wayOutDistance, values.wayOutCar, values.wayOutWorkTime, values.wayOutWorkers]);
+    // 🔹 AV hesabla
+    const av = +values.wayOutCar === 1 ? distance * 0.014 : distance * 0.028;
+    setFieldValue("cardJobs[0].av", +av.toFixed(3));
+
+    // 🔹 Price hesabla
+    let price = 0;
+    if (values.paymentType === "internal") {
+      const worker = values.cardJobs[0].workers[0];
+      if (worker) {
+        const foundUser = users.find(u => u.id === Number(worker.workerId));
+        const percent = foundUser ? Number(foundUser.percent || 0) / 100 : 0;
+        price = Number(worker.workerAv || 0) * 50 * percent;
+      }
+    } else {
+      price = +values.wayOutCar === 1 ? distance * 1 : distance * 2;
+    }
+    setFieldValue("cardJobs[0].price", +price.toFixed(2));
+
+    // 🔹 Expence = iş vaxtı * işçi sayı * 2 (get + return)
+    const expPrice = +values.wayOutWorkTime * (+values.wayOutWorkers || 0) * 2;
+    if (values.expences[0] && values.expences[0].description === "Mütəxəssis çıxışı") {
+      setFieldValue("expences[0].price", +expPrice.toFixed(2));
+    } else {
+      setFieldValue("expences", [{ description: "Mütəxəssis çıxışı", price: +expPrice.toFixed(2) }]);
+    }
+  }, [
+    values.isWayOut,
+    values.wayOutDistance,
+    values.wayOutCar,
+    values.wayOutWorkTime,
+    values.wayOutWorkers,
+    values.paymentType,
+    values.cardJobs,
+    values.expences,
+    users,
+    setFieldValue,
+  ]);
 
   return null;
 };
