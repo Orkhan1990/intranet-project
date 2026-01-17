@@ -80,6 +80,12 @@ export interface NewCardInterface {
   servisInfo: boolean;
   comments: string;
   recommendation: string;
+  isWayOut: boolean;
+  wayOutDirection: string;
+  wayOutWorkers: number;
+  wayOutCar: number;
+  wayOutDistance: number;
+  wayOutWorkTime: number;
   cardProblems: NewCardProblemsInterface[];
   cardJobs: NewCardJobsInterface[];
   expences: NewCardExpencesInterface[];

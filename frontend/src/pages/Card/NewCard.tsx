@@ -21,8 +21,8 @@ import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
-import { AUTO_JOBS } from "../../utilis/autojobs";
 import { AUTO_EXPENSES } from "../../utilis/autoExpenses";
+import { AUTO_JOBS } from "../../utilis/autoJobs";
 // import { updateJobPricesByClientType } from "../../utilis/utilis";
 
 const types = [
@@ -50,6 +50,12 @@ const newCardInitialValues: NewCardInterface = {
   servisInfo: false,
   comments: "",
   recommendation: "",
+  isWayOut: false,
+  wayOutDirection: "",
+  wayOutWorkers: 0,
+  wayOutCar: 0,
+  wayOutDistance: 0,
+  wayOutWorkTime: 0,
   cardProblems: [{ description: "", serviceWorkers: [""] }],
   cardJobs: [
     {
@@ -93,7 +99,7 @@ const SectionCard = ({
 const NewCard = () => {
   const [error, setError] = useState<string | boolean>(false);
   const [loading, setLoading] = useState(false);
-  const [openGedis, setOpenGedis] = useState(false);
+  // const [openGedis, setOpenGedis] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
   const [jobPrices, setJobPrices] = useState<number[]>([0]);
@@ -249,12 +255,10 @@ const NewCard = () => {
               <SectionCard title="Gediş və Zəmanət">
                 <div className="flex flex-wrap gap-5 text-sm">
                   <label className="flex items-center gap-2">
-                    <input
+                    <Field as="input"
                       type="checkbox"
-                      checked={openGedis}
-                      onChange={(e) => {
-                        setOpenGedis(e.target.checked);
-                      }}
+                      checked={values.isWayOut}
+                      name="isWayOut"
                     />
                     Gediş
                   </label>
@@ -274,27 +278,28 @@ const NewCard = () => {
                   </label>
                 </div>
 
-                {openGedis && (
+                {values.isWayOut && (
                   <div className="flex flex-col gap-5 mt-4">
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">Hara</label>
-                      <TextInput sizing="sm" />
+                      <Field as={TextInput} name="wayOutDirection" sizing="sm" />
                     </div>
 
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">Maşın</label>
-                      <Select sizing="sm">
+                      <Field as={Select} name="wayOutCar" sizing="sm">
                         <option value="mitsubishi">Mitsubishi L200</option>
                         <option value="man">Man TGL 12.240</option>
-                      </Select>
+                      </Field>
                     </div>
 
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">Məsafə</label>
-                      <TextInput
+                      <Field as={TextInput}
+                        name="wayOutDistance"
                         sizing="sm"
-                        onChange={(e) => {
-                          if (openGedis) {
+                        onChange={(e:any) => {
+                          if (values.isWayOut) {
                             // GEDİŞ JOB əlavə et
                             setFieldValue("cardJobs", [
                               {
@@ -347,13 +352,13 @@ const NewCard = () => {
 
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">İşçi sayı</label>
-                      <TextInput sizing="sm" />
+                      <Field as={TextInput} name="wayOutWorkers" sizing="sm" />
                       <span>(sürücü ilə birlikdə)</span>
                     </div>
 
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">İş saatları</label>
-                      <TextInput sizing="sm" />
+                      <Field as={TextInput} name="wayOutWorkTime" sizing="sm" />
                       <span>(səyahət daxil olmaqla)</span>
                     </div>
                   </div>
@@ -625,7 +630,6 @@ const NewCard = () => {
                               handlePriceUpdate(index, price)
                             }
                             paymentType={values.paymentType}
-                            openGedis={openGedis}
                           />
                         ))}
                         <tbody>

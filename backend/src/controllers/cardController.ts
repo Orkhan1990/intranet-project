@@ -202,11 +202,15 @@ export const createCard = async (
     newCard.servisInfo = cardData.servisInfo;
     newCard.comments = cardData.comments;
     newCard.recommendation = cardData.recommendation;
-
+    newCard.isWayOut = cardData.isWayOut;
+    newCard.wayOutDirection = cardData.wayOutDirection;
+    newCard.wayOutWorkers = cardData.wayOutWorkers;
+    newCard.wayOutCar = cardData.wayOutCar;
+    newCard.wayOutDistance = cardData.wayOutDistance;
+    newCard.wayOutWorkTime = cardData.wayOutWorkTime;
     newCard.workSum = workSum;
     newCard.workSumOwn = workSumOwn;
     newCard.avSum = avSum;
-
     newCard.openDate = new Date();
     newCard.isOpen = true;
     newCard.userId = userId;
@@ -582,6 +586,13 @@ export const updateCard = async (
     existingCard.recommendation = cardData.recommendation;
     existingCard.workSum = workSum;
     existingCard.workSumOwn = workSumOwn;
+    existingCard.isWayOut = cardData.isWayOut;
+    existingCard.wayOutDirection = cardData.wayOutDirection;
+    existingCard.wayOutWorkers = cardData.wayOutWorkers;
+    existingCard.wayOutCar = cardData.wayOutCar;
+    existingCard.wayOutDistance = cardData.wayOutDistance;
+    existingCard.wayOutWorkTime = cardData.wayOutWorkTime;
+    
 
     const updatedCard = await cardRepository.save(existingCard);
 

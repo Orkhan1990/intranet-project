@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Client } from "./Client";
 import { CardProblem } from "./CardProblem";
@@ -38,6 +45,24 @@ export class Card extends AllEntities {
 
   @Column({ type: "double", default: 0, name: "av_sum" })
   avSum: number;
+
+  @Column({ default: false, name: "is_way_out" })
+  isWayOut: boolean;
+
+  @Column({ name: "way_out_direction", nullable: true })
+  wayOutDirection: string;
+
+  @Column({ name: "way_out_workers", default: 0 })
+  wayOutWorkers: number;
+
+  @Column({ name: "way_out_car", default: 0 })
+  wayOutCar: number;
+
+  @Column({ type: "double", name: "way_out_distance", default: 0 })
+  wayOutDistance: number;
+
+  @Column({ type: "double", name: "way_out_work_time", default: 0 })
+  wayOutWorkTime: number;
 
   @Column({ name: "sassi", nullable: true })
   sassi: string;
@@ -99,7 +124,10 @@ export class Card extends AllEntities {
   @OneToMany(() => CardJob, (cardJob) => cardJob.card, { cascade: true })
   cardJobs: CardJob[];
 
-  @OneToMany(() => CardPart, (cardPart) => cardPart.card, { cascade: true,eager:true })
+  @OneToMany(() => CardPart, (cardPart) => cardPart.card, {
+    cascade: true,
+    eager: true,
+  })
   cardParts: CardPart[];
 
   // User (creator / owner)
@@ -127,10 +155,9 @@ export class Card extends AllEntities {
   @Column({ name: "brandId", nullable: true })
   brandId: number;
 
-  @OneToOne(() => Account, account => account.card,{eager:true})
-account: Account;
+  @OneToOne(() => Account, (account) => account.card, { eager: true })
+  account: Account;
 
-@OneToOne(() => Repair, repair => repair.card,{eager:true})
-repair: Repair;
-
+  @OneToOne(() => Repair, (repair) => repair.card, { eager: true })
+  repair: Repair;
 }

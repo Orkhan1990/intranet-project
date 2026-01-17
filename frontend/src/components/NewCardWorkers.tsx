@@ -16,7 +16,6 @@ interface CardWorkersInterface {
   jobWorkerPrice: (price: any) => void;
   cardData?: any;
   paymentType:any
-  openGedis?:boolean
 }
 
 const NewCardWorkers = ({
@@ -26,7 +25,6 @@ const NewCardWorkers = ({
   jobWorkerPrice,
   cardData,
   paymentType,
-  openGedis
 }: CardWorkersInterface) => {
   const dispatch = useDispatch<AppDispatch>();
   const [totalPrice, setTotalPrice] = useState(0);
@@ -43,9 +41,9 @@ useEffect(() => {
   const av = Number(values.av || 0);
   const discount = Number(values.discount || 0);
 
-  if (openGedis) {
-    const km = av * 72; // GEDIS üçün AV-ni KM-ə çeviririk
-  }
+  // if (openGedis) {
+  //   const km = av * 72; // GEDIS üçün AV-ni KM-ə çeviririk
+  // }
   const basePrice = av * 50;
 
   let calculatedTotal = 0;
