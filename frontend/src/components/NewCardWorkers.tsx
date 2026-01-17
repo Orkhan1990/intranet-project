@@ -14,20 +14,20 @@ interface CardWorkersInterface {
   workers: UserInterface[];
   values: any;
   name: string;
-  jobWorkerPrice: (price: any) => void;
+  // jobWorkerPrice: (price: any) => void;
   cardData?: any;
   paymentType:any;
-  allValues?:any;
+  // allValues?:any;
 }
 
 const NewCardWorkers = ({
   workers,
   values,
   name,
-  jobWorkerPrice,
+  // jobWorkerPrice,
   cardData,
   paymentType,
-  allValues
+  // allValues
 }: CardWorkersInterface) => {
   const dispatch = useDispatch<AppDispatch>();
   // const [totalPrice, setTotalPrice] = useState(0);
@@ -40,16 +40,15 @@ const NewCardWorkers = ({
   }, [dispatch]);
 
 
-  console.log(allValues.wayOutCar,"wayoutcar");
   
 
 
 useEffect(() => {
   const av = Number(values.av || 0);
-  const discount = Number(values.discount || 0);
+  // const discount = Number(values.discount || 0);
 
   // Əgər bu job gedisdirsə (index 0 və isWayOut) → skip et
-  if (name === "cardJobs[0]" && allValues?.isWayOut) {
+  if (name === "cardJobs[0]" ) {
     return;
   }
 
@@ -73,14 +72,13 @@ useEffect(() => {
   const finalPrice = Number(calculatedTotal.toFixed(2));
 
   setFieldValue(`${name}.price`, finalPrice);
-  jobWorkerPrice(finalPrice * (1 - discount / 100));
+  // jobWorkerPrice(finalPrice * (1 - discount / 100));
 }, [
   values.av,
   values.discount,
   values.workers,
   paymentType,
   users,
-  allValues
 ]);
 
 

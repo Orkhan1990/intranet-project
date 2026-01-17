@@ -47,9 +47,10 @@ const WayOutAutoLogic = () => {
       ]);
     }
 
-   setFieldValue("cardJobs[0].av",+values.wayOutCar===1 ? parseFloat((distance / 72).toFixed(3)) :parseFloat(((distance / 72)*2).toFixed(3))); // 30 km/h
-   setFieldValue("cardJobs[0].price", parseFloat((distance * 1).toFixed(2))); // get to + back from location
-  }, [values.isWayOut, values.wayOutDistance]);
+   setFieldValue("cardJobs[0].av",+values.wayOutCar===1 ? parseFloat((distance *0.014).toFixed(3)) :parseFloat(((distance *0.028)).toFixed(3))); // 30 km/h
+   setFieldValue("cardJobs[0].price", +values.wayOutCar===1 ?parseFloat((distance * 1).toFixed(2)):parseFloat((distance * 2).toFixed(2))); // get to + back from location
+   setFieldValue("expences[0].price", parseFloat((+values.wayOutWorkTime*(+values.wayOutWorkers)*2).toFixed(2))); // work time * workers * 2 (go + back)
+  }, [values.isWayOut, values.wayOutDistance, values.wayOutCar, values.wayOutWorkTime, values.wayOutWorkers]);
 
   return null;
 };

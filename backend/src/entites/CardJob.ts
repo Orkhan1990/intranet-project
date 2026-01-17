@@ -11,14 +11,17 @@ export class CardJob extends AllEntities {
   @Column()
   name: string;
 
-  @Column({ type: "float", nullable: true })
+  @Column({ type: "decimal", precision: 10, scale: 3, nullable: true })
   av: number;
 
-  @Column({ type: "float", nullable: true })
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
   price: number;
 
-  @Column({ type: "float", nullable: true })
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
   discount: number;
+
+   @Column({ type: "decimal", precision: 10, scale: 2,   name: "discount_price", nullable: true })
+  discountPrice: number;
 
   @Column({ nullable: true })
   oil: string;

@@ -11,14 +11,16 @@ export class CardWorkerJob extends AllEntities {
     name: "worker_av",
     type: "decimal",
     precision: 10,
-    scale: 2,
+    scale: 3,
     default: 0,      // ALWAYS DEFAULT
   })
   workerAv: number;
 
   // İşçinin maaş faizi
   @Column({
-    type: "float",
+    type: "decimal",
+    precision: 10,
+    scale: 2,
     default: 0,      // ALWAYS DEFAULT
   })
   salaryPercent: number;

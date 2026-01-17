@@ -246,7 +246,7 @@ export const createCard = async (
     for (const j of cardJobs) {
       const av = Number(j.av || 0);
       const discount = Number(j.discount || 0);
-      let jobPrice = 0;
+      let jobDiscountPrice = 0;
 
       const job = new CardJob();
       job.code = j.code;
@@ -255,6 +255,7 @@ export const createCard = async (
       job.discount = discount;
       job.oil = j.oil;
       job.cardId = savedCard.id;
+      job.price = j.price;
 
       const savedJob = await cardJobRepo.save(job);
 
@@ -271,7 +272,7 @@ export const createCard = async (
           const earnedSalary = workerAv * 50 * (percent / 100);
 
           if (cardData.paymentType === "internal") {
-            jobPrice += earnedSalary;
+            jobDiscountPrice += earnedSalary;
           }
 
           const wj = new CardWorkerJob();
@@ -286,12 +287,12 @@ export const createCard = async (
         }
       }
 
-      if (cardData.paymentType !== "internal") {
-        jobPrice = av * 50;
-      }
+      // if (cardData.paymentType !== "internal") {
+      //   jobDiscountPrice = av * 50;
+      // }
 
-      jobPrice = jobPrice * (1 - discount / 100);
-      savedJob.price = Number(jobPrice.toFixed(2));
+      jobDiscountPrice = j.price * (1 - discount / 100);
+      savedJob.discountPrice = Number(jobDiscountPrice.toFixed(2));
       await cardJobRepo.save(savedJob);
     }
 
@@ -592,7 +593,6 @@ export const updateCard = async (
     existingCard.wayOutCar = cardData.wayOutCar;
     existingCard.wayOutDistance = cardData.wayOutDistance;
     existingCard.wayOutWorkTime = cardData.wayOutWorkTime;
-    
 
     const updatedCard = await cardRepository.save(existingCard);
 

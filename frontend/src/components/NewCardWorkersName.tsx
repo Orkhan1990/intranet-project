@@ -66,7 +66,7 @@ const NewCardWorkersName = ({
           <Field
             as={TextInput}
             type="text"
-            className="w-[70px]"
+            className="w-[100px]"
             name={`${name}.workerAv`}
             onChange={handleAvChange}
             sizing="sm"

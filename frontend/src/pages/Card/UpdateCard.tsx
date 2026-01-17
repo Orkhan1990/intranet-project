@@ -60,8 +60,8 @@ const UpdateCard = () => {
   const [refreshPage, setRefreshPage] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
-  const [jobPrices, setJobPrices] = useState<number[]>([0]);
-  const [expencePrices, setExpencePrices] = useState<number>(0);
+  // const [jobPrices, setJobPrices] = useState<number[]>([0]);
+  // const [expencePrices, setExpencePrices] = useState<number>(0);
   const [cardPartsPrice, setCardPartsPrice] = useState<number>(0);
   const [cardData, setCardData] = useState<UpdateCardInterface | null>(null);
   const [clientCars, setClientCars] = useState<ClientCar[] | null>(null);
@@ -254,13 +254,13 @@ const UpdateCard = () => {
   };
 
   // İşçilik qiymətini yeniləyən funksiya
-  const handlePriceUpdate = (index: number, price: number) => {
-    setJobPrices((prev) => {
-      const updated = [...prev];
-      updated[index] = price;
-      return updated;
-    });
-  };
+  // const handlePriceUpdate = (index: number, price: number) => {
+  //   setJobPrices((prev) => {
+  //     const updated = [...prev];
+  //     updated[index] = price;
+  //     return updated;
+  //   });
+  // };
 
   const handlecardPartsPriceUpdate = (price: number) => {
     setCardPartsPrice(price);
@@ -286,21 +286,21 @@ const UpdateCard = () => {
   };
 
   // Yeni işçilik əlavə ediləndə sıfır qiymət daxil edilir
-  const handleAddJob = () => {
-    setJobPrices((prev) => [...prev, 0]);
-  };
+  // const handleAddJob = () => {
+  //   setJobPrices((prev) => [...prev, 0]);
+  // };
 
   // İşçilik silinəndə qiyməti də silinir
-  const handleRemoveJob = (index: number) => {
-    setJobPrices((prev) => prev.filter((_, i) => i !== index));
-  };
+  // const handleRemoveJob = (index: number) => {
+  //   setJobPrices((prev) => prev.filter((_, i) => i !== index));
+  // };
 
-  const totalPriceWorker = jobPrices.reduce((a, b) => a + b, 0);
-  const totalExpencesPrice = expencePrices;
-  const totalPriceWithoutNds =
-    totalPriceWorker + totalExpencesPrice + cardPartsPrice;
-  const totalPriceNds = totalPriceWithoutNds * 0.18;
-  const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
+  // const totalPriceWorker = jobPrices.reduce((a, b) => a + b, 0);
+  // const totalExpencesPrice = expencePrices;
+  // const totalPriceWithoutNds =
+  //   totalPriceWorker + totalExpencesPrice + cardPartsPrice;
+  // const totalPriceNds = totalPriceWithoutNds * 0.18;
+  // const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
   const onSubmit = async (values: any, totalPriceWorker: any) => {
     try {
@@ -367,11 +367,27 @@ const UpdateCard = () => {
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue }) => {
-          const totalExpencesPrice = values?.expences?.reduce(
-            (sum: any, item: any) => sum + Number(item.price || 0),
+          // const totalExpencesPrice = values?.expences?.reduce(
+          //   (sum: any, item: any) => sum + Number(item.price || 0),
+          //   0
+          // );
+          // setExpencePrices(totalExpencesPrice);
+
+             const totalPriceWorker = values.cardJobs.reduce((sum, job) => {
+            const price = Number(job.price || 0);
+            const discount = Number(job.discount || 0);
+
+            return sum + price * (1 - discount / 100);
+          }, 0);
+
+          const totalExpencesPrice = values.expences.reduce(
+            (sum, item) => sum + Number(item.price || 0),
             0
           );
-          setExpencePrices(totalExpencesPrice);
+
+          const totalPriceWithoutNds = totalPriceWorker + totalExpencesPrice;
+          const totalPriceNds = values.nds ? totalPriceWithoutNds * 0.18 : 0;
+          const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
           return (
             <Form className="space-y-8">
@@ -787,11 +803,12 @@ const UpdateCard = () => {
                             workers={workers}
                             name={`cardJobs[${index}]`}
                             values={job}
-                            jobWorkerPrice={(price) =>
-                              handlePriceUpdate(index, price)
-                            }
+                            // jobWorkerPrice={(price) =>
+                            //   handlePriceUpdate(index, price)
+                            // }
                             cardData={cardData}
                             paymentType={values.paymentType}
+                            //  allValues={values}
                           />
                         ))}
 
@@ -832,7 +849,7 @@ const UpdateCard = () => {
                               workers: [{ workerAv: "", workerId: "" }],
                             });
 
-                            handleAddJob();
+                            // handleAddJob();
                           }}
                         >
                           Əlavə et +
@@ -848,7 +865,7 @@ const UpdateCard = () => {
                           onClick={() => {
                             const index = values.cardJobs.length - 1;
                             remove(index);
-                            handleRemoveJob(index);
+                            // handleRemoveJob(index);
                           }}
                         >
                           Azalt -
