@@ -691,7 +691,7 @@ export const updateCard = async (
       const av = Number(j.av || 0);
       const discount = Number(j.discount || 0);
 
-      let jobPrice = 0;
+      let jobDisCountPrice = 0;
 
       // 🔥 INTERNAL PAYMENT
       if (cardData.paymentType === "internal") {
@@ -701,15 +701,15 @@ export const updateCard = async (
 
           const workerPercent = workerMap.get(workerId) || 0;
 
-          jobPrice += workerAv * 50 * (workerPercent / 100);
+          jobDisCountPrice += workerAv * 50 * (workerPercent / 100);
         }
 
         // discount sonda
-        jobPrice = jobPrice * (1 - discount / 100);
+        jobDisCountPrice = jobDisCountPrice * (1 - discount / 100);
       }
       // 🔹 EXTERNAL / NORMAL
       else {
-        jobPrice = av * 50 * (1 - discount / 100);
+        jobDisCountPrice = av * 50 * (1 - discount / 100);
       }
 
       const newJob = cardJobRepo.create({
@@ -718,7 +718,8 @@ export const updateCard = async (
         av,
         discount,
         oil: j.oil,
-        price: Number(jobPrice.toFixed(2)),
+        price: j.price,
+        discountPrice: Number(jobDisCountPrice.toFixed(2)),
         cardId,
       });
 

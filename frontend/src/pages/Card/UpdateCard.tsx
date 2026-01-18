@@ -29,6 +29,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
 import { ClientCar, UpdateCardInterface } from "../../types";
 import { fetchCards } from "../../redux-toolkit/features/filters/filterSlice";
+import WayOutAutoLogic from "../../components/Card/WayOutAutoLogic";
 
 const types = [
   "Tiqac",
@@ -106,14 +107,14 @@ const UpdateCard = () => {
     ],
     expences: [{ description: "", price: "" }],
     cardParts: [
-      {
-        code: "",
-        partName: "",
-        count: 0,
-        soldPrice: 0,
-        discount: 0,
-        totalPrice: 0,
-      },
+      // {
+      //   code: "",
+      //   partName: "",
+      //   count: 0,
+      //   soldPrice: 0,
+      //   discount: 0,
+      //   totalPrice: 0,
+      // },
     ],
   });
 
@@ -163,9 +164,9 @@ const UpdateCard = () => {
           ? data.cardJobs.map((j: any) => ({
               code: j.code || "",
               name: j.name || "",
-              av: j.av || 0,
-              price: j.price || 0,
-              discount: j.discount || 0,
+              av: parseFloat(j.av) || 0,
+              price: parseFloat(j.price) || 0,
+              discount: parseFloat(j.discount) || 0,
               oil: j.oil || "",
 
               workers: j.workers?.length
@@ -187,14 +188,14 @@ const UpdateCard = () => {
         cardParts: data.cardParts?.length
           ? data.cardParts
           : [
-              {
-                code: "",
-                partName: "",
-                count: 0,
-                soldPrice: 0,
-                discount: 0,
-                totalPrice: 0,
-              },
+              // {
+              //   code: "",
+              //   partName: "",
+              //   count: 0,
+              //   soldPrice: 0,
+              //   discount: 0,
+              //   totalPrice: 0,
+              // },
             ],
       });
     } catch (err) {
@@ -345,6 +346,9 @@ const UpdateCard = () => {
   };
 
   return (
+   
+    
+
     <div className="min-h-screen bg-gray-50 py-6 px-3 md:px-8 space-y-8">
       <div className="text-center">
         <h2 className="text-3xl font-extrabold text-gray-800 mb-1">
@@ -390,6 +394,8 @@ const UpdateCard = () => {
           const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
           return (
+            <>
+            <WayOutAutoLogic />
             <Form className="space-y-8">
               {/* Client Section */}
               <SectionCard title="Müştəri Məlumatları">
@@ -1062,10 +1068,12 @@ const UpdateCard = () => {
                 </Button>
               </div>
             </Form>
+            </>
           );
         }}
       </Formik>
     </div>
+  
   );
 };
 

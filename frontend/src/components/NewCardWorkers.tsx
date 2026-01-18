@@ -45,41 +45,26 @@ const NewCardWorkers = ({
 
 useEffect(() => {
   const av = Number(values.av || 0);
-  // const discount = Number(values.discount || 0);
-
-  // Əgər bu job gedisdirsə (index 0 və isWayOut) → skip et
-  if (name === "cardJobs[0]" ) {
-    return;
-  }
-
-  // Normal işlər üçün basePrice
-  const basePrice = av * 50;
+  const discount = Number(values.discount || 0);
 
   let calculatedTotal = 0;
 
   if (paymentType === "internal") {
     values.workers.forEach((w: any) => {
-      if (!w.workerId) return;
-      const worker = users.find(u => u.id === Number(w.workerId));
-      if (!worker) return;
-      const percent = Number(worker.percent || 0) / 100;
-      calculatedTotal += w.workerAv * 50 * percent;
+      const workerAv = Number(w.workerAv || 0);
+      const workerPercent = Number(users.find(u => u.id === Number(w.workerId))?.percent || 0) / 100;
+      calculatedTotal += workerAv * 50 * workerPercent;
     });
   } else {
-    calculatedTotal = basePrice;
+    calculatedTotal = av * 50;
   }
 
-  const finalPrice = Number(calculatedTotal.toFixed(2));
+  // Discount tətbiq et
+  calculatedTotal = calculatedTotal * (1 - discount / 100);
 
-  setFieldValue(`${name}.price`, finalPrice);
-  // jobWorkerPrice(finalPrice * (1 - discount / 100));
-}, [
-  values.av,
-  values.discount,
-  values.workers,
-  paymentType,
-  users,
-]);
+  setFieldValue(`${name}.price`, Number(calculatedTotal.toFixed(2)));
+}, [values.av, values.discount, values.workers, paymentType, users]);
+
 
 
 
@@ -131,7 +116,6 @@ useEffect(() => {
             className="w-[100px]"
             readOnly
             name={`${name}.price`}
-            // value={totalPrice}
             sizing="sm"
             disabled={cardData && !cardData?.isOpen}
           />

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useFormikContext } from "formik";
-import { NewCardInterface } from "../../types";
 import { useSelector } from "react-redux";
+import { NewCardInterface } from "../../types";
 import { RootState } from "../../redux-toolkit/store/store";
 
 const WayOutAutoLogic = () => {
@@ -14,50 +14,74 @@ const WayOutAutoLogic = () => {
     const distance = Number(values.wayOutDistance || 0);
     if (distance <= 0) return;
 
-    // ✅ Default job yarat, əgər yoxdur
-    if (!values.cardJobs[0]) {
-      setFieldValue("cardJobs", [
-        {
-          code: "",
-          name: "Servis çıxışı",
-          av: 0,
-          price: 0,
-          discount: 0,
-          oil: "",
-          workers: [{ workerAv: 0, workerId: 0 }],
-        },
-      ]);
-    }
+    /* -------------------------------
+       1️⃣ Servis çıxışı job-u MERGE
+    ------------------------------- */
+    const otherJobs =
+      values.cardJobs?.filter((job) => job.name !== "Servis çıxışı") || [];
 
-    // ✅ Default worker yarat, əgər boşdursa
-    if (!values.cardJobs[0].workers || values.cardJobs[0].workers.length === 0) {
-      setFieldValue("cardJobs[0].workers", [{ workerAv: 0, workerId: 0 }]);
-    }
+    const serviceJob =
+      values.cardJobs?.find((job) => job.name === "Servis çıxışı") || {
+        code: "",
+        name: "Servis çıxışı",
+        av: 0,
+        price: 0,
+        discount: 0,
+        oil: "",
+        workers: [{ workerAv: 0, workerId: 0 }],
+      };
 
-    // 🔹 AV hesabla
+    /* -------------------------------
+       2️⃣ AV HESABI
+    ------------------------------- */
     const av = +values.wayOutCar === 1 ? distance * 0.014 : distance * 0.028;
-    setFieldValue("cardJobs[0].av", +av.toFixed(3));
+    serviceJob.av = +av.toFixed(3);
 
-    // 🔹 Price hesabla
+    /* -------------------------------
+       3️⃣ PRICE HESABI
+    ------------------------------- */
     let price = 0;
     if (values.paymentType === "internal") {
-      const worker = values.cardJobs[0].workers[0];
-      if (worker) {
-        const foundUser = users.find(u => u.id === Number(worker.workerId));
-        const percent = foundUser ? Number(foundUser.percent || 0) / 100 : 0;
-        price = Number(worker.workerAv || 0) * 50 * percent;
-      }
+      const worker = serviceJob.workers[0];
+      const foundUser = users.find((u) => u.id === Number(worker.workerId));
+      const percent = foundUser ? Number(foundUser.percent || 0) / 100 : 0;
+      price = Number(worker.workerAv || 0) * 50 * percent;
     } else {
       price = +values.wayOutCar === 1 ? distance * 1 : distance * 2;
     }
-    setFieldValue("cardJobs[0].price", +price.toFixed(2));
+    serviceJob.price = +price.toFixed(2);
 
-    // 🔹 Expence = iş vaxtı * işçi sayı * 2 (get + return)
-    const expPrice = +values.wayOutWorkTime * (+values.wayOutWorkers || 0) * 2;
-    if (values.expences[0] && values.expences[0].description === "Mütəxəssis çıxışı") {
+    /* -------------------------------
+       4️⃣ CARDJOBS UPDATE (Merge + Only if Changed)
+    ------------------------------- */
+    const mergedJobs = [serviceJob, ...otherJobs];
+
+    const prevJobs = values.cardJobs || [];
+    const isSame =
+      prevJobs.length === mergedJobs.length &&
+      prevJobs.every((job, i) => job.name === mergedJobs[i].name && job.av === mergedJobs[i].av && job.price === mergedJobs[i].price);
+
+    if (!isSame) {
+      setFieldValue("cardJobs", mergedJobs);
+    }
+
+    /* -------------------------------
+       5️⃣ EXPENSE HESABI
+    ------------------------------- */
+    const expPrice =
+      Number(values.wayOutWorkTime || 0) *
+      Number(values.wayOutWorkers || 0) *
+      2;
+
+    if (values.expences?.[0]?.description === "Mütəxəssis çıxışı") {
       setFieldValue("expences[0].price", +expPrice.toFixed(2));
     } else {
-      setFieldValue("expences", [{ description: "Mütəxəssis çıxışı", price: +expPrice.toFixed(2) }]);
+      setFieldValue("expences", [
+        {
+          description: "Mütəxəssis çıxışı",
+          price: +expPrice.toFixed(2),
+        },
+      ]);
     }
   }, [
     values.isWayOut,
