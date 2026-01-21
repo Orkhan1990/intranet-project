@@ -45,7 +45,7 @@ const NewCardWorkers = ({
 
 useEffect(() => {
   const av = Number(values.av || 0);
-  const discount = Number(values.discount || 0);
+  // const discount = Number(values.discount || 0);
 
   let calculatedTotal = 0;
 
@@ -60,7 +60,7 @@ useEffect(() => {
   }
 
   // Discount tətbiq et
-  calculatedTotal = calculatedTotal * (1 - discount / 100);
+  // calculatedTotal = calculatedTotal * (1 - discount / 100);
 
   setFieldValue(`${name}.price`, Number(calculatedTotal.toFixed(2)));
 }, [values.av, values.discount, values.workers, paymentType, users]);

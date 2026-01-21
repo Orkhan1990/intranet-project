@@ -79,7 +79,7 @@ const Agreement = () => {
       return (
         sum +
         (cardDetails.paymentType === "internal"
-          ? item.price / (1 - item.discount / 100)
+          ? Number(item.price) 
           : item.av * 50)
       );
     }
@@ -92,13 +92,13 @@ const Agreement = () => {
     (sum: number, item: any) => {
       // JOB → artıq discountlu gəlir
       if (item.type === "job") {
-        return sum + item.price;
+        return sum + Number(item.price);
       }
 
       // PART → burada discount tətbiq olunur
       return (
         sum +
-        item.price * (item.quantity || 1) * (1 - (item.discount || 0) / 100)
+        Number(item.price) * (item.quantity || 1) * (1 - (item.discount || 0) / 100)
       );
     },
     0

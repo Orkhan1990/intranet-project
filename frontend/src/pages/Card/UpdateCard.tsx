@@ -389,7 +389,15 @@ const UpdateCard = () => {
             0
           );
 
-          const totalPriceWithoutNds = totalPriceWorker + totalExpencesPrice;
+          const totalPartsPrice = values.cardParts.reduce((sum, part) => {
+            const soldPrice = Number(part.soldPrice || 0);
+            const count = Number(part.count || 0);
+            const discount = Number(part.discount || 0);
+            const totalPrice = soldPrice * count * (1 - discount / 100);
+            return sum + totalPrice;
+          }, 0);
+
+          const totalPriceWithoutNds = totalPriceWorker + totalExpencesPrice+totalPartsPrice;
           const totalPriceNds = values.nds ? totalPriceWithoutNds * 0.18 : 0;
           const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
@@ -479,8 +487,9 @@ const UpdateCard = () => {
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">Maşın</label>
                       <Field as={Select} name="wayOutCar" sizing="sm">
-                        <option value="mitsubishi">Mitsubishi L200</option>
-                        <option value="man">Man TGL 12.240</option>
+                        <option value="">Maşını seçin</option>
+                        <option value="1">Mitsubishi L200</option>
+                        <option value="2">Man TGL 12.240</option>
                       </Field>
                     </div>
 

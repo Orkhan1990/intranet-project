@@ -34,7 +34,7 @@ const WayOutAutoLogic = () => {
     /* -------------------------------
        2️⃣ AV HESABI
     ------------------------------- */
-    const av = +values.wayOutCar === 1 ? distance * 0.014 : distance * 0.028;
+    const av = +values.wayOutCar === 1 ? (distance * 0.014) : (distance * 0.028);
     serviceJob.av = +av.toFixed(3);
 
     /* -------------------------------
