@@ -51,7 +51,8 @@ const Agreement = () => {
       price: job.price,
       discount: job.discount,
       date: job.createdAt,
-      av: job.av, // iş saatı üçün əlavə dəyər
+      av: job.av,
+      discountPrice: job.discountPrice // iş saatı üçün əlavə dəyər
     })),
 
     ...(cardDetails?.expenses || []).map((expense: any) => ({
@@ -80,7 +81,7 @@ const Agreement = () => {
         sum +
         (cardDetails.paymentType === "internal"
           ? Number(item.price) 
-          : item.av * 50)
+          :Number(item.price))
       );
     }
 
@@ -92,7 +93,7 @@ const Agreement = () => {
     (sum: number, item: any) => {
       // JOB → artıq discountlu gəlir
       if (item.type === "job") {
-        return sum + Number(item.price);
+        return sum + Number(item.discountPrice);
       }
 
       // PART → burada discount tətbiq olunur
@@ -188,10 +189,10 @@ const Agreement = () => {
         {item.price > 0
           ? item.quantity === ""
             ? parseFloat(
-                (item.price / (1 - item.discount / 100)).toFixed(2)
+                (Number(item.price)).toFixed(2)
               )
             : parseFloat(
-                (item.price * (item.quantity || 1)).toFixed(2)
+                (Number(item.price) * (item.quantity || 1)).toFixed(2)
               )
           : ""}
       </Table.Cell>

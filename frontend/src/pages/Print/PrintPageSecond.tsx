@@ -69,12 +69,12 @@ const PrintPageSecond = () => {
     ) || 0;
 
   const totalPrice = cardDetails?.cardJobs?.reduce(
-    (acc: number, job: any) => acc + job.price,
+    (acc: number, job: any) => acc + (Number(job.discountPrice)),
     0
   );
 
   const jobsTotal =
-    cardDetails?.cardJobs?.reduce((acc: number, j: any) => acc + j.price, 0) ||
+    cardDetails?.cardJobs?.reduce((acc: number, j: any) => acc + (+(j.discountPrice)), 0) ||
     0;
 
   const total = sparePartsTotal + jobsTotal + totalExpences;
@@ -220,13 +220,13 @@ const PrintPageSecond = () => {
               <tr key={i} className="border-b border-gray-300">
                 <td className="px-6 py-2 truncate">{job.name}</td>
                 <td className="px-4 py-2 truncate">{job.code}</td>
-                <td className="px-4 py-2 text-center">{job.av}</td>
+                <td className="px-4 py-2 text-center">{parseFloat(job.av)}</td>
                 <td className="px-4 py-2 text-right whitespace-nowrap">
-                  {formatPrice(job.av * 50)}
+                  {formatPrice(Number(job.price))}
                 </td>
-                <td className="px-4 py-2 text-center">{job.discount}%</td>
+                <td className="px-4 py-2 text-center">{parseFloat(job.discount)}%</td>
                 <td className="px-4 py-2 text-right whitespace-nowrap">
-                  {formatPrice(job.price)}
+                  {formatPrice(Number(job.discountPrice))}
                 </td>
               </tr>
             ))}
@@ -235,7 +235,7 @@ const PrintPageSecond = () => {
                 colSpan={5}
                 className="px-4 py-2 text-right font-semibold"
               ></td>
-              <td className="font-semibold">Cəmi: {totalPrice || 0} AZN</td>
+              <td className="font-semibold">Cəmi: {formatPrice(totalPrice || 0)} AZN</td>
             </tr>
           </tbody>
         </table>

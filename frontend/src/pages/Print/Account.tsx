@@ -51,21 +51,21 @@ const Account = () => {
 
   const totalJobsPrice = cardDetails?.cardJobs?.reduce(
     (sum: any, item: any) => {
-      const price = Number(item?.price) || 0;
+      const price = Number(item?.discountPrice) || 0;
       return sum + price;
     },
-    0
+    0,
   );
 
-  const totalEpencesPrice=cardDetails?.expenses?.reduce(
-     (sum: any, item: any) => {
+  const totalEpencesPrice = cardDetails?.expenses?.reduce(
+    (sum: any, item: any) => {
       const price = Number(item?.price) || 0;
       return sum + price;
     },
-    0
-  )
+    0,
+  );
 
-  const totalPriceeee=totalJobsPrice+totalEpencesPrice
+  const totalPriceeee = totalJobsPrice + totalEpencesPrice;
 
   // console.log({ totalJobsPrice: parseFloat(totalJobsPrice.toFixed(2)) });
 
@@ -166,7 +166,7 @@ const Account = () => {
               <td className="border border-black p-1 text-center"></td>
               <td className="border border-black p-1 text-center">
                 {/* {parseFloat(totalPartsPrice.toFixed(2))} */}
-                <strong>{parseFloat((totalPartsPrice??0).toFixed(2))}</strong>
+                <strong>{parseFloat((totalPartsPrice ?? 0).toFixed(2))}</strong>
               </td>
             </tr>
             <tr>
@@ -180,8 +180,6 @@ const Account = () => {
                 <strong> {parseFloat((totalPriceeee ?? 0).toFixed(2))}</strong>
               </td>
             </tr>
-
-           
           </tbody>
         </table>
 
@@ -197,7 +195,9 @@ const Account = () => {
             <span>ƏDV 18%:</span>
             <span>
               {parseFloat(
-                ((totalPriceeee + totalPartsPrice) * 0.18).toFixed(2))} AZN
+                ((totalPriceeee + totalPartsPrice) * 0.18).toFixed(2),
+              )}{" "}
+              AZN
             </span>
           </div>
           <div className="flex gap-2 ">
@@ -208,8 +208,9 @@ const Account = () => {
                   totalPriceeee +
                   totalPartsPrice +
                   (totalPriceeee + totalPartsPrice) * 0.18
-                ).toFixed(2)
-              )} AZN
+                ).toFixed(2),
+              )}{" "}
+              AZN
             </span>
           </div>
         </div>
@@ -217,14 +218,19 @@ const Account = () => {
         {/* FOOTER */}
         <div className="mt-10 text-sm">
           <p>
-            Servis müqaviləsinə əsasən ödəniş <strong>7 iş günü</strong> ərzində həyata
-            keçirilməlidir.
+            Servis müqaviləsinə əsasən ödəniş <strong>7 iş günü</strong> ərzində
+            həyata keçirilməlidir.
           </p>
 
           <div className="mt-6">
             <p>AZ1063, Bakı, Salyan Şossesi 15-ci km</p>
             <p>Tel: (012) 5260200 | Fax: (012) 4480300</p>
-            <p>E-mail: info@itb.az | www.man.az</p>
+            <p>
+              E-mail: info@itb.az |{" "}
+              <a href="https://itb.az/" target="_blank">
+             www.itb.az
+              </a>
+            </p>
           </div>
         </div>
       </div>

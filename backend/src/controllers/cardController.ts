@@ -719,7 +719,7 @@ export const updateCard = async (
         discount,
         oil: j.oil,
         price: j.price,
-        discountPrice: Number(jobDisCountPrice.toFixed(2)),
+        discountPrice: (Number(j.price)* (1 - discount / 100)),
         cardId,
       });
 
@@ -784,6 +784,7 @@ export const updateCard = async (
         newPart.count = Number(p.count);
         newPart.soldPrice = Number(p.soldPrice);
         newPart.discount = Number(p.discount || 0);
+        newPart.netPrice = Number(p.netPrice);
         newPart.date = p.date ? new Date(p.date) : new Date();
 
         if (p.sparePart?.id) {

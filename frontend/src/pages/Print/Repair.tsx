@@ -35,7 +35,8 @@ const Repair = () => {
       price: job.price,
       discount: job.discount,
       date: job.createdAt,
-      av: job.av, // iş saatı üçün əlavə dəyər
+      av: job.av,
+      discountPrice: job.discountPrice // iş saatı üçün əlavə dəyər
     })),
 
     ...(cardDetails?.expenses || []).map((expense: any) => ({
@@ -76,8 +77,8 @@ const Repair = () => {
       return (
         sum +
         (cardDetails.paymentType === "internal"
-          ? (item.price / (1 - item.discount / 100)*(1 - item.discount / 100))
-          : (item.av * 50)*(1 - item.discount / 100))
+          ? Number(item.discountPrice)
+          : Number(item.discountPrice))
       );
     }
 
@@ -203,7 +204,7 @@ const Repair = () => {
                     <td className="border border-black text-center">
                       {item.quantity === ""
                         ? parseFloat(
-                            (item.price / (1 - item.discount / 100)* (1 - item.discount / 100||1)).toFixed(2)
+                            (item.price * (1 - item.discount / 100||1)).toFixed(2)
                           )
                         : parseFloat(
                             (item.price * (1 - item.discount / 100||1)*(item.quantity || 1)).toFixed(2)
@@ -276,7 +277,7 @@ const Repair = () => {
           <p>AZ1063, Bakı, Salyan Şossesi 15-ci km</p>
           <p>Tel: (012)5260200 &nbsp; Fax: (012)4480300</p>
           <p>E-mail: info@itb.az</p>
-          <p>Internet: www.man.az</p>
+          <a href="https://itb.az/" target="_blank">Web Site: www.itb.az</a>
         </div>
       </div>
     </div>

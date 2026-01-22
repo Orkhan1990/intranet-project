@@ -6,7 +6,7 @@ import {
   Textarea,
   Spinner,
 } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import { FiPrinter } from "react-icons/fi";
@@ -30,6 +30,7 @@ import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
 import { ClientCar, UpdateCardInterface } from "../../types";
 import { fetchCards } from "../../redux-toolkit/features/filters/filterSlice";
 import WayOutAutoLogic from "../../components/Card/WayOutAutoLogic";
+import SpecialPricingOverride from "../../components/Card/SpecialPricingOverride";
 
 const types = [
   "Tiqac",
@@ -123,9 +124,11 @@ const UpdateCard = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { id } = useParams();
 
-  const workers = users.filter(
-    (p: any) => p.isWorker === true || p.userRole === "ServiceUser"
+  const workers = useMemo(() => {
+  return users.filter(
+    p => p.isWorker === true || p.userRole === "ServiceUser"
   );
+}, [users]);
 
   useEffect(() => {
     // Component mount olanda scroll yuxarı qalxsın
@@ -232,7 +235,7 @@ const UpdateCard = () => {
   const createAccountForCard = async (cardId: any) => {
     const data = await createAccountForCardApi(cardId);
 
-    console.log({ data });
+    // console.log({ data });
     if (data.isExist) {
       navigate(`/account/${cardId}`);
       window.scrollTo(0, 0);
@@ -244,7 +247,7 @@ const UpdateCard = () => {
 
   const createRepair = async (cardId: any) => {
     const data = await createRepairForCardApi(cardId);
-    console.log({ data });
+    // console.log({ data });
     if (data.isExist) {
       navigate(`/repair/${cardId}`);
       window.scrollTo(0, 0);
@@ -339,7 +342,7 @@ const UpdateCard = () => {
       if (data.success) {
         navigate("/statistics");
       }
-      console.log(data);
+      // console.log(data);
     } catch (error: any) {
       setError(error.message || "Kart bağlanarkən xəta baş verdi");
     }
@@ -403,6 +406,7 @@ const UpdateCard = () => {
 
           return (
             <>
+            <SpecialPricingOverride />
             <WayOutAutoLogic />
             <Form className="space-y-8">
               {/* Client Section */}
@@ -481,12 +485,12 @@ const UpdateCard = () => {
                   <div className="flex flex-col gap-5 mt-4">
                     <div className="flex gap-2 items-center w-full">
                       <label htmlFor="">Hara</label>
-                      <Field as={TextInput} name="wayOutDirection" sizing="sm" />
+                      <Field as={TextInput} name="wayOutDirection" sizing="sm" disabled={!cardData?.isOpen}/>
                     </div>
 
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">Maşın</label>
-                      <Field as={Select} name="wayOutCar" sizing="sm">
+                      <Field as={Select} name="wayOutCar" sizing="sm" disabled={!cardData?.isOpen}>
                         <option value="">Maşını seçin</option>
                         <option value="1">Mitsubishi L200</option>
                         <option value="2">Man TGL 12.240</option>
@@ -495,19 +499,19 @@ const UpdateCard = () => {
 
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">Məsafə</label>
-                      <Field as={TextInput} name="wayOutDistance" sizing="sm" />
+                      <Field as={TextInput} name="wayOutDistance" sizing="sm" disabled={!cardData?.isOpen} />
                       <span>km</span>
                     </div>
 
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">İşçi sayı</label>
-                      <Field as={TextInput} name="wayOutWorkers" sizing="sm" />
+                      <Field as={TextInput} name="wayOutWorkers" sizing="sm" disabled={!cardData?.isOpen} />
                       <span>(sürücü ilə birlikdə)</span>
                     </div>
 
                     <div className="flex gap-2 items-center">
                       <label htmlFor="">İş saatları</label>
-                      <Field as={TextInput} name="wayOutWorkTime" sizing="sm" />
+                      <Field as={TextInput} name="wayOutWorkTime" sizing="sm" disabled={!cardData?.isOpen} />
                       <span>(səyahət daxil olmaqla)</span>
                     </div>
                   </div>
