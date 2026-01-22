@@ -188,17 +188,17 @@ useEffect(() => {
                   (totalExpenses ?? 0);
                 const edvPrice = countTotalPrice + countTotalPrice * 0.18;
 
-                const totalPartsPrice =
-                  card?.cardParts?.reduce((sum: number, part: any) => {
-                    const price = (part.soldPrice ?? 0) * (part.count ?? 0);
-                    const discount = part.discount ?? part.dicount ?? 0;
-                    return sum + price * (1 - discount / 100);
-                  }, 0) ?? 0;
+                // const totalPartsPrice =
+                //   card?.cardParts?.reduce((sum: number, part: any) => {
+                //     const price = (part.soldPrice ?? 0) * (part.count ?? 0);
+                //     const discount = part.discount ?? part.dicount ?? 0;
+                //     return sum + price * (1 - discount / 100);
+                //   }, 0) ?? 0;
 
-                  const totalPartsOwnPrice=  card?.cardParts?.reduce((sum: number, part: any) => {
-                    const price = (part.netPrice ?? 0) * (part.count ?? 0);
-                    return sum + price 
-                  }, 0) ?? 0;
+                  // const totalPartsOwnPrice=  card?.cardParts?.reduce((sum: number, part: any) => {
+                  //   const price = (part.netPrice ?? 0) * (part.count ?? 0);
+                  //   return sum + price 
+                  // }, 0) ?? 0;
 
                 return (
                   <tr
@@ -228,8 +228,8 @@ useEffect(() => {
                     <td className="p-3">{parseFloat((card.workSum).toFixed(2))}</td>
                     <td className="p-3">{parseFloat((card.workSumOwn).toFixed(2))}</td>
                     <td className="p-3">{parseFloat((card.avSum).toFixed(2))}</td>
-                    <td className="p-3">{parseFloat(totalPartsPrice.toFixed(2)) ?? 0}</td>
-                    <td className="p-3">{parseFloat(totalPartsOwnPrice.toFixed(2)) ?? 0}</td>
+                    <td className="p-3">{parseFloat((card.partsTotalPrice).toFixed(2)) ?? 0}</td>
+                    <td className="p-3">{parseFloat(card?.partsSumOwn.toFixed(2)) ?? 0}</td>
                     <td className="p-3">{parseFloat(totalExpenses.toFixed(2)) ?? 0}</td>
                     <td className="p-3">{parseFloat(countTotalPrice.toFixed(2))}</td>
                     <td className="p-3">{parseFloat(edvPrice.toFixed(2))}</td>

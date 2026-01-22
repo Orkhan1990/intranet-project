@@ -83,8 +83,13 @@ export const addToCard = async (
       (sum: any, p: any) => sum + p.soldPrice * p.count * (1 - p.discount),
       0
     );
+    const totalPartsOwnPrice = existingCard?.cardParts?.reduce(
+      (sum: any, p: any) => sum + p.netPrice * p.count,
+      0
+    );
 
     existingCard.partsTotalPrice = totalSell;
+    existingCard.partsSumOwn = totalPartsOwnPrice;
 
     await cardRepository.save(existingCard);
 
