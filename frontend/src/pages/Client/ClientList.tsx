@@ -15,7 +15,8 @@ const ClientList = () => {
   const [clients, setClients] = useState<ClientInterface[]>([]);
   const [error, setError] = useState(false);
  
-
+ console.log(error);
+ 
 
   useEffect(() => {
     const getAllClients = async () => {
@@ -129,20 +130,20 @@ const ClientList = () => {
                   <input
                     onBlur={() => handleSubmit(item.id)}
                     type="text"
-                    name="partsDiscount"
-                    onChange={(e)=>handleChange(item.id,"partsDiscount",Number(e.target.value))}
+                    // name="partsDiscount"
+                    // onChange={(e)=>handleChange(item.id,"partsDiscount",Number(e.target.value))}
                     className="border border-black outline-none w-10 p-1"
-                    value={item.partsDiscount}
+                    // value={item.partsDiscount}
                   />
                 </Table.Cell>
                 <Table.Cell>
                   <input
                     onBlur={() => handleSubmit(item.id)}
                     type="text"
-                    name="partsDiscount"
-                    onChange={(e)=>handleChange(item.id,"partsDiscount",Number(e.target.value))}
+                    // name="partsDiscount"
+                    // onChange={(e)=>handleChange(item.id,"partsDiscount",Number(e.target.value))}
                     className="border border-black outline-none w-10 p-1"
-                    value={item.partsDiscount}
+                    // value={item.partsDiscount}
                   />
                 </Table.Cell>
                 <Table.Cell>

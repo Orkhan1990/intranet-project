@@ -33,7 +33,7 @@ const repairSequenceRepository = AppDataSource.getRepository(RepairSequence);
 export const addToCard = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { cardId, id, selectedCount } = req.body;
@@ -41,6 +41,14 @@ export const addToCard = async (
     // console.log(cardId, id, selectedCount);
 
     const part = await sparePartsRepository.findOneBy({ id: id });
+    const card = await cardRepository.findOne({
+      where: { id: +cardId },
+      relations: ["client"],
+    });
+    
+    if (!card) {
+      return next(errorHandler(404, "Kart mövcud deyil"));
+    }
 
     if (!part) {
       return next(errorHandler(404, "Məhsul anbarda mövcud deyil!"));
@@ -56,7 +64,16 @@ export const addToCard = async (
     newCardPart.count = selectedCount;
     newCardPart.date = new Date();
     newCardPart.partName = part.name;
-    newCardPart.soldPrice = part.sellPrice;
+    newCardPart.soldPrice =
+      card.paymentType === "internal" || card.paymentType === "warranty"
+        ? part.price
+        : part.sellPrice;
+    newCardPart.discount =
+      card.paymentType === "cash" ||
+      card.paymentType === "transfer" ||
+      card.paymentType === "pos"
+        ? card.client.partsDiscount
+        : 0;
     newCardPart.netPrice = part.price;
     newCardPart.code = part.code;
     newCardPart.sparePart = part;
@@ -81,11 +98,11 @@ export const addToCard = async (
 
     const totalSell = existingCard?.cardParts?.reduce(
       (sum: any, p: any) => sum + p.soldPrice * p.count * (1 - p.discount),
-      0
+      0,
     );
     const totalPartsOwnPrice = existingCard?.cardParts?.reduce(
       (sum: any, p: any) => sum + p.netPrice * p.count,
-      0
+      0,
     );
 
     existingCard.partsTotalPrice = totalSell;
@@ -104,7 +121,7 @@ export const addToCard = async (
 export const createCard = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const queryRunner = AppDataSource.createQueryRunner();
   await queryRunner.connect();
@@ -117,24 +134,20 @@ export const createCard = async (
     /* ============================
        0️⃣ SAFE DEFAULT ARRAYS
     ============================ */
-    const cardJobs = Array.isArray(cardData.cardJobs)
-      ? cardData.cardJobs
-      : [];
+    const cardJobs = Array.isArray(cardData.cardJobs) ? cardData.cardJobs : [];
 
     const cardProblems = Array.isArray(cardData.cardProblems)
       ? cardData.cardProblems
       : [];
 
-    const expences = Array.isArray(cardData.expences)
-      ? cardData.expences
-      : [];
+    const expences = Array.isArray(cardData.expences) ? cardData.expences : [];
 
     /* ============================
        1️⃣ AV SUM
     ============================ */
     const avSum = cardJobs.reduce(
       (sum: number, j: any) => sum + Number(j.av || 0),
-      0
+      0,
     );
 
     /* ============================
@@ -143,7 +156,7 @@ export const createCard = async (
     const workerIds = cardJobs.flatMap((j: any) =>
       Array.isArray(j.workers)
         ? j.workers.map((w: any) => Number(w.workerId))
-        : []
+        : [],
     );
 
     const uniqueWorkerIds = [...new Set(workerIds)].filter(Boolean);
@@ -329,7 +342,6 @@ export const createCard = async (
   }
 };
 
-
 export const filterCards = async (req: Request, res: Response) => {
   try {
     const filters = req.body.filters || {};
@@ -446,7 +458,7 @@ export const filterCards = async (req: Request, res: Response) => {
 export const getCardDetails = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const cardId = Number(req.params.id);
@@ -486,7 +498,7 @@ export const getCardDetails = async (
 export const updateCard = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const queryRunner = AppDataSource.createQueryRunner();
   await queryRunner.connect();
@@ -497,20 +509,19 @@ export const updateCard = async (
     const { cardData } = req.body;
     const userId = req.userId;
     console.log(cardData);
-    
 
     // 1) AV TOPLAMI
     // =============================
     const avSum = cardData.cardJobs.reduce(
       (sum: number, job: any) => sum + Number(job.av || 0), //bu duzdur
-      0
+      0,
     );
 
     // =============================
     // 2) WORKER-ID-LƏRİ YIĞIRIQ
     // =============================
     const workerIds = cardData.cardJobs.flatMap((j: any) =>
-      j.workers.map((jw: any) => Number(jw.workerId))
+      j.workers.map((jw: any) => Number(jw.workerId)),
     );
 
     const uniqueWorkerIds = [...new Set(workerIds)];
@@ -526,31 +537,30 @@ export const updateCard = async (
     // =============================
     // 3) ÜMUMİ ENDİRİMLİ MƏBLƏĞ HESABLANMASI
     // =============================
-  
-     const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
+
+    const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
       const av = Number(j.av || 0);
       const globalDiscount = Number(j.discount || 0);
-      if(cardData.paymentType==="internal"){
-         let workerTotalSumOwn = 0;
-      for (const jw of j.workers) {
-        const avWorker = Number(jw.workerAv || 0);
-        const workerId = Number(jw.workerId);
-        const workerPercent = workerMap.get(workerId) || 0;
+      if (cardData.paymentType === "internal") {
+        let workerTotalSumOwn = 0;
+        for (const jw of j.workers) {
+          const avWorker = Number(jw.workerAv || 0);
+          const workerId = Number(jw.workerId);
+          const workerPercent = workerMap.get(workerId) || 0;
 
-        const price = 50 * avWorker * (workerPercent / 100)*(1-globalDiscount/100);
-        // ⭐ DÜZGÜN MAAS DÜSTURU
-        workerTotalSumOwn += price;
+          const price =
+            50 * avWorker * (workerPercent / 100) * (1 - globalDiscount / 100);
+          // ⭐ DÜZGÜN MAAS DÜSTURU
+          workerTotalSumOwn += price;
+        }
+        return sum + workerTotalSumOwn;
+      } else {
+        const price = av * 50 * (1 - globalDiscount / 100);
+        return sum + price;
       }
-      return sum + workerTotalSumOwn;
-      }else{
-         const price = av * 50 * (1 - globalDiscount / 100);
-      return sum + price;
-      }
-    
     }, 0);
 
-
-     const workSumOwn = cardData.cardJobs.reduce((sum: number, j: any) => {
+    const workSumOwn = cardData.cardJobs.reduce((sum: number, j: any) => {
       // const av = Number(j.av || 0);
       // const globalDiscount = Number(j.discount || 0);
       // const price = av * 50 * (1 - globalDiscount / 100);
@@ -566,7 +576,6 @@ export const updateCard = async (
       }
       return sum + workerTotalSumOwn;
     }, 0);
-  
 
     // 1️⃣ Mövcud kartı tap
     const existingCard = await cardRepository.findOneBy({ id: cardId });
@@ -650,7 +659,7 @@ export const updateCard = async (
             ...new Set(
               p.serviceWorkers
                 .map(Number)
-                .filter((id: any) => Number.isInteger(id) && id > 0)
+                .filter((id: any) => Number.isInteger(id) && id > 0),
             ),
           ];
 
@@ -724,7 +733,7 @@ export const updateCard = async (
         discount,
         oil: j.oil,
         price: j.price,
-        discountPrice: (Number(j.price)* (1 - discount / 100)),
+        discountPrice: Number(j.price) * (1 - discount / 100),
         cardId,
       });
 
@@ -818,7 +827,7 @@ export const updateCard = async (
 export const returnPart = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { cardId, partId } = req.body;
@@ -856,7 +865,7 @@ export const returnPart = async (
 export const createAccountForCard = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { cardId } = req.body;
@@ -924,7 +933,7 @@ export const createAccountForCard = async (
 export const createRepairForCard = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { cardId } = req.body;
@@ -996,7 +1005,7 @@ export const createRepairForCard = async (
 export const closeCard = async (
   req: CustomRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { cardId } = req.body;

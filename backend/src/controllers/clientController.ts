@@ -229,6 +229,7 @@ export const getClientCars = async (
         "produceDate",
         "sassi",
          "qostNumber",
+         "paymentType"
       ],
     });
 

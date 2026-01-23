@@ -22,6 +22,7 @@ import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
 import WayOutAutoLogic from "../../components/Card/WayOutAutoLogic";
+import SpecialPricingController from "../../components/Card/SpecialPricingOverride";
 // import { AUTO_EXPENSES } from "../../utilis/autoExpenses";
 // import { AUTO_JOBS } from "../../utilis/autoJobs";
 // import { updateJobPricesByClientType } from "../../utilis/utilis";
@@ -124,17 +125,9 @@ const NewCard = () => {
   }, [dispatch]);
 
   console.log(openBobcatWarranty, openAmmannWarranty, clientCars);
-  // console.log({clientType});
 
   const navigate = useNavigate();
-  // İşçilik qiymətini yeniləyən funksiya
-  // const handlePriceUpdate = (index: number, price: number) => {
-  //   setJobPrices((prev) => {
-  //     const updated = [...prev];
-  //     updated[index] = price;
-  //     return updated;
-  //   });
-  // };
+
 
   const openWarehousePopup = () => {
     window.scrollTo(0, 0);
@@ -145,21 +138,7 @@ const NewCard = () => {
     return Number.isInteger(value) ? value : Number(value.toFixed(2));
   };
 
-  // Yeni işçilik əlavə ediləndə sıfır qiymət daxil edilir
-  // const handleAddJob = () => {
-  //   setJobPrices((prev) => [...prev, 0]);
-  // };
 
-  // İşçilik silinəndə qiyməti də silinir
-  // const handleRemoveJob = (index: number) => {
-  //   setJobPrices((prev) => prev.filter((_, i) => i !== index));
-  // };
-
-  // const totalPriceWorker = jobPrices.reduce((a, b) => a + b, 0);
-  // const totalExpencesPrice = expencePrices;
-  // const totalPriceWithoutNds = totalPriceWorker + totalExpencesPrice;
-  // const totalPriceNds = totalPriceWithoutNds * 0.18;
-  // const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
   const onSubmit = async (values: NewCardInterface, totalPriceWorker: any) => {
     try {
@@ -204,11 +183,7 @@ const NewCard = () => {
 
       <Formik initialValues={newCardInitialValues} onSubmit={onSubmit}>
         {({ values, setFieldValue }) => {
-          // const totalExpencesPrice = values.expences.reduce(
-          //   (sum, item) => sum + Number(item.price || 0),
-          //   0
-          // );
-          // setExpencePrices(totalExpencesPrice);
+      
 
           const totalPriceWorker = values.cardJobs.reduce((sum, job) => {
             const price = Number(job.price || 0);
@@ -226,9 +201,12 @@ const NewCard = () => {
           const totalPriceNds = values.nds ? totalPriceWithoutNds * 0.18 : 0;
           const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
+
+
           return (
             <>
               <WayOutAutoLogic />
+                <SpecialPricingController />
 
               <Form className="space-y-8">
                 {/* Client Section */}
@@ -419,6 +397,8 @@ const NewCard = () => {
                                   carData.produceDate
                                 );
                                 setFieldValue("qostNumber", carData.qostNumber);
+                                setFieldValue("km", carData.km);
+                                setFieldValue("paymentType", carData.paymentType);
                               }
                             }}
                           >

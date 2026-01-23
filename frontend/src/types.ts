@@ -443,4 +443,5 @@ export interface ClientCar {
   produceDate: string;
   sassi:string;
   qostNumber:string;
+  paymentType:string;
 }

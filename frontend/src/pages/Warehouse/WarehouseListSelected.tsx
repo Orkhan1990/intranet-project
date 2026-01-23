@@ -6,7 +6,6 @@ import { FaXmark } from "react-icons/fa6";
 import { Button } from "flowbite-react";
 import { addToCard } from "../../api/allApi";
 import { useParams } from "react-router-dom";
-
 interface SparePartInterface {
   id: string;
   code: string;
@@ -30,6 +29,7 @@ const WarehouseListSelected = () => {
   const [selectedCount, setSelectedCount] = useState<number>(1);
 
   const { id } = useParams();
+
 
   console.log(selectedPartId, error);
   console.log(selectedCount);

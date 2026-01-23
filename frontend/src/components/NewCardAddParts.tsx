@@ -106,6 +106,7 @@ const NewCardAddParts = ({
                           name={`cardParts.${index}.soldPrice`}
                           className="w-full border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                           disabled={!cardData?.isOpen}
+                          value={values.cardParts[index].soldPrice} // buraya əlavə et
                         />
                       </Table.Cell>
 

@@ -66,11 +66,39 @@ useEffect(() => {
 }, [values.av, values.discount, values.workers, paymentType, users]);
 
 
+useEffect(() => {
+  if (!cardData?.client) return;
+
+  const client = cardData.client;
+  const isWorker = client.type === "worker";
+  const isInternal = paymentType === "internal";
+
+  // values.workers.forEach((worker: any, index: number) => {
+  //   // Şirkət işçisi & internal → endirim yalnız icazə varsa qalır
+  //   if (isWorker && isInternal) {
+  //     if (!worker.allowDiscount) {
+  //       setFieldValue(`workers[${index}].discount`, 0);
+  //     }
+  //   } 
+  //   // Nagd / köçürmə → əvvəl endirim varsa avtomatik düşür
+  //   else if (paymentType === "naghd" || paymentType === "kocurme") {
+  //     if (worker.discount && worker.discount > 0) {
+  //       setFieldValue(`workers[${index}].discount`, 0);
+  //     }
+  //   }
+  // });
+
+  if (isWorker && isInternal) {
+    setFieldValue(`${name}.discount`,  0);
+  } else if (paymentType === "transfer" || paymentType === "cash") {
+    setFieldValue(`${name}.discount`,client.av || 0);
+  }
+
+}, [cardData?.client, paymentType]);
 
 
 
-
-  console.log({ values });
+  console.log({ values },"azzzzzzzzz");
 
   return (
     <tbody>
