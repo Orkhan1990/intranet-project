@@ -23,8 +23,8 @@ const NewCardAddParts = ({
     values.cardParts?.reduce(
       (acc: any, part: any) =>
         acc +
-        (part.soldPrice * part.count -
-          part.soldPrice * part.count * (part.discount / 100 || 0)),
+        (part.usedPrice * part.count -
+          part.usedPrice * part.count * (part.discount / 100 || 0)),
       0,
     ) || 0;
 
