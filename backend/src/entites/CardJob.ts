@@ -23,8 +23,8 @@ export class CardJob extends AllEntities {
    @Column({ type: "decimal", precision: 10, scale: 2,   name: "discount_price", nullable: true })
   discountPrice: number;
 
-  @Column({ nullable: true })
-  oil: string;
+  @Column({ type: "double", nullable: true })
+  oil: number;
 
   @OneToMany(() => CardWorkerJob, (worker) => worker.cardJob, { cascade: true })
   workers: CardWorkerJob[];

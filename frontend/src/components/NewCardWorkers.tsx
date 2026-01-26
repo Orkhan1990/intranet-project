@@ -5,9 +5,8 @@ import NewCardWorkersName from "./NewCardWorkersName";
 import { Field, FieldArray } from "formik";
 import { UserInterface } from "../types";
 import { useEffect} from "react";
-import { fetchUsers } from "../redux-toolkit/features/user/userSlice";
-import { RootState, AppDispatch } from "../redux-toolkit/store/store";
-import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux-toolkit/store/store";
+import {  useSelector } from "react-redux";
 import { useFormikContext } from "formik";
 
 interface CardWorkersInterface {
@@ -29,15 +28,12 @@ const NewCardWorkers = ({
   paymentType,
   // allValues
 }: CardWorkersInterface) => {
-  const dispatch = useDispatch<AppDispatch>();
   // const [totalPrice, setTotalPrice] = useState(0);
 
   const { setFieldValue } = useFormikContext<any>();
   const { users } = useSelector((state: RootState) => state.user);
 
-  useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+
 
 
   
@@ -61,8 +57,11 @@ useEffect(() => {
 
   // Discount tətbiq et
   // calculatedTotal = calculatedTotal * (1 - discount / 100);
+ const newPrice = Number(calculatedTotal.toFixed(2));
 
-  setFieldValue(`${name}.price`, Number(calculatedTotal.toFixed(2)));
+  if (values.price !== newPrice) {
+    setFieldValue(`${name}.price`, newPrice);
+  }
 }, [values.av, values.discount, values.workers, paymentType, users]);
 
 
@@ -73,20 +72,7 @@ useEffect(() => {
   const isWorker = client.type === "worker";
   const isInternal = paymentType === "internal";
 
-  // values.workers.forEach((worker: any, index: number) => {
-  //   // Şirkət işçisi & internal → endirim yalnız icazə varsa qalır
-  //   if (isWorker && isInternal) {
-  //     if (!worker.allowDiscount) {
-  //       setFieldValue(`workers[${index}].discount`, 0);
-  //     }
-  //   } 
-  //   // Nagd / köçürmə → əvvəl endirim varsa avtomatik düşür
-  //   else if (paymentType === "naghd" || paymentType === "kocurme") {
-  //     if (worker.discount && worker.discount > 0) {
-  //       setFieldValue(`workers[${index}].discount`, 0);
-  //     }
-  //   }
-  // });
+
 
   if (isWorker && isInternal) {
     setFieldValue(`${name}.discount`,  0);
@@ -97,8 +83,22 @@ useEffect(() => {
 }, [cardData?.client, paymentType]);
 
 
+const handleWorkerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   const value = e.target.value;
 
-  console.log({ values },"azzzzzzzzz");
+   setFieldValue(`${name}.code`, value);
+  if (value === "Y1") {
+    // auto fill
+    setFieldValue(`${name}.name`, "Yağın dəyişilməsi");
+    setFieldValue(`${name}.av`, 0.4);
+  }
+};
+
+
+
+
+
+
 
   return (
     <tbody>
@@ -111,6 +111,8 @@ useEffect(() => {
             sizing="sm"
             name={`${name}.code`}
             disabled={cardData && !cardData?.isOpen}
+            onChange={handleWorkerNameChange}
+
           />
         </td>
         <td className="px-1">
