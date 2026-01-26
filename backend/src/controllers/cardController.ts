@@ -64,7 +64,8 @@ export const addToCard = async (
     newCardPart.count = selectedCount;
     newCardPart.date = new Date();
     newCardPart.partName = part.name;
-    newCardPart.soldPrice =
+    newCardPart.soldPrice =part.sellPrice;
+    newCardPart.usedPrice =
       card.paymentType === "internal" || card.paymentType === "warranty"
         ? part.price
         : part.sellPrice;

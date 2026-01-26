@@ -9,7 +9,7 @@ interface NewCardAddPartsProps {
   cardPartsPrice?: (price: any) => void;
   cardId?: string;
   setRefreshPage?: React.Dispatch<React.SetStateAction<boolean>>;
-  cardData:any
+  cardData: any;
 }
 
 const NewCardAddParts = ({
@@ -17,7 +17,7 @@ const NewCardAddParts = ({
   cardPartsPrice,
   cardId,
   setRefreshPage,
-  cardData
+  cardData,
 }: NewCardAddPartsProps) => {
   const price =
     values.cardParts?.reduce(
@@ -25,12 +25,12 @@ const NewCardAddParts = ({
         acc +
         (part.soldPrice * part.count -
           part.soldPrice * part.count * (part.discount / 100 || 0)),
-      0
+      0,
     ) || 0;
 
   useEffect(() => {
     cardPartsPrice?.(price);
-  }, [price, values?.cardParts]);
+  }, [price, values?.cardParts,cardData?.paymentType]);
 
   const returnPartToWareHouse = async (partId: any, cardId: any) => {
     try {
@@ -103,10 +103,9 @@ const NewCardAddParts = ({
 
                       <Table.Cell className="px-2 py-1 w-28">
                         <Field
-                          name={`cardParts.${index}.soldPrice`}
+                          name={`cardParts.${index}.usedPrice`}
                           className="w-full border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                           disabled={!cardData?.isOpen}
-                          value={values.cardParts[index].soldPrice} // buraya əlavə et
                         />
                       </Table.Cell>
 
@@ -124,11 +123,11 @@ const NewCardAddParts = ({
                           type="text"
                           readOnly
                           value={
-                            part.soldPrice && part.count
+                            part.usedPrice && part.count
                               ? formatPrice(
-                                  part.soldPrice *
+                                  part.usedPrice *
                                     part.count *
-                                    (1 - (part.discount ?? 0) / 100)
+                                    (1 - (part.discount ?? 0) / 100),
                                 )
                               : "0"
                           }

@@ -20,6 +20,10 @@ export class CardPart extends AllEntities {
   @Column({ type: "double", nullable: true, name: "sold_price" })
   soldPrice: number;
 
+  
+  @Column({ type: "double", nullable: true, name: "used_price" })
+  usedPrice: number;
+
   @Column({ type: "double", nullable: true, name: "net_price" })
   netPrice: number;
 

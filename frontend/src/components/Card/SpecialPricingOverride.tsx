@@ -11,63 +11,68 @@ const SpecialPricingController = () => {
     return clients.find(c => c.id === Number(values.clientId));
   }, [clients, values.clientId]);
 
-  useEffect(() => {
-    if (!client || !values.cardParts) return;
 
-    const isInternal =
-      values.paymentType === "internal" ||
-      values.paymentType === "warranty";
+  console.log(values.cardParts,"vzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+  
 
-    const allowDiscount =
-      values.paymentType === "cash" ||
-      values.paymentType === "transfer" ||
-      values.paymentType === "pos";
+useEffect(() => {
+  if (!client || !values.cardParts?.length) return;
 
-    // 🔧 İŞÇİLİK
-    values.cardJobs?.forEach((job: any, index: number) => {
-      if (isInternal) {
-        if (job.discount !== 0) {
-          setFieldValue(`cardJobs[${index}].discount`, 0);
-        }
-      } else if (allowDiscount && client.av) {
-        if (job.discount !== client.av) {
-          setFieldValue(`cardJobs[${index}].discount`, client.av);
-        }
+  const isInternal =
+    values.paymentType === "internal" ||
+    values.paymentType === "warranty";
+
+  const allowDiscount =
+    values.paymentType === "cash" ||
+    values.paymentType === "transfer" ||
+    values.paymentType === "pos";
+
+  // 🔧 İŞÇİLİK
+  values.cardJobs?.forEach((job: any, index: number) => {
+    if (isInternal) {
+      if (job.discount !== 0) {
+        setFieldValue(`cardJobs[${index}].discount`, 0);
       }
-    });
-
-    // 🔧 EHTİYYAT HİSSƏLƏRİ
-    values.cardParts.forEach((part: any, index: number) => {
-      if (!part) return;
-
-      if (isInternal) {
-        // payment internal/warranty → netPrice
-        if (part.soldPrice !== part.netPrice) {
-          setFieldValue(`cardParts[${index}].soldPrice`, part.netPrice);
-        }
-        if (part.discount !== 0) {
-          setFieldValue(`cardParts[${index}].discount`, 0);
-        }
-      } else {
-        // payment cash/transfer/pos → soldPrice qalır
-        setFieldValue(`cardParts[${index}].soldPrice`, part.soldPrice);
-
-        if (allowDiscount && client.partsDiscount) {
-          if (part.discount !== client.partsDiscount) {
-            setFieldValue(
-              `cardParts[${index}].discount`,
-              client.partsDiscount
-            );
-          }
-        }
+    } else if (allowDiscount && client.av) {
+      if (job.discount !== client.av) {
+        setFieldValue(`cardJobs[${index}].discount`, client.av);
       }
-    });
-  }, [
-    client,
-    values.paymentType,
-    values.cardJobs,
-    values.cardParts, // <- burda artıq whole array dependency var
-  ]);
+    }
+  });
+
+  // 🔧 EHTİYYAT HİSSƏLƏRİ — ƏSAS DÜZƏLİŞ
+  values.cardParts.forEach((part: any, index: number) => {
+    if (!part) return;
+
+    const newUsedPrice = isInternal
+      ? part.netPrice      // maya
+      : part.soldPrice;   // satış
+
+    if (part.usedPrice !== newUsedPrice) {
+      setFieldValue(`cardParts[${index}].usedPrice`, newUsedPrice);
+    }
+
+    if (isInternal) {
+      if (part.discount !== 0) {
+        setFieldValue(`cardParts[${index}].discount`, 0);
+      }
+    } else if (allowDiscount && client.partsDiscount) {
+      if (part.discount !== client.partsDiscount) {
+        setFieldValue(
+          `cardParts[${index}].discount`,
+          client.partsDiscount
+        );
+      }
+    }
+  });
+
+}, [
+  client,
+  values.paymentType,
+  values.cardJobs,
+  // ❌ values.cardParts BURADAN ÇIXARILIR
+]);
+
 
   return null;
 };
