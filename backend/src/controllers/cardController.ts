@@ -16,6 +16,7 @@ import { Account } from "../entites/Account";
 import { Repair } from "../entites/Repair";
 import { AccountSequence } from "../entites/AccountSequence";
 import { RepairSequence } from "../entites/RepairSequence";
+import { JobList } from "../entites/JobList";
 
 const cardPartsRepository = AppDataSource.getRepository(CardPart);
 const cardRepository = AppDataSource.getRepository(Card);
@@ -29,6 +30,7 @@ const accountRepository = AppDataSource.getRepository(Account);
 const repairRepository = AppDataSource.getRepository(Repair);
 const accountSequenceRepository = AppDataSource.getRepository(AccountSequence);
 const repairSequenceRepository = AppDataSource.getRepository(RepairSequence);
+const jobListRepository = AppDataSource.getRepository(JobList);
 
 export const addToCard = async (
   req: Request,
@@ -45,7 +47,7 @@ export const addToCard = async (
       where: { id: +cardId },
       relations: ["client"],
     });
-    
+
     if (!card) {
       return next(errorHandler(404, "Kart mövcud deyil"));
     }
@@ -64,7 +66,7 @@ export const addToCard = async (
     newCardPart.count = selectedCount;
     newCardPart.date = new Date();
     newCardPart.partName = part.name;
-    newCardPart.soldPrice =part.sellPrice;
+    newCardPart.soldPrice = part.sellPrice;
     newCardPart.usedPrice =
       card.paymentType === "internal" || card.paymentType === "warranty"
         ? part.price
@@ -1030,3 +1032,17 @@ export const closeCard = async (
     next(errorHandler(500, error));
   }
 };
+
+
+export const getJobList = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const jobList = await jobListRepository.find();
+    if (!jobList) {
+      return next(errorHandler(404, "Job list tapılmadı"));
+    }
+    res.status(200).json(jobList);
+  } catch (error) {
+    console.log(error);
+    next(errorHandler(500, error));
+  }
+;};

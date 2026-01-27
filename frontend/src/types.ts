@@ -445,3 +445,12 @@ export interface ClientCar {
   qostNumber:string;
   paymentType:string;
 }
+
+
+export interface JobListInterface {
+  id: number;
+  code: string;
+  name: string;
+  av: number;
+  oil: string;
+}

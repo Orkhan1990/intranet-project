@@ -21,13 +21,14 @@ import {
   createRepairForCardApi,
   fetchCardDetails,
   fetchClientCars,
+  getJobListAPI,
   updateCardApi,
 } from "../../api/allApi";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
-import { ClientCar, UpdateCardInterface } from "../../types";
+import { ClientCar, JobListInterface, UpdateCardInterface } from "../../types";
 import { fetchCards } from "../../redux-toolkit/features/filters/filterSlice";
 import WayOutAutoLogic from "../../components/Card/WayOutAutoLogic";
 import SpecialPricingOverride from "../../components/Card/SpecialPricingOverride";
@@ -67,6 +68,8 @@ const UpdateCard = () => {
   const [cardPartsPrice, setCardPartsPrice] = useState<number>(0);
   const [cardData, setCardData] = useState<UpdateCardInterface | null>(null);
   const [clientCars, setClientCars] = useState<ClientCar[] | null>(null);
+  const [jobsList, setJobsList] = useState<JobListInterface[]>([]);
+  
 
   const navigate = useNavigate();
 
@@ -134,6 +137,22 @@ const UpdateCard = () => {
     // Component mount olanda scroll yuxarı qalxsın
     window.scrollTo(0, 0);
   }, []);
+
+    useEffect(() => {
+      const fetchJobs = async () => {
+        try {
+          const response = await getJobListAPI();
+          setJobsList(response); 
+        } catch (error) {
+          console.error("Job list yüklənərkən xəta baş verdi:", error);
+        }
+      };
+  
+      fetchJobs();
+    }, []);
+
+    console.log({jobsList});
+    
 
   useEffect(() => {
     dispatch(fetchUsers());
@@ -803,7 +822,7 @@ const UpdateCard = () => {
                 {({ push, remove }) => (
                   <SectionCard title="İşçilik">
                     <div className="overflow-x-auto">
-                      <table className="w-full text-xs text-gray-600">
+                      <table className="w-full text-xs text-gray-600 ">
                         <thead className="bg-gray-100">
                           <tr>
                             <th className="text-center p-2">Kod</th>
@@ -822,12 +841,9 @@ const UpdateCard = () => {
                             workers={workers}
                             name={`cardJobs[${index}]`}
                             values={job}
-                            // jobWorkerPrice={(price) =>
-                            //   handlePriceUpdate(index, price)
-                            // }
                             cardData={cardData}
                             paymentType={values.paymentType}
-                            //  allValues={values}
+                            jobsList={jobsList}
                           />
                         ))}
 

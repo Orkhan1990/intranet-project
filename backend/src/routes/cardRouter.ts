@@ -3,7 +3,7 @@
 
 import express from "express";
 import verifyToken from "../middleware/verifyToken";
-import { addToCard, closeCard, createAccountForCard, createCard, createRepairForCard, filterCards, getCardDetails, returnPart, updateCard } from "../controllers/cardController";
+import { addToCard, closeCard, createAccountForCard, createCard, createRepairForCard, filterCards, getCardDetails, getJobList, returnPart, updateCard } from "../controllers/cardController";
 import { create } from "axios";
 
 
@@ -21,7 +21,8 @@ router.post("/updateCard/:id",verifyToken,updateCard);
 router.post("/returnPart",verifyToken,returnPart);
 router.post("/createAccountForCard",verifyToken,createAccountForCard)
 router.post("/createRepairForCard",verifyToken,createRepairForCard)
-router.post("/closeCard",verifyToken,closeCard)
+router.post("/closeCard",verifyToken,closeCard);
+router.get("/getJobList",verifyToken,getJobList)
 
 
 

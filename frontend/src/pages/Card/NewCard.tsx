@@ -15,8 +15,8 @@ import NewCardProblems from "../../components/NewCardProblems";
 import NewCardWorkers from "../../components/NewCardWorkers";
 // import NewCardAddParts from "../../components/NewCardAddParts";
 import AddCharges from "../../components/AddCharges";
-import { ClientCar, NewCardInterface } from "../../types";
-import { createCardApi, fetchClientCars } from "../../api/allApi";
+import { ClientCar, JobListInterface, NewCardInterface } from "../../types";
+import { createCardApi, fetchClientCars, getJobListAPI} from "../../api/allApi";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
@@ -104,7 +104,7 @@ const NewCard = () => {
   // const [openGedis, setOpenGedis] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
-  // const [jobPrices, setJobPrices] = useState<number[]>([0]);
+    const [jobsList, setJobsList] = useState<JobListInterface[]>([]);
   const [clientCars, setClientCars] = useState<ClientCar[] | null>(null);
   const { users } = useSelector((state: RootState) => state.user);
   const { clients } = useSelector((state: RootState) => state.client);
@@ -113,6 +113,22 @@ const NewCard = () => {
   const workers = users.filter(
     (p: any) => p.isWorker === true || p.userRole === "ServiceUser"
   );
+
+   useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await getJobListAPI();
+        setJobsList(response.data); 
+      } catch (error) {
+        console.error("Job list yüklənərkən xəta baş verdi:", error);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  console.log({jobsList});
+  
 
   useEffect(() => {
     const load = async () => {
@@ -604,11 +620,8 @@ const NewCard = () => {
                               workers={workers}
                               name={`cardJobs[${index}]`}
                               values={values.cardJobs[index]}
-                              // jobWorkerPrice={(price) =>
-                              //   handlePriceUpdate(index, price)
-                              // }
                               paymentType={values.paymentType}
-                              // allValues={values}
+                              jobsList={jobsList}
                             />
                           ))}
                           <tbody>

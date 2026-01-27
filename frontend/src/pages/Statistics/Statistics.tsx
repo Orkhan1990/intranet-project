@@ -188,17 +188,6 @@ useEffect(() => {
                   (totalExpenses ?? 0);
                 const edvPrice = countTotalPrice + countTotalPrice * 0.18;
 
-                // const totalPartsPrice =
-                //   card?.cardParts?.reduce((sum: number, part: any) => {
-                //     const price = (part.soldPrice ?? 0) * (part.count ?? 0);
-                //     const discount = part.discount ?? part.dicount ?? 0;
-                //     return sum + price * (1 - discount / 100);
-                //   }, 0) ?? 0;
-
-                  // const totalPartsOwnPrice=  card?.cardParts?.reduce((sum: number, part: any) => {
-                  //   const price = (part.netPrice ?? 0) * (part.count ?? 0);
-                  //   return sum + price 
-                  // }, 0) ?? 0;
 
                 return (
                   <tr
