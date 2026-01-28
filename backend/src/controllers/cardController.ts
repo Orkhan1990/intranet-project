@@ -355,6 +355,7 @@ export const filterCards = async (req: Request, res: Response) => {
       .createQueryBuilder("card")
       .leftJoinAndSelect("card.client", "client")
       .leftJoinAndSelect("card.user", "user")
+      .leftJoinAndSelect("card.closedByUser", "closedByUser")
       .leftJoinAndSelect("card.cardJobs", "cardJobs")
       .leftJoinAndSelect("cardJobs.workers", "jobWorkers")
       .leftJoinAndSelect("jobWorkers.user", "workerUser")
@@ -473,6 +474,7 @@ export const getCardDetails = async (
       relations: [
         "client",
         "user",
+         "closedByUser",
         "cardJobs",
         "cardJobs.workers",
         "cardJobs.workers.user",
@@ -1021,6 +1023,7 @@ export const closeCard = async (
 
     card.isOpen = false;
     card.closeDate = new Date();
+    card.closedByUserId = userId;
 
     await cardRepository.save(card);
 

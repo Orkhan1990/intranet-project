@@ -141,6 +141,14 @@ export class Card extends AllEntities {
   @Column({ name: "user_id", nullable: true })
   userId: number;
 
+  // Kartı bağlayan user
+  @ManyToOne(() => User, { nullable: true, onDelete: "SET NULL" })
+  @JoinColumn({ name: "closed_by_user_id" })
+  closedByUser: User;
+
+  @Column({ name: "closed_by_user_id", nullable: true })
+  closedByUserId: number;
+
   @OneToMany(() => CardExpense, (e) => e.card)
   expenses: CardExpense[];
 

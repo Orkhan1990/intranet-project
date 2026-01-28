@@ -26,29 +26,28 @@ const Statistics = () => {
   const cards = useSelector((state: RootState) => state.card.cards);
   const activeTab = useSelector((state: RootState) => state.filter.activeTab);
 
-const location = useLocation();
+  const location = useLocation();
 
-useEffect(() => {
-  dispatch(fetchCards(filters));
-}, [location.pathname]);
+  useEffect(() => {
+    dispatch(fetchCards(filters));
+  }, [location.pathname]);
 
-useEffect(() => {
-  const autoFetch = async () => {
-    setLoading(true);
+  useEffect(() => {
+    const autoFetch = async () => {
+      setLoading(true);
 
-    const currentFilters = {
-      ...filters,
-      startDate: startDate?.toISOString() ?? null,
-      endDate: endDate?.toISOString() ?? null,
+      const currentFilters = {
+        ...filters,
+        startDate: startDate?.toISOString() ?? null,
+        endDate: endDate?.toISOString() ?? null,
+      };
+
+      await dispatch(fetchCards(currentFilters));
+      setLoading(false);
     };
 
-    await dispatch(fetchCards(currentFilters));
-    setLoading(false);
-  };
-
-  autoFetch();
-}, []); // ⬅️ SADECE MOUNT OLANDA
-
+    autoFetch();
+  }, []); // ⬅️ SADECE MOUNT OLANDA
 
   console.log({ cards, loading });
 
@@ -171,6 +170,7 @@ useEffect(() => {
                 <th className="p-3 whitespace-nowrap">Təmir/Hesab</th>
                 <th className="p-3 whitespace-nowrap">Açdı</th>
                 <th className="p-3 whitespace-nowrap">Açılma</th>
+                <th className="p-3 whitespace-nowrap">Bağladı</th>
                 <th className="p-3 whitespace-nowrap">Bağlanma</th>
               </tr>
             </thead>
@@ -179,7 +179,7 @@ useEffect(() => {
               {cards?.map((card: any, index: number) => {
                 const totalExpenses = card?.expenses?.reduce(
                   (sum: number, exp: any) => sum + (exp.price ?? 0),
-                  0
+                  0,
                 );
 
                 const countTotalPrice =
@@ -187,7 +187,6 @@ useEffect(() => {
                   (card?.partsTotalPrice ?? 0) +
                   (totalExpenses ?? 0);
                 const edvPrice = countTotalPrice + countTotalPrice * 0.18;
-
 
                 return (
                   <tr
@@ -214,13 +213,25 @@ useEffect(() => {
                       </div>
                     </td>
                     <td className="p-3 text-center">/</td>
-                    <td className="p-3">{parseFloat((card.workSum).toFixed(2))}</td>
-                    <td className="p-3">{parseFloat((card.workSumOwn).toFixed(2))}</td>
-                    <td className="p-3">{parseFloat((card.avSum).toFixed(2))}</td>
-                    <td className="p-3">{parseFloat((card.partsTotalPrice).toFixed(2)) ?? 0}</td>
-                    <td className="p-3">{parseFloat(card?.partsSumOwn.toFixed(2)) ?? 0}</td>
-                    <td className="p-3">{parseFloat(totalExpenses.toFixed(2)) ?? 0}</td>
-                    <td className="p-3">{parseFloat(countTotalPrice.toFixed(2))}</td>
+                    <td className="p-3">
+                      {parseFloat(card.workSum.toFixed(2))}
+                    </td>
+                    <td className="p-3">
+                      {parseFloat(card.workSumOwn.toFixed(2))}
+                    </td>
+                    <td className="p-3">{parseFloat(card.avSum.toFixed(2))}</td>
+                    <td className="p-3">
+                      {parseFloat(card.partsTotalPrice.toFixed(2)) ?? 0}
+                    </td>
+                    <td className="p-3">
+                      {parseFloat(card?.partsSumOwn.toFixed(2)) ?? 0}
+                    </td>
+                    <td className="p-3">
+                      {parseFloat(totalExpenses.toFixed(2)) ?? 0}
+                    </td>
+                    <td className="p-3">
+                      {parseFloat(countTotalPrice.toFixed(2))}
+                    </td>
                     <td className="p-3">{parseFloat(edvPrice.toFixed(2))}</td>
                     <td className="p-3"></td>
                     <td className="p-3">/</td>
@@ -239,6 +250,11 @@ useEffect(() => {
                           })
                         : "-"}
                     </td>
+                    <td className="p-3 text-center">
+                      {card?.closedByUser
+                        ? `${card.closedByUser.firstName} ${card.closedByUser.lastName}`
+                        : "-"}
+                    </td>{" "}
                     <td className="p-2 text-center">
                       {card.closeDate
                         ? new Date(card.closeDate).toLocaleString("az-AZ", {
