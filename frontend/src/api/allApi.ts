@@ -536,3 +536,22 @@ export const getJobListAPI = async () => {
     );
   }
 };
+
+
+export const createWorkCatalogAPI = async (workCatalogData: any) => {
+  try {
+    const response = await axios.post(`${VITE_API_BASE_URL}card/createWorkCatalog`, workCatalogData, { 
+      withCredentials: true,
+    });
+    const data: any = response.data;
+    if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "İş kataloqu yaradılmadı");
+    }
+    return data;
+  } catch (error: any) {  
+    console.log(error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  }
+};

@@ -454,3 +454,11 @@ export interface JobListInterface {
   av: number;
   oil: string;
 }
+
+
+export interface WorkCatalogInterface {
+  av: string;
+  name: string;
+  code: string;
+}
+

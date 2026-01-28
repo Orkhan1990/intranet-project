@@ -1046,3 +1046,26 @@ export const getJobList = async (req: Request, res: Response, next: NextFunction
     next(errorHandler(500, error));
   }
 ;};
+
+
+export const createWorkCatalog = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { name, code, av} = req.body;
+    const userId = req.userId;
+
+    console.log(req.body);
+    
+
+    const newJobList = new JobList();
+    newJobList.name = name;
+    newJobList.code = code; 
+    newJobList.av=+av
+
+    await jobListRepository.save(newJobList);
+
+    res.status(201).json({success:true, jobList: newJobList});
+  } catch (error) {
+    console.log(error);
+    next(errorHandler(500, error));
+  }
+};

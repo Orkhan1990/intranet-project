@@ -40,6 +40,10 @@ export const navbarList:NavbarListInterface[] = [
           {
               title:"AV kataloq",
               url:"/avCatalog"
+          },
+          {
+              title:"Iş kataloqu yaratmaq",
+              url:"/workCatalog"
           }
       ]
     },

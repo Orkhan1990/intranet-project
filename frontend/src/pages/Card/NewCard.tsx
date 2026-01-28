@@ -118,7 +118,7 @@ const NewCard = () => {
     const fetchJobs = async () => {
       try {
         const response = await getJobListAPI();
-        setJobsList(response.data); 
+        setJobsList(response); 
       } catch (error) {
         console.error("Job list yüklənərkən xəta baş verdi:", error);
       }

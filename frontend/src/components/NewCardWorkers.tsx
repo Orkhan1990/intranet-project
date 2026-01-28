@@ -27,6 +27,8 @@ const NewCardWorkers = ({
 }: CardWorkersInterface) => {
   const [showJobs, setShowJobs] = useState(false);
   const { setFieldValue, handleChange } = useFormikContext<any>();
+  const [search, setSearch] = useState("");
+
   const { users } = useSelector((state: RootState) => state.user);
 
   // console.log({jobsList});
@@ -102,10 +104,23 @@ const NewCardWorkers = ({
     }
   };
 
+  const handleFilterWork = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const filterValue = e.target.value.toLowerCase();
+    setSearch(filterValue);
+  };
+
+  const filteredJobs = jobsList.filter(
+    (job: any) =>
+      job.code.toLowerCase().includes(search.toLowerCase()) ||
+      job.name.toLowerCase().includes(search.toLowerCase()) ||
+      job.av.includes(search.toLowerCase()),
+  );
+
   return (
     <tbody>
-      <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 ">
-        <td className="px-1">
+      <tr className="border-b hover:bg-gray-50">
+        <td className="px-1 ">
+          {/* Job code input field */}
           <Field
             as={TextInput}
             type="text"
@@ -126,52 +141,67 @@ const NewCardWorkers = ({
               sizing="sm"
               disabled={cardData && !cardData?.isOpen}
             />
-            <button type="button" onClick={() => setShowJobs(true)}>
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setShowJobs(true);
+              }}
+            >
               <FaArrowAltCircleUp className="text-2xl text-green-600" />
             </button>
 
-{showJobs && (
-  <div
-    className="fixed inset-0 bg-black/30 z-50 flex justify-center items-start pt-20"
-    onClick={() => setShowJobs(false)}
-  >
-    <div
-      ref={popupRef}
-      className="bg-white border p-4 shadow-lg max-h-[900px] overflow-y-auto w-1/2"
-      onClick={(e) => e.stopPropagation()} // popup içində klikləyəndə bağlanmasın
-    >
-      <table className="table-auto text-sm w-full">
-        <thead>
-          <tr className="bg-gray-100 sticky top-0">
-            <th className="px-2 py-1 text-left">Code</th>
-            <th className="px-2 py-1 text-left">Name</th>
-            <th className="px-2 py-1 text-left">AV</th>
-          </tr>
-        </thead>
-        <tbody>
-          {jobsList.map((job: any) => (
-            <tr
-              key={job.id}
-              className="cursor-pointer hover:bg-gray-200"
-              onClick={() => {
-                setFieldValue(`${name}.code`, job.code);
-                setFieldValue(`${name}.name`, job.name);
-                setFieldValue(`${name}.av`, parseFloat(job.av));
-                setShowJobs(false);
-              }}
-            >
-              <td className="px-2 py-1">{job.code}</td>
-              <td className="px-2 py-1">{job.name}</td>
-              <td className="px-2 py-1">{parseFloat(job.av)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
-
-
+            {showJobs && (
+              <div
+                className="fixed inset-0 bg-black/30 z-50 flex justify-center items-start pt-20 scroll-py-0.5"
+                onClick={() => setShowJobs(false)}
+              >
+                <div
+                  ref={popupRef}
+                  className="bg-white border p-4 shadow-lg 
+             max-h-[70vh] overflow-y-auto 
+             w-[800px] rounded-lg"
+                  onClick={(e) => e.stopPropagation()} // popup içində klikləyəndə bağlanmasın
+                >
+                  <div>
+                    <TextInput
+                      type="text"
+                      sizing={"sm"}
+                      className="w-1/2 mb-2"
+                      placeholder="Axtar..."
+                      onChange={handleFilterWork}
+                    />
+                  </div>
+                  <table className="table-auto text-sm w-full">
+                    <thead>
+                      <tr className="bg-gray-100 sticky top-0">
+                        <th className="px-2 py-1 text-left">Kod</th>
+                        <th className="px-2 py-1 text-left">Ad</th>
+                        <th className="px-2 py-1 text-left">AV</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredJobs.map((job: any) => (
+                        <tr
+                          key={job.id}
+                          className="cursor-pointer hover:bg-gray-200"
+                          onClick={() => {
+                            setFieldValue(`${name}.code`, job.code);
+                            setFieldValue(`${name}.name`, job.name);
+                            setFieldValue(`${name}.av`, parseFloat(job.av));
+                            setShowJobs(false);
+                          }}
+                        >
+                          <td className="px-2 py-1">{job.code}</td>
+                          <td className="px-2 py-1">{job.name}</td>
+                          <td className="px-2 py-1">{parseFloat(job.av)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         </td>
         <td className="px-1">

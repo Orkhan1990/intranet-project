@@ -33,6 +33,7 @@ import PrintPageSecond from "./pages/Print/PrintPageSecond";
 import Agreement from "./pages/Print/Agreement";
 import Account from "./pages/Print/Account";
 import Repair from "./pages/Print/Repair";
+import WorkCatalog from "./pages/WorkCatalog";
 
 function App() {
   return (
@@ -184,6 +185,15 @@ function App() {
             element={
               <Layout>
                 <PrixodList />
+              </Layout>
+            }
+          />
+
+           <Route
+            path="/workCatalog"
+            element={
+              <Layout>
+                <WorkCatalog />
               </Layout>
             }
           />
