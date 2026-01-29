@@ -555,3 +555,25 @@ export const createWorkCatalogAPI = async (workCatalogData: any) => {
     );
   }
 };
+
+export const filterEmployeeFee = async (filters: any) => {
+  try {
+    const response = await axios.post(
+      `${VITE_API_BASE_URL}employeeFee/filterEmployeeFee`,
+      { filters },
+      {
+        withCredentials: true,
+      }
+    );
+    const data: any = response.data;
+    if (!response.status.toString().startsWith("2") || data.success === false) {
+      throw new Error(data.message || "Əmək haqqı məlumatları alınmadı");
+    }
+    return data;
+  } catch (error: any) {
+    console.log(error);
+    throw new Error(
+      error.response?.data?.message || error.message || "Xəta baş verdi"
+    );
+  } 
+};

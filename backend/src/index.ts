@@ -10,6 +10,7 @@ import sparePartRouter from "./routes/sparePartRouter";
 import priceListRouter from "./routes/priceListRouter";
 import orderRouter from "./routes/orderRouter";
 import orderPartRouter from "./routes/orderPartRouter";
+import employeeFeeRouter from "./routes/employeeFeeRouter";
 import cardRouter from "./routes/cardRouter";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
@@ -42,6 +43,7 @@ app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/orderPart", orderPartRouter);
 app.use("/api/v1/priceList", priceListRouter);
 app.use("/api/v1/card",cardRouter);
+app.use("/api/v1/employeeFee",employeeFeeRouter);
 
 app.use(
   (error: CustomError, req: Request, res: Response, next: NextFunction) => {
