@@ -55,7 +55,7 @@ export interface NewCardJobsInterface {
   av: number;
   price: number;
   discount: number;
-  oil: string;
+  oil: number;
   workers: JobWorkersInterface[];
 }
 

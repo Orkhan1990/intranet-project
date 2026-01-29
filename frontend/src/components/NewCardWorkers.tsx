@@ -57,7 +57,7 @@ const NewCardWorkers = ({
 
     let calculatedTotal = 0;
 
-    if (paymentType === "internal") {
+    if (paymentType === "internal" && values.code !== "Y1") {
       values.workers.forEach((w: any) => {
         const workerAv = Number(w.workerAv || 0);
         const workerPercent =
@@ -236,11 +236,10 @@ const NewCardWorkers = ({
           />
         </td>
         <td className="px-1">
-          <Field
-            as={TextInput}
+          <TextInput
             type="text"
             className="w-[70px]"
-            name={`${name}.oil`}
+            // name={`${name}.oil`}
             sizing="sm"
             disabled={cardData && !cardData?.isOpen}
           />

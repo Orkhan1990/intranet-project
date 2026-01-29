@@ -134,6 +134,8 @@ export const createCard = async (
     const { cardData } = req.body;
     const userId = req.userId;
 
+    log(cardData);
+
     /* ============================
        0️⃣ SAFE DEFAULT ARRAYS
     ============================ */
@@ -274,7 +276,7 @@ export const createCard = async (
       job.name = j.name;
       job.av = av;
       job.discount = discount;
-      job.oil = j.oil;
+      job.oil = j.code==="Y1" ? 33.3 : 0;
       job.cardId = savedCard.id;
       job.price = j.price;
 
@@ -290,7 +292,7 @@ export const createCard = async (
           const workerAv = Number(jw.workerAv || 0);
           const percent = Number(user.percent || 0);
 
-          const earnedSalary = workerAv * 50 * (percent / 100);
+          const earnedSalary = jw.code === "Y1" ? (33.3*0.3) : workerAv * 50 * (percent / 100);
 
           if (cardData.paymentType === "internal") {
             jobDiscountPrice += earnedSalary;
@@ -546,7 +548,7 @@ export const updateCard = async (
     const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
       const av = Number(j.av || 0);
       const globalDiscount = Number(j.discount || 0);
-      if (cardData.paymentType === "internal") {
+      if (cardData.paymentType === "internal" && j.code !== "Y1") {
         let workerTotalSumOwn = 0;
         for (const jw of j.workers) {
           const avWorker = Number(jw.workerAv || 0);
@@ -736,7 +738,7 @@ export const updateCard = async (
         name: j.name,
         av,
         discount,
-        oil: j.oil,
+        oil: j.code==="Y1" ? 33.3 : 0,
         price: j.price,
         discountPrice: Number(j.price) * (1 - discount / 100),
         cardId,
@@ -756,7 +758,7 @@ export const updateCard = async (
 
           const workerAv = Number(jw.workerAv || 0);
 
-          const earnedSalary = workerAv * 50 * (worker.percent / 100);
+          const earnedSalary = j.code === "Y1" ? (33.3 * 0.3) : workerAv * 50 * (worker.percent / 100);
 
           const newWorkerJob = new CardWorkerJob();
           newWorkerJob.cardJobId = savedJob.id;

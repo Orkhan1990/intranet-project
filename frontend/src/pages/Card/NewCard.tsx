@@ -66,7 +66,7 @@ const newCardInitialValues: NewCardInterface = {
       av: 0,
       price: 0,
       discount: 0,
-      oil: "",
+      oil: 0,
       workers: [{ workerAv: "", workerId: 0 }],
     },
   ],
