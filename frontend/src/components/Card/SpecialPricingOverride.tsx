@@ -66,10 +66,12 @@ useEffect(() => {
   });
 
 }, [
-  client?.id,
-  values.clientId,
+   client?.id,
+  client?.av,
+  client?.partsDiscount,
   values.paymentType,
   values.cardJobs,
+  values.cardParts,
 ]);
 
 

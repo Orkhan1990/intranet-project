@@ -30,6 +30,7 @@ const NewCardWorkers = ({
   const [search, setSearch] = useState("");
 
   const { users } = useSelector((state: RootState) => state.user);
+  const autoDiscountSet = useRef(false);
 
   // console.log({jobsList});
 
@@ -52,8 +53,11 @@ const NewCardWorkers = ({
     };
   }, []);
 
+
+
   useEffect(() => {
     const av = Number(values.av || 0);
+    // const discount = Number(values.discount || 0); // burada təyin et
 
     let calculatedTotal = 0;
 
@@ -63,6 +67,7 @@ const NewCardWorkers = ({
         const workerPercent =
           Number(users.find((u) => u.id === Number(w.workerId))?.percent || 0) /
           100;
+
         calculatedTotal += workerAv * 50 * workerPercent;
       });
     } else {
@@ -76,20 +81,27 @@ const NewCardWorkers = ({
     if (values.price !== newPrice) {
       setFieldValue(`${name}.price`, newPrice);
     }
-  }, [values.av, values.discount, values.workers, paymentType, users]);
+  }, [values.av, values.workers, paymentType, users]);
+
+
+
 
   useEffect(() => {
     if (!cardData?.client) return;
+    if (autoDiscountSet.current) return;
 
     const client = cardData.client;
-    const isWorker = client.type === "worker";
+    // const isWorker = client.type === "worker";
     const isInternal = paymentType === "internal";
 
-    if (isWorker && isInternal) {
+    if (isInternal) {
       setFieldValue(`${name}.discount`, 0);
     } else if (paymentType === "transfer" || paymentType === "cash") {
-      setFieldValue(`${name}.discount`, client.av || 0);
+      setFieldValue(`${name}.discount`, cardData.discount ?? client.av ?? 0);
     }
+
+      autoDiscountSet.current = true; // 🔒 bir dəfəlik
+
   }, [cardData?.client, paymentType]);
 
   const handleWorkerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,6 +245,7 @@ const NewCardWorkers = ({
             name={`${name}.discount`}
             sizing="sm"
             disabled={cardData && !cardData?.isOpen}
+         
           />
         </td>
         <td className="px-1">

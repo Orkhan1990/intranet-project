@@ -227,7 +227,7 @@ const UpdateCard = () => {
     }
   };
 
-  console.log(cardData?.isOpen);
+  console.log({ cardData },"1111111111111111111111");
   const hasRepairAct = cardData?.repair?.repairId > 349;
 
   useEffect(() => {

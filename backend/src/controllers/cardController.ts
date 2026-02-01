@@ -764,7 +764,7 @@ export const updateCard = async (
           newWorkerJob.cardJobId = savedJob.id;
           newWorkerJob.workerAv = workerAv;
           newWorkerJob.workerId = worker.id;
-          newWorkerJob.salaryPercent = worker.percent;
+          newWorkerJob.salaryPercent = worker.percent??0;
           newWorkerJob.earnedSalary = earnedSalary;
           newWorkerJob.date = new Date();
 
