@@ -16,112 +16,91 @@ export const filterEmployeeFee = async (
   next: NextFunction,
 ) => {
   try {
-    const {
-      startDate,
-      endDate,
-      clientId,
-      cardNumber,
-      paymentType,
-    } = req.body.filters;
+    const { startDate, endDate, clientId, cardNumber, paymentType } =
+      req.body.filters;
 
     console.log(req.body);
-    
 
-   const qb = cardWorkerJobRepository
-  .createQueryBuilder("cw")
-  .leftJoinAndSelect("cw.user", "worker") // bütün işçilər
-  .leftJoin("cw.cardJob", "job")
-  .leftJoin("job.card", "card")
-  .leftJoin("card.client", "client")
-  .select([
-    "worker.id AS workerId",
-    "CONCAT(worker.firstName, ' ', worker.lastName) AS fullName",
-    "COALESCE(SUM(CASE WHEN cw.date BETWEEN :start AND :end THEN cw.workerAv ELSE 0 END), 0) AS totalAv",
-    "COALESCE(SUM(CASE WHEN (cw.date BETWEEN :start AND :end) AND (job.oil != 33.3 OR job.oil IS NULL) THEN cw.earnedSalary ELSE 0 END), 0) AS normalSalary",
-    "COALESCE(SUM(CASE WHEN (cw.date BETWEEN :start AND :end) AND (job.oil = 33.3) THEN cw.earnedSalary ELSE 0 END), 0) AS oilSalary",
-  ])
-  .where("worker.userRole = :role", { role: "ServiceUser" })
-  .groupBy("worker.id")
-  .setParameters({ start: startDate, end: endDate });
+    const qb = AppDataSource.getRepository(User)
+      .createQueryBuilder("worker")
 
-    // 🧑‍🔧 YALNIZ SERVICE USER
-    qb.where("worker.userRole = :role", { role: "ServiceUser" });
+      // 🔹 yalnız service user-lər
+      .where("worker.userRole = :role", { role: "ServiceUser" })
 
-    // 🔒 YALNIZ BAĞLI KARTLAR
-    qb.andWhere("(card.is_open = false OR card.id IS NULL)");
+      // 🔹 LEFT JOIN – hamı görünsün deyə
+      .leftJoin("worker.cardWorkerJobs", "cw")
+      .leftJoin("cw.cardJob", "job")
+      .leftJoin("job.card", "card")
+      .leftJoin("card.client", "client")
 
-    // 📅 TARİX
-    if (startDate && endDate) {
-      qb.andWhere(
-        "(cw.date BETWEEN :start AND :end OR cw.id IS NULL)",
-        { start: startDate, end: endDate }
-      );
-    }
+      .select([
+        "worker.id AS workerId",
+        "CONCAT(worker.firstName, ' ', worker.lastName) AS fullName",
 
-    // 🧾 CLIENT
-    if (clientId) {
-      qb.andWhere("(card.clientId = :clientId OR card.id IS NULL)", {
-        clientId,
-      });
-    }
+        // 🔢 AV
+        `
+    COALESCE(SUM(
+      CASE 
+        WHEN card.is_open = false
+         AND (:startDate IS NULL OR card.close_date >= :startDate)
+         AND (:endDate IS NULL OR card.close_date <= :endDate)
+         AND (:clientId IS NULL OR card.clientId = :clientId)
+         AND (:cardNumber IS NULL OR card.car_number LIKE :cardNumber)
+        THEN cw.workerAv
+        ELSE 0
+      END
+    ), 0) AS totalAv
+    `,
 
-    // 🚗 CARD NUMBER
-    if (cardNumber) {
-      qb.andWhere(
-        "(card.car_number LIKE :cardNumber OR card.id IS NULL)",
-        { cardNumber: `%${cardNumber}%` }
-      );
-    }
+        // 💰 NORMAL
+        `
+    COALESCE(SUM(
+      CASE 
+        WHEN card.is_open = false
+         AND (job.oil != 33.3 OR job.oil IS NULL)
+         AND (:startDate IS NULL OR card.close_date >= :startDate)
+         AND (:endDate IS NULL OR card.close_date <= :endDate)
+         AND (:clientId IS NULL OR card.clientId = :clientId)
+         AND (:cardNumber IS NULL OR card.car_number LIKE :cardNumber)
+        THEN cw.earnedSalary
+        ELSE 0
+      END
+    ), 0) AS normalSalary
+    `,
 
-    // 💳 PAYMENT TYPE
-    if (paymentType) {
-      qb.andWhere(
-        "(card.payment_type = :paymentType OR card.id IS NULL)",
-        { paymentType }
-      );
-    }
+        // 🛢 OIL
+        `
+    COALESCE(SUM(
+      CASE 
+        WHEN card.is_open = false
+         AND job.oil = 33.3
+         AND (:startDate IS NULL OR card.close_date >= :startDate)
+         AND (:endDate IS NULL OR card.close_date <= :endDate)
+         AND (:clientId IS NULL OR card.clientId = :clientId)
+         AND (:cardNumber IS NULL OR card.car_number LIKE :cardNumber)
+        THEN cw.earnedSalary
+        ELSE 0
+      END
+    ), 0) AS oilSalary
+    `,
+      ])
 
-    // 🧮 SELECT
-    qb.select([
-      "worker.id AS workerId",
-      "CONCAT(worker.firstName, ' ', worker.lastName) AS fullName",
+      .groupBy("worker.id")
+      .addGroupBy("worker.firstName")
+      .addGroupBy("worker.lastName")
 
-      // 🔢 AV – həmişə görünsün
-      "COALESCE(SUM(cw.workerAv), 0) AS totalAv",
+      .setParameters({
+        startDate: startDate || null,
+        endDate: endDate || null,
+        clientId: clientId || null,
+        cardNumber: cardNumber ? `%${cardNumber}%` : null,
+      })
 
-      // 🟢 NORMAL MAAŞ
-      `
-      COALESCE(SUM(
-        CASE 
-          WHEN job.oil != 33.3 OR job.oil IS NULL
-          THEN cw.earnedSalary
-          ELSE 0
-        END
-      ), 0) AS normalSalary
-      `,
-
-      // 🟠 OIL MAAŞ
-      `
-      COALESCE(SUM(
-        CASE 
-          WHEN job.oil = 33.3
-          THEN cw.earnedSalary
-          ELSE 0
-        END
-      ), 0) AS oilSalary
-      `,
-    ]);
-
-    qb.groupBy("worker.id");
-    qb.addGroupBy("worker.firstName");
-    qb.addGroupBy("worker.lastName");
-
-    qb.orderBy("fullName", "ASC");
+      .orderBy("fullName", "ASC");
 
     const data = await qb.getRawMany();
 
     console.log(data);
-    
 
     res.json(data);
   } catch (error) {

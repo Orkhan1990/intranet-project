@@ -115,7 +115,7 @@ const Warehouse = () => {
         <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100">
           Anbar
         </h1>
-        <Link to="/importWarehouse">
+        <Link to="/importPrixod">
           <Button color="blue" size="xs">
             Əlavə et +
           </Button>

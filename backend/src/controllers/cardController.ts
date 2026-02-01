@@ -804,7 +804,7 @@ export const updateCard = async (
         newPart.code = p.code;
         newPart.count = Number(p.count);
         newPart.soldPrice = Number(p.soldPrice);
-        newPart.discount = Number(p.discount || 0);
+        newPart.discount =cardData.paymentType === "internal" ? 0 : Number(p.discount || 0);
         newPart.netPrice = Number(p.netPrice);
         newPart.date = p.date ? new Date(p.date) : new Date();
 

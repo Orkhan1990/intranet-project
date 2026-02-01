@@ -34,9 +34,8 @@ useEffect(() => {
         setFieldValue(`cardJobs[${index}].discount`, 0);
       }
     } else if (allowDiscount && client.av) {
-      if (job.discount !== client.av) {
+    
         setFieldValue(`cardJobs[${index}].discount`, client.av);
-      }
     }
   });
 
@@ -67,10 +66,10 @@ useEffect(() => {
   });
 
 }, [
-  client,
+  client?.id,
+  values.clientId,
   values.paymentType,
   values.cardJobs,
-  // ❌ values.cardParts BURADAN ÇIXARILIR
 ]);
 
 

@@ -980,6 +980,7 @@ const UpdateCard = () => {
                   cardId={id}
                   setRefreshPage={setRefreshPage}
                   cardData={cardData}
+                  paymentType={values.paymentType}
                 />
                 <div className="flex gap-3 font-semibold mt-5 items-center justify-center">
                   <span>Cəmi:</span>

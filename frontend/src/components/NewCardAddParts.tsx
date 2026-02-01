@@ -10,6 +10,7 @@ interface NewCardAddPartsProps {
   cardId?: string;
   setRefreshPage?: React.Dispatch<React.SetStateAction<boolean>>;
   cardData: any;
+  paymentType?:string;
 }
 
 const NewCardAddParts = ({
@@ -18,6 +19,7 @@ const NewCardAddParts = ({
   cardId,
   setRefreshPage,
   cardData,
+  paymentType
 }: NewCardAddPartsProps) => {
   const price =
     values.cardParts?.reduce(
@@ -82,6 +84,7 @@ const NewCardAddParts = ({
                           name={`cardParts.${index}.code`}
                           className="w-full border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                           disabled={!cardData?.isOpen}
+                          readOnly
                         />
                       </Table.Cell>
 
@@ -90,6 +93,7 @@ const NewCardAddParts = ({
                           name={`cardParts.${index}.partName`}
                           className="w-full border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                           disabled={!cardData?.isOpen}
+                          readOnly
                         />
                       </Table.Cell>
 
@@ -98,6 +102,7 @@ const NewCardAddParts = ({
                           name={`cardParts.${index}.count`}
                           className="w-full border rounded px-2 py-1 text-sm text-center dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                           disabled={!cardData?.isOpen}
+                          readOnly
                         />
                       </Table.Cell>
 
@@ -114,7 +119,7 @@ const NewCardAddParts = ({
                           name={`cardParts.${index}.discount`}
                           value={part.discount || 0}
                           className="w-full border rounded px-2 py-1 text-sm text-center dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                          disabled={!cardData?.isOpen}
+                          disabled={!cardData?.isOpen|| paymentType === "internal"}
                         />
                       </Table.Cell>
 
