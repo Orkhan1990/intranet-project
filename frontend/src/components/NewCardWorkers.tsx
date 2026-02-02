@@ -30,7 +30,6 @@ const NewCardWorkers = ({
   const [search, setSearch] = useState("");
 
   const { users } = useSelector((state: RootState) => state.user);
-  const autoDiscountSet = useRef(false);
 
   // console.log({jobsList});
 
@@ -61,7 +60,7 @@ const NewCardWorkers = ({
 
     let calculatedTotal = 0;
 
-    if (paymentType === "internal" && values.code !== "Y1") {
+    if (paymentType === "internal" ) {
       values.workers.forEach((w: any) => {
         const workerAv = Number(w.workerAv || 0);
         const workerPercent =
@@ -81,14 +80,13 @@ const NewCardWorkers = ({
     if (values.price !== newPrice) {
       setFieldValue(`${name}.price`, newPrice);
     }
-  }, [values.av, values.workers, paymentType, users]);
+  }, [values.av, values.workers, paymentType, users,values.code]);
 
 
 
 
   useEffect(() => {
     if (!cardData?.client) return;
-    if (autoDiscountSet.current) return;
 
     const client = cardData.client;
     // const isWorker = client.type === "worker";
@@ -100,9 +98,8 @@ const NewCardWorkers = ({
       setFieldValue(`${name}.discount`, cardData.discount ?? client.av ?? 0);
     }
 
-      autoDiscountSet.current = true; // 🔒 bir dəfəlik
 
-  }, [cardData?.client, paymentType]);
+  }, [cardData?.client,paymentType]);
 
   const handleWorkerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

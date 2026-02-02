@@ -38,6 +38,4 @@ export class CardPart extends AllEntities {
   @JoinColumn({ name: "card_id" })
   card: Card;
 
-  @Column({ name: "card_id" })
-  cardId: number;
 }

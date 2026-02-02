@@ -111,14 +111,14 @@ const UpdateCard = () => {
     ],
     expences: [{ description: "", price: "" }],
     cardParts: [
-      // {
-      //   code: "",
-      //   partName: "",
-      //   count: 0,
-      //   soldPrice: 0,
-      //   discount: 0,
-      //   totalPrice: 0,
-      // },
+      {
+        code: "",
+        partName: "",
+        count: 0,
+        soldPrice: 0,
+        discount: 0,
+        totalPrice: 0,
+      },
     ],
   });
 
@@ -402,9 +402,9 @@ const UpdateCard = () => {
              const totalPriceWorker = values.cardJobs.reduce((sum, job) => {
             const price = Number(job.price || 0);
             const discount = Number(job.discount || 0);
-
             return sum + price * (1 - discount / 100);
           }, 0);
+
 
           const totalExpencesPrice = values.expences.reduce(
             (sum, item) => sum + Number(item.price || 0),
@@ -412,16 +412,22 @@ const UpdateCard = () => {
           );
 
           const totalPartsPrice = values.cardParts.reduce((sum, part) => {
-            const soldPrice = Number(part.soldPrice || 0);
+            const usedPrice = Number(part.usedPrice || 0);
             const count = Number(part.count || 0);
             const discount = Number(part.discount || 0);
-            const totalPrice = soldPrice * count * (1 - discount / 100);
+            const totalPrice = usedPrice * count * (1 - discount / 100);
             return sum + totalPrice;
           }, 0);
 
-          const totalPriceWithoutNds = totalPriceWorker + totalExpencesPrice+totalPartsPrice;
+          const totalPriceWithoutNds = (Number(totalPriceWorker)) + (Number(totalExpencesPrice))+(Number(totalPartsPrice));
           const totalPriceNds = values.nds ? totalPriceWithoutNds * 0.18 : 0;
           const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
+
+
+          console.log({totalPriceWorker});
+          console.log({totalPartsPrice})
+          console.log({totalExpencesPrice})
+
 
           return (
             <>

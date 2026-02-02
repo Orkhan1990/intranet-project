@@ -62,7 +62,7 @@ export const addToCard = async (
 
     // CardPart yarat
     const newCardPart = new CardPart();
-    newCardPart.cardId = cardId;
+    newCardPart.card = card;
     newCardPart.count = selectedCount;
     newCardPart.date = new Date();
     newCardPart.partName = part.name;
@@ -190,6 +190,14 @@ export const createCard = async (
         // NORMAL PAYMENT
         if (cardData.paymentType !== "internal") {
           workSum += av * 50 * (1 - discount / 100);
+          for (const jw of j.workers) {
+            const workerAv = Number(jw.workerAv || 0);
+            const workerPercent = workerMap.get(Number(jw.workerId)) || 0;
+
+            const salary = workerAv * 50 * (workerPercent / 100);
+            // workSum += salary * (1 - discount / 100);
+            workSumOwn += salary;
+          }
         }
 
         // INTERNAL PAYMENT
@@ -276,7 +284,7 @@ export const createCard = async (
       job.name = j.name;
       job.av = av;
       job.discount = discount;
-      job.oil = j.code==="Y1" ? 33.3 : 0;
+      job.oil = j.code === "Y1" ? 33.3 : 0;
       job.cardId = savedCard.id;
       job.price = j.price;
 
@@ -292,7 +300,8 @@ export const createCard = async (
           const workerAv = Number(jw.workerAv || 0);
           const percent = Number(user.percent || 0);
 
-          const earnedSalary = jw.code === "Y1" ? (33.3*0.3) : workerAv * 50 * (percent / 100);
+          const earnedSalary =
+            jw.code === "Y1" ? 33.3 * 0.3 : workerAv * 50 * (percent / 100);
 
           if (cardData.paymentType === "internal") {
             jobDiscountPrice += earnedSalary;
@@ -476,7 +485,7 @@ export const getCardDetails = async (
       relations: [
         "client",
         "user",
-         "closedByUser",
+        "closedByUser",
         "cardJobs",
         "cardJobs.workers",
         "cardJobs.workers.user",
@@ -515,7 +524,7 @@ export const updateCard = async (
     const cardId = Number(req.params.id);
     const { cardData } = req.body;
     const userId = req.userId;
-    console.log(cardData);
+    console.log(cardData, cardId);
 
     // 1) AV TOPLAMI
     // =============================
@@ -545,44 +554,49 @@ export const updateCard = async (
     // 3) ÜMUMİ ENDİRİMLİ MƏBLƏĞ HESABLANMASI
     // =============================
 
-    const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
-      const av = Number(j.av || 0);
-      const globalDiscount = Number(j.discount || 0);
-      if (cardData.paymentType === "internal" && j.code !== "Y1") {
-        let workerTotalSumOwn = 0;
-        for (const jw of j.workers) {
-          const avWorker = Number(jw.workerAv || 0);
-          const workerId = Number(jw.workerId);
-          const workerPercent = workerMap.get(workerId) || 0;
+   const workSum = cardData.cardJobs.reduce((sum: number, j: any) => {
+  const av = Number(j.av || 0);
+  const discount = Number(j.discount || 0);
 
-          const price =
-            50 * avWorker * (workerPercent / 100) * (1 - globalDiscount / 100);
-          // ⭐ DÜZGÜN MAAS DÜSTURU
-          workerTotalSumOwn += price;
-        }
-        return sum + workerTotalSumOwn;
-      } else {
-        const price = av * 50 * (1 - globalDiscount / 100);
-        return sum + price;
-      }
-    }, 0);
+  let price = 0;
 
-    const workSumOwn = cardData.cardJobs.reduce((sum: number, j: any) => {
-      // const av = Number(j.av || 0);
-      // const globalDiscount = Number(j.discount || 0);
-      // const price = av * 50 * (1 - globalDiscount / 100);
-      let workerTotalSumOwn = 0;
-      for (const jw of j.workers) {
-        const avWorker = Number(jw.workerAv || 0);
-        const workerId = Number(jw.workerId);
-        const workerPercent = workerMap.get(workerId) || 0;
+  // 🔥 INTERNAL → yalnız işçi maaşı
+  if (cardData.paymentType === "internal") {
+    for (const jw of j.workers || []) {
+      const avWorker = Number(jw.workerAv || 0);
+      const workerId = Number(jw.workerId);
+      const workerPercent = workerMap.get(workerId) || 0;
 
-        const price = 50 * avWorker * (workerPercent / 100);
-        // ⭐ DÜZGÜN MAAS DÜSTURU
-        workerTotalSumOwn += price;
-      }
-      return sum + workerTotalSumOwn;
-    }, 0);
+      price += avWorker * 50 * (workerPercent / 100);
+    }
+  }
+  // 🔹 EXTERNAL → av * 50
+  else {
+    price = av * 50;
+  }
+
+  // ✅ Y1 də daxil olmaqla hamısına discount
+  return sum + price * (1 - discount / 100);
+}, 0);
+
+
+   const workSumOwn = cardData.cardJobs.reduce((sum: number, j: any) => {
+  // ❌ Y1 maya dəyərinə düşmür
+  // if (j.code === "Y1") return sum;
+
+  let workerTotal = 0;
+
+  for (const jw of j.workers || []) {
+    const avWorker =j.code==="Y1"?0: Number(jw.workerAv || 0);
+    const workerId = Number(jw.workerId);
+    const workerPercent = workerMap.get(workerId) || 0;
+
+    workerTotal += avWorker * 50 * (workerPercent / 100);
+  }
+
+  return sum + workerTotal;
+}, 0);
+
 
     // 1️⃣ Mövcud kartı tap
     const existingCard = await cardRepository.findOneBy({ id: cardId });
@@ -593,6 +607,7 @@ export const updateCard = async (
     // 2️⃣ Kartın əsas sahələrini update et
     existingCard.clientId = Number(cardData.clientId);
     existingCard.type = cardData.type;
+    existingCard.avSum = avSum;
     existingCard.manufactured = cardData.manufactured;
     existingCard.model = cardData.model;
     existingCard.sassi = cardData.sassi;
@@ -614,8 +629,7 @@ export const updateCard = async (
     existingCard.wayOutCar = cardData.wayOutCar;
     existingCard.wayOutDistance = cardData.wayOutDistance;
     existingCard.wayOutWorkTime = cardData.wayOutWorkTime;
-
-    const updatedCard = await cardRepository.save(existingCard);
+    await cardRepository.save(existingCard);
 
     // ==========================
     // 2️⃣ Join table əlaqələrini sil
@@ -738,7 +752,7 @@ export const updateCard = async (
         name: j.name,
         av,
         discount,
-        oil: j.code==="Y1" ? 33.3 : 0,
+        oil: j.code === "Y1" ? 33.3 : 0,
         price: j.price,
         discountPrice: Number(j.price) * (1 - discount / 100),
         cardId,
@@ -758,13 +772,16 @@ export const updateCard = async (
 
           const workerAv = Number(jw.workerAv || 0);
 
-          const earnedSalary = j.code === "Y1" ? (33.3 * 0.3) : workerAv * 50 * (worker.percent / 100);
+          const earnedSalary =
+            j.code === "Y1"
+              ? 33.3 * 0.3
+              : workerAv * 50 * (worker.percent / 100);
 
           const newWorkerJob = new CardWorkerJob();
           newWorkerJob.cardJobId = savedJob.id;
           newWorkerJob.workerAv = workerAv;
           newWorkerJob.workerId = worker.id;
-          newWorkerJob.salaryPercent = worker.percent??0;
+          newWorkerJob.salaryPercent = worker.percent ?? 0;
           newWorkerJob.earnedSalary = earnedSalary;
           newWorkerJob.date = new Date();
 
@@ -790,8 +807,9 @@ export const updateCard = async (
 
     //Yeni ehtiyyat hisselerini silinir və yenileri elave edilir
 
-    await cardPartsRepository.delete({ cardId });
-
+    await cardPartsRepository.delete({
+      card: { id: cardId },
+    });
     // ==========================
     // 2️⃣ Yeni cardParts əlavə et
     // ==========================
@@ -799,12 +817,13 @@ export const updateCard = async (
       for (const p of cardData.cardParts) {
         const newPart = new CardPart();
 
-        newPart.cardId = cardId;
+        newPart.card = existingCard;
         newPart.partName = p.partName;
         newPart.code = p.code;
         newPart.count = Number(p.count);
         newPart.soldPrice = Number(p.soldPrice);
-        newPart.discount =cardData.paymentType === "internal" ? 0 : Number(p.discount || 0);
+        newPart.discount =
+          cardData.paymentType === "internal" ? 0 : Number(p.discount || 0);
         newPart.netPrice = Number(p.netPrice);
         newPart.date = p.date ? new Date(p.date) : new Date();
 
@@ -817,6 +836,33 @@ export const updateCard = async (
         await cardPartsRepository.save(newPart);
       }
     }
+
+    const cardParts = await cardPartsRepository.find({
+      where: {
+        card: { id: cardId },
+      },
+    });
+
+    const partsTotalPrice = cardParts.reduce((sum, part) => {
+      if (cardData.paymentType === "internal") {
+        // 🔥 Maya dəyəri
+        return sum + part.netPrice * part.count * (1 - (part.discount || 0) / 100);
+      } else {
+        // 🔹 Satış qiyməti + endirim
+        return (
+          sum + part.soldPrice * part.count * (1 - (part.discount || 0) / 100)
+        );
+      }
+    }, 0);
+
+    const partsSumOwn = cardParts.reduce(
+      (sum, part) => sum + part.netPrice * part.count,
+      0,
+    );
+
+    existingCard.partsTotalPrice = partsTotalPrice;
+    existingCard.partsSumOwn = partsSumOwn;
+    const updatedCard = await cardRepository.save(existingCard);
 
     res.status(200).json({
       message: "Kart yeniləndi",
@@ -1038,8 +1084,11 @@ export const closeCard = async (
   }
 };
 
-
-export const getJobList = async (req: Request, res: Response, next: NextFunction) => {
+export const getJobList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const jobList = await jobListRepository.find();
     if (!jobList) {
@@ -1050,25 +1099,27 @@ export const getJobList = async (req: Request, res: Response, next: NextFunction
     console.log(error);
     next(errorHandler(500, error));
   }
-;};
+};
 
-
-export const createWorkCatalog = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const createWorkCatalog = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const { name, code, av} = req.body;
+    const { name, code, av } = req.body;
     const userId = req.userId;
 
     console.log(req.body);
-    
 
     const newJobList = new JobList();
     newJobList.name = name;
-    newJobList.code = code; 
-    newJobList.av=+av
+    newJobList.code = code;
+    newJobList.av = +av;
 
     await jobListRepository.save(newJobList);
 
-    res.status(201).json({success:true, jobList: newJobList});
+    res.status(201).json({ success: true, jobList: newJobList });
   } catch (error) {
     console.log(error);
     next(errorHandler(500, error));
