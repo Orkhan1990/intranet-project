@@ -16,13 +16,18 @@ import NewCardWorkers from "../../components/NewCardWorkers";
 // import NewCardAddParts from "../../components/NewCardAddParts";
 import AddCharges from "../../components/AddCharges";
 import { ClientCar, JobListInterface, NewCardInterface } from "../../types";
-import { createCardApi, fetchClientCars, getJobListAPI} from "../../api/allApi";
+import {
+  createCardApi,
+  fetchClientCars,
+  getJobListAPI,
+} from "../../api/allApi";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
 import WayOutAutoLogic from "../../components/Card/WayOutAutoLogic";
 import SpecialPricingController from "../../components/Card/SpecialPricingOverride";
+import WayOutResetLogic from "../../components/Card/WayOutResetLogic";
 // import { AUTO_EXPENSES } from "../../utilis/autoExpenses";
 // import { AUTO_JOBS } from "../../utilis/autoJobs";
 // import { updateJobPricesByClientType } from "../../utilis/utilis";
@@ -70,7 +75,7 @@ const newCardInitialValues: NewCardInterface = {
       workers: [{ workerAv: "", workerId: 0 }],
     },
   ],
-  expences: [{ description: "", price: "" }],
+  expences: [{ description: "", price: 0}],
   cardParts: [
     // {
     //   code: "",
@@ -104,21 +109,21 @@ const NewCard = () => {
   // const [openGedis, setOpenGedis] = useState(false);
   const [openBobcatWarranty, setOpenBobcatWarranty] = useState(false);
   const [openAmmannWarranty, setOpenAmmannWarranty] = useState(false);
-    const [jobsList, setJobsList] = useState<JobListInterface[]>([]);
+  const [jobsList, setJobsList] = useState<JobListInterface[]>([]);
   const [clientCars, setClientCars] = useState<ClientCar[] | null>(null);
   const { users } = useSelector((state: RootState) => state.user);
   const { clients } = useSelector((state: RootState) => state.client);
   const dispatch = useDispatch<AppDispatch>();
 
   const workers = users.filter(
-    (p: any) => p.isWorker === true || p.userRole === "ServiceUser"
+    (p: any) => p.isWorker === true || p.userRole === "ServiceUser",
   );
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchJobs = async () => {
       try {
         const response = await getJobListAPI();
-        setJobsList(response); 
+        setJobsList(response);
       } catch (error) {
         console.error("Job list yüklənərkən xəta baş verdi:", error);
       }
@@ -127,8 +132,7 @@ const NewCard = () => {
     fetchJobs();
   }, []);
 
-  console.log({jobsList});
-  
+  console.log({ jobsList });
 
   useEffect(() => {
     const load = async () => {
@@ -144,7 +148,6 @@ const NewCard = () => {
 
   const navigate = useNavigate();
 
-
   const openWarehousePopup = () => {
     window.scrollTo(0, 0);
     alert("Birinci kart yarat!!");
@@ -153,8 +156,6 @@ const NewCard = () => {
   const displayPrice = (value: number) => {
     return Number.isInteger(value) ? value : Number(value.toFixed(2));
   };
-
-
 
   const onSubmit = async (values: NewCardInterface, totalPriceWorker: any) => {
     try {
@@ -199,8 +200,6 @@ const NewCard = () => {
 
       <Formik initialValues={newCardInitialValues} onSubmit={onSubmit}>
         {({ values, setFieldValue }) => {
-      
-
           const totalPriceWorker = values.cardJobs.reduce((sum, job) => {
             const price = Number(job.price || 0);
             const discount = Number(job.discount || 0);
@@ -210,19 +209,18 @@ const NewCard = () => {
 
           const totalExpencesPrice = values.expences.reduce(
             (sum, item) => sum + Number(item.price || 0),
-            0
+            0,
           );
 
           const totalPriceWithoutNds = totalPriceWorker + totalExpencesPrice;
           const totalPriceNds = values.nds ? totalPriceWithoutNds * 0.18 : 0;
           const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
-
-
           return (
             <>
+              <SpecialPricingController />
               <WayOutAutoLogic />
-                <SpecialPricingController />
+              <WayOutResetLogic />
 
               <Form className="space-y-8">
                 {/* Client Section */}
@@ -397,7 +395,7 @@ const NewCard = () => {
 
                               // 1. seçilmiş maşın datalarını tap
                               const carData = clientCars?.find(
-                                (c) => c.sassi === selectedSassi
+                                (c) => c.sassi === selectedSassi,
                               );
                               if (carData) {
                                 // 2. Formik inputlarını avtomatik doldur
@@ -405,16 +403,19 @@ const NewCard = () => {
                                 setFieldValue("type", carData.type);
                                 setFieldValue(
                                   "manufactured",
-                                  carData.manufactured
+                                  carData.manufactured,
                                 );
                                 setFieldValue("carNumber", carData.carNumber);
                                 setFieldValue(
                                   "produceDate",
-                                  carData.produceDate
+                                  carData.produceDate,
                                 );
                                 setFieldValue("qostNumber", carData.qostNumber);
                                 setFieldValue("km", carData.km);
-                                setFieldValue("paymentType", carData.paymentType);
+                                setFieldValue(
+                                  "paymentType",
+                                  carData.paymentType,
+                                );
                               }
                             }}
                           >
@@ -482,7 +483,7 @@ const NewCard = () => {
                           {[2025, 2024, 2023, 2022, 2021, 2020, 2019].map(
                             (y) => (
                               <option key={y}>{y}</option>
-                            )
+                            ),
                           )}
                         </Field>
                       </div>

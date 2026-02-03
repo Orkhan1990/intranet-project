@@ -32,6 +32,7 @@ import { ClientCar, JobListInterface, UpdateCardInterface } from "../../types";
 import { fetchCards } from "../../redux-toolkit/features/filters/filterSlice";
 import WayOutAutoLogic from "../../components/Card/WayOutAutoLogic";
 import SpecialPricingOverride from "../../components/Card/SpecialPricingOverride";
+import WayOutResetLogic from "../../components/Card/WayOutResetLogic";
 
 const types = [
   "Tiqac",
@@ -424,15 +425,12 @@ const UpdateCard = () => {
           const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
 
-          console.log({totalPriceWorker});
-          console.log({totalPartsPrice})
-          console.log({totalExpencesPrice})
-
 
           return (
             <>
             <SpecialPricingOverride />
             <WayOutAutoLogic />
+             <WayOutResetLogic/>
             <Form className="space-y-8">
               {/* Client Section */}
               <SectionCard title="Müştəri Məlumatları">

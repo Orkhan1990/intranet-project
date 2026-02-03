@@ -69,20 +69,46 @@ const WayOutAutoLogic = () => {
        5️⃣ EXPENSE HESABI
     ------------------------------- */
     const expPrice =
-      Number(values.wayOutWorkTime || 0) *
-      Number(values.wayOutWorkers || 0) *
-      2;
+  Number(values.wayOutWorkTime || 0) *
+  Number(values.wayOutWorkers || 0) *
+  2;
 
-    if (values.expences?.[0]?.description === "Mütəxəssis çıxışı") {
-      setFieldValue("expences[0].price", +expPrice.toFixed(2));
-    } else {
-      setFieldValue("expences", [
-        {
-          description: "Mütəxəssis çıxışı",
-          price: +expPrice.toFixed(2),
-        },
-      ]);
-    }
+const prevExpenses = values.expences || [];
+
+const exitExpenseIndex = prevExpenses.findIndex(
+  (e) => e.description === "Mütəxəssis çıxışı"
+);
+
+const mergedExpenses = [...prevExpenses];
+
+if (exitExpenseIndex >= 0) {
+  // varsa → update
+  if (mergedExpenses[exitExpenseIndex].price !== expPrice) {
+    mergedExpenses[exitExpenseIndex] = {
+      ...mergedExpenses[exitExpenseIndex],
+      price: (expPrice),
+    };
+  }
+} else {
+  // yoxdursa → əlavə et
+  mergedExpenses.push({
+    description: "Mütəxəssis çıxışı",
+    price: expPrice,
+  });
+}
+
+/* 🔒 only if changed */
+const isSameExpense =
+  prevExpenses.length === mergedExpenses.length &&
+  prevExpenses.every(
+    (e, i) =>
+      e.description === mergedExpenses[i].description &&
+      e.price === mergedExpenses[i].price
+  );
+
+if (!isSameExpense) {
+  setFieldValue("expences", mergedExpenses);
+}
   }, [
     values.isWayOut,
     values.wayOutDistance,
