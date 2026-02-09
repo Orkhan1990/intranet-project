@@ -558,25 +558,25 @@ export const updateCard = async (
       const av = Number(j.av || 0);
       const discount = Number(j.discount || 0);
 
-      let price = 0;
+      // let price = 0;
 
-      // 🔥 INTERNAL → yalnız işçi maaşı
-      if (cardData.paymentType === "internal") {
-        for (const jw of j.workers || []) {
-          const avWorker = Number(jw.workerAv || 0);
-          const workerId = Number(jw.workerId);
-          const workerPercent = workerMap.get(workerId) || 0;
+      // // 🔥 INTERNAL → yalnız işçi maaşı
+      // if (cardData.paymentType === "internal") {
+      //   for (const jw of j.workers || []) {
+      //     const avWorker = Number(jw.workerAv || 0);
+      //     const workerId = Number(jw.workerId);
+      //     const workerPercent = workerMap.get(workerId) || 0;
 
-          price += avWorker * 50 * (workerPercent / 100);
-        }
-      }
-      // 🔹 EXTERNAL → av * 50
-      else {
-        price = av * 50;
-      }
+      //     price += avWorker * 50 * (workerPercent / 100);
+      //   }
+      // }
+      // // 🔹 EXTERNAL → av * 50
+      // else {
+      //   price = av * 50;
+      // }
 
       // ✅ Y1 də daxil olmaqla hamısına discount
-      return sum + price * (1 - discount / 100);
+      return sum + j.price * (1 - discount / 100);
     }, 0);
 
     const workSumOwn = cardData.cardJobs.reduce((sum: number, j: any) => {

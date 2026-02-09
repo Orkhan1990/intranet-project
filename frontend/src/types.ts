@@ -61,7 +61,7 @@ export interface NewCardJobsInterface {
 
 export interface NewCardExpencesInterface {
   description: string;
-  price: string;
+  price: number;
 }
 
 export interface NewCardInterface {
