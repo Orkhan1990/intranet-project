@@ -65,7 +65,8 @@ export interface NewCardExpencesInterface {
 }
 
 export interface NewCardInterface {
-  clientId: number;
+  id:number;
+ clientId: number;
   type: string;
   manufactured: string;
   model: string;
@@ -79,6 +80,9 @@ export interface NewCardInterface {
   repairAgain: boolean;
   servisInfo: boolean;
   comments: string;
+  isOpen:boolean;
+  openDate: string | null;
+  closeDate: string | null;
   recommendation: string;
   isWayOut: boolean;
   wayOutDirection: string;
@@ -86,22 +90,19 @@ export interface NewCardInterface {
   wayOutCar: number;
   wayOutDistance: number;
   wayOutWorkTime: number;
-  cardProblems: NewCardProblemsInterface[];
-  cardJobs: NewCardJobsInterface[];
-  expences: NewCardExpencesInterface[];
-   cardParts: [
-    // {
-    //   code: "",
-    //   partName: "",
-    //   count: 0,
-    //   soldPrice: 0,
-    //   discount: 0,
-    //   totalPrice: 0
-    // }
-  ],
+  cardProblems: {
+    description: string;
+    serviceWorkers: any[];
+  }[];
+  cardJobs: any[];
+  expences: any[];
+  cardParts: any[];
+  account:any;
+  repair:any
 }
 
 export interface UpdateCardInterface {
+  id:number;
   clientId: number;
   type: string;
   manufactured: string;

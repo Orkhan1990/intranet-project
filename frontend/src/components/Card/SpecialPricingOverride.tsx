@@ -12,11 +12,11 @@ const SpecialPricingController = () => {
   }, [clients, values.clientId]);
 
 
-  console.log(values.cardParts,"vzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+  // console.log(values.cardParts,"vzzzzzzzzzzzzzzzzzzzzzzzzzzz");
   
 
 useEffect(() => {
-  if (!client || !values.cardParts?.length) return;
+  if (!client) return;
 
   const isInternal =
     values.paymentType === "internal" ||

@@ -9,7 +9,10 @@ const WayOutAutoLogic = () => {
   const { users } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
+    if (values.id) return;
+
   if (!values.isWayOut) return;
+  
 
   const distance = Number(values.wayOutDistance || 0);
   if (distance <= 0) return;

@@ -70,58 +70,10 @@ const UpdateCard = () => {
   const [cardData, setCardData] = useState<UpdateCardInterface | null>(null);
   const [clientCars, setClientCars] = useState<ClientCar[] | null>(null);
   const [jobsList, setJobsList] = useState<JobListInterface[]>([]);
-  
 
   const navigate = useNavigate();
 
-  const [initialValues, setInitialValues] = useState({
-    clientId: 0,
-    type: "tiqac",
-    manufactured: "man",
-    model: "",
-    sassi: "",
-    carNumber: "",
-    produceDate: "2025",
-    km: "",
-    qostNumber: "",
-    paymentType: "transfer",
-    nds: false,
-    repairAgain: false,
-    servisInfo: false,
-    comments: "",
-    openDate: "",
-    closeDate: "",
-    recommendation: "",
-    isWayOut: false,
-    wayOutDirection: "",
-    wayOutWorkers: 0,
-    wayOutCar: 0,
-    wayOutDistance: 0,
-    wayOutWorkTime: 0,
-    cardProblems: [{ description: "", serviceWorkers: [""] }],
-    cardJobs: [
-      {
-        code: "",
-        name: "",
-        av: 0,
-        price: 0,
-        discount: 0,
-        oil: "",
-        workers: [{ workerAv: "", workerId: 0 }],
-      },
-    ],
-    expences: [{ description: "", price: "" }],
-    cardParts: [
-      {
-        code: "",
-        partName: "",
-        count: 0,
-        soldPrice: 0,
-        discount: 0,
-        totalPrice: 0,
-      },
-    ],
-  });
+  
 
   const { users } = useSelector((state: RootState) => state.user);
   const { clients } = useSelector((state: RootState) => state.client);
@@ -129,106 +81,133 @@ const UpdateCard = () => {
   const { id } = useParams();
 
   const workers = useMemo(() => {
-  return users.filter(
-    p => p.isWorker === true || p.userRole === "ServiceUser"
-  );
-}, [users]);
+    return users.filter(
+      (p) => p.isWorker === true || p.userRole === "ServiceUser",
+    );
+  }, [users]);
+
+  useEffect(() => {
+    reloadCard();
+  }, [id, refreshPage]);
 
   useEffect(() => {
     // Component mount olanda scroll yuxarı qalxsın
     window.scrollTo(0, 0);
   }, []);
 
-    useEffect(() => {
-      const fetchJobs = async () => {
-        try {
-          const response = await getJobListAPI();
-          setJobsList(response); 
-        } catch (error) {
-          console.error("Job list yüklənərkən xəta baş verdi:", error);
-        }
-      };
-  
-      fetchJobs();
-    }, []);
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await getJobListAPI();
+        setJobsList(response);
+      } catch (error) {
+        console.error("Job list yüklənərkən xəta baş verdi:", error);
+      }
+    };
 
-    console.log({jobsList});
-    
+    fetchJobs();
+  }, []);
+
+  console.log({ jobsList });
 
   useEffect(() => {
     dispatch(fetchUsers());
     dispatch(fetchClients());
   }, [dispatch]);
 
-  console.log(openAmmannWarranty, openBobcatWarranty, setInitialValues);
+  console.log(openAmmannWarranty, openBobcatWarranty);
 
-  console.log({ cardData });
+  console.log({ cardData }, "qaqaaaaaaaaaaaa");
 
-  const reloadCard = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchCardDetails(id);
+ const reloadCard = async () => {
+  try {
+    setLoading(true);
+    const data = await fetchCardDetails(id);
+    console.log({ data }, "backend-dən gələn data");
 
-      setCardData({
-        ...initialValues,
-        ...data,
-        // PROBLEMLER
-        cardProblems: data.cardProblems?.length
-          ? data.cardProblems.map((p: any) => ({
-              description: p.description || "",
-              serviceWorkers: p.serviceWorkers?.length
-                ? p.serviceWorkers.map((w: any) => w.id) // <-- ID-lərə çevir
-                : [""],
+    // Full mapping – bütün required field-ləri doldururuq
+    const mapped: UpdateCardInterface = {
+      id: data.id,
+      clientId: data.clientId || 0,
+      type: data.type || "tiqac",
+      manufactured: data.manufactured || "",
+      model: data.model || "",
+      sassi: data.sassi || "",
+      carNumber: data.carNumber || "",
+      produceDate: data.produceDate || "",
+      km: data.km || "",
+      qostNumber: data.qostNumber || "",
+      paymentType: data.paymentType || "transfer",
+      nds: data.nds || false,
+      repairAgain: data.repairAgain || false,
+      servisInfo: data.servisInfo || false,
+      comments: data.comments || "",
+      isOpen: data.isOpen || false,
+      openDate: data.openDate ?? null,
+      closeDate: data.closeDate ?? null,
+      recommendation: data.recommendation || "",
+      isWayOut: Boolean(data.isWayOut),
+      wayOutDirection: data.wayOutDirection || "",
+      wayOutWorkers: Number(data.wayOutWorkers || 0),
+      wayOutCar: Number(data.wayOutCar || 0),
+      wayOutDistance: Number(data.wayOutDistance || 0),
+      wayOutWorkTime: Number(data.wayOutWorkTime || 0),
+
+      cardProblems: data.cardProblems?.length
+        ? data.cardProblems.map((p: any) => ({
+            description: p.description ?? "",
+            serviceWorkers:
+              p.serviceWorkers?.map((w: any) => String(w.id)) || [""],
+          }))
+        : [{ description: "", serviceWorkers: [""] }],
+
+
+       cardJobs: data.cardJobs?.length
+    ? data.cardJobs.map((j: any) => ({
+        code: j.code ?? "",
+        name: j.name ?? "",
+        av: Number(j.av) || 0,
+        price: Number(j.price) || 0,
+        discount: Number(j.discount) || 0,
+        oil: Number(j.oil) ?? 0,
+        workers: j.workers?.length
+          ? j.workers.map((w: any) => ({
+              workerId: Number(w.workerId),
+              workerAv: String(w.workerAv ?? ""),
             }))
-          : [{ description: "", serviceWorkers: [""] }],
+          : [{ workerId: 0, workerAv: "" }],
+      }))
+    : [],
 
-        // JOBS (backend cardJobs → jobs)
-        cardJobs: data.cardJobs?.length
-          ? data.cardJobs.map((j: any) => ({
-              code: j.code || "",
-              name: j.name || "",
-              av: parseFloat(j.av) || 0,
-              price: parseFloat(j.price) || 0,
-              discount: parseFloat(j.discount) || 0,
-              oil: j.oil || "",
+      expences: data.expences?.length
+        ? data.expences.map((e: any) => ({
+            description: e.description ?? "",
+            price: Number(e.price) || 0,
+          }))
+        : [],
 
-              workers: j.workers?.length
-                ? j.workers.map((w: any) => ({
-                    workerAv: Number(w.workerAv) || "",
-                    workerId: w.user?.id || "", // <-- DÜZGÜN YER
-                  }))
-                : [{ workerAv: "", workerId: "" }],
-            }))
-          : initialValues.cardJobs,
+      cardParts: data.cardParts?.length
+        ? data.cardParts.map((p: any) => ({
+            ...p,
+            discount: Number(p.discount || 0),
+            usedPrice: Number(p.usedPrice || 0),
+          }))
+        : [],
 
-        // EXPENCES (backend expenses/expences qarışıqlığı)
-        expences: data.expences?.length
-          ? data.expences
-          : data.expenses?.length
-            ? data.expenses
-            : [{ description: "", price: 0 }],
+      account: data.account || null,
+      repair: data.repair || null,
+    };
 
-        cardParts: data.cardParts?.length
-          ? data.cardParts
-          : [
-              // {
-              //   code: "",
-              //   partName: "",
-              //   count: 0,
-              //   soldPrice: 0,
-              //   discount: 0,
-              //   totalPrice: 0,
-              // },
-            ],
-      });
-    } catch (err) {
-      console.log("Card reload error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setCardData(mapped); // Formik initialValues üçün hazır
+  } catch (e) {
+    console.error(e);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  console.log({ cardData },"1111111111111111111111");
+
+  // console.log({ cardData },"1111111111111111111111");
   const hasRepairAct = cardData?.repair?.repairId > 349;
 
   useEffect(() => {
@@ -247,10 +226,6 @@ const UpdateCard = () => {
       window.removeEventListener("message", handleMessage);
     };
   }, []);
-
-  useEffect(() => {
-    reloadCard();
-  }, [id, refreshPage]);
 
   const createAccountForCard = async (cardId: any) => {
     const data = await createAccountForCardApi(cardId);
@@ -301,7 +276,7 @@ const UpdateCard = () => {
     window.open(
       url,
       "warehousePopup",
-      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`,
     );
   };
 
@@ -368,10 +343,16 @@ const UpdateCard = () => {
     }
   };
 
-  return (
-   
-    
+  // ⬅️ UpdateCard componentinin return-dan ƏVVƏL
+  if (loading || !cardData) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner size="xl" />
+      </div>
+    );
+  }
 
+  return (
     <div className="min-h-screen bg-gray-50 py-6 px-3 md:px-8 space-y-8">
       <div className="text-center">
         <h2 className="text-3xl font-extrabold text-gray-800 mb-1">
@@ -389,8 +370,8 @@ const UpdateCard = () => {
       )}
 
       <Formik
-        initialValues={cardData || initialValues}
-        enableReinitialize={true}
+        initialValues={cardData}
+        enableReinitialize
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue }) => {
@@ -400,714 +381,754 @@ const UpdateCard = () => {
           // );
           // setExpencePrices(totalExpencesPrice);
 
-             const totalPriceWorker = values.cardJobs.reduce((sum, job) => {
-            const price = Number(job.price || 0);
-            const discount = Number(job.discount || 0);
-            return sum + price * (1 - discount / 100);
-          }, 0);
-
-
-          const totalExpencesPrice = values.expences.reduce(
-            (sum, item) => sum + Number(item.price || 0),
-            0
+          const totalPriceWorker = values.cardJobs.reduce(
+            (sum: any, job: any) => {
+              const price = Number(job.price || 0);
+              const discount = Number(job.discount || 0);
+              return sum + price * (1 - discount / 100);
+            },
+            0,
           );
 
-          const totalPartsPrice = values.cardParts.reduce((sum, part) => {
-            const usedPrice = Number(part.usedPrice || 0);
-            const count = Number(part.count || 0);
-            const discount = Number(part.discount || 0);
-            const totalPrice = usedPrice * count * (1 - discount / 100);
-            return sum + totalPrice;
-          }, 0);
+          const totalExpencesPrice = values.expences.reduce(
+            (sum: any, item: any) => sum + Number(item.price || 0),
+            0,
+          );
 
-          const totalPriceWithoutNds = (Number(totalPriceWorker)) + (Number(totalExpencesPrice))+(Number(totalPartsPrice));
+          const totalPartsPrice = values.cardParts.reduce(
+            (sum: any, part: any) => {
+              const usedPrice = Number(part.usedPrice || 0);
+              const count = Number(part.count || 0);
+              const discount = Number(part.discount || 0);
+              const totalPrice = usedPrice * count * (1 - discount / 100);
+              return sum + totalPrice;
+            },
+            0,
+          );
+
+          const totalPriceWithoutNds =
+            Number(totalPriceWorker) +
+            Number(totalExpencesPrice) +
+            Number(totalPartsPrice);
           const totalPriceNds = values.nds ? totalPriceWithoutNds * 0.18 : 0;
           const totalPriceWithNds = totalPriceWithoutNds + totalPriceNds;
 
-
-
           return (
             <>
-            <SpecialPricingOverride />
-            <WayOutAutoLogic />
-             <WayOutResetLogic/>
-            <Form className="space-y-8">
-              {/* Client Section */}
-              <SectionCard title="Müştəri Məlumatları">
-                <div className="grid grid-cols-1 md:grid-cols-2 items-end gap-4">
-                  <div>
-                    <Label htmlFor="clientId" value="Müştəri adı" />
-                    <Field
-                      as={Select}
-                      id="clientId"
-                      name="clientId"
-                      className="w-full mt-1"
-                      sizing="sm"
-                      disabled={!cardData?.isOpen}
-                      onChange={async (e: any) => {
-                        const clientId = e.target.value;
-                        setFieldValue("clientId", clientId);
-
-                        // 1. Müştərinin maşınlarını gətir
-                        const clientCars: any = await fetchClientCars(clientId);
-                        setClientCars(clientCars); // useState ilə saxlayırıq
-
-                        // 2. Əvvəlki maşın seçimi sıfırlansın
-                        setFieldValue("sassi", "");
-                      }}
-                    >
-                      <option value="">Müştərini seç</option>
-                      {clients &&
-                        clients.map((item: any) => (
-                          <option key={item.id} value={item.id}>
-                            {item.companyName}
-                          </option>
-                        ))}
-                    </Field>
-                  </div>
-                  <Link
-                    to="/newClient"
-                    className="text-blue-600 text-sm flex items-center gap-2 justify-end md:justify-start"
-                  >
-                    <FaPlus /> Yeni müştəri yarat
-                  </Link>
-                </div>
-              </SectionCard>
-
-              {/* Warranty / Trip Section */}
-              <SectionCard title="Gediş və Zəmanət">
-                <div className="flex flex-wrap gap-5 text-sm">
-                  <label className="flex items-center gap-2">
-                    <Field
-                      name="isWayOut"
-                      as="input"
-                      type="checkbox"
-                      disabled={!cardData?.isOpen}
-                    />
-                    Gediş
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      onChange={(e) => setOpenBobcatWarranty(e.target.checked)}
-                      disabled={!cardData?.isOpen}
-                    />
-                    Bobcat zəmanət
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      onChange={(e) => setOpenAmmannWarranty(e.target.checked)}
-                      disabled={!cardData?.isOpen}
-                    />
-                    AMMANN zəmanət
-                  </label>
-                </div>
-
-                {values.isWayOut && (
-                  <div className="flex flex-col gap-5 mt-4">
-                    <div className="flex gap-2 items-center w-full">
-                      <label htmlFor="">Hara</label>
-                      <Field as={TextInput} name="wayOutDirection" sizing="sm" disabled={!cardData?.isOpen}/>
-                    </div>
-
-                    <div className="flex gap-2 items-center">
-                      <label htmlFor="">Maşın</label>
-                      <Field as={Select} name="wayOutCar" sizing="sm" disabled={!cardData?.isOpen}>
-                        <option value="">Maşını seçin</option>
-                        <option value="1">Mitsubishi L200</option>
-                        <option value="2">Man TGL 12.240</option>
-                      </Field>
-                    </div>
-
-                    <div className="flex gap-2 items-center">
-                      <label htmlFor="">Məsafə</label>
-                      <Field as={TextInput} name="wayOutDistance" sizing="sm" disabled={!cardData?.isOpen} />
-                      <span>km</span>
-                    </div>
-
-                    <div className="flex gap-2 items-center">
-                      <label htmlFor="">İşçi sayı</label>
-                      <Field as={TextInput} name="wayOutWorkers" sizing="sm" disabled={!cardData?.isOpen} />
-                      <span>(sürücü ilə birlikdə)</span>
-                    </div>
-
-                    <div className="flex gap-2 items-center">
-                      <label htmlFor="">İş saatları</label>
-                      <Field as={TextInput} name="wayOutWorkTime" sizing="sm" disabled={!cardData?.isOpen} />
-                      <span>(səyahət daxil olmaqla)</span>
-                    </div>
-                  </div>
-                )}
-              </SectionCard>
-
-              {/* Machine Info */}
-              <SectionCard title="Texniki Məlumat">
-                <div className="p-5 border rounded-xl bg-white shadow-sm">
-                  <div className="flex flex-col gap-4">
+              <SpecialPricingOverride />
+              <WayOutAutoLogic />
+              <WayOutResetLogic />
+              <Form className="space-y-8">
+                {/* Client Section */}
+                <SectionCard title="Müştəri Məlumatları">
+                  <div className="grid grid-cols-1 md:grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block mb-1 font-medium">
-                        Katın nömrəsi
-                      </label>
-                      <Field
-                        as={TextInput}
-                        name="id"
-                        placeholder="Şassi nömrəsi"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                        className="w-1/3"
-                      />
-                    </div>
-
-                    {/* Texnikanın növü */}
-                    <div>
-                      <label className="block mb-1 font-medium">
-                        Texnikanın növü
-                      </label>
+                      <Label htmlFor="clientId" value="Müştəri adı" />
                       <Field
                         as={Select}
-                        name="type"
-                        className="w-1/3"
+                        id="clientId"
+                        name="clientId"
+                        className="w-full mt-1"
                         sizing="sm"
                         disabled={!cardData?.isOpen}
+                        onChange={async (e: any) => {
+                          const clientId = e.target.value;
+                          setFieldValue("clientId", clientId);
+
+                          // 1. Müştərinin maşınlarını gətir
+                          const clientCars: any =
+                            await fetchClientCars(clientId);
+                          setClientCars(clientCars); // useState ilə saxlayırıq
+
+                          // 2. Əvvəlki maşın seçimi sıfırlansın
+                          setFieldValue("sassi", "");
+                        }}
                       >
-                        {types.map((t, i) => (
-                          <option key={i}>{t}</option>
-                        ))}
+                        <option value="">Müştərini seç</option>
+                        {clients &&
+                          clients.map((item: any) => (
+                            <option key={item.id} value={item.id}>
+                              {item.companyName}
+                            </option>
+                          ))}
                       </Field>
                     </div>
+                    <Link
+                      to="/newClient"
+                      className="text-blue-600 text-sm flex items-center gap-2 justify-end md:justify-start"
+                    >
+                      <FaPlus /> Yeni müştəri yarat
+                    </Link>
+                  </div>
+                </SectionCard>
 
-                    {/* İstehsalçı */}
-                    <div className="flex justify-between  items-center">
-                      <div className="w-1/3">
-                        <label className="block mb-1 font-medium">
-                          İstehsalçı
-                        </label>
-                        <Field as={Select} name="manufactured" sizing="sm">
-                          <option value="man">MAN</option>
-                          <option value="mercedes">Mercedes</option>
-                          <option value="daf">DAF</option>
-                          <option value="ford">Ford</option>
-                          <option value="volvo">Volvo</option>
-                        </Field>
+                {/* Warranty / Trip Section */}
+                <SectionCard title="Gediş və Zəmanət">
+                  <div className="flex flex-wrap gap-5 text-sm">
+                    <label className="flex items-center gap-2">
+                      <Field
+                        name="isWayOut"
+                        as="input"
+                        type="checkbox"
+                        disabled={!cardData?.isOpen}
+                      />
+                      Gediş
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        onChange={(e) =>
+                          setOpenBobcatWarranty(e.target.checked)
+                        }
+                        disabled={!cardData?.isOpen}
+                      />
+                      Bobcat zəmanət
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        onChange={(e) =>
+                          setOpenAmmannWarranty(e.target.checked)
+                        }
+                        disabled={!cardData?.isOpen}
+                      />
+                      AMMANN zəmanət
+                    </label>
+                  </div>
+
+                  {values.isWayOut && (
+                    <div className="flex flex-col gap-5 mt-4">
+                      <div className="flex gap-2 items-center w-full">
+                        <label htmlFor="">Hara</label>
+                        <Field
+                          as={TextInput}
+                          name="wayOutDirection"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                        />
                       </div>
-                      <div className="mt-7 w-1/6">
+
+                      <div className="flex gap-2 items-center">
+                        <label htmlFor="">Maşın</label>
                         <Field
                           as={Select}
-                          name="sassi"
+                          name="wayOutCar"
                           sizing="sm"
-                          onChange={(e: any) => {
-                            const selectedSassi = e.target.value;
-                            setFieldValue("sassi", selectedSassi);
-
-                            // 1. seçilmiş maşın datalarını tap
-                            const carData = clientCars?.find(
-                              (c) => c.sassi === selectedSassi
-                            );
-                            if (carData) {
-                              // 2. Formik inputlarını avtomatik doldur
-                              setFieldValue("model", carData.model ?? "");
-                              setFieldValue("type", carData.type);
-                              setFieldValue(
-                                "manufactured",
-                                carData.manufactured
-                              );
-                              setFieldValue("carNumber", carData.carNumber);
-                              setFieldValue("produceDate", carData.produceDate);
-                              setFieldValue("qostNumber", carData.qostNumber);
-                            }
-                          }}
+                          disabled={!cardData?.isOpen}
                         >
-                          <option value=""></option>
-                          {clientCars?.map((car, index) => (
-                            <option key={index} value={car.sassi}>
-                              {car.sassi}
-                            </option>
+                          <option value="">Maşını seçin</option>
+                          <option value="1">Mitsubishi L200</option>
+                          <option value="2">Man TGL 12.240</option>
+                        </Field>
+                      </div>
+
+                      <div className="flex gap-2 items-center">
+                        <label htmlFor="">Məsafə</label>
+                        <Field
+                          as={TextInput}
+                          name="wayOutDistance"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                        />
+                        <span>km</span>
+                      </div>
+
+                      <div className="flex gap-2 items-center">
+                        <label htmlFor="">İşçi sayı</label>
+                        <Field
+                          as={TextInput}
+                          name="wayOutWorkers"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                        />
+                        <span>(sürücü ilə birlikdə)</span>
+                      </div>
+
+                      <div className="flex gap-2 items-center">
+                        <label htmlFor="">İş saatları</label>
+                        <Field
+                          as={TextInput}
+                          name="wayOutWorkTime"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                        />
+                        <span>(səyahət daxil olmaqla)</span>
+                      </div>
+                    </div>
+                  )}
+                </SectionCard>
+
+                {/* Machine Info */}
+                <SectionCard title="Texniki Məlumat">
+                  <div className="p-5 border rounded-xl bg-white shadow-sm">
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <label className="block mb-1 font-medium">
+                          Katın nömrəsi
+                        </label>
+                        <Field
+                          as={TextInput}
+                          name="id"
+                          placeholder="Şassi nömrəsi"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                          className="w-1/3"
+                        />
+                      </div>
+
+                      {/* Texnikanın növü */}
+                      <div>
+                        <label className="block mb-1 font-medium">
+                          Texnikanın növü
+                        </label>
+                        <Field
+                          as={Select}
+                          name="type"
+                          className="w-1/3"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                        >
+                          {types.map((t, i) => (
+                            <option key={i}>{t}</option>
                           ))}
                         </Field>
                       </div>
-                    </div>
 
-                    {/* Model */}
-                    <div>
-                      <label className="block mb-1 font-medium">Model</label>
-                      <Field
-                        as={TextInput}
-                        name="model"
-                        placeholder="Model"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                        className="w-1/3"
-                      />
-                    </div>
+                      {/* İstehsalçı */}
+                      <div className="flex justify-between  items-center">
+                        <div className="w-1/3">
+                          <label className="block mb-1 font-medium">
+                            İstehsalçı
+                          </label>
+                          <Field as={Select} name="manufactured" sizing="sm">
+                            <option value="man">MAN</option>
+                            <option value="mercedes">Mercedes</option>
+                            <option value="daf">DAF</option>
+                            <option value="ford">Ford</option>
+                            <option value="volvo">Volvo</option>
+                          </Field>
+                        </div>
+                        <div className="mt-7 w-1/6">
+                          <Field
+                            as={Select}
+                            name="sassi"
+                            sizing="sm"
+                            onChange={(e: any) => {
+                              const selectedSassi = e.target.value;
+                              setFieldValue("sassi", selectedSassi);
 
-                    {/* Şassi */}
-                    <div>
-                      <label className="block mb-1 font-medium">
-                        Şassi nömrəsi
-                      </label>
-                      <Field
-                        as={TextInput}
-                        name="sassi"
-                        placeholder="Şassi nömrəsi"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                        className="w-1/3"
-                      />
-                    </div>
+                              // 1. seçilmiş maşın datalarını tap
+                              const carData = clientCars?.find(
+                                (c) => c.sassi === selectedSassi,
+                              );
+                              if (carData) {
+                                // 2. Formik inputlarını avtomatik doldur
+                                setFieldValue("model", carData.model ?? "");
+                                setFieldValue("type", carData.type);
+                                setFieldValue(
+                                  "manufactured",
+                                  carData.manufactured,
+                                );
+                                setFieldValue("carNumber", carData.carNumber);
+                                setFieldValue(
+                                  "produceDate",
+                                  carData.produceDate,
+                                );
+                                setFieldValue("qostNumber", carData.qostNumber);
+                              }
+                            }}
+                          >
+                            <option value=""></option>
+                            {clientCars?.map((car, index) => (
+                              <option key={index} value={car.sassi}>
+                                {car.sassi}
+                              </option>
+                            ))}
+                          </Field>
+                        </div>
+                      </div>
 
-                    {/* Maşın nömrəsi */}
-                    <div>
-                      <label className="block mb-1 font-medium">
-                        Maşın nömrəsi
-                      </label>
-                      <Field
-                        as={TextInput}
-                        name="carNumber"
-                        placeholder="Maşın nömrəsi"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                        className="w-1/3"
-                      />
-                    </div>
-
-                    {/* Buraxılış ili */}
-                    <div>
-                      <label className="block mb-1 font-medium">
-                        Buraxılış ili
-                      </label>
-                      <Field
-                        as={Select}
-                        name="produceDate"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                        className="w-1/3"
-                      >
-                        {[2025, 2024, 2023, 2022, 2021, 2020, 2019].map((y) => (
-                          <option key={y}>{y}</option>
-                        ))}
-                      </Field>
-                    </div>
-
-                    {/* KM */}
-                    <div>
-                      <label className="block mb-1 font-medium">
-                        Km/Motosaat
-                      </label>
-                      <Field
-                        as={TextInput}
-                        name="km"
-                        placeholder="Km/Motosaat"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                        className="w-1/3"
-                      />
-                    </div>
-
-                    {/* Dövlət nömrəsi */}
-                    <div>
-                      <label className="block mb-1 font-medium">
-                        Dövlət nömrəsi
-                      </label>
-                      <Field
-                        as={TextInput}
-                        name="qostNumber"
-                        placeholder="Dövlət nömrəsi"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                        className="w-1/3"
-                      />
-                    </div>
-
-                    {/* Payment */}
-                    <div>
-                      <label className="block mb-1 font-medium">
-                        Ödəniş tipi
-                      </label>
-                      <Field
-                        as={Select}
-                        name="paymentType"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                        className="w-1/3"
-                      >
-                        <option value="transfer">Köçürülmə</option>
-                        <option value="cash">Nağd</option>
-                        <option value="warranty">Qarantiya</option>
-                        <option value="internal">Daxili iş</option>
-                        <option value="pos">POS</option>
-                      </Field>
-                    </div>
-                  </div>
-
-                  {/* Checkboxes */}
-                  <div className="flex flex-wrap gap-6 mt-6">
-                    <label className="flex items-center gap-2">
-                      <Field
-                        type="checkbox"
-                        name="nds"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                      />{" "}
-                      ƏDV (18%)
-                    </label>
-
-                    <label className="flex items-center gap-2">
-                      <Field
-                        type="checkbox"
-                        name="repairAgain"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                      />{" "}
-                      Təkrar təmir
-                    </label>
-
-                    <label className="flex items-center gap-2">
-                      <Field
-                        type="checkbox"
-                        name="servisInfo"
-                        sizing="sm"
-                        disabled={!cardData?.isOpen}
-                      />{" "}
-                      Servis məlumatı
-                    </label>
-                  </div>
-                </div>
-              </SectionCard>
-
-              {/* Problems */}
-              <FieldArray name="cardProblems">
-                {({ push, remove }) => (
-                  <SectionCard title="Problemlər">
-                    {values?.cardProblems.map((_, index) => (
-                      <div
-                        key={index}
-                        className="border p-4 rounded-md bg-gray-50"
-                      >
-                        <NewCardProblems
-                          serviceWorkers={workers}
-                          name={`cardProblems[${index}]`}
-                          values={values.cardProblems[index]}
-                          setFieldValue={setFieldValue}
-                          cardData={cardData}
+                      {/* Model */}
+                      <div>
+                        <label className="block mb-1 font-medium">Model</label>
+                        <Field
+                          as={TextInput}
+                          name="model"
+                          placeholder="Model"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                          className="w-1/3"
                         />
                       </div>
-                    ))}
-                    <div className="flex justify-end gap-3">
-                      <Button
-                        onClick={() =>
-                          push({ description: "", serviceWorkers: [""] })
-                        }
-                        color="blue"
-                        size="xs"
-                        type="button"
-                        disabled={!cardData?.isOpen}
-                      >
-                        Əlavə et +
-                      </Button>
-                      <Button
-                        onClick={() => remove(values.cardProblems.length - 1)}
-                        color="gray"
-                        size="xs"
-                        type="button"
-                        disabled={
-                          values.cardProblems.length <= 1 || !cardData?.isOpen
-                        }
-                      >
-                        Azalt -
-                      </Button>
-                    </div>
-                  </SectionCard>
-                )}
-              </FieldArray>
 
-              {/* Jobs */}
-              <FieldArray name="cardJobs">
-                {({ push, remove }) => (
-                  <SectionCard title="İşçilik">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-xs text-gray-600 ">
-                        <thead className="bg-gray-100">
-                          <tr>
-                            <th className="text-center p-2">Kod</th>
-                            <th className="text-center p-2">Adı</th>
-                            <th className="text-center p-2">AV</th>
-                            <th className="text-center p-2">Qiymət</th>
-                            <th className="text-center p-2">Endirim(%)</th>
-                            <th className="text-center p-2">Yağ</th>
-                            <th className="text-center p-2">İşçilər</th>
-                          </tr>
-                        </thead>
-
-                        {values.cardJobs.map((job, index) => (
-                          <NewCardWorkers
-                            key={index}
-                            workers={workers}
-                            name={`cardJobs[${index}]`}
-                            values={job}
-                            cardData={cardData}
-                            paymentType={values.paymentType}
-                            jobsList={jobsList}
-                          />
-                        ))}
-
-                        <tbody>
-                          <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-
-                            <td>
-                              <div className=" flex text-sm font-semibold">
-                                Cəmi:
-                                <span className="text-blue-700 flex justify-center">
-                                  {displayPrice(totalPriceWorker)} AZN
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="flex gap-2">
-                        <Button
-                          color="blue"
-                          size="xs"
-                          type="button"
+                      {/* Şassi */}
+                      <div>
+                        <label className="block mb-1 font-medium">
+                          Şassi nömrəsi
+                        </label>
+                        <Field
+                          as={TextInput}
+                          name="sassi"
+                          placeholder="Şassi nömrəsi"
+                          sizing="sm"
                           disabled={!cardData?.isOpen}
-                          onClick={() => {
-                            push({
-                              code: "",
-                              name: "",
-                              av: 0,
-                              price: 0,
-                              discount: 0,
-                              oil: "",
-                              workers: [{ workerAv: "", workerId: "" }],
-                            });
-
-                            // handleAddJob();
-                          }}
-                        >
-                          Əlavə et +
-                        </Button>
-
-                        <Button
-                          color="gray"
-                          size="xs"
-                          type="button"
-                          disabled={
-                            values.cardJobs.length <= 1 || !cardData?.isOpen
-                          }
-                          onClick={() => {
-                            const index = values.cardJobs.length - 1;
-                            remove(index);
-                            // handleRemoveJob(index);
-                          }}
-                        >
-                          Azalt -
-                        </Button>
-                      </div>
-                    </div>
-
-                    <Link
-                      to={`/printPageOne/${id}`}
-                      className="flex justify-end mt-4"
-                    >
-                      <Button color="warning" size="xs">
-                        <FiPrinter className="mr-2" /> Çap et
-                      </Button>
-                    </Link>
-                  </SectionCard>
-                )}
-              </FieldArray>
-
-              {/* Expenses */}
-              <FieldArray name="expences">
-                {({ push, remove }) => (
-                  <SectionCard title="Xərclər">
-                    {values.expences.map((item, index) => (
-                      <AddCharges
-                        key={index}
-                        name={`expences[${index}]`}
-                        values={item}
-                        cardData={cardData}
-                        expenceUpdatePrice={(price) =>
-                          setFieldValue(`expences.${index}.price`, price)
-                        }
-                      />
-                    ))}
-
-                    <div className="flex justify-between items-center">
-                      <div className="font-semibold text-sm">
-                        Cəmi: {displayPrice(totalExpencesPrice)} AZN
+                          className="w-1/3"
+                        />
                       </div>
 
-                      <div className="flex gap-2">
-                        {/* ƏLAVƏ ET */}
-                        <Button
-                          color="blue"
-                          size="xs"
+                      {/* Maşın nömrəsi */}
+                      <div>
+                        <label className="block mb-1 font-medium">
+                          Maşın nömrəsi
+                        </label>
+                        <Field
+                          as={TextInput}
+                          name="carNumber"
+                          placeholder="Maşın nömrəsi"
+                          sizing="sm"
                           disabled={!cardData?.isOpen}
-                          onClick={() => push({ description: "", price: 0 })}
-                        >
-                          Əlavə et +
-                        </Button>
+                          className="w-1/3"
+                        />
+                      </div>
 
-                        {/* AZALT → sonuncu expense-i silir */}
-                        <Button
-                          color="gray"
-                          size="xs"
-                          disabled={
-                            values.expences.length <= 1 || !cardData?.isOpen
-                          }
-                          onClick={() => remove(values.expences.length - 1)}
+                      {/* Buraxılış ili */}
+                      <div>
+                        <label className="block mb-1 font-medium">
+                          Buraxılış ili
+                        </label>
+                        <Field
+                          as={Select}
+                          name="produceDate"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                          className="w-1/3"
                         >
-                          Azalt -
-                        </Button>
+                          {[2025, 2024, 2023, 2022, 2021, 2020, 2019].map(
+                            (y) => (
+                              <option key={y}>{y}</option>
+                            ),
+                          )}
+                        </Field>
+                      </div>
+
+                      {/* KM */}
+                      <div>
+                        <label className="block mb-1 font-medium">
+                          Km/Motosaat
+                        </label>
+                        <Field
+                          as={TextInput}
+                          name="km"
+                          placeholder="Km/Motosaat"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                          className="w-1/3"
+                        />
+                      </div>
+
+                      {/* Dövlət nömrəsi */}
+                      <div>
+                        <label className="block mb-1 font-medium">
+                          Dövlət nömrəsi
+                        </label>
+                        <Field
+                          as={TextInput}
+                          name="qostNumber"
+                          placeholder="Dövlət nömrəsi"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                          className="w-1/3"
+                        />
+                      </div>
+
+                      {/* Payment */}
+                      <div>
+                        <label className="block mb-1 font-medium">
+                          Ödəniş tipi
+                        </label>
+                        <Field
+                          as={Select}
+                          name="paymentType"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                          className="w-1/3"
+                        >
+                          <option value="transfer">Köçürülmə</option>
+                          <option value="cash">Nağd</option>
+                          <option value="warranty">Qarantiya</option>
+                          <option value="internal">Daxili iş</option>
+                          <option value="pos">POS</option>
+                        </Field>
                       </div>
                     </div>
-                  </SectionCard>
-                )}
-              </FieldArray>
 
-              {/* Parts */}
+                    {/* Checkboxes */}
+                    <div className="flex flex-wrap gap-6 mt-6">
+                      <label className="flex items-center gap-2">
+                        <Field
+                          type="checkbox"
+                          name="nds"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                        />{" "}
+                        ƏDV (18%)
+                      </label>
 
-              <SectionCard title="Ehtiyyat hissələri">
-                <NewCardAddParts
-                  values={values}
-                  cardPartsPrice={(price: any) =>
-                    handlecardPartsPriceUpdate(price)
-                  }
-                  cardId={id}
-                  setRefreshPage={setRefreshPage}
-                  cardData={cardData}
-                  paymentType={values.paymentType}
-                />
-                <div className="flex gap-3 font-semibold mt-5 items-center justify-center">
-                  <span>Cəmi:</span>
-                  <span>{cardPartsPrice} AZN</span>
-                </div>
+                      <label className="flex items-center gap-2">
+                        <Field
+                          type="checkbox"
+                          name="repairAgain"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                        />{" "}
+                        Təkrar təmir
+                      </label>
 
-                {cardData?.isOpen && (
-                  <div className="flex flex-col gap-1 mt-5 text-blue-700  w-[100px]">
-                    <div
-                      className="hover:underline cursor-pointer"
-                      // onClick={openWarehousePopup}
-                    >
-                      E/h əlavə et (barkod ilə)
-                    </div>
-                    <div
-                      className="hover:underline cursor-pointer"
-                      onClick={() => openWarehousePopup(id)}
-                      color={"blue"}
-                    >
-                      E/h əlavə et{" "}
+                      <label className="flex items-center gap-2">
+                        <Field
+                          type="checkbox"
+                          name="servisInfo"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                        />{" "}
+                        Servis məlumatı
+                      </label>
                     </div>
                   </div>
-                )}
+                </SectionCard>
 
-                <div className="flex items-center justify-between">
-                  {!cardData?.isOpen ? (
-                    <div className="flex gap-2">
-                      <Button
-                        color={"blue"}
-                        size={"xs"}
-                        onClick={() => createAccountForCard(id)}
-                        disabled={!hasRepairAct}
+                {/* Problems */}
+                <FieldArray name="cardProblems">
+                  {({ push, remove }) => (
+                    <SectionCard title="Problemlər">
+                      {values?.cardProblems.map((_: any, index: any) => (
+                        <div
+                          key={index}
+                          className="border p-4 rounded-md bg-gray-50"
+                        >
+                          <NewCardProblems
+                            serviceWorkers={workers}
+                            name={`cardProblems[${index}]`}
+                            values={values.cardProblems[index]}
+                            setFieldValue={setFieldValue}
+                            cardData={cardData}
+                          />
+                        </div>
+                      ))}
+                      <div className="flex justify-end gap-3">
+                        <Button
+                          onClick={() =>
+                            push({ description: "", serviceWorkers: [""] })
+                          }
+                          color="blue"
+                          size="xs"
+                          type="button"
+                          disabled={!cardData?.isOpen}
+                        >
+                          Əlavə et +
+                        </Button>
+                        <Button
+                          onClick={() => remove(values.cardProblems.length - 1)}
+                          color="gray"
+                          size="xs"
+                          type="button"
+                          disabled={
+                            values.cardProblems.length <= 1 || !cardData?.isOpen
+                          }
+                        >
+                          Azalt -
+                        </Button>
+                      </div>
+                    </SectionCard>
+                  )}
+                </FieldArray>
+
+                {/* Jobs */}
+                <FieldArray name="cardJobs">
+                  {({ push, remove }) => (
+                    <SectionCard title="İşçilik">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs text-gray-600 ">
+                          <thead className="bg-gray-100">
+                            <tr>
+                              <th className="text-center p-2">Kod</th>
+                              <th className="text-center p-2">Adı</th>
+                              <th className="text-center p-2">AV</th>
+                              <th className="text-center p-2">Qiymət</th>
+                              <th className="text-center p-2">Endirim(%)</th>
+                              <th className="text-center p-2">Yağ</th>
+                              <th className="text-center p-2">İşçilər</th>
+                            </tr>
+                          </thead>
+
+                          {values.cardJobs.map((job: any, index: any) => (
+                            <NewCardWorkers
+                              key={index}
+                              workers={workers}
+                              name={`cardJobs[${index}]`}
+                              values={job}
+                              cardData={cardData}
+                              paymentType={values.paymentType}
+                              jobsList={jobsList}
+                            />
+                          ))}
+
+                          <tbody>
+                            <tr>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+
+                              <td>
+                                <div className=" flex text-sm font-semibold">
+                                  Cəmi:
+                                  <span className="text-blue-700 flex justify-center">
+                                    {displayPrice(totalPriceWorker)} AZN
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="flex justify-between items-center mt-4">
+                        <div className="flex gap-2">
+                          <Button
+                            color="blue"
+                            size="xs"
+                            type="button"
+                            disabled={!cardData?.isOpen}
+                            onClick={() => {
+                              push({
+                                code: "",
+                                name: "",
+                                av: 0,
+                                price: 0,
+                                discount: 0,
+                                oil: "",
+                                workers: [{ workerAv: "", workerId: "" }],
+                              });
+
+                              // handleAddJob();
+                            }}
+                          >
+                            Əlavə et +
+                          </Button>
+
+                          <Button
+                            color="gray"
+                            size="xs"
+                            type="button"
+                            disabled={
+                              values.cardJobs.length <= 1 || !cardData?.isOpen
+                            }
+                            onClick={() => {
+                              const index = values.cardJobs.length - 1;
+                              remove(index);
+                              // handleRemoveJob(index);
+                            }}
+                          >
+                            Azalt -
+                          </Button>
+                        </div>
+                      </div>
+
+                      <Link
+                        to={`/printPageOne/${id}`}
+                        className="flex justify-end mt-4"
                       >
-                        Hesab Aktı Yarat
-                      </Button>
-                      <Button
-                        color={"blue"}
-                        size={"xs"}
-                        onClick={() => createRepair(id)}
+                        <Button color="warning" size="xs">
+                          <FiPrinter className="mr-2" /> Çap et
+                        </Button>
+                      </Link>
+                    </SectionCard>
+                  )}
+                </FieldArray>
+
+                {/* Expenses */}
+                <FieldArray name="expences">
+                  {({ push, remove }) => (
+                    <SectionCard title="Xərclər">
+                      {values.expences.map((item: any, index: any) => (
+                        <AddCharges
+                          key={index}
+                          name={`expences[${index}]`}
+                          values={item}
+                          cardData={cardData}
+                          expenceUpdatePrice={(price) =>
+                            setFieldValue(`expences.${index}.price`, price)
+                          }
+                        />
+                      ))}
+
+                      <div className="flex justify-between items-center">
+                        <div className="font-semibold text-sm">
+                          Cəmi: {displayPrice(totalExpencesPrice)} AZN
+                        </div>
+
+                        <div className="flex gap-2">
+                          {/* ƏLAVƏ ET */}
+                          <Button
+                            color="blue"
+                            size="xs"
+                            disabled={!cardData?.isOpen}
+                            onClick={() => push({ description: "", price: 0 })}
+                          >
+                            Əlavə et +
+                          </Button>
+
+                          {/* AZALT → sonuncu expense-i silir */}
+                          <Button
+                            color="gray"
+                            size="xs"
+                            disabled={
+                              values.expences.length <= 1 || !cardData?.isOpen
+                            }
+                            onClick={() => remove(values.expences.length - 1)}
+                          >
+                            Azalt -
+                          </Button>
+                        </div>
+                      </div>
+                    </SectionCard>
+                  )}
+                </FieldArray>
+
+                {/* Parts */}
+
+                <SectionCard title="Ehtiyyat hissələri">
+                  <NewCardAddParts
+                    values={values}
+                    cardPartsPrice={(price: any) =>
+                      handlecardPartsPriceUpdate(price)
+                    }
+                    cardId={id}
+                    setRefreshPage={setRefreshPage}
+                    cardData={cardData}
+                    paymentType={values.paymentType}
+                  />
+                  <div className="flex gap-3 font-semibold mt-5 items-center justify-center">
+                    <span>Cəmi:</span>
+                    <span>{cardPartsPrice} AZN</span>
+                  </div>
+
+                  {cardData?.isOpen && (
+                    <div className="flex flex-col gap-1 mt-5 text-blue-700  w-[100px]">
+                      <div
+                        className="hover:underline cursor-pointer"
+                        // onClick={openWarehousePopup}
                       >
-                        Təmir Aktı Yarat
-                      </Button>
+                        E/h əlavə et (barkod ilə)
+                      </div>
+                      <div
+                        className="hover:underline cursor-pointer"
+                        onClick={() => openWarehousePopup(id)}
+                        color={"blue"}
+                      >
+                        E/h əlavə et{" "}
+                      </div>
                     </div>
-                  ) : (
-                    <div className="flex gap-2"></div>
                   )}
 
-                  <div className="flex gap-2">
-                    <Link to={`/printPageSecond/${id}`}>
-                      <Button color="warning" size="xs">
-                        <FiPrinter className="mr-2" /> Çap et
-                      </Button>
-                    </Link>
-                    <Link to={`/agreement/${id}`}>
-                      <Button color="blue" size="xs">
-                        Razılaşma aktı
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </SectionCard>
+                  <div className="flex items-center justify-between">
+                    {!cardData?.isOpen ? (
+                      <div className="flex gap-2">
+                        <Button
+                          color={"blue"}
+                          size={"xs"}
+                          onClick={() => createAccountForCard(id)}
+                          disabled={!hasRepairAct}
+                        >
+                          Hesab Aktı Yarat
+                        </Button>
+                        <Button
+                          color={"blue"}
+                          size={"xs"}
+                          onClick={() => createRepair(id)}
+                        >
+                          Təmir Aktı Yarat
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2"></div>
+                    )}
 
-              {/* Comments */}
-              <SectionCard title="İş haqqında şərhlər">
-                <Field
-                  as={Textarea}
-                  rows={4}
-                  name="comments"
-                  placeholder="Şərh yazın..."
-                  disabled={!cardData?.isOpen}
-                />
-              </SectionCard>
-
-              {/* Recommendation */}
-              <SectionCard title="Məsləhətlər">
-                <Field
-                  as={Textarea}
-                  rows={4}
-                  name="recommendation"
-                  placeholder="Məsləhət yazın..."
-                  disabled={!cardData?.isOpen}
-                />
-              </SectionCard>
-
-              {/* Totals */}
-              <div className="bg-gray-100 rounded-md p-4 text-right font-medium space-y-1">
-                <div>Cəm: {displayPrice(totalPriceWithoutNds)} AZN</div>
-                {values.nds && (
-                  <>
-                    <div>ƏDV (18%): {displayPrice(totalPriceNds)} AZN</div>
-                    <div className="text-blue-700 font-bold text-lg">
-                      Cəmi ƏDV ilə: {displayPrice(totalPriceWithNds)} AZN
+                    <div className="flex gap-2">
+                      <Link to={`/printPageSecond/${id}`}>
+                        <Button color="warning" size="xs">
+                          <FiPrinter className="mr-2" /> Çap et
+                        </Button>
+                      </Link>
+                      <Link to={`/agreement/${id}`}>
+                        <Button color="blue" size="xs">
+                          Razılaşma aktı
+                        </Button>
+                      </Link>
                     </div>
-                  </>
-                )}
-              </div>
+                  </div>
+                </SectionCard>
 
-              {/* Footer Actions */}
-              <div className="bottom-0 bg-white border-t shadow-inner flex flex-wrap justify-end gap-3 p-4">
-                <Button
-                  type="submit"
-                  color="blue"
-                  size="xs"
-                  disabled={!cardData?.isOpen}
-                >
-                  Yadda Saxla
-                </Button>
-                <Button
-                  color="purple"
-                  size="xs"
-                  onClick={() => closeCard(id)}
-                  disabled={!cardData?.isOpen}
-                >
-                  Kartı Bağla
-                </Button>
-              </div>
-            </Form>
+                {/* Comments */}
+                <SectionCard title="İş haqqında şərhlər">
+                  <Field
+                    as={Textarea}
+                    rows={4}
+                    name="comments"
+                    placeholder="Şərh yazın..."
+                    disabled={!cardData?.isOpen}
+                  />
+                </SectionCard>
+
+                {/* Recommendation */}
+                <SectionCard title="Məsləhətlər">
+                  <Field
+                    as={Textarea}
+                    rows={4}
+                    name="recommendation"
+                    placeholder="Məsləhət yazın..."
+                    disabled={!cardData?.isOpen}
+                  />
+                </SectionCard>
+
+                {/* Totals */}
+                <div className="bg-gray-100 rounded-md p-4 text-right font-medium space-y-1">
+                  <div>Cəm: {displayPrice(totalPriceWithoutNds)} AZN</div>
+                  {values.nds && (
+                    <>
+                      <div>ƏDV (18%): {displayPrice(totalPriceNds)} AZN</div>
+                      <div className="text-blue-700 font-bold text-lg">
+                        Cəmi ƏDV ilə: {displayPrice(totalPriceWithNds)} AZN
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Footer Actions */}
+                <div className="bottom-0 bg-white border-t shadow-inner flex flex-wrap justify-end gap-3 p-4">
+                  <Button
+                    type="submit"
+                    color="blue"
+                    size="xs"
+                    disabled={!cardData?.isOpen}
+                  >
+                    Yadda Saxla
+                  </Button>
+                  <Button
+                    color="purple"
+                    size="xs"
+                    onClick={() => closeCard(id)}
+                    disabled={!cardData?.isOpen}
+                  >
+                    Kartı Bağla
+                  </Button>
+                </div>
+              </Form>
             </>
           );
         }}
       </Formik>
     </div>
-  
   );
 };
 
