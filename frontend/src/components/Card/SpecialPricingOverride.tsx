@@ -11,69 +11,65 @@ const SpecialPricingController = () => {
     return clients.find(c => c.id === Number(values.clientId));
   }, [clients, values.clientId]);
 
+  useEffect(() => {
+    if (!client) return;
 
-  // console.log(values.cardParts,"vzzzzzzzzzzzzzzzzzzzzzzzzzzz");
-  
+    const isInternal =
+      values.paymentType === "internal" ||
+      values.paymentType === "warranty";
 
-useEffect(() => {
-  if (!client) return;
+    const allowDiscount =
+      values.paymentType === "cash" ||
+      values.paymentType === "transfer" ||
+      values.paymentType === "pos";
 
-  const isInternal =
-    values.paymentType === "internal" ||
-    values.paymentType === "warranty";
+    // 🔧 İŞÇİLİK
+    values.cardJobs?.forEach((job: any, index: number) => {
+      // Əgər istifadəçi manual dəyişibsə override etmə
+      if (job.manualDiscount) return;
 
-  const allowDiscount =
-    values.paymentType === "cash" ||
-    values.paymentType === "transfer" ||
-    values.paymentType === "pos";
-
-  // 🔧 İŞÇİLİK
-  values.cardJobs?.forEach((job: any, index: number) => {
-    if (isInternal) {
-      if (job.discount !== 0) {
-        setFieldValue(`cardJobs[${index}].discount`, 0);
-      }
-    } else if (allowDiscount && client.av) {
-    
+      if (isInternal) {
+        if (job.discount !== 0) {
+          setFieldValue(`cardJobs[${index}].discount`, 0);
+        }
+      } else if (allowDiscount && client.av) {
         setFieldValue(`cardJobs[${index}].discount`, client.av);
-    }
-  });
-
-  // 🔧 EHTİYYAT HİSSƏLƏRİ — ƏSAS DÜZƏLİŞ
-  values.cardParts.forEach((part: any, index: number) => {
-    if (!part) return;
-
-    const newUsedPrice = isInternal
-      ? part.netPrice      // maya
-      : part.soldPrice;   // satış
-
-    if (part.usedPrice !== newUsedPrice) {
-      setFieldValue(`cardParts[${index}].usedPrice`, newUsedPrice);
-    }
-
-    if (isInternal) {
-      if (part.discount !== 0) {
-        setFieldValue(`cardParts[${index}].discount`, 0);
       }
-    } else if (allowDiscount && client.partsDiscount) {
-      if (part.discount !== client.partsDiscount) {
+    });
+
+    // 🔧 EHTİYYAT HİSSƏLƏRİ
+    values.cardParts.forEach((part: any, index: number) => {
+      if (!part) return;
+
+      // usedPrice yenilənməsi
+      const newUsedPrice = isInternal ? part.netPrice : part.soldPrice;
+      if (part.usedPrice !== newUsedPrice) {
+        setFieldValue(`cardParts[${index}].usedPrice`, newUsedPrice);
+      }
+
+      // Əgər istifadəçi manual dəyişibsə override etmə
+      if (part.manualDiscount) return;
+
+      if (isInternal) {
+        if (part.discount !== 0) {
+          setFieldValue(`cardParts[${index}].discount`, 0);
+        }
+      } else if (allowDiscount && client.partsDiscount) {
         setFieldValue(
           `cardParts[${index}].discount`,
           client.partsDiscount
         );
       }
-    }
-  });
+    });
 
-}, [
-   client?.id,
-  client?.av,
-  client?.partsDiscount,
-  values.paymentType,
-  values.cardJobs,
-  values.cardParts,
-]);
-
+  }, [
+    client?.id,
+    client?.av,
+    client?.partsDiscount,
+    values.paymentType,
+    values.cardJobs,
+    values.cardParts,
+  ]);
 
   return null;
 };

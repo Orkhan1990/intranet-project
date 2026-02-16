@@ -870,6 +870,7 @@ const UpdateCard = () => {
                               cardData={cardData}
                               paymentType={values.paymentType}
                               jobsList={jobsList}
+                              index={index}
                             />
                           ))}
 

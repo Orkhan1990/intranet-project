@@ -1,5 +1,5 @@
 import { Button, Table } from "flowbite-react";
-import { Field, FieldArray } from "formik";
+import { Field, FieldArray, useFormikContext } from "formik";
 import { useEffect } from "react";
 import { FaMinus } from "react-icons/fa";
 import { returnPart } from "../api/allApi";
@@ -10,7 +10,7 @@ interface NewCardAddPartsProps {
   cardId?: string;
   setRefreshPage?: React.Dispatch<React.SetStateAction<boolean>>;
   cardData: any;
-  paymentType?:string;
+  paymentType?: string;
 }
 
 const NewCardAddParts = ({
@@ -19,8 +19,12 @@ const NewCardAddParts = ({
   cardId,
   setRefreshPage,
   cardData,
-  paymentType
+  paymentType,
 }: NewCardAddPartsProps) => {
+
+
+    const { setFieldValue} = useFormikContext<any>();
+  
   const price =
     values.cardParts?.reduce(
       (acc: any, part: any) =>
@@ -32,7 +36,7 @@ const NewCardAddParts = ({
 
   useEffect(() => {
     cardPartsPrice?.(price);
-  }, [price, values?.cardParts,cardData?.paymentType]);
+  }, [price, values?.cardParts, cardData?.paymentType]);
 
   const returnPartToWareHouse = async (partId: any, cardId: any) => {
     try {
@@ -119,7 +123,19 @@ const NewCardAddParts = ({
                           name={`cardParts.${index}.discount`}
                           value={part.discount || 0}
                           className="w-full border rounded px-2 py-1 text-sm text-center dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                          disabled={!cardData?.isOpen|| paymentType === "internal"}
+                          disabled={
+                            !cardData?.isOpen || paymentType === "internal"
+                          }
+                          onChange={(e: any) => {
+                            setFieldValue(
+                              `cardParts[${index}].discount`,
+                              Number(e.target.value),
+                            );
+                            setFieldValue(
+                              `cardParts[${index}].manualDiscount`,
+                              true,
+                            );
+                          }}
                         />
                       </Table.Cell>
 

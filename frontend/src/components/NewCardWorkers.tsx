@@ -15,6 +15,7 @@ interface CardWorkersInterface {
   cardData?: any;
   paymentType: any;
   jobsList?: any;
+  index: number;
 }
 
 const NewCardWorkers = ({
@@ -24,6 +25,7 @@ const NewCardWorkers = ({
   cardData,
   paymentType,
   jobsList,
+  index,
 }: CardWorkersInterface) => {
   const [showJobs, setShowJobs] = useState(false);
   const { setFieldValue, handleChange } = useFormikContext<any>();
@@ -52,15 +54,13 @@ const NewCardWorkers = ({
     };
   }, []);
 
-
-
   useEffect(() => {
     const av = Number(values.av || 0);
     // const discount = Number(values.discount || 0); // burada təyin et
 
     let calculatedTotal = 0;
 
-    if (paymentType === "internal" ) {
+    if (paymentType === "internal") {
       values.workers.forEach((w: any) => {
         const workerAv = Number(w.workerAv || 0);
         const workerPercent =
@@ -80,10 +80,7 @@ const NewCardWorkers = ({
     if (values.price !== newPrice) {
       setFieldValue(`${name}.price`, newPrice);
     }
-  }, [values.av, values.workers, paymentType, users,values.code]);
-
-
-
+  }, [values.av, values.workers, paymentType, users, values.code]);
 
   useEffect(() => {
     if (!cardData?.client) return;
@@ -97,9 +94,7 @@ const NewCardWorkers = ({
     } else if (paymentType === "transfer" || paymentType === "cash") {
       setFieldValue(`${name}.discount`, cardData.discount ?? client.av ?? 0);
     }
-
-
-  }, [cardData?.client,paymentType]);
+  }, [cardData?.client, paymentType]);
 
   const handleWorkerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -240,9 +235,15 @@ const NewCardWorkers = ({
             type="text"
             className="w-[70px]"
             name={`${name}.discount`}
+            onChange={(e: any) => {
+              setFieldValue(
+                `cardJobs[${index}].discount`,
+                Number(e.target.value),
+              );
+              setFieldValue(`cardJobs[${index}].manualDiscount`, true);
+            }}
             sizing="sm"
             disabled={cardData && !cardData?.isOpen}
-         
           />
         </td>
         <td className="px-1">
