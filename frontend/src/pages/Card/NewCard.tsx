@@ -63,6 +63,11 @@ const newCardInitialValues: NewCardInterface = {
   wayOutCar: 0,
   wayOutDistance: 0,
   wayOutWorkTime: 0,
+  isOpen: false,
+  account: "",
+  closeDate:"",
+  openDate:"",
+  repair: "",
   cardProblems: [{ description: "", serviceWorkers: [""] }],
   cardJobs: [
     {
@@ -618,6 +623,7 @@ const NewCard = () => {
                           {values.cardJobs.map((_, index) => (
                             <NewCardWorkers
                               key={index}
+                              index={index}
                               workers={workers}
                               name={`cardJobs[${index}]`}
                               values={values.cardJobs[index]}

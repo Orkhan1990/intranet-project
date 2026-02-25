@@ -153,13 +153,15 @@ const UpdateCard = () => {
       wayOutDistance: Number(data.wayOutDistance || 0),
       wayOutWorkTime: Number(data.wayOutWorkTime || 0),
 
-      cardProblems: data.cardProblems?.length
-        ? data.cardProblems.map((p: any) => ({
-            description: p.description ?? "",
-            serviceWorkers:
-              p.serviceWorkers?.map((w: any) => String(w.id)) || [""],
-          }))
-        : [{ description: "", serviceWorkers: [""] }],
+  cardProblems: data.cardProblems?.length
+  ? data.cardProblems.map((p: any) => ({
+      description: p.description ?? "",
+      serviceWorkers:
+        p.serviceWorkers && p.serviceWorkers.length > 0
+          ? p.serviceWorkers.map((w: any) => String(w.id))
+          : [""], // 🔥 əsas fix budur
+    }))
+  : [{ description: "", serviceWorkers: [""] }],
 
 
        cardJobs: data.cardJobs?.length

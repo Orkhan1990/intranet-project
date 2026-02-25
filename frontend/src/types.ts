@@ -65,7 +65,7 @@ export interface NewCardExpencesInterface {
 }
 
 export interface NewCardInterface {
-  id:number;
+  // id:number;
  clientId: number;
   type: string;
   manufactured: string;
