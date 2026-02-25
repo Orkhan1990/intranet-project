@@ -335,7 +335,7 @@ export const createCard = async (
       const exp = new CardExpense();
       exp.description = e.description;
       exp.price = Number(e.price || 0);
-      exp.card= savedCard;
+      exp.card = savedCard;
 
       await cardExpenseRespoisitory.save(exp);
     }
@@ -478,7 +478,7 @@ export const getCardDetails = async (
   try {
     const cardId = Number(req.params.id);
 
-    console.log(cardId);
+    // console.log(cardId);
 
     const card = await cardRepository.findOne({
       where: { id: cardId },
@@ -516,10 +516,6 @@ export const updateCard = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const queryRunner = AppDataSource.createQueryRunner();
-  await queryRunner.connect();
-  await queryRunner.startTransaction();
-
   try {
     const cardId = Number(req.params.id);
     const { cardData } = req.body;
@@ -596,6 +592,27 @@ export const updateCard = async (
       return sum + workerTotal;
     }, 0);
 
+    let partsTotalPrice = 0;
+    let partsSumOwn = 0;
+
+    if (Array.isArray(cardData.cardParts) && cardData.cardParts.length > 0) {
+      partsTotalPrice = cardData.cardParts.reduce((sum: number, part: any) => {
+        if (cardData.paymentType === "internal") {
+          return (
+            sum + part.netPrice * part.count * (1 - (part.discount || 0) / 100)
+          );
+        } else {
+          return (
+            sum + part.soldPrice * part.count * (1 - (part.discount || 0) / 100)
+          );
+        }
+      }, 0);
+
+      partsSumOwn = cardData.cardParts.reduce((sum: number, part: any) => {
+        return sum + part.netPrice * part.count;
+      }, 0);
+    }
+
     // 1️⃣ Mövcud kartı tap
     const existingCard = await cardRepository.findOneBy({ id: cardId });
     if (!existingCard) {
@@ -627,6 +644,8 @@ export const updateCard = async (
     existingCard.wayOutCar = cardData.wayOutCar;
     existingCard.wayOutDistance = cardData.wayOutDistance;
     existingCard.wayOutWorkTime = cardData.wayOutWorkTime;
+    existingCard.partsTotalPrice = partsTotalPrice;
+    existingCard.partsSumOwn = partsSumOwn;
     await cardRepository.save(existingCard);
 
     // ==========================
@@ -837,45 +856,13 @@ export const updateCard = async (
       }
     }
 
-    const cardParts = await cardPartsRepository.find({
-      where: {
-        card: { id: cardId },
-      },
-    });
-
-    const partsTotalPrice = cardParts.reduce((sum, part) => {
-      if (cardData.paymentType === "internal") {
-        // 🔥 Maya dəyəri
-        return (
-          sum + part.netPrice * part.count * (1 - (part.discount || 0) / 100)
-        );
-      } else {
-        // 🔹 Satış qiyməti + endirim
-        return (
-          sum + part.soldPrice * part.count * (1 - (part.discount || 0) / 100)
-        );
-      }
-    }, 0);
-
-    const partsSumOwn = cardParts.reduce(
-      (sum, part) => sum + part.netPrice * part.count,
-      0,
-    );
-
-    existingCard.partsTotalPrice = partsTotalPrice;
-    existingCard.partsSumOwn = partsSumOwn;
-    const updatedCard = await cardRepository.save(existingCard);
 
     res.status(200).json({
       message: "Kart yeniləndi",
-      card: updatedCard,
     });
   } catch (error) {
-    await queryRunner.rollbackTransaction();
     console.log(error);
     next(errorHandler(500, error));
-  } finally {
-    await queryRunner.release();
   }
 };
 
@@ -1023,7 +1010,7 @@ export const createRepairForCard = async (
       return next(errorHandler(500, "Repair sequence tapılmadı"));
     }
 
-    console.log(sequence, "sequence");
+    // console.log(sequence, "sequence");
 
     const nextAccountID = sequence.currentValue + 1;
 

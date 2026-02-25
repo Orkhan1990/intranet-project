@@ -173,14 +173,14 @@ const UpdateCard = () => {
         workers: j.workers?.length
           ? j.workers.map((w: any) => ({
               workerId: Number(w.workerId),
-              workerAv: String(w.workerAv ?? ""),
+              workerAv: Number(w.workerAv ?? 0),
             }))
-          : [{ workerId: 0, workerAv: "" }],
+          : [{ workerId: 0, workerAv: 0 }],
       }))
     : [],
 
-      expences: data.expences?.length
-        ? data.expences.map((e: any) => ({
+      expences: data.expenses?.length
+        ? data.expenses.map((e: any) => ({
             description: e.description ?? "",
             price: Number(e.price) || 0,
           }))
