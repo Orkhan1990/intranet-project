@@ -51,9 +51,27 @@ const WayOutAutoLogic = () => {
         : [{ workerId: 0, workerAv: 0 }],
     };
 
-    const otherJobs = prevJobs.filter((j) => j.name !== "Servis çıxışı");
+    // const otherJobs = prevJobs.filter((j) => j.name !== "Servis çıxışı");
 
-    const mergedJobs = [serviceJob, ...otherJobs];
+   const isOnlyOneEmptyJob =
+  prevJobs.length === 1 &&
+  prevJobs[0].name?.trim() === "" &&
+  Number(prevJobs[0].price) === 0;
+
+let mergedJobs: any[] = [];
+
+if (existingServiceJob) {
+  // Sadəcə update et
+  mergedJobs = prevJobs.map((j) =>
+    j.name === "Servis çıxışı" ? serviceJob : j
+  );
+} else if (isOnlyOneEmptyJob) {
+  // 🔥 Əgər yalnız 1 boş job varsa → onu replace et
+  mergedJobs = [serviceJob];
+} else {
+  // 🔥 Əks halda → ən üstdə əlavə et
+  mergedJobs = [serviceJob, ...prevJobs];
+}
 
     if (JSON.stringify(prevJobs) !== JSON.stringify(mergedJobs)) {
       setFieldValue("cardJobs", mergedJobs);
@@ -91,7 +109,6 @@ const WayOutAutoLogic = () => {
     values.wayOutDistance,
     values.wayOutCar,
     values.paymentType,
-    values.cardJobs,
     values.wayOutWorkTime,
     values.wayOutWorkers,
     users,

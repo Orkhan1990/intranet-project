@@ -80,7 +80,7 @@ const newCardInitialValues: NewCardInterface = {
       workers: [{ workerAv: "", workerId: 0 }],
     },
   ],
-  expences: [{ description: "", price: 0}],
+  expences: [],
   cardParts: [
     // {
     //   code: "",
