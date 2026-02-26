@@ -16,6 +16,7 @@ import { CardExpense } from "./CardExpense";
 import { Brand } from "./Brand";
 import { Account } from "./Account";
 import { Repair } from "./Repair";
+import { WarrantyStatus } from "../enums/allEnums";
 
 @Entity({ name: "cards" })
 export class Card extends AllEntities {
@@ -66,6 +67,68 @@ export class Card extends AllEntities {
 
   @Column({ name: "sassi", nullable: true })
   sassi: string;
+
+  @Column({
+    type: "enum",
+    enum: WarrantyStatus,
+    name: "warranty_status",
+    default: WarrantyStatus.None,
+  })
+  warrantyStatus: WarrantyStatus;
+
+  @Column({
+  name: "warranty_send_date",
+  type: "timestamp",
+  nullable: true,
+})
+warrantySendDate: Date;
+
+ @Column({
+  name: "warranty_paid_date",
+  type: "timestamp",
+  nullable: true,
+})
+warrantyPaidDate: Date;
+
+@Column({
+  name: "warranty_job",
+  type: "decimal",
+  precision: 12,
+  scale: 2,
+  nullable: true,
+  default: 0,
+})
+warrantyJob: string;
+
+@Column({
+  name: "warranty_part",
+  type: "decimal",
+  precision: 12,
+  scale: 2,
+  nullable: true,
+  default: 0,
+})
+warrantyPart: string;
+
+@Column({
+  name: "warranty_add_expenses",
+  type: "decimal",
+  precision: 12,
+  scale: 2,
+  nullable: true,
+  default: 0,
+})
+warrantyAddExpenses: string;
+
+@Column({
+  name: "warranty_currency",
+  type: "decimal",
+  precision: 12,
+  scale: 4, 
+  nullable: true,
+  default: 1,
+})
+warrantyCurrency: string;
 
   @Column({
     type: "timestamp",

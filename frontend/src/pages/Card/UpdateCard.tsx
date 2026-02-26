@@ -578,6 +578,27 @@ const UpdateCard = () => {
                         />
                       </div>
 
+                      {
+                        values.paymentType === "warranty" && (
+                          <div>
+                             <label className="block mb-1 font-medium">
+                          Qarantiyanin statusu
+                        </label>
+                        <Field
+                          as={Select}
+                          name="type"
+                          className="w-1/3"
+                          sizing="sm"
+                          disabled={!cardData?.isOpen}
+                        >
+                          {types.map((t, i) => (
+                            <option key={i}>{t}</option>
+                          ))}
+                        </Field>
+                          </div>
+                        )
+                      }
+
                       {/* Texnikanın növü */}
                       <div>
                         <label className="block mb-1 font-medium">

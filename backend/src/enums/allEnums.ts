@@ -55,3 +55,9 @@ export enum OrderStatus{
     PrixodAccept="prixodAccept",
     PrixodComplete="prixodComplete"
   }
+
+  export enum WarrantyStatus{
+    None="none",
+    Send="send",
+    Paid="paid",
+  }

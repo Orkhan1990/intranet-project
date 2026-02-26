@@ -51,7 +51,6 @@ const WayOutAutoLogic = () => {
         : [{ workerId: 0, workerAv: 0 }],
     };
 
-    // const otherJobs = prevJobs.filter((j) => j.name !== "Servis çıxışı");
 
    const isOnlyOneEmptyJob =
   prevJobs.length === 1 &&
