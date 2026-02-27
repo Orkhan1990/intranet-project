@@ -66,6 +66,25 @@ const Statistics = () => {
     setLoading(false);
   };
 
+
+const warrantyStatusColor = (
+  payment: string,
+  warrantyStatus: string
+) => {
+  if (payment !== "warranty") return "hover:bg-gray-50 transition";
+
+  switch (warrantyStatus) {
+    case "none":
+      return "bg-red-500";
+    case "send":
+      return "bg-yellow-500";
+    case "paid":
+      return "bg-green-500";
+    default:
+      return "";
+  }
+};
+
   return (
     <div className="min-h-screen ">
       <div className=" ml-20 mt-20">
@@ -191,7 +210,7 @@ const Statistics = () => {
                 return (
                   <tr
                     key={card.id}
-                    className="border-b hover:bg-gray-50 transition"
+                    className={`border-b  ${warrantyStatusColor(card.paymentType, card.warrantyStatus)}`}
                   >
                     <td className="p-3">{index + 1}</td>
                     <td className="p-3">

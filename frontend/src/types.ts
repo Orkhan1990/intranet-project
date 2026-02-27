@@ -127,6 +127,13 @@ export interface UpdateCardInterface {
   wayOutCar: number;
   wayOutDistance: number;
   wayOutWorkTime: number;
+    warrantyStatus:string;
+  warrantySendDate: string | null;
+  warrantyPaidDate: string | null;
+  warrantyJob: string;
+  warrantyPart: string;
+  warrantyAddExpenses: string;
+  warrantyCurrency: string;
   cardProblems: {
     description: string;
     serviceWorkers: any[];

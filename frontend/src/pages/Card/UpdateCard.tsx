@@ -33,6 +33,7 @@ import { fetchCards } from "../../redux-toolkit/features/filters/filterSlice";
 import WayOutAutoLogic from "../../components/Card/WayOutAutoLogic";
 import SpecialPricingOverride from "../../components/Card/SpecialPricingOverride";
 import WayOutResetLogic from "../../components/Card/WayOutResetLogic";
+import { WarrantyStatus } from "../../enums/projectEnums";
 
 const types = [
   "Tiqac",
@@ -72,8 +73,6 @@ const UpdateCard = () => {
   const [jobsList, setJobsList] = useState<JobListInterface[]>([]);
 
   const navigate = useNavigate();
-
-  
 
   const { users } = useSelector((state: RootState) => state.user);
   const { clients } = useSelector((state: RootState) => state.client);
@@ -119,95 +118,99 @@ const UpdateCard = () => {
 
   console.log({ cardData }, "qaqaaaaaaaaaaaa");
 
- const reloadCard = async () => {
-  try {
-    setLoading(true);
-    const data = await fetchCardDetails(id);
-    console.log({ data }, "backend-dən gələn data");
+  const reloadCard = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchCardDetails(id);
+      console.log({ data }, "backend-dən gələn data");
 
-    // Full mapping – bütün required field-ləri doldururuq
-    const mapped: UpdateCardInterface = {
-      id: data.id,
-      clientId: data.clientId || 0,
-      type: data.type || "tiqac",
-      manufactured: data.manufactured || "",
-      model: data.model || "",
-      sassi: data.sassi || "",
-      carNumber: data.carNumber || "",
-      produceDate: data.produceDate || "",
-      km: data.km || "",
-      qostNumber: data.qostNumber || "",
-      paymentType: data.paymentType || "transfer",
-      nds: data.nds || false,
-      repairAgain: data.repairAgain || false,
-      servisInfo: data.servisInfo || false,
-      comments: data.comments || "",
-      isOpen: data.isOpen || false,
-      openDate: data.openDate ?? null,
-      closeDate: data.closeDate ?? null,
-      recommendation: data.recommendation || "",
-      isWayOut: Boolean(data.isWayOut),
-      wayOutDirection: data.wayOutDirection || "",
-      wayOutWorkers: Number(data.wayOutWorkers || 0),
-      wayOutCar: Number(data.wayOutCar || 0),
-      wayOutDistance: Number(data.wayOutDistance || 0),
-      wayOutWorkTime: Number(data.wayOutWorkTime || 0),
-
-  cardProblems: data.cardProblems?.length
-  ? data.cardProblems.map((p: any) => ({
-      description: p.description ?? "",
-      serviceWorkers:
-        p.serviceWorkers && p.serviceWorkers.length > 0
-          ? p.serviceWorkers.map((w: any) => String(w.id))
-          : [""], // 🔥 əsas fix budur
-    }))
-  : [{ description: "", serviceWorkers: [""] }],
-
-
-       cardJobs: data.cardJobs?.length
-    ? data.cardJobs.map((j: any) => ({
-        code: j.code ?? "",
-        name: j.name ?? "",
-        av: Number(j.av) || 0,
-        price: Number(j.price) || 0,
-        discount: Number(j.discount) || 0,
-        oil: Number(j.oil) ?? 0,
-        workers: j.workers?.length
-          ? j.workers.map((w: any) => ({
-              workerId: Number(w.workerId),
-              workerAv: Number(w.workerAv ?? 0),
+      // Full mapping – bütün required field-ləri doldururuq
+      const mapped: UpdateCardInterface = {
+        id: data.id,
+        clientId: data.clientId || 0,
+        type: data.type || "tiqac",
+        manufactured: data.manufactured || "",
+        model: data.model || "",
+        sassi: data.sassi || "",
+        carNumber: data.carNumber || "",
+        produceDate: data.produceDate || "",
+        km: data.km || "",
+        qostNumber: data.qostNumber || "",
+        paymentType: data.paymentType || "transfer",
+        nds: data.nds || false,
+        repairAgain: data.repairAgain || false,
+        servisInfo: data.servisInfo || false,
+        comments: data.comments || "",
+        isOpen: data.isOpen || false,
+        openDate: data.openDate ?? null,
+        closeDate: data.closeDate ?? null,
+        recommendation: data.recommendation || "",
+        isWayOut: Boolean(data.isWayOut),
+        wayOutDirection: data.wayOutDirection || "",
+        wayOutWorkers: Number(data.wayOutWorkers || 0),
+        wayOutCar: Number(data.wayOutCar || 0),
+        wayOutDistance: Number(data.wayOutDistance || 0),
+        wayOutWorkTime: Number(data.wayOutWorkTime || 0),
+        warrantyStatus: data.warrantyStatus || WarrantyStatus.None,
+        warrantySendDate: data.warrantySendDate ?? null,
+        warrantyPaidDate: data.warrantyPaidDate ?? null,
+        warrantyJob: data.warrantyJob || "",
+        warrantyPart: data.warrantyPart || "",
+        warrantyAddExpenses: data.warrantyAddExpenses || "",
+        warrantyCurrency: data.warrantyCurrency || "",
+        cardProblems: data.cardProblems?.length
+          ? data.cardProblems.map((p: any) => ({
+              description: p.description ?? "",
+              serviceWorkers:
+                p.serviceWorkers && p.serviceWorkers.length > 0
+                  ? p.serviceWorkers.map((w: any) => String(w.id))
+                  : [""], // 🔥 əsas fix budur
             }))
-          : [{ workerId: 0, workerAv: 0 }],
-      }))
-    : [],
+          : [{ description: "", serviceWorkers: [""] }],
 
-      expences: data.expenses?.length
-        ? data.expenses.map((e: any) => ({
-            description: e.description ?? "",
-            price: Number(e.price) || 0,
-          }))
-        : [],
+        cardJobs: data.cardJobs?.length
+          ? data.cardJobs.map((j: any) => ({
+              code: j.code ?? "",
+              name: j.name ?? "",
+              av: Number(j.av) || 0,
+              price: Number(j.price) || 0,
+              discount: Number(j.discount) || 0,
+              oil: Number(j.oil) ?? 0,
+              workers: j.workers?.length
+                ? j.workers.map((w: any) => ({
+                    workerId: Number(w.workerId),
+                    workerAv: Number(w.workerAv ?? 0),
+                  }))
+                : [{ workerId: 0, workerAv: 0 }],
+            }))
+          : [],
 
-      cardParts: data.cardParts?.length
-        ? data.cardParts.map((p: any) => ({
-            ...p,
-            discount: Number(p.discount || 0),
-            usedPrice: Number(p.usedPrice || 0),
-          }))
-        : [],
+        expences: data.expenses?.length
+          ? data.expenses.map((e: any) => ({
+              description: e.description ?? "",
+              price: Number(e.price) || 0,
+            }))
+          : [],
 
-      account: data.account || null,
-      repair: data.repair || null,
-    };
+        cardParts: data.cardParts?.length
+          ? data.cardParts.map((p: any) => ({
+              ...p,
+              discount: Number(p.discount || 0),
+              usedPrice: Number(p.usedPrice || 0),
+            }))
+          : [],
 
-    setCardData(mapped); // Formik initialValues üçün hazır
-  } catch (e) {
-    console.error(e);
-  } finally {
-    setLoading(false);
-  }
-};
+        account: data.account || null,
+        repair: data.repair || null,
+      };
 
+      setCardData(mapped); // Formik initialValues üçün hazır
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // console.log({ cardData },"1111111111111111111111");
   const hasRepairAct = cardData?.repair?.repairId > 349;
@@ -371,11 +374,7 @@ const UpdateCard = () => {
         </div>
       )}
 
-      <Formik
-        initialValues={cardData}
-        enableReinitialize
-        onSubmit={onSubmit}
-      >
+      <Formik initialValues={cardData} enableReinitialize onSubmit={onSubmit}>
         {({ values, setFieldValue }) => {
           // const totalExpencesPrice = values?.expences?.reduce(
           //   (sum: any, item: any) => sum + Number(item.price || 0),
@@ -578,26 +577,69 @@ const UpdateCard = () => {
                         />
                       </div>
 
-                      {
-                        values.paymentType === "warranty" && (
-                          <div>
-                             <label className="block mb-1 font-medium">
-                          Qarantiyanin statusu
-                        </label>
-                        <Field
-                          as={Select}
-                          name="type"
-                          className="w-1/3"
-                          sizing="sm"
-                          disabled={!cardData?.isOpen}
-                        >
-                          {types.map((t, i) => (
-                            <option key={i}>{t}</option>
-                          ))}
-                        </Field>
+                      {values.paymentType === "warranty" && (
+                        <div className="flex  gap-4">
+                          <div className="flex flex-col gap-2">
+                            <label className="block  font-medium">
+                              Qarantiyanin statusu
+                            </label>
+                            <Field
+                              as={Select}
+                              name="warrantyStatus"
+                              className="w-52"
+                              sizing="sm"
+                              disabled={!cardData?.isOpen}
+                            >
+                              <option value="none">İşlənməyib</option>
+                              <option value="sent">Müraciət göndərilib</option>
+                              <option value="paid">Ödənildi</option>
+                            </Field>
                           </div>
-                        )
-                      }
+                          <div className="flex gap-3">
+                            <div className="flex flex-col gap-2">
+                              <label htmlFor="">Eh/h</label>
+                              <Field
+                                as={TextInput}
+                                name="warrantyPart"
+                                // className="w-1/3"
+                                sizing="sm"
+                                disabled={!cardData?.isOpen}
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <label htmlFor="">İşçilik</label>
+                              <Field
+                                as={TextInput}
+                                name="warrantyJob"
+                                // className="w-1/3"
+                                sizing="sm"
+                                disabled={!cardData?.isOpen}
+                              />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                              <label htmlFor="">Əlavə Xərclər</label>
+                              <Field
+                                as={TextInput}
+                                name="warrantyAddExpenses"
+                                // className="w-1/3"
+                                sizing="sm"
+                                disabled={!cardData?.isOpen}
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <label htmlFor="">Valyuta</label>
+                              <Field
+                                as={TextInput}
+                                name="warrantyCurrency"
+                                // className="w-1/3"
+                                sizing="sm"
+                                disabled={!cardData?.isOpen}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Texnikanın növü */}
                       <div>

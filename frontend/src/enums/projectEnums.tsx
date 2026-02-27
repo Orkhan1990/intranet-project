@@ -42,3 +42,9 @@ export enum Type {
   Hengs = "hengs",
   Man = "man",
 }
+
+ export enum WarrantyStatus{
+    None="none",
+    Send="send",
+    Paid="paid",
+  }

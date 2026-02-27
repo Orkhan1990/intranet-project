@@ -646,6 +646,14 @@ export const updateCard = async (
     existingCard.wayOutWorkTime = cardData.wayOutWorkTime;
     existingCard.partsTotalPrice = partsTotalPrice;
     existingCard.partsSumOwn = partsSumOwn;
+    existingCard.warrantyStatus = cardData.warrantyStatus;
+    existingCard.warrantyJob = cardData.warrantyJob;
+    existingCard.warrantyPart = cardData.warrantyPart;
+    existingCard.warrantyAddExpenses = cardData.warrantyAddExpenses;
+    existingCard.warrantyCurrency = cardData.warrantyCurrency;
+    existingCard.warrantyPaidDate=new Date();
+    existingCard.warrantySendDate=new Date();
+
     await cardRepository.save(existingCard);
 
     // ==========================

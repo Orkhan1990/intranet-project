@@ -28,9 +28,7 @@ import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
 import WayOutAutoLogic from "../../components/Card/WayOutAutoLogic";
 import SpecialPricingController from "../../components/Card/SpecialPricingOverride";
 import WayOutResetLogic from "../../components/Card/WayOutResetLogic";
-// import { AUTO_EXPENSES } from "../../utilis/autoExpenses";
-// import { AUTO_JOBS } from "../../utilis/autoJobs";
-// import { updateJobPricesByClientType } from "../../utilis/utilis";
+
 
 const types = [
   "Tiqac",
