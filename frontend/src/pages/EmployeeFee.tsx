@@ -1,5 +1,5 @@
 import { Button, Select, TextInput } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { filterEmployeeFee } from "../api/allApi";
 import { RootState } from "../redux-toolkit/store/store";
 import { useSelector } from "react-redux";
@@ -54,6 +54,10 @@ const EmployeeFee = () => {
       console.error("Filter error:", err);
     }
   };
+
+  useEffect(() => {
+  fetchWorkers()
+}, [])
 
   return (
     <div className="min-h-screen px-4 sm:px-8 py-6 bg-gray-50 dark:bg-gray-900">

@@ -590,9 +590,9 @@ const UpdateCard = () => {
                               sizing="sm"
                               disabled={!cardData?.isOpen}
                             >
-                              <option value="none">İşlənməyib</option>
-                              <option value="sent">Müraciət göndərilib</option>
-                              <option value="paid">Ödənildi</option>
+                              <option value={WarrantyStatus.None}>İşlənməyib</option>
+                              <option value={WarrantyStatus.Send}>Müraciət göndərilib</option>
+                              <option value={WarrantyStatus.Paid}>Ödənildi</option>
                             </Field>
                           </div>
                           <div className="flex gap-3">

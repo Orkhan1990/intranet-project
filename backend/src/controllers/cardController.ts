@@ -651,8 +651,8 @@ export const updateCard = async (
     existingCard.warrantyPart = cardData.warrantyPart;
     existingCard.warrantyAddExpenses = cardData.warrantyAddExpenses;
     existingCard.warrantyCurrency = cardData.warrantyCurrency;
-    existingCard.warrantyPaidDate=new Date();
-    existingCard.warrantySendDate=new Date();
+    existingCard.warrantyPaidDate = cardData.warrantyPaidDate ? new Date() : null;
+    existingCard.warrantySendDate = cardData.warrantySendDate ? new Date() : null;
 
     await cardRepository.save(existingCard);
 
@@ -863,7 +863,6 @@ export const updateCard = async (
         await cardPartsRepository.save(newPart);
       }
     }
-
 
     res.status(200).json({
       message: "Kart yeniləndi",
