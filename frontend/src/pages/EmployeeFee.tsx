@@ -1,6 +1,6 @@
 import { Button, Select, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { filterEmployeeFee } from "../api/allApi";
+import { filterEmployeeFee, getWorkerUsers } from "../api/allApi";
 import { RootState } from "../redux-toolkit/store/store";
 import { useSelector } from "react-redux";
 
@@ -17,6 +17,7 @@ const EmployeeFee = () => {
   });
   const [results, setResults] = useState<any[]>([]);
 
+
   const { clients } = useSelector((state: RootState) => state.client);
 
   const handleChange = (key: string, value: any) => {
@@ -26,12 +27,20 @@ const EmployeeFee = () => {
     }));
   };
 
+
+  useEffect(() => {
+  filterEmployeeFee({
+    filters
+  }).then(res => setResults(res));
+}, []);
+
+
   console.log({ results });
 
-  const resultsWithoutOils = results.filter(
+  const resultsWithoutOils = results?.filter(
     (result) => Number(result.oilSalary) !== 0,
   );
-  const resultsWithOils = results.filter(
+  const resultsWithOils = results?.filter(
     (result) => Number(result.oilSalary) === 0,
   );
 
@@ -56,7 +65,7 @@ const EmployeeFee = () => {
   };
 
   useEffect(() => {
-  fetchWorkers()
+  getWorkerUsers()
 }, [])
 
   return (

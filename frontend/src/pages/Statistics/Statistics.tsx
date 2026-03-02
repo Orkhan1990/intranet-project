@@ -75,11 +75,11 @@ const warrantyStatusColor = (
 
   switch (warrantyStatus) {
     case "none":
-      return "bg-red-300";
+      return "bg-red-600";
     case "send":
       return "bg-yellow-200";
     case "paid":
-      return "bg-green-300";
+      return "bg-green-500";
     default:
       return "";
   }
