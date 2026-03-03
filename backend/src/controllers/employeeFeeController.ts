@@ -11,70 +11,81 @@ export const filterEmployeeFee = async (
   next: NextFunction
 ) => {
   try {
-    const { startDate, endDate, clientId, cardNumber } = req.body.filters;
-
-    const qb = AppDataSource.getRepository(User)
-      .createQueryBuilder("worker")
-      // 🔹 yalnız service user və percent tipli işçilər
-      .where("worker.userRole = :role", { role: "ServiceUser" })
-      .andWhere("worker.salaryType = :salaryType", { salaryType: "percent" })
-
-      // 🔹 LEFT JOIN-lər
-      .leftJoin("worker.cardWorkerJobs", "cw")
+       const { startDate, endDate, clientId, cardNumber } = req.body.filters;
+ const rawData = await AppDataSource.getRepository(User)
+      .createQueryBuilder("user")
+      .leftJoin("user.cardWorkerJobs", "cw")
       .leftJoin("cw.cardJob", "job")
       .leftJoin("job.card", "card")
-      .leftJoin("card.client", "client")
-
-      // 🔹 Seçim
+      .where("user.isWorker = :isWorker", { isWorker: true })
+      .andWhere("user.userRole = :role", { role: "ServiceUser" })
+      .andWhere(
+        "(card.id IS NULL OR (card.isOpen = false " +
+          "AND (:startDate IS NULL OR card.openDate >= :startDate) " +
+          "AND (:endDate IS NULL OR card.openDate <= :endDate) " +
+          "AND (:clientId IS NULL OR card.clientId = :clientId) " +
+          "AND (:cardNumber IS NULL OR card.carNumber LIKE :cardNumber)))",
+        {
+          startDate,
+          endDate,
+          clientId,
+          cardNumber: cardNumber ? `%${cardNumber}%` : null,
+        }
+      )
       .select([
-        "worker.id AS workerId",
-        "CONCAT(worker.firstName, ' ', worker.lastName) AS fullName",
-        `
-        COALESCE(SUM(
-          CASE 
-            WHEN card.is_open = false
-             AND (:startDate IS NULL OR card.close_date >= :startDate)
-             AND (:endDate IS NULL OR card.close_date <= :endDate)
-             AND (:clientId IS NULL OR card.clientId = :clientId)
-             AND (:cardNumber IS NULL OR card.car_number LIKE :cardNumber)
-            THEN cw.worker_av
-            ELSE 0
-          END
-        ), 0) AS totalAv
-        `,
-        `
-        COALESCE(SUM(
-          CASE 
-            WHEN card.is_open = false
-             AND (:startDate IS NULL OR card.close_date >= :startDate)
-             AND (:endDate IS NULL OR card.close_date <= :endDate)
-             AND (:clientId IS NULL OR card.clientId = :clientId)
-             AND (:cardNumber IS NULL OR card.car_number LIKE :cardNumber)
-            THEN cw.earned_salary
-            ELSE 0
-          END
-        ), 0) AS totalSalary
-        `
+        "user.id AS userId",
+        "user.userName AS userName",
+        "user.firstName AS firstName",
+        "user.lastName AS lastName",
+        "cw.earnedSalary AS earnedSalary",
+        "cw.workerAv AS workerAv",
+        "job.price AS jobPrice",
+        "job.oil AS jobOil",
+        "card.isOpen AS cardIsOpen",
       ])
+      .getRawMany();
 
-      .groupBy("worker.id")
-      .addGroupBy("worker.firstName")
-      .addGroupBy("worker.lastName")
-      .setParameters({
-        startDate: startDate || null,
-        endDate: endDate || null,
-        clientId: clientId || null,
-        cardNumber: cardNumber ? `%${cardNumber}%` : null,
-      })
-      .orderBy("fullName", "ASC");
+    // 2️⃣ JS-də reduce ilə user-lərə toplama və jobs array
+    const usersMap = new Map<number, any>();
 
-    const data = await qb.getRawMany();
-    console.log(data);
+    rawData.forEach((row) => {
+      const userId = row.userId;
+      if (!usersMap.has(userId)) {
+        usersMap.set(userId, {
+          id: userId,
+          userName: row.userName,
+          firstName: row.firstName,
+          lastName: row.lastName,
+          totalSalary: 0,
+          totalAv: 0,
+          jobs: [],
+        });
+      }
+
+      const user = usersMap.get(userId);
+
+      // Yalnız bağlı kartlar üzrə toplama
+      if (row.cardIsOpen === 0 || row.cardIsOpen === false) { // MySQL boolean = 0/1
+        user.totalSalary += Number(row.earnedSalary || 0);
+        user.totalAv += Number(row.workerAv || 0);
+
+        if (row.jobPrice !== null) {
+          user.jobs.push({
+            jobPrice: row.jobPrice,
+            jobOil: row.jobOil,
+            cardIsOpen: Boolean(row.cardIsOpen),
+          });
+        }
+      }
+    });
+
+    const data = Array.from(usersMap.values());
+
+console.log(rawData);
     
 
     res.json(data);
-  } catch (error) {
-    console.error(error);
-    next(errorHandler(500, "Server error"));
+  } catch (err) {
+    next(err);
   }
 };
