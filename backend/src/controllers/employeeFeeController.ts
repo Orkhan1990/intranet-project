@@ -12,78 +12,108 @@ export const filterEmployeeFee = async (
 ) => {
   try {
        const { startDate, endDate, clientId, cardNumber } = req.body.filters;
- const rawData = await AppDataSource.getRepository(User)
-      .createQueryBuilder("user")
-      .leftJoin("user.cardWorkerJobs", "cw")
-      .leftJoin("cw.cardJob", "job")
-      .leftJoin("job.card", "card")
-      .where("user.isWorker = :isWorker", { isWorker: true })
-      .andWhere("user.userRole = :role", { role: "ServiceUser" })
-      .andWhere(
-        "(card.id IS NULL OR (card.isOpen = false " +
-          "AND (:startDate IS NULL OR card.openDate >= :startDate) " +
-          "AND (:endDate IS NULL OR card.openDate <= :endDate) " +
-          "AND (:clientId IS NULL OR card.clientId = :clientId) " +
-          "AND (:cardNumber IS NULL OR card.carNumber LIKE :cardNumber)))",
-        {
-          startDate,
-          endDate,
-          clientId,
-          cardNumber: cardNumber ? `%${cardNumber}%` : null,
-        }
-      )
-      .select([
-        "user.id AS userId",
-        "user.userName AS userName",
-        "user.firstName AS firstName",
-        "user.lastName AS lastName",
-        "cw.earnedSalary AS earnedSalary",
-        "cw.workerAv AS workerAv",
-        "job.price AS jobPrice",
-        "job.oil AS jobOil",
-        "card.isOpen AS cardIsOpen",
-      ])
-      .getRawMany();
+const qb = AppDataSource.getRepository(User)
+    .createQueryBuilder("user")
+    .leftJoin("user.cardWorkerJobs", "cw")
+    .leftJoin("cw.cardJob", "job");
 
-    // 2️⃣ JS-də reduce ilə user-lərə toplama və jobs array
-    const usersMap = new Map<number, any>();
+  // 🔹 Dinamik JOIN şərti (yalnız bağlı kartlar)
+  let joinCondition = "card.isOpen = :isOpen";
+  const params: any = { isOpen: false };
 
-    rawData.forEach((row) => {
-      const userId = row.userId;
-      if (!usersMap.has(userId)) {
-        usersMap.set(userId, {
-          id: userId,
-          userName: row.userName,
-          firstName: row.firstName,
-          lastName: row.lastName,
-          totalSalary: 0,
-          totalAv: 0,
-          jobs: [],
-        });
-      }
+ if (startDate) {
+    joinCondition += " AND card.closeDate >= :startDate";
+    params.startDate = startDate;
+  }
 
-      const user = usersMap.get(userId);
+  if (endDate) {
+    joinCondition += " AND card.closeDate <= :endDate";
+    params.endDate = endDate;
+  }
 
-      // Yalnız bağlı kartlar üzrə toplama
-      if (row.cardIsOpen === 0 || row.cardIsOpen === false) { // MySQL boolean = 0/1
-        user.totalSalary += Number(row.earnedSalary || 0);
-        user.totalAv += Number(row.workerAv || 0);
+  if (cardNumber) {
+    joinCondition += " AND card.carNumber LIKE :cardNumber";
+    params.cardNumber = `%${cardNumber}%`;
+  }
 
-        if (row.jobPrice !== null) {
-          user.jobs.push({
-            jobPrice: row.jobPrice,
-            jobOil: row.jobOil,
-            cardIsOpen: Boolean(row.cardIsOpen),
-          });
-        }
-      }
-    });
+  if (clientId) {
+    joinCondition += " AND card.clientId = :clientId";
+    params.clientId = clientId;
+  }
 
-    const data = Array.from(usersMap.values());
+  qb.leftJoin("job.card", "card", joinCondition, params);
 
-console.log(rawData);
-    
+  qb.where("user.isWorker = :isWorker", { isWorker: true })
+    .andWhere("user.userRole = :role", { role: "ServiceUser" });
 
+  qb.select([
+    "user.id as id",
+    "user.firstName as firstName",
+    "user.lastName as lastName",
+    "user.userName as userName",
+
+    // 🔹 Əsas maaş (oil olmayan işlər)
+    `
+    COALESCE(
+      SUM(
+        CASE 
+          WHEN card.id IS NOT NULL 
+            AND (job.oil IS NULL OR job.oil = 0)
+          THEN
+            COALESCE(
+              cw.earnedSalary,
+              job.price * COALESCE(user.percent, 0) / 100
+            )
+          ELSE 0
+        END
+      ),
+      0
+    ) as totalSalary
+    `,
+
+    // 🔹 Yağ maaşı (oil > 0 olan işlər)
+    `
+    COALESCE(
+      SUM(
+        CASE 
+          WHEN card.id IS NOT NULL 
+            AND job.oil > 0
+          THEN
+            COALESCE(
+              cw.earnedSalary,
+              job.price * COALESCE(user.percent, 0) / 100
+            )
+          ELSE 0
+        END
+      ),
+      0
+    ) as oilSalary
+    `,
+
+    // 🔹 Ümumi AV
+    `
+    COALESCE(
+      SUM(
+        CASE 
+          WHEN card.id IS NOT NULL 
+          THEN COALESCE(cw.workerAv, 0)
+          ELSE 0
+        END
+      ),
+      0
+    ) as totalAv
+    `
+  ])
+    .groupBy("user.id")
+    .addGroupBy("user.firstName")
+    .addGroupBy("user.lastName")
+    .addGroupBy("user.userName");
+
+
+
+        const data= await qb.getRawMany();
+        console.log(data);
+        
     res.json(data);
   } catch (err) {
     next(err);

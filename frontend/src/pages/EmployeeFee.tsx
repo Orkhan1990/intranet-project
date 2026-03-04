@@ -40,11 +40,11 @@ const EmployeeFee = () => {
   const resultsWithoutOils = results?.filter(
     (result) => Number(result.oilSalary) !== 0,
   );
-  const resultsWithOils = results?.filter(
-    (result) => Number(result.oilSalary) === 0,
-  );
+  // const resultsWithOils = results?.filter(
+  //   (result) => Number(result.oilSalary) === 0,
+  // );
 
-  console.log({ resultsWithOils });
+  // console.log({ resultsWithOils });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,7 +178,7 @@ const EmployeeFee = () => {
               </tr>
             </thead>
             <tbody>
-              {resultsWithOils.map((result, index) => (
+              {results.map((result, index) => (
                 <tr
                   key={index}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
@@ -187,11 +187,11 @@ const EmployeeFee = () => {
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                    {result.fullName}
+                    {result.firstName} {result.lastName}
                   </td>
                   <td className="px-6 py-4">{parseFloat(result.totalAv)}</td>
                   <td className="px-6 py-4">
-                    {parseFloat(result.normalSalary)}
+                    {parseFloat(result.totalSalary)}
                   </td>
                 </tr>
               ))}
@@ -202,14 +202,14 @@ const EmployeeFee = () => {
                   Cəmi
                 </td>
                 <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                  {resultsWithOils.reduce(
+                  {results.reduce(
                     (sum, result) => sum + parseFloat(result.totalAv),
                     0,
                   )}
                 </td>
                 <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                  {resultsWithOils.reduce(
-                    (sum, result) => sum + parseFloat(result.normalSalary),
+                  {results.reduce(
+                    (sum, result) => sum + parseFloat(result.totalSalary),
                     0,
                   )}
                 </td>
@@ -243,7 +243,7 @@ const EmployeeFee = () => {
                   <td className="px-6 py-4">{index + 1}</td>
 
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                    {result.fullName}
+                    {result.firstName} {result.lastName}
                   </td>
                   <td className="px-6 py-4">{parseFloat(result.oilSalary)}</td>
                 </tr>
