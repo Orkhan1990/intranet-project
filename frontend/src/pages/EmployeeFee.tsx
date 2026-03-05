@@ -4,6 +4,9 @@ import { filterEmployeeFee, getWorkerUsers } from "../api/allApi";
 import { RootState } from "../redux-toolkit/store/store";
 import { useSelector } from "react-redux";
 
+
+
+
 const EmployeeFee = () => {
   const today = new Date().toISOString().split("T")[0];
 
@@ -32,25 +35,28 @@ const EmployeeFee = () => {
 
   console.log({filters});
   
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+       const cleanFilters = Object.fromEntries(
+      Object.entries(filters).filter(
+        ([, value]) => value !== "" && value !== null && value !== false,
+      ),
+    );
+      const res = await filterEmployeeFee({ filters: cleanFilters });
+      setResults(res);
+    } catch (err) {
+      console.error("Error fetching default data:", err);
+    }
+  };
 
-
-  useEffect(() => {
-  filterEmployeeFee({
-    filters
-  }).then(res => setResults(res));
+  fetchData();
 }, []);
 
 
-  console.log({ results });
+  // console.log({ results });
 
-  const resultsWithoutOils = results?.filter(
-    (result) => Number(result.oilSalary) !== 0,
-  );
-  // const resultsWithOils = results?.filter(
-  //   (result) => Number(result.oilSalary) === 0,
-  // );
 
-  // console.log({ resultsWithOils });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +67,7 @@ const EmployeeFee = () => {
       ),
     );
     try {
-      const res = await filterEmployeeFee(cleanFilters);
+    const res = await filterEmployeeFee({filters: cleanFilters});
 
       setResults(res);
       console.log(res);
@@ -73,6 +79,33 @@ const EmployeeFee = () => {
   useEffect(() => {
   getWorkerUsers()
 }, [])
+
+
+
+  const resultsWithoutOils = results?.filter(
+    (result: any) => Number(result.oilSalary) !== 0,
+  );
+  // const resultsWithOils = results?.filter(
+  //   (result) => Number(result.oilSalary) === 0,
+  // );
+
+  // console.log({ resultsWithOils });
+
+/* Nəticə nümunəsi:
+[
+  {
+    userId: 2,
+    firstName: "Tural",
+    lastName: "Suleymanov",
+    userName: "tural",
+    percent: 50,
+    totalAv: 6.0,      // oil=0 olanların cəmi
+    oilSalary: 33.3,   // oil>0 olanların cəmi
+    jobs: [...]        // hər bir job məlumatı
+  },
+  ...
+]
+*/
 
   return (
     <div className="min-h-screen px-4 sm:px-8 py-6 bg-gray-50 dark:bg-gray-900">
@@ -197,7 +230,7 @@ const EmployeeFee = () => {
                   </td>
                   <td className="px-6 py-4">{parseFloat(result.totalAv)}</td>
                   <td className="px-6 py-4">
-                    {parseFloat(result.totalSalary)}
+                    {parseFloat(result.totalAv) * 50 * ((result.percent ?? 0) / 100)}
                   </td>
                 </tr>
               ))}
@@ -215,7 +248,7 @@ const EmployeeFee = () => {
                 </td>
                 <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                   {results.reduce(
-                    (sum, result) => sum + parseFloat(result.totalSalary),
+                    (sum, result) => sum + parseFloat(result.totalAv) * 50 * ((result.percent ?? 0) / 100),
                     0,
                   )}
                 </td>
