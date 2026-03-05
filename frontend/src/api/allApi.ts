@@ -560,7 +560,7 @@ export const filterEmployeeFee = async (filters: any) => {
   try {
     const response = await axios.post(
       `${VITE_API_BASE_URL}employeeFee/filterEmployeeFee`,
-      { filters },
+       {filters},
       {
         withCredentials: true,
       }

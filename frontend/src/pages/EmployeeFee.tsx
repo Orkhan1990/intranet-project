@@ -7,6 +7,9 @@ import { useSelector } from "react-redux";
 const EmployeeFee = () => {
   const today = new Date().toISOString().split("T")[0];
 
+  console.log(today);
+  
+
   const [filters, setFilters] = useState({
     startDate: today,
     endDate: "",
@@ -26,6 +29,9 @@ const EmployeeFee = () => {
       [key]: value,
     }));
   };
+
+  console.log({filters});
+  
 
 
   useEffect(() => {
