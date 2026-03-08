@@ -33,7 +33,7 @@ const EmployeeFee = () => {
     }));
   };
 
-  console.log({filters});
+  console.log({startDate: filters.startDate, endDate: filters.endDate});
   
  useEffect(() => {
   const fetchData = async () => {
@@ -54,7 +54,7 @@ const EmployeeFee = () => {
 }, []);
 
 
-  // console.log({ results });
+  console.log({ results });
 
 
 
@@ -231,6 +231,7 @@ const EmployeeFee = () => {
                   <td className="px-6 py-4">{parseFloat(result.totalAv)}</td>
                   <td className="px-6 py-4">
                     {parseFloat(result.totalAv) * 50 * ((result.percent ?? 0) / 100)}
+                    {/* {parseFloat(result.salary)} */}
                   </td>
                 </tr>
               ))}
@@ -284,7 +285,7 @@ const EmployeeFee = () => {
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                     {result.firstName} {result.lastName}
                   </td>
-                  <td className="px-6 py-4">{parseFloat(result.oilSalary)}</td>
+                  <td className="px-6 py-4">{parseFloat((result.oilSalary))}</td>
                 </tr>
               ))}
               <tr>

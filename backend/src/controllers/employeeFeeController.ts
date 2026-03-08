@@ -1,6 +1,5 @@
 import { NextFunction, Response } from "express";
 import { CustomRequest } from "../middleware/verifyToken";
-import errorHandler from "../middleware/errorHandler";
 import { AppDataSource } from "../database";
 import { User } from "../entites/User";
 
@@ -11,104 +10,99 @@ export const filterEmployeeFee = async (
 ) => {
   try {
     const { startDate, endDate, clientId, paymentType, cardNumber } =
-      req.body.filters.filters;
+      req.body.filters?.filters || {};
 
-    //  const start = new Date(startDate);
-    //  const end = new Date(endDate);
-    //  console.log(req.body.filters);
-    // console.log(req.body.filters.filters.startDate);
+    // // 🔹 Boş stringləri undefined kimi qəbul edirik
+    // startDate = startDate?.trim() || undefined;
+    // endDate = endDate?.trim() || undefined;
+    // clientId = clientId || undefined;
+    // paymentType = paymentType?.trim() || undefined;
+    // cardNumber = cardNumber?.trim() || undefined;
 
-    const qb = AppDataSource.getRepository(User)
-      .createQueryBuilder("user")
-      .leftJoin("user.cardWorkerJobs", "cw")
-      .leftJoin("cw.cardJob", "job");
+    const params: any = {};
+    let joinCondition = "c.id = j.card_id AND c.is_open = 0";
 
-    // 🔹 Dinamik JOIN şərti
-    let joinCondition = "card.isOpen = :isOpen";
-    const params: any = { isOpen: false };
-
-    if (startDate) {
-      joinCondition += " AND card.closeDate BETWEEN :startDate AND :endDate";
+    // 🔹 Tarix condition
+    if (startDate && endDate) {
+      joinCondition += " AND c.close_date BETWEEN :startDate AND :endDate";
       params.startDate = `${startDate} 00:00:00`;
-      params.endDate = `${endDate ?? startDate} 23:59:59`; // endDate yoxdursa startDate ilə eyni
+      params.endDate = `${endDate} 23:59:59`;
+    } else if (startDate) {
+      const end = endDate
+        ? `${endDate} 23:59:59`
+        : new Date().toISOString().slice(0, 10) + " 23:59:59";
+
+      // dateCondition = "AND c.close_date BETWEEN :startDate AND :endDate";
+      params.startDate = `${startDate} 00:00:00`;
+      params.endDate = end;
+      joinCondition += " AND c.close_date BETWEEN :startDate AND :endDate";
+      params.startDate = `${startDate} 00:00:00`;
+      params.endDate = `${end} 23:59:59`;
     }
 
+    // 🔹 Client / paymentType / cardNumber filterləri joinCondition-a əlavə olunur
+    if (clientId) {
+      joinCondition += " AND c.client_id = :clientId";
+      params.clientId = clientId;
+    }
+    if (paymentType) {
+      joinCondition += " AND c.payment_type = :paymentType";
+      params.paymentType = paymentType;
+    }
     if (cardNumber) {
-      joinCondition += " AND card.id LIKE :cardNumber";
+      joinCondition += " AND c.card_number LIKE :cardNumber";
       params.cardNumber = `%${cardNumber}%`;
     }
 
-    if (paymentType) {
-      joinCondition += " AND card.paymentType = :paymentType";
-      params.paymentType = paymentType;
-    }
-
-    if (clientId) {
-      joinCondition += " AND card.clientId = :clientId";
-      params.clientId = clientId;
-    }
-
-    qb.leftJoin("job.card", "card", joinCondition, params);
-
-    qb.where("user.isWorker = :isWorker", { isWorker: true }).andWhere(
-      "user.userRole = :role",
-      { role: "ServiceUser" },
-    );
-
-    qb.select([
-      "user.id as id",
-      "user.firstName as firstName",
-      "user.lastName as lastName",
-      "user.userName as userName",
-      "user.percent as percent",
-
-      `
-      COALESCE(
-        SUM(
-          CASE 
-            WHEN card.id IS NOT NULL 
-              AND job.oil > 0
-            THEN
-              COALESCE(
-                cw.earnedSalary,
-                job.price * COALESCE(user.percent, 0) / 100
-              )
+    const query = AppDataSource.getRepository(User)
+      .createQueryBuilder("u")
+      .leftJoin("card_worker_jobs", "cw", "cw.worker_id = u.id")
+      .leftJoin("card_jobs", "j", "j.id = cw.card_job_id")
+      .leftJoin("cards", "c", joinCondition, params)
+      .select("u.id", "id")
+      .addSelect("u.first_name", "firstName")
+      .addSelect("u.last_name", "lastName")
+      .addSelect("u.percent", "percent")
+      // AV
+      .addSelect(`
+        COALESCE(SUM(
+          CASE
+            WHEN c.id IS NOT NULL AND j.code <> 'Y1'
+            THEN cw.worker_av
             ELSE 0
           END
-        ),
-        0
-      ) as oilSalary
-      `,
-
-      `
-      COALESCE(
-        SUM(
-          CASE 
-            WHEN card.id IS NOT NULL 
-            THEN COALESCE(cw.workerAv, 0)
+        ),0)
+      `, "totalAv")
+      // Normal maaş
+      .addSelect(`
+        COALESCE(SUM(
+          CASE
+            WHEN c.id IS NOT NULL AND j.code <> 'Y1'
+            THEN cw.earnedSalary
             ELSE 0
           END
-        ),
-        0
-      ) as totalAv
-      `,
-    ])
-      .groupBy("user.id")
-      .addGroupBy("user.firstName")
-      .addGroupBy("user.lastName")
-      .addGroupBy("user.userName");
+        ),0)
+      `, "salary")
+      // Yağ maaşı
+      .addSelect(`
+        COALESCE(SUM(
+          CASE
+            WHEN c.id IS NOT NULL AND j.code = 'Y1'
+            THEN (j.oil / 33.3) * 9.99
+            ELSE 0
+          END
+        ),0)
+      `, "oilSalary")
+      .where("u.isWorker = :isWorker", { isWorker: 1 })
+      .groupBy("u.id")
+      .addGroupBy("u.first_name")
+      .addGroupBy("u.last_name")
+      .addGroupBy("u.percent");
 
-    // 🔎 Debug üçün
-    // console.log(qb.getSql());
-    // console.log(qb.getParameters());
-
-    const data = await qb.getRawMany();
-    console.log(data);
+    const data = await query.getRawMany();
 
     res.json(data);
   } catch (err) {
     next(err);
   }
 };
-
-
