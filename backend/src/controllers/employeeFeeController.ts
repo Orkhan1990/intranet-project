@@ -12,45 +12,46 @@ export const filterEmployeeFee = async (
     const { startDate, endDate, clientId, paymentType, cardNumber } =
       req.body.filters?.filters || {};
 
-    // // 🔹 Boş stringləri undefined kimi qəbul edirik
-    // startDate = startDate?.trim() || undefined;
-    // endDate = endDate?.trim() || undefined;
-    // clientId = clientId || undefined;
-    // paymentType = paymentType?.trim() || undefined;
-    // cardNumber = cardNumber?.trim() || undefined;
+    console.log(startDate, endDate, clientId);
 
     const params: any = {};
     let joinCondition = "c.id = j.card_id AND c.is_open = 0";
 
-    // 🔹 Tarix condition
+    const hasFilter =
+      startDate || endDate || clientId || paymentType || cardNumber;
+
+    // 🔹 Əgər heç bir filter yoxdursa bütün nəticələri 0 et
+    if (!hasFilter) {
+      joinCondition += " AND 1 = 0";
+    }
+
+    // 🔹 Tarix filter
     if (startDate && endDate) {
       joinCondition += " AND c.close_date BETWEEN :startDate AND :endDate";
       params.startDate = `${startDate} 00:00:00`;
       params.endDate = `${endDate} 23:59:59`;
     } else if (startDate) {
-      const end = endDate
-        ? `${endDate} 23:59:59`
-        : new Date().toISOString().slice(0, 10) + " 23:59:59";
-
-      // dateCondition = "AND c.close_date BETWEEN :startDate AND :endDate";
-      params.startDate = `${startDate} 00:00:00`;
-      params.endDate = end;
+      const end = new Date().toISOString().slice(0, 10) + " 23:59:59";
       joinCondition += " AND c.close_date BETWEEN :startDate AND :endDate";
       params.startDate = `${startDate} 00:00:00`;
-      params.endDate = `${end} 23:59:59`;
+      params.endDate = end;
     }
 
-    // 🔹 Client / paymentType / cardNumber filterləri joinCondition-a əlavə olunur
+    // 🔹 Client filter
     if (clientId) {
-      joinCondition += " AND c.client_id = :clientId";
+      joinCondition += " AND c.client.id = :clientId";
       params.clientId = clientId;
     }
+
+    // 🔹 Payment type
     if (paymentType) {
       joinCondition += " AND c.payment_type = :paymentType";
       params.paymentType = paymentType;
     }
+
+    // 🔹 Card number
     if (cardNumber) {
-      joinCondition += " AND c.card_number LIKE :cardNumber";
+      joinCondition += " AND c.id LIKE :cardNumber";
       params.cardNumber = `%${cardNumber}%`;
     }
 
@@ -63,8 +64,10 @@ export const filterEmployeeFee = async (
       .addSelect("u.first_name", "firstName")
       .addSelect("u.last_name", "lastName")
       .addSelect("u.percent", "percent")
+
       // AV
-      .addSelect(`
+      .addSelect(
+        `
         COALESCE(SUM(
           CASE
             WHEN c.id IS NOT NULL AND j.code <> 'Y1'
@@ -72,9 +75,13 @@ export const filterEmployeeFee = async (
             ELSE 0
           END
         ),0)
-      `, "totalAv")
+      `,
+        "totalAv",
+      )
+
       // Normal maaş
-      .addSelect(`
+      .addSelect(
+        `
         COALESCE(SUM(
           CASE
             WHEN c.id IS NOT NULL AND j.code <> 'Y1'
@@ -82,9 +89,13 @@ export const filterEmployeeFee = async (
             ELSE 0
           END
         ),0)
-      `, "salary")
+      `,
+        "salary",
+      )
+
       // Yağ maaşı
-      .addSelect(`
+      .addSelect(
+        `
         COALESCE(SUM(
           CASE
             WHEN c.id IS NOT NULL AND j.code = 'Y1'
@@ -92,7 +103,10 @@ export const filterEmployeeFee = async (
             ELSE 0
           END
         ),0)
-      `, "oilSalary")
+      `,
+        "oilSalary",
+      )
+
       .where("u.isWorker = :isWorker", { isWorker: 1 })
       .groupBy("u.id")
       .addGroupBy("u.first_name")
