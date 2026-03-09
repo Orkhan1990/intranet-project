@@ -1,105 +1,133 @@
 import { Select, TextInput } from "flowbite-react";
 
-const Incoming = () => {
+interface IncomingProps {
+  filters: any;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+}
+
+const Incoming = ({ filters, handleChange }: IncomingProps) => {
+  const {
+    code,
+    orderNumber,
+    market,
+    brand,
+    supplier,
+    paymentType,
+    invoice,
+    project,
+  } = filters;
+
   return (
     <div className="w-[80%] border border-yellow-300 p-10 rounded-md">
-      <form action="" className="flex  gap-5 items-center">
-        <div className="flex flex-col gap-5 ">
+      <form className="flex gap-5 items-center">
+        <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
-            <label htmlFor="" className="text-sm">
-              Kod
-            </label>
-            <TextInput type="text" sizing={"sm"} className="w-56" />
+            <label className="text-sm">Kod</label>
+            <TextInput
+              type="text"
+              sizing="sm"
+              className="w-56"
+              name="code"
+              value={code || ""}
+              onChange={handleChange}
+            />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="" className="text-sm">
-              Sifariş nömrəsi
-            </label>
-            <TextInput type="text" sizing={"sm"} className="w-56" />
+            <label className="text-sm">Sifariş nömrəsi</label>
+            <TextInput
+              type="text"
+              sizing="sm"
+              className="w-56"
+              name="orderNumber"
+              value={orderNumber || ""}
+              onChange={handleChange}
+            />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="" className="text-sm">
-              Bazar
-            </label>
-            <Select className="w-40" sizing={"sm"}>
+            <label className="text-sm">Bazar</label>
+            <Select
+              className="w-40"
+              sizing="sm"
+              name="market"
+              value={market || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
-              <option value="">Yerli</option>
-              <option value="">Xarici</option>
+              <option value="yerli">Yerli</option>
+              <option value="xarici">Xarici</option>
             </Select>
           </div>
         </div>
 
-        <div className="flex flex-col gap-5 ">
+        <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
-            <label htmlFor="" className="text-sm">
-              Brend
-            </label>
-            <Select className="w-40" sizing={"sm"}>
+            <label className="text-sm">Brend</label>
+            <Select
+              className="w-40"
+              sizing="sm"
+              name="brand"
+              value={brand || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
-              <option value="">BM-RS</option>
-              <option value="">BF</option>
-              <option value="">BM-RS</option>
-              <option value="">BF</option>
-              <option value="">BM-RS</option>
-              <option value="">BF</option>
-              <option value="">BM-RS</option>
-              <option value="">BF</option>
+              <option value="BM-RS">BM-RS</option>
+              <option value="BF">BF</option>
             </Select>
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="" className="text-sm">
-              Təchizatçı
-            </label>
-            <Select className="w-56" sizing={"sm"}>
+            <label className="text-sm">Təchizatçı</label>
+            <Select
+              className="w-56"
+              sizing="sm"
+              name="supplier"
+              value={supplier || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
-              <option value="">Man GMBH</option>
-              <option value="">Fatih Bedir</option>
+              <option value="man">Man GMBH</option>
+              <option value="fatih">Fatih Bedir</option>
             </Select>
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="" className="text-sm">
-              Ödəniş növü
-            </label>
-            <Select className="w-40" sizing={"sm"}>
+            <label className="text-sm">Ödəniş növü</label>
+            <Select
+              className="w-40"
+              sizing="sm"
+              name="paymentType"
+              value={paymentType || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
-              <option value="">Nağd</option>
-              <option value="">Köçürmə</option>
+              <option value="cash">Nağd</option>
+              <option value="transfer">Köçürmə</option>
             </Select>
           </div>
         </div>
 
-        <div className="flex flex-col gap-5 ">
+        <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
-            <label htmlFor="" className="text-sm">
-              Faktura
-            </label>
-            <Select className="w-40" sizing={"sm"}>
+            <label className="text-sm">Faktura</label>
+            <Select
+              className="w-40"
+              sizing="sm"
+              name="invoice"
+              value={invoice || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
             </Select>
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="" className="text-sm">
-              Project
-            </label>
-            <Select className="w-40" sizing={"sm"}>
+            <label className="text-sm">Project</label>
+            <Select
+              className="w-40"
+              sizing="sm"
+              name="project"
+              value={project || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
-              <option value="">Project</option>
             </Select>
-          </div>
-
-          <div className="flex  gap-5">
-            <div className="flex gap-3 items-center">
-              <TextInput type="radio" sizing={"sm"}  className="cursor-pointer" />
-              <label htmlFor="" className="text-sm">
-                Anbarın vəziyyəti
-              </label>
-            </div>
-            <div className="flex gap-3 items-center">
-              <TextInput type="radio" sizing={"sm"}  className="cursor-pointer" />
-              <label htmlFor="" className="text-sm">
-                Tes
-              </label>
-            </div>
           </div>
         </div>
       </form>

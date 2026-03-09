@@ -1,13 +1,14 @@
 import { Select } from "flowbite-react";
 
-const Briqada = () => {
+const Briqada = ({ filters, handleChange }: any) => {
+
   return (
     <div className="w-[60%] border border-yellow-300 p-10 rounded-md">
       <div className="flex flex-col gap-1">
         <label htmlFor="" className="text-sm">
           Briqada
         </label>
-        <Select className="w-52 cursor-pointer" sizing={"sm"}>
+        <Select className="w-52 cursor-pointer" sizing={"sm"} name="briqada" value={filters.briqada || ""} onChange={handleChange}>
           <option value="">Briqada seç</option>
           <option value="">Aqreqat briqadası</option>
           <option value="">Dəmirçi və Rəngləmə briqadası</option>

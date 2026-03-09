@@ -3,19 +3,15 @@ import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
-import { setFilter } from "../../redux-toolkit/features/filters/filterSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 
-const WorkerCard = () => {
+const WorkerCard = ({ filters, handleChange }: any) => {
   const dispatch: AppDispatch = useDispatch();
+
   const { users } = useSelector((state: RootState) => state.user);
   const { clients } = useSelector((state: RootState) => state.client);
-  const filters = useSelector((state: RootState) => state.filter);
-
-  const handleChange = (key: string, value: any) => {
-    dispatch(setFilter({ [key]: value }));
-  };
+  const activeTab = useSelector((state: RootState) => state.filter.activeTab);
 
   const receptions = users.filter((p) => p.isReception === true);
   const serviceWorkers = users.filter(
@@ -28,67 +24,77 @@ const WorkerCard = () => {
     dispatch(fetchClients());
   }, [dispatch]);
 
+  if (activeTab !== "İş kartı") return null;
+
+  const {
+    cardStatus,
+    cardNumber,
+    banNumber,
+    paymentType,
+    clientId,
+    manufactured,
+    workerId,
+    receptionId,
+    minAmount,
+    maxAmount,
+    carNumber,
+    customerType,
+    legalOrPhysical,
+  } = filters;
+
   return (
     <div className="w-[97%] border border-yellow-300 p-4 rounded-md">
       <form className="flex gap-10 items-center">
-        {/* Card Status Radio Buttons */}
+
+        {/* CARD STATUS */}
         <div className="flex flex-col gap-3">
-          <div className="flex gap-3 items-center">
-            <input
-              type="radio"
-              name="cardStatus"
-              checked={filters.cardStatus === "all"}
-              onChange={() => handleChange("cardStatus", "all")}
-            />
-            <label className="text-sm">Bütün kartlar</label>
-          </div>
-          <div className="flex gap-3 items-center">
-            <input
-              type="radio"
-              name="cardStatus"
-              checked={filters.cardStatus === "open"}
-              onChange={() => handleChange("cardStatus", "open")}
-            />
-            <label className="text-sm">Açıq kartlar</label>
-          </div>
-          <div className="flex gap-3 items-center">
-            <input
-              type="radio"
-              name="cardStatus"
-              checked={filters.cardStatus === "closed"}
-              onChange={() => handleChange("cardStatus", "closed")}
-            />
-            <label className="text-sm">Bağlı kartlar</label>
-          </div>
+          {[
+            { label: "Bütün kartlar", value: "all" },
+            { label: "Açıq kartlar", value: "open" },
+            { label: "Bağlı kartlar", value: "closed" },
+          ].map((item) => (
+            <label key={item.value} className="flex gap-2 items-center text-sm">
+              <input
+                type="radio"
+                name="cardStatus"
+                value={item.value}
+                checked={cardStatus === item.value}
+                onChange={handleChange}
+              />
+              {item.label}
+            </label>
+          ))}
         </div>
 
-        {/* Card Details */}
+        {/* CARD DETAILS */}
         <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-1">
+          <div>
             <label className="text-sm">Kartın nömrəsi</label>
             <TextInput
-              type="text"
+              name="cardNumber"
               sizing="sm"
-              value={filters.cardNumber || ""}
-              onChange={(e) => handleChange("cardNumber", e.target.value)}
+              value={cardNumber || ""}
+              onChange={handleChange}
             />
           </div>
-          <div className="flex flex-col gap-1">
+
+          <div>
             <label className="text-sm">Ban nömrəsi</label>
             <TextInput
-              type="text"
+              name="banNumber"
               sizing="sm"
-              value={filters.banNumber || ""}
-              onChange={(e) => handleChange("banNumber", e.target.value)}
+              value={banNumber || ""}
+              onChange={handleChange}
             />
           </div>
-          <div className="flex flex-col gap-1">
+
+          <div>
             <label className="text-sm">Ödəniş növü</label>
             <Select
-              className="w-36 cursor-pointer"
+              name="paymentType"
               sizing="sm"
-              value={filters.paymentType || ""}
-              onChange={(e) => handleChange("paymentType", e.target.value)}
+              value={paymentType || ""}
+              onChange={handleChange}
             >
               <option value="">Seç</option>
               <option value="transfer">Köçürülmə</option>
@@ -100,56 +106,50 @@ const WorkerCard = () => {
           </div>
         </div>
 
-        {/* Client, Brand, Worker, Car */}
+        {/* CLIENT / BRAND / WORKER */}
         <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-1">
+          <div>
             <label className="text-sm">Müştərilər</label>
             <Select
-              className="w-36 cursor-pointer"
+              name="clientId"
               sizing="sm"
-              value={filters.clientId || ""}
-              onChange={(e) => handleChange("clientId", e.target.value)}
+              value={clientId || ""}
+              onChange={handleChange}
             >
               <option value="">Müştəri seç</option>
-              {clients &&
-                clients.map((client) => (
-                  <option key={client.id} value={client.id}>
-                    {client.companyName}
-                  </option>
-                ))}
+              {clients?.map((client) => (
+                <option key={client.id} value={client.id}>
+                  {client.companyName}
+                </option>
+              ))}
             </Select>
           </div>
-          <div className="flex flex-col gap-1">
+
+          <div>
             <label className="text-sm">Brend</label>
             <Select
-              className="w-36 cursor-pointer"
+              name="manufactured"
               sizing="sm"
-              value={filters.manufactured || ""}
-              onChange={(e) => handleChange("manufactured", e.target.value)}
+              value={manufactured || ""}
+              onChange={handleChange}
             >
-              <option value="">Bütün Brendler</option>
-
-              <option value="man">Man</option>
+              <option value="">Bütün brendlər</option>
+              <option value="man">MAN</option>
               <option value="neoplan">Neoplan</option>
-              <option value="daf">Daf</option>
+              <option value="daf">DAF</option>
               <option value="mercedes">Mercedes</option>
-              <option value="sumitomo">Sumitomo</option>
               <option value="scania">Scania</option>
-              <option value="Kamaz">Kamaz</option>
-              <option value="ford">Ford</option>
-              <option value="shagman">Shagman</option>
               <option value="volvo">Volvo</option>
-              <option value="iveco">Iveco</option>
-              <option value="renault">Renault</option>
             </Select>
           </div>
-          <div className="flex flex-col gap-1">
+
+          <div>
             <label className="text-sm">İşçilər</label>
             <Select
-              className="w-36 cursor-pointer"
+              name="workerId"
               sizing="sm"
-              value={filters.workerId || ""}
-              onChange={(e) => handleChange("workerId", e.target.value)}
+              value={workerId || ""}
+              onChange={handleChange}
             >
               <option value="">İşçi seç</option>
               {serviceWorkers.map((user) => (
@@ -159,26 +159,27 @@ const WorkerCard = () => {
               ))}
             </Select>
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm">Maşının nömrəsi</label>
+
+          <div>
+            <label className="text-sm">Maşın nömrəsi</label>
             <TextInput
-              type="text"
+              name="carNumber"
               sizing="sm"
-              value={filters.carNumber || ""}
-              onChange={(e) => handleChange("carNumber", e.target.value)}
+              value={carNumber || ""}
+              onChange={handleChange}
             />
           </div>
         </div>
 
-        {/* Reception, Min/Max, Customer Type, Legal/Physical */}
+        {/* RECEPTION / PRICE RANGE */}
         <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-1">
+          <div>
             <label className="text-sm">Qəbulçu</label>
             <Select
-              className="w-36 cursor-pointer"
+              name="receptionId"
               sizing="sm"
-              value={filters.receptionId || ""}
-              onChange={(e) => handleChange("receptionId", e.target.value)}
+              value={receptionId || ""}
+              onChange={handleChange}
             >
               <option value="">Qəbulçu seç</option>
               {receptions.map((user) => (
@@ -188,62 +189,59 @@ const WorkerCard = () => {
               ))}
             </Select>
           </div>
-          <div className="flex gap-5">
-            <div className="flex flex-col gap-1">
+
+          <div className="flex gap-4">
+            <div>
               <label className="text-sm">Min</label>
               <TextInput
                 type="number"
+                name="minAmount"
                 sizing="sm"
-                value={filters.minAmount || ""}
-                onChange={(e) =>
-                  handleChange("minAmount", Number(e.target.value))
-                }
+                value={minAmount || ""}
+                onChange={handleChange}
               />
             </div>
-            <div className="flex flex-col gap-1">
+
+            <div>
               <label className="text-sm">Max</label>
               <TextInput
                 type="number"
+                name="maxAmount"
                 sizing="sm"
-                value={filters.maxAmount || ""}
-                onChange={(e) =>
-                  handleChange("maxAmount", Number(e.target.value))
-                }
+                value={maxAmount || ""}
+                onChange={handleChange}
               />
             </div>
           </div>
 
-          <div className="flex gap-5">
-            <div className="flex flex-col gap-1">
-              <label className="text-sm">Müştəri növü</label>
-              <Select
-                className="w-36 cursor-pointer"
-                sizing="sm"
-                value={filters.customerType || ""}
-                onChange={(e) => handleChange("customerType", e.target.value)}
-              >
-                <option value="">Seç</option>
-                <option value={"customer"}>Müştəri</option>
-                <option value={"worker"}>Işçi</option>
-                <option value={"boss"}>Təsisçi</option>
-                <option value={"itb"}>İTB</option>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-sm">Hüquqi/Fiziki</label>
-              <Select
-                className="w-36 cursor-pointer"
-                sizing="sm"
-                value={filters.legalOrPhysical || ""}
-                onChange={(e) =>
-                  handleChange("legalOrPhysical", e.target.value)
-                }
-              >
-                <option value="">Seç</option>
-                <option value="legal">Hüquqi</option>
-                <option value="physical">Fiziki</option>
-              </Select>
-            </div>
+          <div>
+            <label className="text-sm">Müştəri növü</label>
+            <Select
+              name="customerType"
+              sizing="sm"
+              value={customerType || ""}
+              onChange={handleChange}
+            >
+              <option value="">Seç</option>
+              <option value="customer">Müştəri</option>
+              <option value="worker">İşçi</option>
+              <option value="boss">Təsisçi</option>
+              <option value="itb">İTB</option>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm">Hüquqi/Fiziki</label>
+            <Select
+              name="legalOrPhysical"
+              sizing="sm"
+              value={legalOrPhysical || ""}
+              onChange={handleChange}
+            >
+              <option value="">Seç</option>
+              <option value="legal">Hüquqi</option>
+              <option value="physical">Fiziki</option>
+            </Select>
           </div>
         </div>
       </form>

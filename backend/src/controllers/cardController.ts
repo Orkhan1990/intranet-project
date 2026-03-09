@@ -358,112 +358,89 @@ export const createCard = async (
 
 export const filterCards = async (req: Request, res: Response) => {
   try {
-    const filters = req.body.filters || {};
+     const { tab, ...filters } = req.body;
 
-    // console.log({ filters });
+    let result: any[] = [];
 
-    const query = AppDataSource.getRepository(Card)
-      .createQueryBuilder("card")
-      .leftJoinAndSelect("card.client", "client")
-      .leftJoinAndSelect("card.user", "user")
-      .leftJoinAndSelect("card.closedByUser", "closedByUser")
-      .leftJoinAndSelect("card.cardJobs", "cardJobs")
-      .leftJoinAndSelect("cardJobs.workers", "jobWorkers")
-      .leftJoinAndSelect("jobWorkers.user", "workerUser")
-      .leftJoinAndSelect("card.cardParts", "cardParts")
-      .leftJoinAndSelect("card.cardProblems", "cardProblems")
-      .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
-      .leftJoinAndSelect("card.expenses", "cardExpenses")
-      .leftJoinAndSelect("card.account", "account") // ✅
-      .leftJoinAndSelect("card.repair", "repair"); // ✅
+    switch (tab) {
+      case "İş kartı":
+        const query = AppDataSource.getRepository(Card)
+          .createQueryBuilder("card")
+          .leftJoinAndSelect("card.client", "client")
+          .leftJoinAndSelect("card.user", "user")
+          .leftJoinAndSelect("card.closedByUser", "closedByUser")
+          .leftJoinAndSelect("card.cardJobs", "cardJobs")
+          .leftJoinAndSelect("cardJobs.workers", "jobWorkers")
+          .leftJoinAndSelect("jobWorkers.user", "workerUser")
+          .leftJoinAndSelect("card.cardParts", "cardParts")
+          .leftJoinAndSelect("card.cardProblems", "cardProblems")
+          .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
+          .leftJoinAndSelect("card.expenses", "cardExpenses")
+          .leftJoinAndSelect("card.account", "account")
+          .leftJoinAndSelect("card.repair", "repair");
 
-    if (
-      filters.startDate &&
-      filters.startDate.trim() !== "" &&
-      filters.endDate &&
-      filters.endDate.trim() !== ""
-    ) {
-      // Hər iki tarix varsa → BETWEEN
-      query.andWhere("card.open_date BETWEEN :start AND :end", {
-        start: filters.startDate.trim(),
-        end: filters.endDate.trim(),
-      });
-    } else if (filters.startDate && filters.startDate.trim() !== "") {
-      // Yalnız start varsa
-      query.andWhere("card.open_date >= :start", {
-        start: filters.startDate.trim(),
-      });
-    } else if (filters.endDate && filters.endDate.trim() !== "") {
-      // Yalnız end varsa
-      query.andWhere("card.open_date <= :end", {
-        end: filters.endDate.trim(),
-      });
+        // Tarix filterləri
+        if (filters.startDate && filters.endDate) {
+          query.andWhere("card.close_date BETWEEN :start AND :end", {
+            start: filters.startDate,
+            end: filters.endDate,
+          });
+        } else if (filters.startDate) {
+          query.andWhere("card.close_date >= :start", { start: filters.startDate });
+        } else if (filters.endDate) {
+          query.andWhere("card.close_date <= :end", { end: filters.endDate });
+        }
+
+        // Digər filterlər
+        if (filters.cardNumber) query.andWhere("card.id = :cardNumber", { cardNumber: filters.cardNumber });
+        if (filters.cardStatus && filters.cardStatus !== "all") {
+          const isOpen = filters.cardStatus === "open";
+          query.andWhere("card.is_open = :isOpen", { isOpen });
+        }
+        if (filters.banNumber) query.andWhere("card.qostNumber = :banNumber", { banNumber: filters.banNumber });
+        if (filters.paymentType) query.andWhere("card.paymentType = :paymentType", { paymentType: filters.paymentType });
+        if (filters.clientId) query.andWhere("client.id = :clientId", { clientId: filters.clientId });
+        if (filters.manufactured) query.andWhere("card.manufactured = :manufactured", { manufactured: filters.manufactured });
+        if (filters.workerId) query.andWhere("jobWorkers.user_id = :workerId", { workerId: filters.workerId });
+        if (filters.receptionId) query.andWhere("user.id = :receptionId", { receptionId: filters.receptionId });
+        if (filters.legalOrPhysical) query.andWhere("client.type_of_status = :legalOrPhysical", { legalOrPhysical: filters.legalOrPhysical });
+        if (filters.customerType) query.andWhere("client.type = :customerType", { customerType: filters.customerType });
+        if (filters.carNumber) query.andWhere("card.car_number = :carNumber", { carNumber: filters.carNumber });
+
+        result = await query.getMany();
+        break;
+
+      case "Gəlir":
+        // result = await AppDataSource.getRepository(Income)
+        //   .createQueryBuilder("income")
+        //   .where(filters.startDate ? "income.date >= :startDate" : "1=1", { startDate: filters.startDate })
+        //   .andWhere(filters.endDate ? "income.date <= :endDate" : "1=1", { endDate: filters.endDate })
+        //   .andWhere(filters.code ? "income.code = :code" : "1=1", { code: filters.code })
+        //   .andWhere(filters.orderNumber ? "income.orderNumber = :orderNumber" : "1=1", { orderNumber: filters.orderNumber })
+        //   .getMany();
+        break;
+
+      case "Xərc":
+        // result = await AppDataSource.getRepository(Expense)
+        //   .createQueryBuilder("expense")
+        //   .where(filters.startDate ? "expense.date >= :startDate" : "1=1", { startDate: filters.startDate })
+        //   .andWhere(filters.endDate ? "expense.date <= :endDate" : "1=1", { endDate: filters.endDate })
+        //   .andWhere(filters.client ? "expense.clientId = :client" : "1=1", { client: filters.client })
+        //   .getMany();
+        break;
+
+      case "Briqada":
+        // result = await AppDataSource.getRepository(Briqada)
+        //   .createQueryBuilder("briqada")
+        //   .where(filters.team ? "briqada.team = :team" : "1=1", { team: filters.team })
+        //   .getMany();
+        break;
+
+      default:
+        return res.status(400).json({ message: "Invalid tab" });
     }
 
-    // Other filters
-    if (filters.cardNumber) {
-      query.andWhere("card.id = :cardNumber", {
-        cardNumber: filters.cardNumber,
-      });
-    }
-
-    if (filters.cardStatus && filters.cardStatus !== "all") {
-      const isOpen = filters.cardStatus === "open";
-      query.andWhere("card.is_open = :isOpen", { isOpen });
-    }
-    if (filters.banNumber && filters.banNumber.trim() !== "") {
-      query.andWhere("card.qostNumber = :banNumber", {
-        banNumber: filters.banNumber.trim(),
-      });
-    }
-    if (filters.paymentType) {
-      query.andWhere("card.paymentType = :paymentType", {
-        paymentType: filters.paymentType,
-      });
-    }
-    if (filters.clientId) {
-      query.andWhere("client.id = :clientId", { clientId: filters.clientId });
-    }
-    if (filters.manufactured) {
-      query.andWhere("card.manufactured = :manufactured", {
-        manufactured: filters.manufactured,
-      });
-    }
-    if (filters.receptionId) {
-      query.andWhere("card.user_id = :receptionId", {
-        receptionId: filters.receptionId,
-      });
-    }
-
-    if (filters.legalOrPhysical) {
-      query.andWhere("client.type_of_status = :legalOrPhysical", {
-        legalOrPhysical: filters.legalOrPhysical,
-      });
-    }
-
-    if (filters.customerType) {
-      query.andWhere("client.type = :customerType", {
-        customerType: filters.customerType,
-      });
-    }
-
-    if (filters.carNumber && filters.carNumber.trim() !== "") {
-      query.andWhere("card.car_number = :carNumber", {
-        carNumber: filters.carNumber.trim(),
-      });
-    }
-    // if (filters.minAmount) {
-    //   query.andWhere('card.amount >= :minAmount', { minAmount: filters.minAmount });
-    // }
-    // if (filters.maxAmount) {
-    //   query.andWhere('card.amount <= :maxAmount', { maxAmount: filters.maxAmount });
-    // }
-
-    const cards = await query.getMany(); // fetch results with joined client and user
-
-    // log(cards);
-
-    res.json(cards);
+    return res.json(result);
   } catch (error) {
     console.error("FilterCards error:", error);
     res.status(500).json({ message: "Error filtering cards." });
@@ -651,8 +628,12 @@ export const updateCard = async (
     existingCard.warrantyPart = cardData.warrantyPart;
     existingCard.warrantyAddExpenses = cardData.warrantyAddExpenses;
     existingCard.warrantyCurrency = cardData.warrantyCurrency;
-    existingCard.warrantyPaidDate = cardData.warrantyPaidDate ? new Date() : null;
-    existingCard.warrantySendDate = cardData.warrantySendDate ? new Date() : null;
+    existingCard.warrantyPaidDate = cardData.warrantyPaidDate
+      ? new Date()
+      : null;
+    existingCard.warrantySendDate = cardData.warrantySendDate
+      ? new Date()
+      : null;
 
     await cardRepository.save(existingCard);
 

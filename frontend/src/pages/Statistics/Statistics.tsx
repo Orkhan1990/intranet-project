@@ -9,82 +9,103 @@ import Briqada from "../../components/Statistics/Briqada";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import {
-  fetchCards,
+  // fetchCards,
+  resetActiveTabFilter,
   setActiveTab,
 } from "../../redux-toolkit/features/filters/filterSlice";
-import { Link, useLocation } from "react-router-dom";
+// import { clearCards } from "../../redux-toolkit/features/card/cardSlice";
+import { Link } from "react-router-dom";
+import { filterTheCardsAPI } from "../../api/allApi";
 
 const Statistics = () => {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [loading, setLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
+  const activeTab = useSelector((state: RootState) => state.filter.activeTab);
+  const [cards, setCards] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const [filters, setFilters] = useState<any>({
+    startDate: null,
+    endDate: null,
+    cardStatus: "",
+    cardNumber: "",
+    banNumber: "",
+    paymentType: "",
+    clientId: "",
+    manufactured: "",
+    workerId: "",
+    receptionId: "",
+    minAmount: "",
+    maxAmount: "",
+    customerType: "",
+    legalOrPhysical: "",
+    carNumber: "",
+    code: "",
+    invoice: "",
+    market: "",
+    orderNumber: "",
+    supplier: "",
+    warehouse: false,
+    client: "",
+    project: "",
+    team: "",
+  });
 
   const tabs = ["İş kartı", "Gəlir", "Xərc", "Briqada"];
 
-  const filters = useSelector((state: RootState) => state.filter);
-  const cards = useSelector((state: RootState) => state.card.cards);
-  const activeTab = useSelector((state: RootState) => state.filter.activeTab);
-
-  const location = useLocation();
-
   useEffect(() => {
-    dispatch(fetchCards(filters));
-  }, [location.pathname]);
+    dispatch(resetActiveTabFilter());
+  }, [dispatch]);
 
-  useEffect(() => {
-    const autoFetch = async () => {
-      setLoading(true);
+  // filter input change
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFilters((prev: any) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
-      const currentFilters = {
-        ...filters,
-        startDate: startDate?.toISOString() ?? null,
-        endDate: endDate?.toISOString() ?? null,
-      };
+  // datepicker change
+  const handleDateChange = (date: Date | null, name: string) => {
+    setFilters((prev: any) => ({
+      ...prev,
+      [name]: date,
+    }));
+  };
 
-      await dispatch(fetchCards(currentFilters));
-      setLoading(false);
-    };
-
-    autoFetch();
-  }, []); // ⬅️ SADECE MOUNT OLANDA
-
-  console.log({ cards, loading });
-
+  // Fetch cards API
   const handleFetch = async () => {
     setLoading(true);
 
-    const currentFilters = {
+    const payload = {
+      tab: activeTab,
       ...filters,
-      startDate: startDate?.toISOString() ?? null,
-      endDate: endDate?.toISOString() ?? null,
     };
 
-    // BURDA YALNIZ FETCH ET
-    await dispatch(fetchCards(currentFilters));
+    try {
+      const response = await filterTheCardsAPI(payload);
+      setCards(response);
+    } catch (err) {
+      console.error(err);
+      setCards([]);
+    }
 
     setLoading(false);
   };
 
-
-const warrantyStatusColor = (
-  payment: string,
-  warrantyStatus: string
-) => {
-  if (payment !== "warranty") return "hover:bg-gray-50 transition";
-
-  switch (warrantyStatus) {
-    case "none":
-      return "bg-red-600";
-    case "send":
-      return "bg-yellow-200";
-    case "paid":
-      return "bg-green-500";
-    default:
-      return "";
-  }
-};
-
+  // Warranty row color
+  const warrantyStatusColor = (payment: string, warrantyStatus: string) => {
+    if (payment !== "warranty") return "hover:bg-gray-50 transition";
+    switch (warrantyStatus) {
+      case "none":
+        return "bg-red-600";
+      case "send":
+        return "bg-yellow-200";
+      case "paid":
+        return "bg-green-500";
+      default:
+        return "";
+    }
+  };
   return (
     <div className="min-h-screen ">
       <div className=" ml-20 mt-20">
@@ -96,10 +117,9 @@ const warrantyStatusColor = (
                   Başlanğıc tarix
                 </label>
                 <DatePicker
-                  selected={startDate}
-                  onChange={(date: any) => setStartDate(date)}
+                  selected={filters.startDate}
+                  onChange={(date) => handleDateChange(date, "startDate")}
                   className="border border-gray-300 text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-                  dateFormat="dd-MM-yyyy"
                   placeholderText="Tarix seçin"
                 />
               </div>
@@ -108,10 +128,9 @@ const warrantyStatusColor = (
                   Son tarix
                 </label>
                 <DatePicker
-                  selected={endDate}
-                  onChange={(date: any) => setEndDate(date)}
+                  selected={filters.endDate}
+                  onChange={(date) => handleDateChange(date, "endDate")}
                   className="border border-gray-300 text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-                  dateFormat="dd-MM-yyyy"
                   placeholderText="Tarix seçin"
                 />
               </div>
@@ -135,17 +154,53 @@ const warrantyStatusColor = (
                     className={`cursor-pointer hover:underline whitespace-nowrap px-2 py-1 rounded ${
                       activeTab === tab ? "bg-red-700 text-white underline" : ""
                     }`}
-                    onClick={() => dispatch(setActiveTab(tab))}
+                      onClick={() => {
+        dispatch(setActiveTab(tab));
+        setFilters({
+          startDate: null,
+          endDate: null,
+          cardStatus: "",
+          cardNumber: "",
+          banNumber: "",
+          paymentType: "",
+          clientId: "",
+          manufactured: "",
+          workerId: "",
+          receptionId: "",
+          minAmount: "",
+          maxAmount: "",
+          customerType: "",
+          legalOrPhysical: "",
+          carNumber: "",
+          code: "",
+          invoice: "",
+          market: "",
+          orderNumber: "",
+          supplier: "",
+          warehouse: false,
+          client: "",
+          project: "",
+          team: "",
+        });
+      }}
                   >
                     {tab}
                   </span>
                 ))}
               </div>
               <div>
-                {activeTab === "İş kartı" && <WorkerCard />}
-                {activeTab === "Gəlir" && <Incoming />}
-                {activeTab === "Xərc" && <Expenses />}
-                {activeTab === "Briqada" && <Briqada />}
+                {activeTab === "İş kartı" && (
+                  <WorkerCard filters={filters} handleChange={handleChange} />
+                )}
+                {activeTab === "Gəlir" && (
+                  <Incoming filters={filters} handleChange={handleChange} />
+                )}
+                {activeTab === "Xərc" && (
+                  <Expenses filters={filters} handleChange={handleChange} />
+                )}
+                {activeTab === "Briqada" && (
+                  <Briqada filters={filters} handleChange={handleChange} />
+                )}
               </div>
             </div>
           </div>
@@ -162,6 +217,12 @@ const warrantyStatusColor = (
       </div>
       {loading && cards.length === 0 && (
         <p className="text-center mt-10 text-gray-500 italic">Yüklənir...</p>
+      )}
+
+      {!loading && cards.length === 0 && (
+        <p className="text-center mt-10 text-gray-500 italic">
+          Nəticə tapılmadı
+        </p>
       )}
 
       {cards && cards.length > 0 && (

@@ -23,11 +23,16 @@ const initialState: CardsState = {
 const cardsSlice = createSlice({
   name: "cards",
   initialState: initialState,
-  reducers: {},
+  reducers: {
+      clearCards: (state) => {
+      state.cards = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCards.pending, (state) => {
         state.loading = true;
+        state.cards = [];
       })
       .addCase(fetchCards.fulfilled, (state, action) => {
         state.loading = false;
@@ -39,5 +44,5 @@ const cardsSlice = createSlice({
       });
   },
 });
-
+export const { clearCards } = cardsSlice.actions;
 export default cardsSlice.reducer;
