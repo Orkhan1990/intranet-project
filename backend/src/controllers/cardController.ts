@@ -367,20 +367,32 @@ export const filterCards = async (req: Request, res: Response) => {
 
     switch (filters.tab) {
     case "İş kartı": {
-  const query = AppDataSource.getRepository(Card)
-    .createQueryBuilder("card")
-    .leftJoinAndSelect("card.client", "client")
-    .leftJoinAndSelect("card.user", "user")
-    .leftJoinAndSelect("card.closedByUser", "closedByUser")
-    .leftJoinAndSelect("card.cardJobs", "cardJobs")
-    .leftJoinAndSelect("cardJobs.workers", "jobWorkers")
-    .leftJoinAndSelect("jobWorkers.user", "workerUser")
-    .leftJoinAndSelect("card.cardParts", "cardParts")
-    .leftJoinAndSelect("card.cardProblems", "cardProblems")
-    .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
-    .leftJoinAndSelect("card.expenses", "cardExpenses")
-    .leftJoinAndSelect("card.account", "account")
-    .leftJoinAndSelect("card.repair", "repair");
+const query = AppDataSource.getRepository(Card)
+  .createQueryBuilder("card")
+
+  // CARD RELATIONS
+  .leftJoinAndSelect("card.client", "client")
+  .leftJoinAndSelect("card.user", "receptionUser")
+  .leftJoinAndSelect("card.closedByUser", "closedUser")
+
+  // JOB RELATIONS
+  .leftJoinAndSelect("card.cardJobs", "cardJobs")
+  .leftJoinAndSelect("cardJobs.workers", "jobWorkers")
+  .leftJoinAndSelect("jobWorkers.user", "workerUser")
+
+  // CARD DATA
+  .leftJoinAndSelect("card.cardParts", "cardParts")
+  .leftJoinAndSelect("card.cardProblems", "cardProblems")
+  .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
+
+  // FINANCE
+  .leftJoinAndSelect("card.expenses", "cardExpenses")
+  .leftJoinAndSelect("card.account", "account")
+
+  // REPAIR
+  .leftJoinAndSelect("card.repair", "repair")
+
+  .distinct(true);
 
   // Tarixləri Date obyektinə çeviririk
   let start: Date | null = filters.startDate ? new Date(filters.startDate) : null;
@@ -429,8 +441,11 @@ export const filterCards = async (req: Request, res: Response) => {
   if (filters.paymentType) query.andWhere("card.paymentType = :paymentType", { paymentType: filters.paymentType });
   if (filters.clientId) query.andWhere("client.id = :clientId", { clientId: filters.clientId });
   if (filters.manufactured) query.andWhere("card.manufactured = :manufactured", { manufactured: filters.manufactured });
-  if (filters.workerId) query.andWhere("jobWorkers.user_id = :workerId", { workerId: filters.workerId });
-  if (filters.receptionId) query.andWhere("user.id = :receptionId", { receptionId: filters.receptionId });
+if (filters.workerId) {
+  query.andWhere("workerUser.id = :workerId", {
+    workerId: filters.workerId,
+  });
+}  if (filters.receptionId) query.andWhere("user.id = :receptionId", { receptionId: filters.receptionId });
   if (filters.legalOrPhysical) query.andWhere("client.type_of_status = :legalOrPhysical", { legalOrPhysical: filters.legalOrPhysical });
   if (filters.customerType) query.andWhere("client.type = :customerType", { customerType: filters.customerType });
   if (filters.carNumber) query.andWhere("card.car_number = :carNumber", { carNumber: filters.carNumber });
