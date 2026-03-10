@@ -135,7 +135,7 @@ const UpdateCard = () => {
         carNumber: data.carNumber || "",
         produceDate: data.produceDate || "",
         km: data.km || "",
-        qostNumber: data.qostNumber || "",
+        engineNumber: data.engineNumber || "",
         paymentType: data.paymentType || "transfer",
         nds: data.nds || false,
         repairAgain: data.repairAgain || false,
@@ -565,7 +565,7 @@ const UpdateCard = () => {
                     <div className="flex flex-col gap-4">
                       <div>
                         <label className="block mb-1 font-medium">
-                          Katın nömrəsi
+                          Kart nömrəsi
                         </label>
                         <Field
                           as={TextInput}
@@ -744,12 +744,12 @@ const UpdateCard = () => {
                       {/* Maşın nömrəsi */}
                       <div>
                         <label className="block mb-1 font-medium">
-                          Maşın nömrəsi
+                          Mühərrik nömrəsi
                         </label>
                         <Field
                           as={TextInput}
-                          name="carNumber"
-                          placeholder="Maşın nömrəsi"
+                          name="engineNumber"
+                          placeholder="Mühərrik nömrəsi"
                           sizing="sm"
                           disabled={!cardData?.isOpen}
                           className="w-1/3"
@@ -798,7 +798,7 @@ const UpdateCard = () => {
                         </label>
                         <Field
                           as={TextInput}
-                          name="qostNumber"
+                          name="carNumber"
                           placeholder="Dövlət nömrəsi"
                           sizing="sm"
                           disabled={!cardData?.isOpen}

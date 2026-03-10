@@ -74,7 +74,7 @@ export interface NewCardInterface {
   carNumber: string;
   produceDate: string;
   km: string;
-  qostNumber: string;
+  engineNumber: string;
   paymentType: string;
   nds: boolean;
   repairAgain: boolean;
@@ -111,7 +111,7 @@ export interface UpdateCardInterface {
   carNumber: string;
   produceDate: string;
   km: string;
-  qostNumber: string;
+  engineNumber: string;
   paymentType: string;
   nds: boolean;
   repairAgain: boolean;

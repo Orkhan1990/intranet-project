@@ -48,7 +48,7 @@ const newCardInitialValues: NewCardInterface = {
   carNumber: "",
   produceDate: "2025",
   km: "",
-  qostNumber: "",
+  engineNumber: "",
   paymentType: "transfer",
   nds: false,
   repairAgain: false,
@@ -461,12 +461,12 @@ const NewCard = () => {
                       {/* Maşın nömrəsi */}
                       <div>
                         <label className="block mb-1 font-medium">
-                          Maşın nömrəsi
+                          Mühərrik nömrəsi
                         </label>
                         <Field
                           as={TextInput}
-                          name="carNumber"
-                          placeholder="Maşın nömrəsi"
+                          name="engineNumber"
+                          placeholder="Mühərrik nömrəsi"
                           sizing="sm"
                           className="w-1/3"
                         />
@@ -512,7 +512,7 @@ const NewCard = () => {
                         </label>
                         <Field
                           as={TextInput}
-                          name="qostNumber"
+                          name="carNumber"
                           placeholder="Dövlət nömrəsi"
                           sizing="sm"
                           className="w-1/3"

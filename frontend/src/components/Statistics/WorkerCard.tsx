@@ -29,7 +29,7 @@ const WorkerCard = ({ filters, handleChange }: any) => {
   const {
     cardStatus,
     cardNumber,
-    banNumber,
+    sassiNumber,
     paymentType,
     clientId,
     manufactured,
@@ -69,7 +69,7 @@ const WorkerCard = ({ filters, handleChange }: any) => {
         {/* CARD DETAILS */}
         <div className="flex flex-col gap-5">
           <div>
-            <label className="text-sm">Kartın nömrəsi</label>
+            <label className="text-sm">Kart nömrəsi</label>
             <TextInput
               name="cardNumber"
               sizing="sm"
@@ -79,11 +79,11 @@ const WorkerCard = ({ filters, handleChange }: any) => {
           </div>
 
           <div>
-            <label className="text-sm">Ban nömrəsi</label>
+            <label className="text-sm">Şassi nömrəsi</label>
             <TextInput
-              name="banNumber"
+              name="sassiNumber"
               sizing="sm"
-              value={banNumber || ""}
+              value={sassiNumber || ""}
               onChange={handleChange}
             />
           </div>

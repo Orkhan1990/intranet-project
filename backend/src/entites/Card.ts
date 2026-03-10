@@ -149,8 +149,8 @@ warrantyCurrency: string;
   @Column({ name: "km", nullable: true })
   km: string;
 
-  @Column({ name: "qost_number", nullable: true })
-  qostNumber: string;
+  @Column({ name: "engine_number", nullable: true })
+  engineNumber: string;
 
   @Column({ name: "payment_type", nullable: true })
   paymentType: string;
