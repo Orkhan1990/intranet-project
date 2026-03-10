@@ -425,7 +425,7 @@ export const filterCards = async (req: Request, res: Response) => {
     const isOpen = filters.cardStatus === "open";
     query.andWhere("card.is_open = :isOpen", { isOpen });
   }
-  if (filters.banNumber) query.andWhere("card.qostNumber = :banNumber", { banNumber: filters.banNumber });
+  if (filters.sassiNumber) query.andWhere("card.sassi = :sassi", { sassi: filters.sassiNumber });
   if (filters.paymentType) query.andWhere("card.paymentType = :paymentType", { paymentType: filters.paymentType });
   if (filters.clientId) query.andWhere("client.id = :clientId", { clientId: filters.clientId });
   if (filters.manufactured) query.andWhere("card.manufactured = :manufactured", { manufactured: filters.manufactured });

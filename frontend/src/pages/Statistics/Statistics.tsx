@@ -161,7 +161,7 @@ const Statistics = () => {
           endDate: null,
           cardStatus: "",
           cardNumber: "",
-          banNumber: "",
+          sassiNumber: "",
           paymentType: "",
           clientId: "",
           manufactured: "",
