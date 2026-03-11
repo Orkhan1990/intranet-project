@@ -1,11 +1,22 @@
 import { Select, TextInput } from "flowbite-react";
+import { AppDispatch, RootState } from "../../redux-toolkit/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { setIncomingFilter } from "../../redux-toolkit/features/filters/filterSlice";
 
-interface IncomingProps {
-  filters: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-}
+// interface IncomingProps {
+//   filters: any;
+//   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+// }
 
-const Incoming = ({ filters, handleChange }: IncomingProps) => {
+const Incoming = () => {
+ const dispatch: AppDispatch = useDispatch();
+   const filters = useSelector((state: RootState) => state.filter.incomingFilters);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    dispatch(setIncomingFilter({ [name]: value }));
+  };
+
   const {
     code,
     orderNumber,

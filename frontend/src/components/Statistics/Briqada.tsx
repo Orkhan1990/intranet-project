@@ -1,6 +1,16 @@
 import { Select } from "flowbite-react";
+import { setBrigadeFilter } from "../../redux-toolkit/features/filters/filterSlice";
+import { AppDispatch, RootState } from "../../redux-toolkit/store/store";
+import { useDispatch, useSelector } from "react-redux";
 
-const Briqada = ({ filters, handleChange }: any) => {
+const Briqada = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const filters = useSelector((state: RootState) => state.filter.brigadeFilters);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    dispatch(setBrigadeFilter({ [name]: value }));
+  };
 
   return (
     <div className="w-[60%] border border-yellow-300 p-10 rounded-md">

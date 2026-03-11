@@ -1,15 +1,24 @@
 import { Select, TextInput } from "flowbite-react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux-toolkit/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux-toolkit/store/store";
+import { setExpensesFilter } from "../../redux-toolkit/features/filters/filterSlice";
 
-interface ExpensesProps {
-  filters: any;
-  handleChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => void;
-}
+// interface ExpensesProps {
+//   filters: any;
+//   handleChange: (
+//     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+//   ) => void;
+// }
 
-const Expenses = ({ filters, handleChange }: ExpensesProps) => {
+const Expenses = () => {
+
+   const dispatch: AppDispatch = useDispatch();
+  const filters = useSelector((state: RootState) => state.filter.expenseFilters);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    dispatch(setExpensesFilter({ [name]: value }));
+  };
   const {
     code,
     clientId,

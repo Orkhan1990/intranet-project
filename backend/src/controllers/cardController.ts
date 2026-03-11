@@ -361,6 +361,34 @@ export const filterCards = async (req: Request, res: Response) => {
     const { filters } = req.body;
     let result: any[] = [];
 
+    console.log(filters);
+    
+   // Yalnız filter sahələrini nəzərə alırıq, tab-ı yox
+const filterFields = [
+  "startDate",
+  "endDate",
+  "cardNumber",
+  "cardStatus",
+  "sassiNumber",
+  "paymentType",
+  "clientId",
+  "manufactured",
+  "workerId",
+  "receptionId",
+  "legalOrPhysical",
+  "customerType",
+  "carNumber",
+];
+
+const hasAnyFilter = filterFields.some(field => {
+  const value = filters[field];
+  return value !== null && value !== undefined && value !== "";
+});
+
+if (!hasAnyFilter) {
+    return res.json([]); // boş nəticə qaytar
+}
+
     // Frontend-dən gələn startDate və endDate-ə saat əlavə edirik
     // const startDate = filters.startDate ? `${filters.startDate} 00:00:00` : null;
     // const endDate = filters.endDate ? `${filters.endDate} 23:59:59` : null;

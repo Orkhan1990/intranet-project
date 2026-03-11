@@ -29,11 +29,11 @@ import { fetchUsers } from "../../redux-toolkit/features/user/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
 import { ClientCar, JobListInterface, UpdateCardInterface } from "../../types";
-import { fetchCards } from "../../redux-toolkit/features/filters/filterSlice";
 import WayOutAutoLogic from "../../components/Card/WayOutAutoLogic";
 import SpecialPricingOverride from "../../components/Card/SpecialPricingOverride";
 import WayOutResetLogic from "../../components/Card/WayOutResetLogic";
 import { WarrantyStatus } from "../../enums/projectEnums";
+import { fetchCards } from "../../redux-toolkit/features/filters/filterSlice";
 
 const types = [
   "Tiqac",

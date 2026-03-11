@@ -1,5 +1,5 @@
 import { Button } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // required
 import WorkerCard from "../../components/Statistics/WorkerCard";
@@ -9,77 +9,58 @@ import Briqada from "../../components/Statistics/Briqada";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import {
-  // fetchCards,
-  resetActiveTabFilter,
   setActiveTab,
+  setStartEndDate,
 } from "../../redux-toolkit/features/filters/filterSlice";
-// import { clearCards } from "../../redux-toolkit/features/card/cardSlice";
 import { Link } from "react-router-dom";
 import { filterTheCardsAPI } from "../../api/allApi";
 
 const Statistics = () => {
   const dispatch: AppDispatch = useDispatch();
-  const activeTab = useSelector((state: RootState) => state.filter.activeTab);
+  const {
+    activeTab,
+    startDate,
+    endDate,
+    workerCardFilters,
+    incomingFilters,
+    expenseFilters,
+    brigadeFilters,
+  } = useSelector((state: RootState) => state.filter);
+
   const [cards, setCards] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [filters, setFilters] = useState<any>({
-    startDate: null,
-    endDate: null,
-    cardStatus: "",
-    cardNumber: "",
-    sassiNumber: "",
-    paymentType: "",
-    clientId: "",
-    manufactured: "",
-    workerId: "",
-    receptionId: "",
-    minAmount: "",
-    maxAmount: "",
-    customerType: "",
-    legalOrPhysical: "",
-    carNumber: "",
-    code: "",
-    invoice: "",
-    market: "",
-    orderNumber: "",
-    supplier: "",
-    warehouse: false,
-    client: "",
-    project: "",
-    team: "",
-  });
-
   const tabs = ["İş kartı", "Gəlir", "Xərc", "Briqada"];
 
-  useEffect(() => {
-    dispatch(resetActiveTabFilter());
-  }, [dispatch]);
-
-  // filter input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFilters((prev: any) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  // Date picker üçün
+  const handleDateChange = (date: Date | null, name: "startDate" | "endDate") => {
+    dispatch(setStartEndDate({ [name]: date }));
   };
 
-  // datepicker change
-  const handleDateChange = (date: Date | null, name: string) => {
-    setFilters((prev: any) => ({
-      ...prev,
-      [name]: date,
-    }));
-  };
-
-  // Fetch cards API
+  // API fetch
   const handleFetch = async () => {
     setLoading(true);
 
-    const payload = {
+    let payload: any = {
       tab: activeTab,
-      ...filters,
+      startDate,
+      endDate,
     };
+
+    switch (activeTab) {
+      case "İş kartı":
+        payload = { ...payload, ...workerCardFilters };
+        break;
+      case "Gəlir":
+        payload = { ...payload, ...incomingFilters };
+        break;
+      case "Xərc":
+        payload = { ...payload, ...expenseFilters };
+        break;
+      case "Briqada":
+        payload = { ...payload, ...brigadeFilters };
+        break;
+    }
 
     try {
       const response = await filterTheCardsAPI(payload);
@@ -87,9 +68,9 @@ const Statistics = () => {
     } catch (err) {
       console.error(err);
       setCards([]);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   // Warranty row color
@@ -117,7 +98,7 @@ const Statistics = () => {
                   Başlanğıc tarix
                 </label>
                 <DatePicker
-                  selected={filters.startDate}
+                  selected={startDate ? new Date(startDate) : null}
                   onChange={(date) => handleDateChange(date, "startDate")}
                   className="border border-gray-300 text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                   placeholderText="Tarix seçin"
@@ -128,7 +109,7 @@ const Statistics = () => {
                   Son tarix
                 </label>
                 <DatePicker
-                  selected={filters.endDate}
+                  selected={endDate ? new Date(endDate) : null}
                   onChange={(date) => handleDateChange(date, "endDate")}
                   className="border border-gray-300 text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                   placeholderText="Tarix seçin"
@@ -154,53 +135,19 @@ const Statistics = () => {
                     className={`cursor-pointer hover:underline whitespace-nowrap px-2 py-1 rounded ${
                       activeTab === tab ? "bg-red-700 text-white underline" : ""
                     }`}
-                      onClick={() => {
-        dispatch(setActiveTab(tab));
-        setFilters({
-          startDate: null,
-          endDate: null,
-          cardStatus: "",
-          cardNumber: "",
-          sassiNumber: "",
-          paymentType: "",
-          clientId: "",
-          manufactured: "",
-          workerId: "",
-          receptionId: "",
-          minAmount: "",
-          maxAmount: "",
-          customerType: "",
-          legalOrPhysical: "",
-          carNumber: "",
-          code: "",
-          invoice: "",
-          market: "",
-          orderNumber: "",
-          supplier: "",
-          warehouse: false,
-          client: "",
-          project: "",
-          team: "",
-        });
-      }}
+                    onClick={() => {
+                      dispatch(setActiveTab(tab));
+                    }}
                   >
                     {tab}
                   </span>
                 ))}
               </div>
               <div>
-                {activeTab === "İş kartı" && (
-                  <WorkerCard filters={filters} handleChange={handleChange} />
-                )}
-                {activeTab === "Gəlir" && (
-                  <Incoming filters={filters} handleChange={handleChange} />
-                )}
-                {activeTab === "Xərc" && (
-                  <Expenses filters={filters} handleChange={handleChange} />
-                )}
-                {activeTab === "Briqada" && (
-                  <Briqada filters={filters} handleChange={handleChange} />
-                )}
+                {activeTab === "İş kartı" && <WorkerCard />}
+                {activeTab === "Gəlir" && <Incoming />}
+                {activeTab === "Xərc" && <Expenses />}
+                {activeTab === "Briqada" && <Briqada />}
               </div>
             </div>
           </div>

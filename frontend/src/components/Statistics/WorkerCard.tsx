@@ -5,8 +5,9 @@ import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
+import { setWorkerCardFilter } from "../../redux-toolkit/features/filters/filterSlice";
 
-const WorkerCard = ({ filters, handleChange }: any) => {
+const WorkerCard = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { users } = useSelector((state: RootState) => state.user);
@@ -15,9 +16,22 @@ const WorkerCard = ({ filters, handleChange }: any) => {
 
   const receptions = users.filter((p) => p.isReception === true);
   const serviceWorkers = users.filter(
-    (p) => p.isWorker === true && p.userRole === "ServiceUser"
+    (p) => p.isWorker === true && p.userRole === "ServiceUser",
   );
+  const filters = useSelector(
+    (state: RootState) => state.filter.workerCardFilters,
+  );
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const target = e.target;
+    const { name, value, type } = target;
 
+    const newValue =
+      type === "checkbox" && "checked" in target ? target.checked : value;
+
+    dispatch(setWorkerCardFilter({ [name]: newValue }));
+  };
   useEffect(() => {
     dispatch(fetchUsers());
     dispatch(fetchBrands());
@@ -45,7 +59,6 @@ const WorkerCard = ({ filters, handleChange }: any) => {
   return (
     <div className="w-[97%] border border-yellow-300 p-4 rounded-md">
       <form className="flex gap-10 items-center">
-
         {/* CARD STATUS */}
         <div className="flex flex-col gap-3">
           {[
