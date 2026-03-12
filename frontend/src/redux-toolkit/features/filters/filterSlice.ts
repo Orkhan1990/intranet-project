@@ -87,10 +87,15 @@ const filterSlice = createSlice({
   name: "filter",
   initialState,
   reducers: {
-    setActiveTab(state, action: PayloadAction<string>) {
-      state.activeTab = action.payload;
-    },
-
+   setActiveTab(state, action: PayloadAction<string>) {
+  state.activeTab = action.payload;
+  // Tab dəyişəndə filterləri reset et
+  state.workerCardFilters = initialState.workerCardFilters;
+  state.incomingFilters = initialState.incomingFilters;
+  state.expenseFilters = initialState.expenseFilters;
+  state.brigadeFilters = initialState.brigadeFilters;
+  state.cards = [];
+},
     setStartEndDate(
       state,
       action: PayloadAction<{ startDate?: Date | null; endDate?: Date | null }>,
