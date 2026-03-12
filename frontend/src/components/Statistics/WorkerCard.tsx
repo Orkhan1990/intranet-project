@@ -54,6 +54,7 @@ const WorkerCard = () => {
     carNumber,
     customerType,
     legalOrPhysical,
+    partNumber
   } = filters;
 
   return (
@@ -116,6 +117,16 @@ const WorkerCard = () => {
               <option value="internal">Daxili iş</option>
               <option value="pos">POS</option>
             </Select>
+          </div>
+
+           <div>
+            <label className="text-sm">E/h Kod</label>
+            <TextInput
+              name="partNumber"
+              sizing="sm"
+              value={partNumber || ""}
+              onChange={handleChange}
+            />
           </div>
         </div>
 

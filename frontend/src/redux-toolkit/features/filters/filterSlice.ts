@@ -36,6 +36,7 @@ const initialState: FilterState = {
     carNumber: "",
     customerType: "",
     legalOrPhysical: "",
+    partNumber: ""
   },
 
   incomingFilters: {

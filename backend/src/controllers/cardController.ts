@@ -362,125 +362,173 @@ export const filterCards = async (req: Request, res: Response) => {
     let result: any[] = [];
 
     console.log(filters);
-    
-   // Yalnız filter sahələrini nəzərə alırıq, tab-ı yox
-const filterFields = [
-  "startDate",
-  "endDate",
-  "cardNumber",
-  "cardStatus",
-  "sassiNumber",
-  "paymentType",
-  "clientId",
-  "manufactured",
-  "workerId",
-  "receptionId",
-  "legalOrPhysical",
-  "customerType",
-  "carNumber",
-];
 
-const hasAnyFilter = filterFields.some(field => {
-  const value = filters[field];
-  return value !== null && value !== undefined && value !== "";
-});
+    // Yalnız filter sahələrini nəzərə alırıq, tab-ı yox
+    const filterFields = [
+      "startDate",
+      "endDate",
+      "cardNumber",
+      "cardStatus",
+      "sassiNumber",
+      "paymentType",
+      "clientId",
+      "manufactured",
+      "workerId",
+      "receptionId",
+      "legalOrPhysical",
+      "customerType",
+      "carNumber",
+      "partNumber"
+    ];
 
-if (!hasAnyFilter) {
-    return res.json([]); // boş nəticə qaytar
-}
+    const hasAnyFilter = filterFields.some((field) => {
+      const value = filters[field];
+      return value !== null && value !== undefined && value !== "";
+    });
+
+    if (!hasAnyFilter) {
+      return res.json([]); // boş nəticə qaytar
+    }
 
     // Frontend-dən gələn startDate və endDate-ə saat əlavə edirik
     // const startDate = filters.startDate ? `${filters.startDate} 00:00:00` : null;
     // const endDate = filters.endDate ? `${filters.endDate} 23:59:59` : null;
 
     switch (filters.tab) {
-    case "İş kartı": {
-const query = AppDataSource.getRepository(Card)
-  .createQueryBuilder("card")
+      case "İş kartı": {
+        const query = AppDataSource.getRepository(Card)
+          .createQueryBuilder("card")
 
-  // CARD RELATIONS
-  .leftJoinAndSelect("card.client", "client")
-  .leftJoinAndSelect("card.user", "receptionUser")
-  .leftJoinAndSelect("card.closedByUser", "closedUser")
+          // CARD RELATIONS
+          .leftJoinAndSelect("card.client", "client")
+          .leftJoinAndSelect("card.user", "receptionUser")
+          .leftJoinAndSelect("card.closedByUser", "closedUser")
 
-  // JOB RELATIONS
-  .leftJoinAndSelect("card.cardJobs", "cardJobs")
-  .leftJoinAndSelect("cardJobs.workers", "jobWorkers")
-  .leftJoinAndSelect("jobWorkers.user", "workerUser")
+          // JOB RELATIONS
+          .leftJoinAndSelect("card.cardJobs", "cardJobs")
+          .leftJoinAndSelect("cardJobs.workers", "jobWorkers")
+          .leftJoinAndSelect("jobWorkers.user", "workerUser")
 
-  // CARD DATA
-  .leftJoinAndSelect("card.cardParts", "cardParts")
-  .leftJoinAndSelect("card.cardProblems", "cardProblems")
-  .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
+          // CARD DATA
+          .leftJoinAndSelect("card.cardParts", "cardParts")
+          .leftJoinAndSelect("card.cardProblems", "cardProblems")
+          .leftJoinAndSelect("cardProblems.serviceWorkers", "serviceWorkers")
 
-  // FINANCE
-  .leftJoinAndSelect("card.expenses", "cardExpenses")
-  .leftJoinAndSelect("card.account", "account")
+          // FINANCE
+          .leftJoinAndSelect("card.expenses", "cardExpenses")
+          .leftJoinAndSelect("card.account", "account")
 
-  // REPAIR
-  .leftJoinAndSelect("card.repair", "repair")
+          // REPAIR
+          .leftJoinAndSelect("card.repair", "repair")
 
-  .distinct(true);
+          .distinct(true);
 
-  // Tarixləri Date obyektinə çeviririk
-  let start: Date | null = filters.startDate ? new Date(filters.startDate) : null;
-  let end: Date | null = filters.endDate ? new Date(filters.endDate) : null;
+        // Tarixləri Date obyektinə çeviririk
+        let start: Date | null = filters.startDate
+          ? new Date(filters.startDate)
+          : null;
+        let end: Date | null = filters.endDate
+          ? new Date(filters.endDate)
+          : null;
 
-  if (start) start.setHours(0, 0, 0, 0);        // start 00:00:00
-  if (end) end.setHours(23, 59, 59, 999);      // end 23:59:59
+        if (start) start.setHours(0, 0, 0, 0); // start 00:00:00
+        if (end) end.setHours(23, 59, 59, 999); // end 23:59:59
 
-  // Tarix filterləri
-  if (start && end) {
-    if (filters.cardStatus === "open") {
-      query.andWhere("card.open_date BETWEEN :start AND :end", { start, end });
-    } else if (filters.cardStatus === "closed") {
-      query.andWhere("card.close_date BETWEEN :start AND :end", { start, end });
-    } else {
-      query.andWhere(
-        `(card.open_date BETWEEN :start AND :end OR card.close_date BETWEEN :start AND :end)`,
-        { start, end }
-      );
-    }
-  } else if (start) {
-    if (filters.cardStatus === "open") {
-      query.andWhere("card.open_date >= :start", { start });
-    } else if (filters.cardStatus === "closed") {
-      query.andWhere("card.close_date >= :start", { start });
-    } else {
-      query.andWhere("(card.open_date >= :start OR card.close_date >= :start)", { start });
-    }
-  } else if (end) {
-    if (filters.cardStatus === "open") {
-      query.andWhere("card.open_date <= :end", { end });
-    } else if (filters.cardStatus === "closed") {
-      query.andWhere("card.close_date <= :end", { end });
-    } else {
-      query.andWhere("(card.open_date <= :end OR card.close_date <= :end)", { end });
-    }
-  }
+        // Tarix filterləri
+        if (start && end) {
+          if (filters.cardStatus === "open") {
+            query.andWhere("card.open_date BETWEEN :start AND :end", {
+              start,
+              end,
+            });
+          } else if (filters.cardStatus === "closed") {
+            query.andWhere("card.close_date BETWEEN :start AND :end", {
+              start,
+              end,
+            });
+          } else {
+            query.andWhere(
+              `(card.open_date BETWEEN :start AND :end OR card.close_date BETWEEN :start AND :end)`,
+              { start, end },
+            );
+          }
+        } else if (start) {
+          if (filters.cardStatus === "open") {
+            query.andWhere("card.open_date >= :start", { start });
+          } else if (filters.cardStatus === "closed") {
+            query.andWhere("card.close_date >= :start", { start });
+          } else {
+            query.andWhere(
+              "(card.open_date >= :start OR card.close_date >= :start)",
+              { start },
+            );
+          }
+        } else if (end) {
+          if (filters.cardStatus === "open") {
+            query.andWhere("card.open_date <= :end", { end });
+          } else if (filters.cardStatus === "closed") {
+            query.andWhere("card.close_date <= :end", { end });
+          } else {
+            query.andWhere(
+              "(card.open_date <= :end OR card.close_date <= :end)",
+              { end },
+            );
+          }
+        }
 
-  // Digər filterlər (sizin əvvəlki kimi)
-  if (filters.cardNumber) query.andWhere("card.id = :cardNumber", { cardNumber: filters.cardNumber });
-  if (filters.cardStatus && filters.cardStatus !== "all") {
-    const isOpen = filters.cardStatus === "open";
-    query.andWhere("card.is_open = :isOpen", { isOpen });
-  }
-  if (filters.sassiNumber) query.andWhere("card.sassi = :sassi", { sassi: filters.sassiNumber });
-  if (filters.paymentType) query.andWhere("card.paymentType = :paymentType", { paymentType: filters.paymentType });
-  if (filters.clientId) query.andWhere("client.id = :clientId", { clientId: filters.clientId });
-  if (filters.manufactured) query.andWhere("card.manufactured = :manufactured", { manufactured: filters.manufactured });
-if (filters.workerId) {
-  query.andWhere("workerUser.id = :workerId", {
-    workerId: filters.workerId,
-  });
-}  if (filters.receptionId) query.andWhere("user.id = :receptionId", { receptionId: filters.receptionId });
-  if (filters.legalOrPhysical) query.andWhere("client.type_of_status = :legalOrPhysical", { legalOrPhysical: filters.legalOrPhysical });
-  if (filters.customerType) query.andWhere("client.type = :customerType", { customerType: filters.customerType });
-  if (filters.carNumber) query.andWhere("card.car_number = :carNumber", { carNumber: filters.carNumber });
+        // Digər filterlər (sizin əvvəlki kimi)
+        if (filters.cardNumber)
+          query.andWhere("card.id = :cardNumber", {
+            cardNumber: filters.cardNumber,
+          });
+       
+          if(filters.partNumber){
+            query.andWhere("cardParts.code = :partNumber", {  partNumber: filters.partNumber });
+          }
 
-  result = await query.getMany();
-  break;
-}
+        if (filters.cardStatus && filters.cardStatus !== "all") {
+          const isOpen = filters.cardStatus === "open";
+          query.andWhere("card.is_open = :isOpen", { isOpen });
+        }
+        if (filters.sassiNumber)
+          query.andWhere("card.sassi = :sassi", { sassi: filters.sassiNumber });
+        if (filters.paymentType)
+          query.andWhere("card.paymentType = :paymentType", {
+            paymentType: filters.paymentType,
+          });
+        if (filters.clientId)
+          query.andWhere("client.id = :clientId", {
+            clientId: filters.clientId,
+          });
+        if (filters.manufactured)
+          query.andWhere("card.manufactured = :manufactured", {
+            manufactured: filters.manufactured,
+          });
+        if (filters.workerId) {
+          query.andWhere("workerUser.id = :workerId", {
+            workerId: filters.workerId,
+          });
+        }
+        if (filters.receptionId)
+          query.andWhere("user.id = :receptionId", {
+            receptionId: filters.receptionId,
+          });
+        if (filters.legalOrPhysical)
+          query.andWhere("client.type_of_status = :legalOrPhysical", {
+            legalOrPhysical: filters.legalOrPhysical,
+          });
+        if (filters.customerType)
+          query.andWhere("client.type = :customerType", {
+            customerType: filters.customerType,
+          });
+        if (filters.carNumber)
+          query.andWhere("card.car_number = :carNumber", {
+            carNumber: filters.carNumber,
+          });
+
+        result = await query.getMany();
+        break;
+      }
 
       case "Gəlir": {
         // const query = AppDataSource.getRepository(Income)
