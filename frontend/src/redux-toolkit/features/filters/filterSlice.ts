@@ -9,6 +9,8 @@ interface FilterState {
   incomingFilters: any;
   expenseFilters: any;
   brigadeFilters: any;
+    cards: any[];
+  loading: boolean;
 }
 
 interface FilterPayload {
@@ -22,6 +24,8 @@ const initialState: FilterState = {
   activeTab: "İş kartı",
   startDate: null,
   endDate: null,
+  cards: [],
+loading: false,
   workerCardFilters: {
     cardStatus: "all",
     cardNumber: "",
@@ -140,6 +144,19 @@ const filterSlice = createSlice({
       state.brigadeFilters = initialState.brigadeFilters;
     },
   },
+  extraReducers: (builder) => {
+  builder
+    .addCase(fetchCards.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(fetchCards.fulfilled, (state, action) => {
+      state.cards = action.payload;
+      state.loading = false;
+    })
+    .addCase(fetchCards.rejected, (state) => {
+      state.loading = false;
+    });
+}
 });
 
 export const {

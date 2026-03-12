@@ -55,7 +55,7 @@ const WorkerCard = () => {
     customerType,
     legalOrPhysical,
     partNumber
-  } = filters;
+  } = filters|| {};
 
   return (
     <div className="w-[97%] border border-yellow-300 p-4 rounded-md">

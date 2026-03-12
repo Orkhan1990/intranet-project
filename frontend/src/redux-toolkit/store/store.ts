@@ -1,45 +1,46 @@
-import { configureStore,combineReducers} from '@reduxjs/toolkit';
-import storage from 'redux-persist/lib/storage/session';
-import { persistReducer,persistStore} from 'redux-persist';
-// import persistStore from 'redux-persist/es/persistStore';
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import storage from "redux-persist/lib/storage/session";
+import { persistReducer, persistStore } from "redux-persist";
+
 import authReducer from "../features/auth/authSlice";
-import brandReducer from '../features/brand/brandSlice';
-import supplierReducer from '../features/supplier/supplierSlice';
-import orderReducer from '../features/order/orderSlice';
-import prixodReducer from '../features/prixod/prixodSlice';
+import brandReducer from "../features/brand/brandSlice";
+import supplierReducer from "../features/supplier/supplierSlice";
+import orderReducer from "../features/order/orderSlice";
+import prixodReducer from "../features/prixod/prixodSlice";
 import userReducer from "../features/user/userSlice";
-import clientReducer from '../features/client/clientSlice';
-import filterReducer from '../features/filters/filterSlice';
-import cardReducer from '../features/card/cardSlice';
+import clientReducer from "../features/client/clientSlice";
+import filterReducer from "../features/filters/filterSlice";
+import cardReducer from "../features/card/cardSlice";
 
-
-const rootReducer=combineReducers({
-  auth:authReducer,
+const rootReducer = combineReducers({
+  auth: authReducer,
   brand: brandReducer,
   supplier: supplierReducer,
   order: orderReducer,
   prixod: prixodReducer,
-  user:userReducer,
-  client:clientReducer,
-  filter:filterReducer,
-  card:cardReducer
-})
+  user: userReducer,
+  client: clientReducer,
+  filter: filterReducer,
+  card: cardReducer,
+});
 
-const persistConfig={
-  key:"root",
+const persistConfig = {
+  key: "root",
   storage,
-  version:1
-}
+  whitelist: ["filter","auth"], // yalnız filter saxlanacaq
+};
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
-  middleware:(getDefaultMiddleware)=>
-    getDefaultMiddleware({serializableCheck:false})
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+});
 
-})
 export const persistor = persistStore(store);
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

@@ -1,5 +1,4 @@
 import { Button } from "flowbite-react";
-import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // required
 import WorkerCard from "../../components/Statistics/WorkerCard";
@@ -9,14 +8,17 @@ import Briqada from "../../components/Statistics/Briqada";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../redux-toolkit/store/store";
 import {
+  fetchCards,
   setActiveTab,
   setStartEndDate,
 } from "../../redux-toolkit/features/filters/filterSlice";
 import { Link } from "react-router-dom";
-import { filterTheCardsAPI } from "../../api/allApi";
+import { useCallback } from "react";
 
 const Statistics = () => {
   const dispatch: AppDispatch = useDispatch();
+
+  // Redux state
   const {
     activeTab,
     startDate,
@@ -25,53 +27,35 @@ const Statistics = () => {
     incomingFilters,
     expenseFilters,
     brigadeFilters,
+    cards=[],
+    loading=false,
   } = useSelector((state: RootState) => state.filter);
-
-  const [cards, setCards] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
 
   const tabs = ["İş kartı", "Gəlir", "Xərc", "Briqada"];
 
-  // Date picker üçün
+  // Date picker handler
   const handleDateChange = (date: Date | null, name: "startDate" | "endDate") => {
     dispatch(setStartEndDate({ [name]: date }));
   };
 
-  // API fetch
-  const handleFetch = async () => {
-    setLoading(true);
-
-    let payload: any = {
+  // Fetch cards
+  const handleFetch = useCallback(() => {
+    const payload: any = {
       tab: activeTab,
       startDate,
       endDate,
+      ...(activeTab === "İş kartı"
+        ? workerCardFilters
+        : activeTab === "Gəlir"
+        ? incomingFilters
+        : activeTab === "Xərc"
+        ? expenseFilters
+        : brigadeFilters),
     };
 
-    switch (activeTab) {
-      case "İş kartı":
-        payload = { ...payload, ...workerCardFilters };
-        break;
-      case "Gəlir":
-        payload = { ...payload, ...incomingFilters };
-        break;
-      case "Xərc":
-        payload = { ...payload, ...expenseFilters };
-        break;
-      case "Briqada":
-        payload = { ...payload, ...brigadeFilters };
-        break;
-    }
+    dispatch(fetchCards(payload));
+  }, [activeTab, startDate, endDate, workerCardFilters, incomingFilters, expenseFilters, brigadeFilters, dispatch]);
 
-    try {
-      const response = await filterTheCardsAPI(payload);
-      setCards(response);
-    } catch (err) {
-      console.error(err);
-      setCards([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Warranty row color
   const warrantyStatusColor = (payment: string, warrantyStatus: string) => {
