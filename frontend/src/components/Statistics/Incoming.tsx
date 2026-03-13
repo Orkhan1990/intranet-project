@@ -11,6 +11,8 @@ import { setIncomingFilter } from "../../redux-toolkit/features/filters/filterSl
 const Incoming = () => {
  const dispatch: AppDispatch = useDispatch();
    const filters = useSelector((state: RootState) => state.filter.incomingFilters);
+     const { brands } = useSelector((state: RootState) => state.brand);
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -33,7 +35,7 @@ const Incoming = () => {
       <form className="flex gap-5 items-center">
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
-            <label className="text-sm">Kod</label>
+            <label className="text-sm">E/h Kod</label>
             <TextInput
               type="text"
               sizing="sm"
@@ -81,8 +83,12 @@ const Incoming = () => {
               onChange={handleChange}
             >
               <option value="">Seç</option>
-              <option value="BM-RS">BM-RS</option>
-              <option value="BF">BF</option>
+              {brands?.map((brand: any) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name}
+                </option>
+              ))}
+      
             </Select>
           </div>
           <div className="flex flex-col gap-1">

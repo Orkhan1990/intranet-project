@@ -94,7 +94,7 @@ const filterSlice = createSlice({
   state.incomingFilters = initialState.incomingFilters;
   state.expenseFilters = initialState.expenseFilters;
   state.brigadeFilters = initialState.brigadeFilters;
-  state.cards = [];
+  // state.cards = [];
 },
     setStartEndDate(
       state,

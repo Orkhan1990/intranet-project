@@ -17,6 +17,7 @@ import { Repair } from "../entites/Repair";
 import { AccountSequence } from "../entites/AccountSequence";
 import { RepairSequence } from "../entites/RepairSequence";
 import { JobList } from "../entites/JobList";
+import { Prixod } from "../entites/Prixod";
 
 const cardPartsRepository = AppDataSource.getRepository(CardPart);
 const cardRepository = AppDataSource.getRepository(Card);
@@ -378,7 +379,7 @@ export const filterCards = async (req: Request, res: Response) => {
       "legalOrPhysical",
       "customerType",
       "carNumber",
-      "partNumber"
+      "partNumber",
     ];
 
     const hasAnyFilter = filterFields.some((field) => {
@@ -481,10 +482,12 @@ export const filterCards = async (req: Request, res: Response) => {
           query.andWhere("card.id = :cardNumber", {
             cardNumber: filters.cardNumber,
           });
-       
-          if(filters.partNumber){
-            query.andWhere("cardParts.code = :partNumber", {  partNumber: filters.partNumber });
-          }
+
+        if (filters.partNumber) {
+          query.andWhere("cardParts.code = :partNumber", {
+            partNumber: filters.partNumber,
+          });
+        }
 
         if (filters.cardStatus && filters.cardStatus !== "all") {
           const isOpen = filters.cardStatus === "open";
@@ -526,20 +529,51 @@ export const filterCards = async (req: Request, res: Response) => {
             carNumber: filters.carNumber,
           });
 
+         
         result = await query.getMany();
         break;
       }
 
       case "Gəlir": {
-        // const query = AppDataSource.getRepository(Income)
-        //   .createQueryBuilder("income");
+        const query = AppDataSource.getRepository(Prixod)
+          .createQueryBuilder("prixod")
+          .leftJoinAndSelect("prixod.spareParts", "spareParts")
+          .leftJoinAndSelect("spareParts.brand", "brand")
+          .leftJoinAndSelect("prixod.order", "order")
+          .leftJoinAndSelect("order.client", "client");
 
-        // if (startDate) query.andWhere("income.date >= :start", { start: startDate });
-        // if (endDate) query.andWhere("income.date <= :end", { end: endDate });
-        // if (filters.code) query.andWhere("income.code = :code", { code: filters.code });
-        // if (filters.orderNumber) query.andWhere("income.orderNumber = :orderNumber", { orderNumber: filters.orderNumber });
 
-        // result = await query.getMany();
+        // Tarix filteri
+        if (filters.startDate)
+          query.andWhere("prixod.createdAt >= :start", {
+            start: filters.startDate,
+          });
+        if (filters.endDate)
+          query.andWhere("prixod.createdAt <= :end", { end: filters.endDate });
+
+        // Əgər part koduna görə filter varsa
+        if (filters.partNumber)
+          query.andWhere("spareParts.code = :partNumber", {
+            partNumber: filters.partNumber,
+          });
+
+        // Əgər order/cardNumber filter varsa
+        if (filters.orderNumber)
+          query.andWhere("order.id = :orderNumber", {
+            orderNumber: filters.orderNumber,
+          });
+
+          if (filters.market)
+          query.andWhere("prixod.market = :market", {
+            market: filters.market,
+          });
+
+            if (filters.brand)
+          query.andWhere("prixod.market = :market", {
+            brand: filters.brand,
+          });
+
+        result = await query.getMany();
         break;
       }
 
