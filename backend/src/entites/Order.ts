@@ -1,4 +1,11 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
 import { AllEntities } from "./AllEntities";
 import { Client } from "./Client";
 import { OrderPart } from "./OrderPart";
@@ -26,7 +33,6 @@ export class Order extends AllEntities {
   @Column()
   model: string;
 
-
   @Column({ name: "chassis_number" })
   chassisNumber: string;
 
@@ -39,7 +45,7 @@ export class Order extends AllEntities {
   @Column()
   km: string;
 
-  @Column({default:false})
+  @Column({ default: false })
   isExcellFile: boolean;
 
   @Column({ name: "vehicle_number" })
@@ -63,7 +69,7 @@ export class Order extends AllEntities {
     enumName: "order_status",
     default: OrderStatus.Open,
   })
-  status:OrderStatus;
+  status: OrderStatus;
 
   @Column()
   comment: string;
@@ -82,15 +88,13 @@ export class Order extends AllEntities {
   @Column({ default: false })
   confirm: boolean;
 
-   
-  
-      @Column({ name: "confirm_date", nullable: true })
-    confirmDate: Date;
+  @Column({ name: "confirm_date", nullable: true })
+  confirmDate: Date;
 
   @Column({ name: "confirm_warehouse_date", nullable: true })
   confirmWarehouseDate: Date;
 
-   @Column({ name: "responsible_start_date", nullable: true })
+  @Column({ name: "responsible_start_date", nullable: true })
   responsibleStartDate: Date;
 
   @Column({ name: "request_to_supplier_date", nullable: true })
@@ -102,58 +106,54 @@ export class Order extends AllEntities {
   @Column({ name: "give_order_date", nullable: true })
   giveOrderDate: Date;
 
+  @Column({ name: "accounting_approval_date", nullable: true })
+  accountingApproval: Date;
 
-   @Column({ name: "accounting_approval_date", nullable: true })
-   accountingApproval: Date;
+  @Column({ name: "payment_date", nullable: true })
+  paymentDate: Date;
 
-   @Column({ name: "payment_date", nullable: true })
-   paymentDate: Date;
+  @Column({ name: "send_date", nullable: true })
+  sendDate: Date;
 
+  @Column({ default: false })
+  accept: boolean;
 
-    @Column({ name: "send_date", nullable: true })
-    sendDate: Date;
+  @Column({ name: "accept_date", nullable: true })
+  acceptDate: Date;
 
+  @Column({ name: "accept_message", nullable: true })
+  acceptMessage: string;
 
-  @Column({default:false})
-  accept:boolean;
+  @Column({ name: "reject_message", nullable: true })
+  rejectMessage: string;
 
-  @Column({name:"accept_date",nullable:true})
-  acceptDate:Date;
+  @Column({ name: "is_responsible", default: false })
+  isResponsible: boolean;
 
-  @Column({name:"accept_message",nullable:true})
-  acceptMessage:string;
+  @Column({ name: "responsible_date", nullable: true })
+  responsibleDate: Date;
 
-  @Column({name:"reject_message",nullable:true})
-  rejectMessage:string;
+  @Column({ name: "responsible_begin_date", nullable: true })
+  responsibleBeginDate: Date;
 
-  @Column({name:"is_responsible",default:false})
-  isResponsible:boolean;
+  @Column({ name: "responsible_message", nullable: true })
+  responsibleMessage: string;
 
-  
-  @Column({name:"responsible_date",nullable:true})
-  responsibleDate:Date;
+  @Column({ name: "is_request_suplier", default: false })
+  isBeginRequestSupplier: boolean;
 
-  @Column({name:"responsible_begin_date",nullable:true})
-  responsibleBeginDate:Date;
+  @Column({ name: "initial_message_to_supplier", nullable: true })
+  firstMessageToSupplier: string;
 
-  @Column({name:"responsible_message",nullable:true})
-  responsibleMessage:string;
-  
-  @Column({name:"is_request_suplier",default:false})
-  isBeginRequestSupplier:boolean;
+  @Column({ name: "second_message_to_supplier", nullable: true })
+  secondMessageToSupplier: string;
 
-  @Column({name:"initial_message_to_supplier",nullable:true})
-  firstMessageToSupplier:string;
+  @Column({ name: "is_finish_calculation", default: false })
+  isFinishCalculation: boolean;
 
-  @Column({name:"second_message_to_supplier",nullable:true})
-  secondMessageToSupplier:string
-
-  @Column({name:"is_finish_calculation",default:false})
-  isFinishCalculation:boolean
-
-  @ManyToMany(()=>Supplier)
+  @ManyToMany(() => Supplier)
   @JoinTable()
-  suppliers:Supplier[];
+  suppliers: Supplier[];
 
   @ManyToOne(() => User, (user) => user.orders)
   user: User;
@@ -167,12 +167,14 @@ export class Order extends AllEntities {
   @OneToMany(() => OrderHistory, (orderHistory) => orderHistory.order)
   orderHistory: OrderHistory[];
 
-  @ManyToOne(() => User, (user) => user.responsibleUserOrders, { nullable: true })
+  @ManyToOne(() => User, (user) => user.responsibleUserOrders, {
+    nullable: true,
+  })
   responsibleUser: User;
 
-  @ManyToOne(() => Prixod, (prixod) => prixod.order, {onDelete:"CASCADE"})
+  @OneToMany(() => Prixod, (prixod) => prixod.order)
   prixods: Prixod[];
 
-  @ManyToOne(() => PrixodHist, (prixodHist) => prixodHist.order, {onDelete:"CASCADE"})
-  prixodHist: PrixodHist[];
+ @OneToMany(() => PrixodHist, (prixodHist) => prixodHist.order)
+prixodHist: PrixodHist[];
 }

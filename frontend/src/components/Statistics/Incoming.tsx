@@ -2,19 +2,33 @@ import { Select, TextInput } from "flowbite-react";
 import { AppDispatch, RootState } from "../../redux-toolkit/store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { setIncomingFilter } from "../../redux-toolkit/features/filters/filterSlice";
+import { fetchSuppliers } from "../../redux-toolkit/features/supplier/supplierSlice";
+import { useEffect } from "react";
+import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
+import { fetchPrixods } from "../../redux-toolkit/features/prixod/prixodSlice";
 
-// interface IncomingProps {
-//   filters: any;
-//   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-// }
 
 const Incoming = () => {
- const dispatch: AppDispatch = useDispatch();
-   const filters = useSelector((state: RootState) => state.filter.incomingFilters);
-     const { brands } = useSelector((state: RootState) => state.brand);
+  const dispatch: AppDispatch = useDispatch();
+  const filters = useSelector(
+    (state: RootState) => state.filter.incomingFilters,
+  );
+  const { brands } = useSelector((state: RootState) => state.brand);
+  const { suppliers } = useSelector((state: RootState) => state.supplier);
+  const {prixods} = useSelector((state: RootState) => state.prixod);
 
+  console.log({suppliers});
+  
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    useEffect(() => {
+      dispatch(fetchSuppliers());
+      dispatch(fetchBrands());
+      dispatch(fetchPrixods());
+    }, [dispatch]);
+    
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     dispatch(setIncomingFilter({ [name]: value }));
   };
@@ -23,16 +37,15 @@ const Incoming = () => {
     code,
     orderNumber,
     market,
-    brand,
-    supplier,
+    brandId,
+    supplierId,
     paymentType,
     invoice,
     project,
   } = filters;
 
   return (
-    <div className="w-[80%] border border-yellow-300 p-10 rounded-md">
-      <form className="flex gap-5 items-center">
+    <div className="flex gap-5 items-center w-[80%] border border-yellow-300 p-10 rounded-md">
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
             <label className="text-sm">E/h Kod</label>
@@ -78,8 +91,8 @@ const Incoming = () => {
             <Select
               className="w-40"
               sizing="sm"
-              name="brand"
-              value={brand || ""}
+              name="brandId"
+              value={brandId || ""}
               onChange={handleChange}
             >
               <option value="">Seç</option>
@@ -88,7 +101,6 @@ const Incoming = () => {
                   {brand.name}
                 </option>
               ))}
-      
             </Select>
           </div>
           <div className="flex flex-col gap-1">
@@ -96,13 +108,17 @@ const Incoming = () => {
             <Select
               className="w-56"
               sizing="sm"
-              name="supplier"
-              value={supplier || ""}
+              name="supplierId"
+              value={supplierId || ""}
               onChange={handleChange}
             >
               <option value="">Seç</option>
-              <option value="man">Man GMBH</option>
-              <option value="fatih">Fatih Bedir</option>
+              {suppliers &&
+                suppliers?.map((supplier: any) => (
+                  <option key={supplier.id} value={supplier.id}>
+                    {supplier.supplier}
+                  </option>
+                ))}
             </Select>
           </div>
           <div className="flex flex-col gap-1">
@@ -132,6 +148,11 @@ const Incoming = () => {
               onChange={handleChange}
             >
               <option value="">Seç</option>
+              {prixods?.map((prixod: any) => (
+                <option key={prixod.id} value={prixod.invoice}>
+                  {prixod.invoice}
+                </option>
+              ))}
             </Select>
           </div>
           <div className="flex flex-col gap-1">
@@ -147,7 +168,6 @@ const Incoming = () => {
             </Select>
           </div>
         </div>
-      </form>
     </div>
   );
 };

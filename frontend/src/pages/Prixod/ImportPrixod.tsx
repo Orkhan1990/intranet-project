@@ -51,7 +51,7 @@ const ImportPrixod = () => {
         nameParts: "",
         brand: Number(brands[0]?.id || 0),
         liquidity: Liquidity.Fast,
-        count: 0,
+        count: 1,
         price: 0,
         salesPrice: 0,
         barcode: "",

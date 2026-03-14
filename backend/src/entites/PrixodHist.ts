@@ -1,56 +1,46 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-} from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { AllEntities } from "./AllEntities";
-import { User } from "./User";
 import { Order } from "./Order";
 import { Prixod } from "./Prixod";
+import { User } from "./User";
 
 @Entity({ name: "prixod_hist" })
 export class PrixodHist extends AllEntities {
   @ManyToOne(() => Order, (order) => order.prixodHist, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "order_id" }) // <--- This adds the column
+  @JoinColumn({ name: "order_id" })
   order: Order;
+
+  @ManyToOne(() => Prixod, (prixod) => prixod.prixodHist, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "prixod_id" })
+  prixod: Prixod;
+
+  @ManyToOne(() => User, (user) => user.prixodHist)
+  user: User;
 
   @Column({ name: "level" })
   level: string;
 
-  @Column({default:false})
+  @Column({ default: false })
   confirm: boolean;
 
   @Column({ nullable: true })
   message: string;
 
-  @Column()
+  @Column({ type: "timestamp", nullable: true })
   confirmDate: Date;
 
   @Column({ default: false })
   accept: boolean;
 
-  @Column()
+  @Column({ type: "timestamp", nullable: true })
   acceptDate: Date;
 
   @Column({ nullable: true })
   reject: string;
 
-  @Column({ name: "date" })
+  @Column({ name: "date", type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   date: Date;
 
   @Column({ nullable: true })
   file: string;
-
-  @ManyToOne(() => User, (user) => user.prixods)
-  user: User;
-
-  @ManyToOne(() => Prixod, (prixod) => prixod.prixodHist, {
-    onDelete: "CASCADE",
-  })
-  @JoinColumn({ name: "prixod_id" }) // <--- This adds the column
-  prixod: Prixod;
 }

@@ -149,6 +149,26 @@ const WorkerCardTable = ({ cards, loading }: { cards: any[]; loading: boolean })
                   </tr>
                 );
               })}
+              <tr  className="border-b">
+                  <td className="p-3"></td>
+                  <td className="p-3"></td>
+                  <td className="p-3"></td>
+                  <td className="p-3"></td>
+                  <td className="p-3"></td>
+                  <td className="p-3"></td>
+                  <td className="p-3"></td>
+                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + parseFloat(card.workSum.toFixed(2)), 0).toFixed(2)}</td>
+                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + parseFloat(card.workSumOwn.toFixed(2)), 0).toFixed(2)}</td>
+                   <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + card.avSum, 0).toFixed(2)}</td>
+                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + card.partsTotalPrice, 0).toFixed(2)}</td>
+                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + card.partsSumOwn, 0).toFixed(2)}</td>
+                  <td className="p-3 font-bold">{cards.reduce((sum,card) => sum + card.expenses.reduce((a:any, b:any) => a + b.price, 0), 0).toFixed(2)}</td>
+                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + parseFloat((card.workSum + card.partsTotalPrice + card.expenses.reduce((a:any, b:any) => a + b.price, 0)).toFixed(2)), 0).toFixed(2)}</td>
+                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + parseFloat(((card.workSum + card.partsTotalPrice + card.expenses.reduce((a:any, b:any) => a + b.price, 0)) * 1.18).toFixed(2)), 0).toFixed(2)}</td>
+
+
+
+              </tr>
             </tbody>
           </table>
         </div>

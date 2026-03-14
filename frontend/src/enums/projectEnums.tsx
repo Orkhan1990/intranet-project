@@ -11,8 +11,8 @@ export enum Market {
 }
 
 export enum PayType {
-  Cash = "nağd",
-  Transfer = "köçürmə",
+  Cash = "cash",
+  Transfer = "transfer",
 }
 
 export enum Liquidity {

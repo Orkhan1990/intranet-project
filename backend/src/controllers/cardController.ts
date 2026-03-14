@@ -362,7 +362,7 @@ export const filterCards = async (req: Request, res: Response) => {
     const { filters } = req.body;
     let result: any[] = [];
 
-    console.log(filters);
+    console.log(req.body);
 
     // Yalnız filter sahələrini nəzərə alırıq, tab-ı yox
     const filterFields = [
@@ -529,51 +529,76 @@ export const filterCards = async (req: Request, res: Response) => {
             carNumber: filters.carNumber,
           });
 
-         
         result = await query.getMany();
         break;
       }
 
       case "Gəlir": {
+        console.log("Gəlir filterə gəldi");
         const query = AppDataSource.getRepository(Prixod)
           .createQueryBuilder("prixod")
           .leftJoinAndSelect("prixod.spareParts", "spareParts")
           .leftJoinAndSelect("spareParts.brand", "brand")
           .leftJoinAndSelect("prixod.order", "order")
-          .leftJoinAndSelect("order.client", "client");
+          .leftJoinAndSelect("prixod.supplier", "supplier");
 
-
-        // Tarix filteri
-        if (filters.startDate)
+        // Filterlər
+        if (filters.startDate) {
           query.andWhere("prixod.createdAt >= :start", {
             start: filters.startDate,
           });
-        if (filters.endDate)
+        }
+        if (filters.endDate) {
           query.andWhere("prixod.createdAt <= :end", { end: filters.endDate });
+        }
 
-        // Əgər part koduna görə filter varsa
-        if (filters.partNumber)
-          query.andWhere("spareParts.code = :partNumber", {
-            partNumber: filters.partNumber,
-          });
-
-        // Əgər order/cardNumber filter varsa
-        if (filters.orderNumber)
+        if (filters.orderNumber) {
           query.andWhere("order.id = :orderNumber", {
             orderNumber: filters.orderNumber,
           });
-
-          if (filters.market)
-          query.andWhere("prixod.market = :market", {
-            market: filters.market,
+        }
+        if (filters.supplierId) {
+          query.andWhere("supplier.id = :supplierId", {
+            supplierId: filters.supplierId,
           });
-
-            if (filters.brand)
-          query.andWhere("prixod.market = :market", {
-            brand: filters.brand,
+        }
+        if (filters.brandId) {
+          query.andWhere("brand.id = :brandId", { brandId: filters.brandId });
+        }
+        if (filters.invoice) {
+          query.andWhere("prixod.invoice = :invoice", {
+            invoice: filters.invoice,
           });
+        }
+        if (filters.paymentType) {
+          query.andWhere("prixod.paymentType = :paymentType", {
+            paymentType: filters.paymentType,
+          });
+        }
 
-        result = await query.getMany();
+        const prixods = await query.getMany();
+
+        // Map edib lazım olan data formatına salırıq
+        result = prixods.flatMap((p, index) =>
+          p.spareParts.map((sp, i) => ({
+            no: index + 1,
+            origCode: sp.origCode,
+            code: sp.code,
+            name: sp.name,
+            brand: sp.brand?.name || "",
+            orderNumber: p.order?.id || "",
+            supplier: p.supplier?.supplier || "",
+            quantityIn: sp.count,
+            quantitySold: sp.sellPrice ? sp.count : 0, // satılan sayını lazım olduqda dəyiş
+            cost: sp.price,
+            sellPrice: sp.sellPrice,
+            totalCost: sp.price * sp.count,
+            totalSellPrice: sp.sellPrice * sp.count,
+            date: p.createdAt,
+            comment: p.comment,
+          })),
+        );
+
         break;
       }
 
@@ -603,6 +628,8 @@ export const filterCards = async (req: Request, res: Response) => {
       default:
         return res.status(400).json({ message: "Invalid tab" });
     }
+
+    console.log(result, "netice");
 
     return res.json(result);
   } catch (error) {
