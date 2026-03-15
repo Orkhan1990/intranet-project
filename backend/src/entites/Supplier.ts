@@ -1,58 +1,64 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne } from 'typeorm';
-import { AllEntities } from './AllEntities';
-import { Prixod} from './Prixod';
-import { Order } from './Order';
-import { SupplierOrderHistory } from './SuppliersOrderHistory';
-import { SupplierOrderParts } from './SupplierOrderParts';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  OneToOne,
+} from "typeorm";
+import { AllEntities } from "./AllEntities";
+import { Prixod } from "./Prixod";
+import { Order } from "./Order";
+import { SupplierOrderHistory } from "./SuppliersOrderHistory";
+import { SupplierOrderParts } from "./SupplierOrderParts";
 
+@Entity({ name: "suppliers" })
+export class Supplier extends AllEntities {
+  @Column({ nullable: false })
+  supplier: string;
 
-@Entity({name:"suppliers"})
-export class Supplier extends AllEntities{
+  @Column({ nullable: true })
+  country: string;
 
-    @Column({nullable:false})
-    supplier:string;
+  @Column({ name: "contact_person", nullable: false })
+  contactPerson: string;
 
-    @Column({nullable:true})
-    country: string;
+  @Column({ nullable: false })
+  phone: string;
 
-    @Column({name:"contact_person",nullable:false})
-    contactPerson:string;
+  @Column({ nullable: false })
+  email: string;
 
-    @Column({nullable:false})
-    phone: string;
+  @Column({ name: "paymnet_type", nullable: false })
+  paymentType: string;
 
-    @Column({nullable:false})
-    email:string;
+  @Column({ name: "deliver_type", nullable: false })
+  deliverType: string;
 
-    @Column({name:"paymnet_type",nullable:false})
-    paymentType: string;
+  @Column({ name: "deliver_period", nullable: false })
+  deliverPeriod: string;
 
-    @Column({name:"deliver_type",nullable:false})
-    deliverType: string;
+  @Column({ name: "credit_line", nullable: true })
+  creditLine: string;
 
-    @Column({name:"deliver_period",nullable:false})
-    deliverPeriod: string;
+  @Column({ name: "credit_note", nullable: true })
+  creditNote: string;
 
-    @Column({name:"credit_line",nullable:true})
-    creditLine: string;
+  @Column({ name: "credit_duration", nullable: true })
+  creditDuration: string;
 
-    @Column({name:"credit_note",nullable:true})
-    creditNote: string;
+  @OneToMany(() => Prixod, (prixod) => prixod.supplier)
+  prixods: Prixod[];
 
-    @Column({name:"credit_duration",nullable:true})
-    creditDuration: string;
+  // @ManyToMany(()=>Order,(order)=>order.suppliers)
+  // orders:Order[];
 
+  @OneToMany(() => SupplierOrderHistory, (item) => item.supplier)
+  supplierOrderHistories: SupplierOrderHistory[];
 
-    @OneToMany(() =>Prixod, (prixod) => prixod.supplier)
-    prixods: Prixod[];
-    
-    // @ManyToMany(()=>Order,(order)=>order.suppliers)
-    // orders:Order[];
+  @OneToMany(() => SupplierOrderParts, (item) => item.supplier)
+  supplierOrderPart: SupplierOrderParts[];
 
-     @OneToMany(()=>SupplierOrderHistory,(item)=>item.supplier)
-     supplierOrderHistories:SupplierOrderHistory[];
-
-     @OneToMany(()=>SupplierOrderParts,(item)=>item.supplier)
-     supplierOrderPart:SupplierOrderParts[];
 
 }

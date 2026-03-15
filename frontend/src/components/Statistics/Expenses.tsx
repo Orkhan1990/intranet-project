@@ -2,18 +2,33 @@ import { Select, TextInput } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux-toolkit/store/store";
 import { setExpensesFilter } from "../../redux-toolkit/features/filters/filterSlice";
+import { fetchPrixods } from "../../redux-toolkit/features/prixod/prixodSlice";
+import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
+import { fetchSuppliers } from "../../redux-toolkit/features/supplier/supplierSlice";
+import { useEffect } from "react";
+import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
 
-// interface ExpensesProps {
-//   filters: any;
-//   handleChange: (
-//     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-//   ) => void;
-// }
+
 
 const Expenses = () => {
 
    const dispatch: AppDispatch = useDispatch();
   const filters = useSelector((state: RootState) => state.filter.expenseFilters);
+
+    const { brands } = useSelector((state: RootState) => state.brand);
+    const { suppliers } = useSelector((state: RootState) => state.supplier);
+    const {clients} = useSelector((state: RootState) => state.client);
+    const {prixods} = useSelector((state: RootState) => state.prixod);
+  
+    console.log({suppliers});
+    
+  
+      useEffect(() => {
+        dispatch(fetchSuppliers());
+        dispatch(fetchBrands());
+        dispatch(fetchPrixods());
+        dispatch(fetchClients());
+      }, [dispatch]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -25,15 +40,14 @@ const Expenses = () => {
     cardStatus,
     orderNumber,
     market,
-    manufactured,
+    brandId,
     paymentType,
     cardNumber,
-    supplier,
+    supplierId,
     invoice,
     project,
   } = filters;
 
-    const { clients } = useSelector((state: RootState) => state.client);
 
 
   return (
@@ -71,7 +85,7 @@ const Expenses = () => {
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
-              Kartın statusu
+              Kart statusu
             </label>
             <Select
               className="w-40"
@@ -114,18 +128,18 @@ const Expenses = () => {
             <Select
               className="w-40"
               sizing={"sm"}
-              name="manufactured"
-              value={manufactured || ""}
+              name="brandId"
+              value={brandId || ""}
               onChange={handleChange}
             >
               <option value="">Brend seç</option>
-              <option value="">3F</option>
-              <option value="">3FM</option>
-              <option value="">4CR</option>
-              <option value="">4D</option>
-              <option value="">4U</option>
-              <option value="">734U</option>
+              {brands?.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name}
+                </option>
+              ))}
             </Select>
+          
           </div>
 
           <div className="flex flex-col gap-1">
@@ -157,10 +171,14 @@ const Expenses = () => {
             <label htmlFor="" className="text-sm">
               Təchizatçı
             </label>
-            <Select className="w-40" sizing={"sm"} name="supplier" value={supplier||""} onChange={handleChange}>
+            <Select className="w-40" sizing={"sm"} name="supplierId" value={supplierId||""} onChange={handleChange}>
               <option value="">Seç</option>
-              <option value="">MAN GMBH</option>
-              <option value="">Fatih Bedir</option>
+              {suppliers?.map((supplier) => (
+                <option key={supplier.id} value={supplier.id}>
+                  {supplier.supplier}
+                </option>
+              ))}
+      
             </Select>
           </div>
 
@@ -204,9 +222,11 @@ const Expenses = () => {
             </label>
             <Select className="w-40" sizing={"sm"} name="invoice" value={invoice||""} onChange={handleChange}>
               <option value="">Seç</option>
-              <option value="">012456</option>
-              <option value="">123456</option>
-              <option value="">7894561</option>
+              {prixods?.map((prixod) => (
+                <option key={prixod.id} value={prixod.invoice}>
+                  {prixod.invoice}
+                </option>
+              ))}
             </Select>
           </div>
 

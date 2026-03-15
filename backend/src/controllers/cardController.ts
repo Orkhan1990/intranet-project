@@ -364,13 +364,13 @@ export const filterCards = async (req: Request, res: Response) => {
 
     console.log(req.body);
     const hasAnyFilter = Object.entries(filters).some(([key, value]) => {
-  if (key === "tab") return false; // tab filter sayılmır
-  return value !== null && value !== undefined && value !== "";
-});
+      if (key === "tab") return false; // tab filter sayılmır
+      return value !== null && value !== undefined && value !== "";
+    });
 
-if (!hasAnyFilter) {
-  return res.json([]);
-}
+    if (!hasAnyFilter) {
+      return res.json([]);
+    }
 
     // Yalnız filter sahələrini nəzərə alırıq, tab-ı yox
     // const filterFields = [
@@ -538,7 +538,7 @@ if (!hasAnyFilter) {
           });
 
         result = await query.getMany();
-        return res.status(200).json( {tab:filters.tab, cards: result});
+        return res.status(200).json({ tab: filters.tab, cards: result });
       }
 
       case "Gəlir": {
@@ -584,13 +584,13 @@ if (!hasAnyFilter) {
           });
         }
 
-        if(filters.code) {
+        if (filters.code) {
           query.andWhere("spareParts.origCode = :code", {
             code: filters.code,
           });
         }
 
-        if(filters.market) {
+        if (filters.market) {
           query.andWhere("prixod.market = :market", {
             market: filters.market,
           });
@@ -619,19 +619,67 @@ if (!hasAnyFilter) {
           })),
         );
 
-        return res.status(200).json({tab:filters.tab, cards: result });
+        return res.status(200).json({ tab: filters.tab, cards: result });
       }
 
       case "Xərc": {
-        // const query = AppDataSource.getRepository(Expense)
-        //   .createQueryBuilder("expense");
+         const cardRepo = AppDataSource.getRepository(Card);
 
-        // if (startDate) query.andWhere("expense.date >= :start", { start: startDate });
-        // if (endDate) query.andWhere("expense.date <= :end", { end: endDate });
-        // if (filters.clientId) query.andWhere("expense.clientId = :clientId", { clientId: filters.clientId });
+    // QueryBuilder istifadə edirik ki, filterləri DB səviyyəsində tətbiq edək
+    let query = cardRepo
+      .createQueryBuilder("card")
+      .leftJoinAndSelect("card.client", "client")
+      .leftJoinAndSelect("card.cardParts", "cardPart")
+      .leftJoinAndSelect("cardPart.sparePart", "sparePart")
+      .leftJoinAndSelect("sparePart.brand", "brand")
+      .leftJoinAndSelect("sparePart.prixod", "prixod")
+      .leftJoinAndSelect("prixod.supplier", "supplier")
+      .leftJoinAndSelect("card.expenses", "expenses");
 
-        // result = await query.getMany();
-        break;
+    // 🔹 Filterlər
+    if (filters.code) query = query.andWhere("cardPart.code = :code", { code: filters.code });
+    if (filters.clientId) query = query.andWhere("client.id = :clientId", { clientId: filters.clientId });
+    if (filters.orderNumber) query = query.andWhere("card.id = :orderNumber", { orderNumber: filters.orderNumber });
+    if (filters.market) query = query.andWhere("prixod.market = :market", { market: filters.market });
+    if (filters.brandId) query = query.andWhere("brand.id = :brandId", { brandId: filters.brandId });
+    if (filters.paymentType) query = query.andWhere("card.paymentType = :paymentType", { paymentType: filters.paymentType });
+    if (filters.cardNumber) query = query.andWhere("card.carNumber = :cardNumber", { cardNumber: filters.cardNumber });
+    if (filters.supplierId) query = query.andWhere("supplier.id = :supplierId", { supplierId: filters.supplierId });
+    if (filters.invoice) query = query.andWhere("prixod.invoice = :invoice", { invoice: filters.invoice });
+    if (filters.startDate) query = query.andWhere("cardPart.date >= :startDate", { startDate: filters.startDate });
+    if (filters.endDate) query = query.andWhere("cardPart.date <= :endDate", { endDate: filters.endDate });
+
+    // 🔹 Kart statusu filteri
+    if (filters.cardStatus && filters.cardStatus !== "all") {
+      const isOpen = filters.cardStatus === "open";
+      query = query.andWhere("card.isOpen = :isOpen", { isOpen });
+    }
+
+    const cards = await query.getMany();
+
+    // 🔹 Frontend formatına çevirmək
+    const expensesCards = cards.flatMap((card, index) =>
+      card.cardParts.map((part) => ({
+        no: index + 1,
+        cardNumber: card.id,
+        code: part.code,
+        name: part.partName,
+        brand: part.sparePart?.brand?.name || "",
+        quantityIn: part.count,
+        client: card.client?.companyName || "",
+        paymentType: card.paymentType || "",
+        orderNumber: card.id,
+        supplier: part.sparePart?.prixod?.supplier?.supplier || "",
+        cost: part.netPrice || 0,
+        sellPrice: part.soldPrice || 0,
+        difference: part.soldPrice && part.netPrice ? part.soldPrice - part.netPrice : 0,
+        sellPriceWithoutDiscount: part.usedPrice || 0,
+        discount: part.discount || 0,
+        date: part.date,
+      }))
+    );
+
+    return res.status(200).json({ tab: filters.tab, cards: expensesCards });
       }
 
       case "Briqada": {
@@ -648,8 +696,6 @@ if (!hasAnyFilter) {
       default:
         return res.status(400).json({ message: "Invalid tab" });
     }
-
-  
   } catch (error) {
     console.error("FilterCards error:", error);
     return res.status(500).json({ message: "Error filtering cards." });

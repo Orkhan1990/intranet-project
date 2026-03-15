@@ -52,4 +52,6 @@ export class SparePart extends AllEntities {
   // 🔹 Card parts relation
   @OneToMany(() => CardPart, (cardPart) => cardPart.sparePart)
   cardParts: CardPart[];
+
+
 }
