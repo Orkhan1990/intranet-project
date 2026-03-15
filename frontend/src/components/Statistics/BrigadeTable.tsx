@@ -1,13 +1,12 @@
-import React from 'react'
 
-const BrigadeTable = ({ cards, loading }: { cards: any[]; loading: boolean }) => {
+const BrigadeTable = ({ brigadeCards, loading }: { brigadeCards: any[]; loading: boolean }) => {
   return (
     <div>
-          {loading && cards.length === 0 && (
+          {loading && brigadeCards.length === 0 && (
         <p className="text-center mt-10 text-gray-500 italic">Yüklənir...</p>
       )}
 
-      {!loading && cards.length === 0 && (
+      {!loading && brigadeCards?.length === 0 && (
         <p className="text-center mt-10 text-gray-500 italic">
           Nəticə tapılmadı
         </p>

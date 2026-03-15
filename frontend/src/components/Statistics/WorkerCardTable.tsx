@@ -1,31 +1,37 @@
 import { Link } from "react-router-dom";
 
-const WorkerCardTable = ({ cards, loading }: { cards: any[]; loading: boolean }) => {
-     const warrantyStatusColor = (payment: string, warrantyStatus: string) => {
-        if (payment !== "warranty") return "hover:bg-gray-50 transition";
-        switch (warrantyStatus) {
-          case "none":
-            return "bg-red-600";
-          case "send":
-            return "bg-yellow-200";
-          case "paid":
-            return "bg-green-500";
-          default:
-            return "";
-        }
-      };
+const WorkerCardTable = ({
+  workerCards,
+  loading,
+}: {
+  workerCards: any[];
+  loading: boolean;
+}) => {
+  const warrantyStatusColor = (payment: string, warrantyStatus: string) => {
+    if (payment !== "warranty") return "hover:bg-gray-50 transition";
+    switch (warrantyStatus) {
+      case "none":
+        return "bg-red-600";
+      case "send":
+        return "bg-yellow-200";
+      case "paid":
+        return "bg-green-500";
+      default:
+        return "";
+    }
+  };
   return (
     <div>
-          {loading && cards.length === 0 && (
+      {loading && workerCards?.length === 0 && (
         <p className="text-center mt-10 text-gray-500 italic">Yüklənir...</p>
       )}
 
-      {!loading && cards.length === 0 && (
+      {!loading && workerCards?.length === 0 && (
         <p className="text-center mt-10 text-gray-500 italic">
           Nəticə tapılmadı
         </p>
       )}
-         {cards && cards.length > 0 && (
+      {workerCards?.length > 0 && (
         <div className="mt-10 overflow-x-auto rounded-lg shadow-md border border-gray-200">
           <table className="w-full text-sm text-left border-collapse">
             <thead className="bg-gray-100 text-gray-700">
@@ -56,7 +62,7 @@ const WorkerCardTable = ({ cards, loading }: { cards: any[]; loading: boolean })
             </thead>
 
             <tbody>
-              {cards?.map((card: any, index: number) => {
+              {workerCards?.map((card: any, index: number) => {
                 const totalExpenses = card?.expenses?.reduce(
                   (sum: number, exp: any) => sum + (exp.price ?? 0),
                   0,
@@ -149,32 +155,113 @@ const WorkerCardTable = ({ cards, loading }: { cards: any[]; loading: boolean })
                   </tr>
                 );
               })}
-              <tr  className="border-b">
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                  <td className="p-3"></td>
-                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + parseFloat(card.workSum.toFixed(2)), 0).toFixed(2)}</td>
-                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + parseFloat(card.workSumOwn.toFixed(2)), 0).toFixed(2)}</td>
-                   <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + card.avSum, 0).toFixed(2)}</td>
-                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + card.partsTotalPrice, 0).toFixed(2)}</td>
-                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + card.partsSumOwn, 0).toFixed(2)}</td>
-                  <td className="p-3 font-bold">{cards.reduce((sum,card) => sum + card.expenses.reduce((a:any, b:any) => a + b.price, 0), 0).toFixed(2)}</td>
-                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + parseFloat((card.workSum + card.partsTotalPrice + card.expenses.reduce((a:any, b:any) => a + b.price, 0)).toFixed(2)), 0).toFixed(2)}</td>
-                  <td className="p-3 font-bold">{cards.reduce((sum, card) => sum + parseFloat(((card.workSum + card.partsTotalPrice + card.expenses.reduce((a:any, b:any) => a + b.price, 0)) * 1.18).toFixed(2)), 0).toFixed(2)}</td>
+              <tr className="border-b">
+                <td className="p-3"></td>
+                <td className="p-3"></td>
+                <td className="p-3"></td>
+                <td className="p-3"></td>
+                <td className="p-3"></td>
+                <td className="p-3"></td>
+                <td className="p-3"></td>
+                <td className="p-3 font-bold">
+                  {Number(
+                    workerCards
+                      ?.reduce(
+                        (sum, card) => sum + Number(card.workSum), // workSum-i Number-ə çeviririk
+                        0,
+                      )
+                      .toFixed(2), // iki onluq dəqiqlik üçün
+                  )}
+                </td>
+                <td className="p-3 font-bold">
+                  {Number(
+                    workerCards
+                      ?.reduce((sum, card) => sum + Number(card.workSumOwn), 0)
+                      .toFixed(2),
+                  )}
+                </td>
+                <td className="p-3 font-bold">
+                  {Number(
+                    workerCards
+                      ?.reduce((sum, card) => sum + Number(card.avSum), 0)
+                      .toFixed(2),
+                  )}
+                </td>
+                <td className="p-3 font-bold">
+                  {Number(
+                    workerCards
+                      ?.reduce(
+                        (sum, card) => sum + Number(card.partsTotalPrice),
+                        0,
+                      )
+                      .toFixed(2),
+                  )}
+                </td>
+                <td className="p-3 font-bold">
+                  {Number(
+                    workerCards
+                      ?.reduce((sum, card) => sum + Number(card.partsSumOwn), 0)
+                      .toFixed(2),
+                  )}
+                </td>
+                <td className="p-3 font-bold">
+                  {Number(
+                    workerCards
+                      ?.reduce(
+                        (sum, card) =>
+                          sum +
+                          Number(
+                            card.expenses.reduce(
+                              (a: any, b: any) => a + b.price,
+                              0,
+                            ),
+                          ),
+                        0,
+                      )
+                      .toFixed(2),
+                  )}
+                </td>
 
-
-
+                <td className="p-3 font-bold">
+                  {Number(
+                    workerCards
+                      ?.reduce((sum, card) => {
+                        const total =
+                          card.workSum +
+                          card.partsTotalPrice +
+                          card.expenses.reduce(
+                            (a: any, b: any) => a + b.price,
+                            0,
+                          );
+                        return sum + parseFloat(total.toFixed(2));
+                      }, 0)
+                      .toFixed(2),
+                  )}
+                </td>
+                <td className="p-3 font-bold">
+                  {Number(
+                    workerCards
+                      ?.reduce((sum, card) => {
+                        const total =
+                          (card.workSum +
+                            card.partsTotalPrice +
+                            card.expenses.reduce(
+                              (a: any, b: any) => a + b.price,
+                              0,
+                            )) *
+                          1.18;
+                        return sum + parseFloat(total.toFixed(2));
+                      }, 0)
+                      .toFixed(2),
+                  )}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default WorkerCardTable
+export default WorkerCardTable;

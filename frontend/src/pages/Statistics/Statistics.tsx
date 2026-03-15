@@ -30,8 +30,11 @@ const Statistics = () => {
     incomingFilters,
     expenseFilters,
     brigadeFilters,
-    cards = [],
     loading = false,
+    workerCards,
+    incomingCards,
+    expenseCards,
+    brigadeCards
   } = useSelector((state: RootState) => state.filter);
 
   const tabs = ["İş kartı", "Gəlir", "Xərc", "Briqada"];
@@ -58,6 +61,7 @@ const Statistics = () => {
             ? expenseFilters
             : brigadeFilters),
     };
+    console.log("PAYLOAD", payload)
 
     dispatch(fetchCards(payload));
   }, [
@@ -72,6 +76,8 @@ const Statistics = () => {
   ]);
 
   // Warranty row color
+
+  console.log({ workerCards, incomingCards, expenseCards });
 
   return (
     <div className="min-h-screen ">
@@ -150,16 +156,16 @@ const Statistics = () => {
       </div>
 
       {activeTab === "İş kartı" && (
-        <WorkerCardTable cards={cards} loading={loading} />
+        <WorkerCardTable workerCards={workerCards} loading={loading} />
       )}
       {activeTab === "Gəlir" && (
-        <IncomingTable cards={cards} loading={loading} />
+        <IncomingTable incomingCards={incomingCards} loading={loading} />
       )}
       {activeTab === "Xərc" && (
-        <ExpensesTable cards={cards} loading={loading} />
+        <ExpensesTable expenseCards={expenseCards} loading={loading} />
       )}
       {activeTab === "Briqada" && (
-        <BrigadeTable cards={cards} loading={loading} />
+        <BrigadeTable brigadeCards={brigadeCards} loading={loading} />
       )}
     </div>
   );

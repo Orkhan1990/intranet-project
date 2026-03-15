@@ -9,8 +9,11 @@ interface FilterState {
   incomingFilters: any;
   expenseFilters: any;
   brigadeFilters: any;
-    cards: any[];
   loading: boolean;
+  workerCards: any[];
+  incomingCards: any[];
+  expenseCards: any[];
+  brigadeCards: any[];
 }
 
 interface FilterPayload {
@@ -24,8 +27,11 @@ const initialState: FilterState = {
   activeTab: "İş kartı",
   startDate: null,
   endDate: null,
-  cards: [],
-loading: false,
+  loading: false,
+  workerCards: [],
+  incomingCards: [],
+  expenseCards: [],
+  brigadeCards: [],
   workerCardFilters: {
     cardStatus: "all",
     cardNumber: "",
@@ -40,7 +46,7 @@ loading: false,
     carNumber: "",
     customerType: "",
     legalOrPhysical: "",
-    partNumber: ""
+    partNumber: "",
   },
 
   incomingFilters: {
@@ -72,30 +78,27 @@ loading: false,
   },
 };
 
-
-
 export const fetchCards = createAsyncThunk(
   "filter/fetchCards",
   async (payload: FilterPayload) => {
     const response = await filterTheCardsAPI(payload);
     return response; // cards array qaytarır
-  }
+  },
 );
-
 
 const filterSlice = createSlice({
   name: "filter",
   initialState,
   reducers: {
-   setActiveTab(state, action: PayloadAction<string>) {
-  state.activeTab = action.payload;
-  // Tab dəyişəndə filterləri reset et
-  state.workerCardFilters = initialState.workerCardFilters;
-  state.incomingFilters = initialState.incomingFilters;
-  state.expenseFilters = initialState.expenseFilters;
-  state.brigadeFilters = initialState.brigadeFilters;
-  // state.cards = [];
-},
+    setActiveTab(state, action: PayloadAction<string>) {
+      state.activeTab = action.payload;
+      // Tab dəyişəndə filterləri reset et
+      state.workerCardFilters = initialState.workerCardFilters;
+      state.incomingFilters = initialState.incomingFilters;
+      state.expenseFilters = initialState.expenseFilters;
+      state.brigadeFilters = initialState.brigadeFilters;
+      // state.cards = [];
+    },
     setStartEndDate(
       state,
       action: PayloadAction<{ startDate?: Date | null; endDate?: Date | null }>,
@@ -150,18 +153,32 @@ const filterSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-  builder
-    .addCase(fetchCards.pending, (state) => {
-      state.loading = true;
-    })
-    .addCase(fetchCards.fulfilled, (state, action) => {
-      state.cards = action.payload;
-      state.loading = false;
-    })
-    .addCase(fetchCards.rejected, (state) => {
-      state.loading = false;
-    });
-}
+    builder
+      .addCase(fetchCards.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCards.fulfilled, (state, action) => {
+        state.loading = false;
+
+        const { tab, cards } = action.payload;
+
+        if (tab === "İş kartı") {
+          state.workerCards = cards;
+        }
+
+        if (tab === "Gəlir") {
+          state.incomingCards = cards;
+        }
+
+        if (tab === "Xərc") {
+          state.expenseCards = cards;
+        }
+      })
+
+      .addCase(fetchCards.rejected, (state) => {
+        state.loading = false;
+      });
+  },
 });
 
 export const {

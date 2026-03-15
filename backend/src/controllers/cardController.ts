@@ -363,33 +363,41 @@ export const filterCards = async (req: Request, res: Response) => {
     let result: any[] = [];
 
     console.log(req.body);
+    const hasAnyFilter = Object.entries(filters).some(([key, value]) => {
+  if (key === "tab") return false; // tab filter sayılmır
+  return value !== null && value !== undefined && value !== "";
+});
+
+if (!hasAnyFilter) {
+  return res.json([]);
+}
 
     // Yalnız filter sahələrini nəzərə alırıq, tab-ı yox
-    const filterFields = [
-      "startDate",
-      "endDate",
-      "cardNumber",
-      "cardStatus",
-      "sassiNumber",
-      "paymentType",
-      "clientId",
-      "manufactured",
-      "workerId",
-      "receptionId",
-      "legalOrPhysical",
-      "customerType",
-      "carNumber",
-      "partNumber",
-    ];
+    // const filterFields = [
+    //   "startDate",
+    //   "endDate",
+    //   "cardNumber",
+    //   "cardStatus",
+    //   "sassiNumber",
+    //   "paymentType",
+    //   "clientId",
+    //   "manufactured",
+    //   "workerId",
+    //   "receptionId",
+    //   "legalOrPhysical",
+    //   "customerType",
+    //   "carNumber",
+    //   "partNumber",
+    // ];
 
-    const hasAnyFilter = filterFields.some((field) => {
-      const value = filters[field];
-      return value !== null && value !== undefined && value !== "";
-    });
+    // const hasAnyFilter = filterFields.some((field) => {
+    //   const value = filters[field];
+    //   return value !== null && value !== undefined && value !== "";
+    // });
 
-    if (!hasAnyFilter) {
-      return res.json([]); // boş nəticə qaytar
-    }
+    // if (!hasAnyFilter) {
+    //   return res.json([]); // boş nəticə qaytar
+    // }
 
     // Frontend-dən gələn startDate və endDate-ə saat əlavə edirik
     // const startDate = filters.startDate ? `${filters.startDate} 00:00:00` : null;
@@ -530,7 +538,7 @@ export const filterCards = async (req: Request, res: Response) => {
           });
 
         result = await query.getMany();
-        break;
+        return res.status(200).json( {tab:filters.tab, cards: result});
       }
 
       case "Gəlir": {
@@ -576,6 +584,18 @@ export const filterCards = async (req: Request, res: Response) => {
           });
         }
 
+        if(filters.code) {
+          query.andWhere("spareParts.origCode = :code", {
+            code: filters.code,
+          });
+        }
+
+        if(filters.market) {
+          query.andWhere("prixod.market = :market", {
+            market: filters.market,
+          });
+        }
+
         const prixods = await query.getMany();
 
         // Map edib lazım olan data formatına salırıq
@@ -599,7 +619,7 @@ export const filterCards = async (req: Request, res: Response) => {
           })),
         );
 
-        break;
+        return res.status(200).json({tab:filters.tab, cards: result });
       }
 
       case "Xərc": {
@@ -629,9 +649,7 @@ export const filterCards = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Invalid tab" });
     }
 
-    console.log(result, "netice");
-
-    return res.json(result);
+  
   } catch (error) {
     console.error("FilterCards error:", error);
     return res.status(500).json({ message: "Error filtering cards." });
