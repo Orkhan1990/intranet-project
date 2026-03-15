@@ -110,7 +110,7 @@ export const navbarList:NavbarListInterface[] = [
           },
           {
               title:"Təmir-hesab",
-              url:"/servisFee"
+              url:"/serviceFee"
           }
       ]
     },

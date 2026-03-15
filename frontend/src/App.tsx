@@ -35,6 +35,7 @@ import Account from "./pages/Print/Account";
 import Repair from "./pages/Print/Repair";
 import WorkCatalog from "./pages/WorkCatalog";
 import EmployeeFee from "./pages/EmployeeFee";
+import ServiceFee from "./pages/ServiceFee";
 
 function App() {
   return (
@@ -89,6 +90,16 @@ function App() {
               </Layout>
             }
           />
+
+            <Route
+            path="/serviceFee"
+            element={
+              <Layout>
+                <ServiceFee />
+              </Layout>
+            }
+          />
+
           <Route
             path="/importWarehouse"
             element={
