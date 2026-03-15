@@ -7,30 +7,31 @@ import { fetchBrands } from "../../redux-toolkit/features/brand/brandSlice";
 import { fetchSuppliers } from "../../redux-toolkit/features/supplier/supplierSlice";
 import { useEffect } from "react";
 import { fetchClients } from "../../redux-toolkit/features/client/clientSlice";
-
-
+import { Market, PayType } from "../../enums/projectEnums";
 
 const Expenses = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const filters = useSelector(
+    (state: RootState) => state.filter.expenseFilters,
+  );
 
-   const dispatch: AppDispatch = useDispatch();
-  const filters = useSelector((state: RootState) => state.filter.expenseFilters);
+  const { brands } = useSelector((state: RootState) => state.brand);
+  const { suppliers } = useSelector((state: RootState) => state.supplier);
+  const { clients } = useSelector((state: RootState) => state.client);
+  const { prixods } = useSelector((state: RootState) => state.prixod);
 
-    const { brands } = useSelector((state: RootState) => state.brand);
-    const { suppliers } = useSelector((state: RootState) => state.supplier);
-    const {clients} = useSelector((state: RootState) => state.client);
-    const {prixods} = useSelector((state: RootState) => state.prixod);
-  
-    console.log({suppliers});
-    
-  
-      useEffect(() => {
-        dispatch(fetchSuppliers());
-        dispatch(fetchBrands());
-        dispatch(fetchPrixods());
-        dispatch(fetchClients());
-      }, [dispatch]);
+  console.log({ suppliers });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  useEffect(() => {
+    dispatch(fetchSuppliers());
+    dispatch(fetchBrands());
+    dispatch(fetchPrixods());
+    dispatch(fetchClients());
+  }, [dispatch]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     dispatch(setExpensesFilter({ [name]: value }));
   };
@@ -42,13 +43,12 @@ const Expenses = () => {
     market,
     brandId,
     paymentType,
+    paymentTypePrixod,
     cardNumber,
     supplierId,
     invoice,
     project,
   } = filters;
-
-
 
   return (
     <div className="w-[80%] border border-yellow-300 p-10 rounded-md">
@@ -67,7 +67,7 @@ const Expenses = () => {
               onChange={handleChange}
             />
           </div>
-           <div>
+          <div>
             <label className="text-sm">Müştərilər</label>
             <Select
               name="clientId"
@@ -104,18 +104,31 @@ const Expenses = () => {
             <label htmlFor="" className="text-sm">
               Sifariş nömrəsi
             </label>
-            <TextInput type="text" sizing={"sm"} className="w-56" name="orderNumber" value={orderNumber||""} onChange={handleChange}/>
+            <TextInput
+              type="text"
+              sizing={"sm"}
+              className="w-56"
+              name="orderNumber"
+              value={orderNumber || ""}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
               Bazar (daxilolma)
             </label>
-            <Select className="w-40" sizing={"sm"} name="market" value={market||""} onChange={handleChange}>
+            <Select
+              className="w-40"
+              sizing={"sm"}
+              name="market"
+              value={market || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
-              <option value="">Yerli</option>
-              <option value="">Xarici</option>
-              <option value="">Akt əsasında</option>
+              <option value={Market.Local}>Yerli</option>
+              <option value={Market.External}>Xarici</option>
+              <option value={Market.Based_On_The_Act}>Akt Əsasında</option>
             </Select>
           </div>
         </div>
@@ -139,7 +152,6 @@ const Expenses = () => {
                 </option>
               ))}
             </Select>
-          
           </div>
 
           <div className="flex flex-col gap-1">
@@ -154,31 +166,43 @@ const Expenses = () => {
               onChange={handleChange}
             >
               <option value="">Seç</option>
-              <option value="">Köçürmə</option>
-              <option value="">Nağd</option>
-              <option value="">Qarantiya</option>
-              <option value="">Daxili iş</option>
+              <option value="transfer">Köçürmə</option>
+              <option value="cash">Nağd</option>
+              <option value="warranty">Qarantiya</option>
+              <option value="internal">Daxili iş</option>
             </Select>
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
               Kart nömrəsi
             </label>
-            <TextInput type="text" sizing={"sm"} className="w-56" name="cardNumber" value={cardNumber||""} onChange={handleChange}/>
+            <TextInput
+              type="text"
+              sizing={"sm"}
+              className="w-56"
+              name="cardNumber"
+              value={cardNumber || ""}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="flex flex-col gap-1">
             <label htmlFor="" className="text-sm">
               Təchizatçı
             </label>
-            <Select className="w-40" sizing={"sm"} name="supplierId" value={supplierId||""} onChange={handleChange}>
+            <Select
+              className="w-40"
+              sizing={"sm"}
+              name="supplierId"
+              value={supplierId || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
               {suppliers?.map((supplier) => (
                 <option key={supplier.id} value={supplier.id}>
                   {supplier.supplier}
                 </option>
               ))}
-      
             </Select>
           </div>
 
@@ -186,10 +210,16 @@ const Expenses = () => {
             <label htmlFor="" className="text-sm">
               Ödəniş növü(daxilolma)
             </label>
-            <Select className="w-40" sizing={"sm"} name="paymentType" value={paymentType||""} onChange={handleChange}>
+            <Select
+              className="w-40"
+              sizing={"sm"}
+              name="paymentTypePrixod"
+              value={paymentTypePrixod || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
-              <option value="">Nağd</option>
-              <option value="">Köçürmə</option>
+              <option value={PayType.Cash}>Nağd</option>
+              <option value={PayType.Transfer}>Köçürmə</option>
             </Select>
           </div>
         </div>
@@ -220,7 +250,13 @@ const Expenses = () => {
             <label htmlFor="" className="text-sm">
               Faktura nömrəsi
             </label>
-            <Select className="w-40" sizing={"sm"} name="invoice" value={invoice||""} onChange={handleChange}>
+            <Select
+              className="w-40"
+              sizing={"sm"}
+              name="invoice"
+              value={invoice || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
               {prixods?.map((prixod) => (
                 <option key={prixod.id} value={prixod.invoice}>
@@ -234,7 +270,13 @@ const Expenses = () => {
             <label htmlFor="" className="text-sm">
               Project
             </label>
-            <Select className="w-40" sizing={"sm"} name="project" value={project||""} onChange={handleChange}>
+            <Select
+              className="w-40"
+              sizing={"sm"}
+              name="project"
+              value={project || ""}
+              onChange={handleChange}
+            >
               <option value="">Seç</option>
               <option value="">Project1</option>
             </Select>

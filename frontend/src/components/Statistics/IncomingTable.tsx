@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { exportToExcel } from "../../utilis/exportExcell";
 
 const IncomingTable = ({
   incomingCards,
@@ -45,7 +46,10 @@ const IncomingTable = ({
             <tbody>
               {incomingCards?.map((card: any) => {
                 return (
-                  <tr key={card.no} className={"border-b"}>
+                  <tr
+                    key={card.no}
+                    className={"border-b odd:bg-white even:bg-gray-200"}
+                  >
                     <td className="p-3">{card.no}</td>
                     <td className="p-3">
                       <Link to={""}>{card.origCode}</Link>
@@ -55,7 +59,18 @@ const IncomingTable = ({
                     </td>
                     <td className="p-3">{card.name}</td>
                     <td className="p-3">{card.brand}</td>
-                    <td className="p-3">{` ${card?.orderNumber === "0" ? card?.comment : card?.orderNumber}`}</td>
+                    <td className="p-3">
+                      {card?.orderNumber === "0" ? (
+                        card?.comment
+                      ) : (
+                        <Link
+                          className="hover:underline hover:text-blue-800"
+                          to={`/editOrder/${card?.orderNumber}`}
+                        >
+                          {card?.orderNumber}
+                        </Link>
+                      )}
+                    </td>{" "}
                     <td className="p-3 text-center">{card.supplier}</td>
                     <td className="p-3">{card.quantityIn}</td>
                     <td className="p-3">{card.quantitySold}</td>
@@ -120,6 +135,12 @@ const IncomingTable = ({
               </tr>
             </tbody>
           </table>
+            <button
+              onClick={() => exportToExcel(incomingCards, "incomingCards")}
+              className=" text-blue-700 underline hover:text-blue-500 px-4 py-2 rounded"
+            >
+              Excel export
+            </button>
         </div>
       )}
     </div>

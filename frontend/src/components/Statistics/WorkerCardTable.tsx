@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { exportToExcel } from "../../utilis/exportExcell";
 
 const WorkerCardTable = ({
   workerCards,
@@ -11,7 +12,7 @@ const WorkerCardTable = ({
     if (payment !== "warranty") return "hover:bg-gray-50 transition";
     switch (warrantyStatus) {
       case "none":
-        return "bg-red-600";
+        return "bg-red-600 ";
       case "send":
         return "bg-yellow-200";
       case "paid":
@@ -77,7 +78,7 @@ const WorkerCardTable = ({
                 return (
                   <tr
                     key={card.id}
-                    className={`border-b  ${warrantyStatusColor(card.paymentType, card.warrantyStatus)}`}
+                    className={`border-b   ${warrantyStatusColor(card.paymentType, card.warrantyStatus)}`}
                   >
                     <td className="p-3">{index + 1}</td>
                     <td className="p-3">
@@ -258,6 +259,12 @@ const WorkerCardTable = ({
               </tr>
             </tbody>
           </table>
+            <button
+              onClick={() => exportToExcel(workerCards, "workerCards")}
+              className="text-blue-700 underline hover:text-blue-500 px-4 py-2 rounded"
+            >
+              Excel export
+            </button>
         </div>
       )}
     </div>

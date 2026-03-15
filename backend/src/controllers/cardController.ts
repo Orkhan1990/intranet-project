@@ -640,10 +640,11 @@ export const filterCards = async (req: Request, res: Response) => {
     // 🔹 Filterlər
     if (filters.code) query = query.andWhere("cardPart.code = :code", { code: filters.code });
     if (filters.clientId) query = query.andWhere("client.id = :clientId", { clientId: filters.clientId });
-    if (filters.orderNumber) query = query.andWhere("card.id = :orderNumber", { orderNumber: filters.orderNumber });
+    if (filters.orderNumber) query = query.andWhere("order.id = :orderNumber", { orderNumber: filters.orderNumber });
     if (filters.market) query = query.andWhere("prixod.market = :market", { market: filters.market });
     if (filters.brandId) query = query.andWhere("brand.id = :brandId", { brandId: filters.brandId });
     if (filters.paymentType) query = query.andWhere("card.paymentType = :paymentType", { paymentType: filters.paymentType });
+    if (filters.paymentTypePrixod) query = query.andWhere("prixod.paymentType = :paymentTypePrixod", { paymentTypePrixod: filters.paymentTypePrixod });
     if (filters.cardNumber) query = query.andWhere("card.carNumber = :cardNumber", { cardNumber: filters.cardNumber });
     if (filters.supplierId) query = query.andWhere("supplier.id = :supplierId", { supplierId: filters.supplierId });
     if (filters.invoice) query = query.andWhere("prixod.invoice = :invoice", { invoice: filters.invoice });

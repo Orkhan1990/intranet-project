@@ -68,6 +68,7 @@ const initialState: FilterState = {
     market: "",
     brandId: "",
     paymentType: "",
+    paymentTypePrixod: "",
     cardNumber: "",
     supplierId: "",
     invoice: "",

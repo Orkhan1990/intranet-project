@@ -1,3 +1,6 @@
+import { Link } from "react-router-dom";
+import { exportToExcel } from "../../utilis/exportExcell";
+
 const ExpensesTable = ({
   expenseCards,
   loading,
@@ -5,6 +8,19 @@ const ExpensesTable = ({
   expenseCards: any[];
   loading: boolean;
 }) => {
+  const paymentFinder = (paymentType: string) => {
+    switch (paymentType) {
+      case "cash":
+        return "Nəğd";
+      case "card":
+        return "Kart";
+      case "transfer":
+        return "Köçürmə";
+      default:
+        return paymentType;
+    }
+  };
+
   return (
     <div>
       {loading && expenseCards?.length === 0 && (
@@ -21,7 +37,7 @@ const ExpensesTable = ({
         <div className="mt-10 overflow-x-auto rounded-lg shadow-md border border-gray-200">
           <table className="w-full text-sm text-left border-collapse">
             <thead>
-              <tr className="bg-gray-200 text-left">
+              <tr className="bg-[#FFF9E1] text-left">
                 <th className="p-3">#</th>
                 <th className="p-3">Kart Nömrəsi</th>
                 <th className="p-3">Kod</th>
@@ -41,16 +57,32 @@ const ExpensesTable = ({
             </thead>
             <tbody>
               {expenseCards?.map((card, index) => (
-                <tr key={index}>
+                <tr key={index} className=" odd:bg-white even:bg-gray-200">
                   <td className="p-3">{index + 1}</td>
-                  <td className="p-3">{card.cardNumber || "-"}</td>
+                  <td className="p-3 hover:text-blue-700">
+                    <Link
+                      className="hover:underline"
+                      to={`/updateCard/${card.cardNumber}`}
+                    >
+                      {card.cardNumber || "-"}
+                    </Link>
+                  </td>
                   <td className="p-3">{card.code || "-"}</td>
                   <td className="p-3">{card.name || "-"}</td>
                   <td className="p-3">{card.brand || "-"}</td>
                   <td className="p-3">{card.quantityIn || 0}</td>
                   <td className="p-3">{card.client || "-"}</td>
-                  <td className="p-3">{card.paymentType || "-"}</td>
-                  <td className="p-3">{card.orderNumber || "-"}</td>
+                  <td className="p-3">
+                    {paymentFinder(card.paymentType) || "-"}
+                  </td>
+                  <td className="p-3 hover:text-blue-700">
+                    <Link
+                      className="hover:underline"
+                      to={`/editOrder/${card.orderNumber}`}
+                    >
+                      {card.orderNumber || "-"}
+                    </Link>
+                  </td>
                   <td className="p-3">{card.supplier || "-"}</td>
                   <td className="p-3">
                     {Number(card.cost) % 1 === 0
@@ -58,16 +90,15 @@ const ExpensesTable = ({
                       : card.cost.toFixed(2)}
                   </td>
                   <td className="p-3">
-
                     <div className="flex gap-1">
                       <span>
-                           {Number(card.sellPrice) % 1 === 0
-                      ? Number(card.sellPrice)
-                      : card.sellPrice.toFixed(2)}
+                        {Number(card.sellPrice) % 1 === 0
+                          ? Number(card.sellPrice)
+                          : card.sellPrice.toFixed(2)}{" "}
+                        AZN
                       </span>
                       <span className="text-red-700 font-bold">{`(${-card.discount}%)`}</span>
                     </div>
-                 
                   </td>
                   <td className="p-3">
                     {(card.sellPrice - card.cost) % 1 === 0
@@ -75,9 +106,9 @@ const ExpensesTable = ({
                       : (card.sellPrice - card.cost).toFixed(2)}
                   </td>
                   <td className="p-3">
-                    {Number(card.sellPriceWithoutDiscount) % 1 === 0
-                      ? Number(card.sellPriceWithoutDiscount)
-                      : card.sellPriceWithoutDiscount.toFixed(2)}
+                    {Number(card.sellPrice) % 1 === 0
+                      ? Number(card.sellPrice)
+                      : card.sellPrice.toFixed(2)}
                   </td>
                   <td className="p-3">
                     {new Date(card.date).toLocaleDateString("en-GB", {
@@ -132,19 +163,25 @@ const ExpensesTable = ({
                     0,
                   )}
                 </td>
-                   <td className="p-3 font-bold">
+                <td className="p-3 font-bold">
                   {expenseCards?.reduce(
-                    (sum: number, card: any) => sum + card.sellPriceWithoutDiscount,
+                    (sum: number, card: any) => sum + card.sellPrice,
                     0,
                   )}
                 </td>
               </tr>
             </tbody>
           </table>
+            <button
+              onClick={() => exportToExcel(expenseCards, "expenses")}
+              className=" text-blue-700 underline hover:text-blue-500 px-4 py-2 rounded"
+            >
+              Excel export
+            </button>
         </div>
       )}
     </div>
-  );
+  )
 };
 
 export default ExpensesTable;
