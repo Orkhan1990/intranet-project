@@ -634,6 +634,7 @@ export const filterCards = async (req: Request, res: Response) => {
       .leftJoinAndSelect("sparePart.brand", "brand")
       .leftJoinAndSelect("sparePart.prixod", "prixod")
       .leftJoinAndSelect("prixod.supplier", "supplier")
+      .leftJoinAndSelect("prixod.order", "order")
       .leftJoinAndSelect("card.expenses", "expenses");
 
     // 🔹 Filterlər
@@ -668,7 +669,7 @@ export const filterCards = async (req: Request, res: Response) => {
         quantityIn: part.count,
         client: card.client?.companyName || "",
         paymentType: card.paymentType || "",
-        orderNumber: card.id,
+        orderNumber: part.sparePart?.prixod?.order?.id || "",
         supplier: part.sparePart?.prixod?.supplier?.supplier || "",
         cost: part.netPrice || 0,
         sellPrice: part.soldPrice || 0,
